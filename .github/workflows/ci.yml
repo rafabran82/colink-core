@@ -1,5 +1,6 @@
 ﻿name: CI
 on:
+  workflow_dispatch:
   push:
   pull_request:
   workflow_dispatch:
@@ -54,3 +55,4 @@ jobs:
               print("Expected a top-level name `app` in main.py", file=sys.stderr); sys.exit(1)
           print("Found top-level `app` symbol ✔")
           PY
+
