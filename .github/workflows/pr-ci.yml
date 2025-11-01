@@ -1,14 +1,36 @@
 ﻿name: PR CI
+
 on:
   pull_request:
+  pull_request_target:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test:
+    name: build-test
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      # Checkout for regular pull_request (runs in PR context)
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
+
+      # Checkout PR HEAD safely when triggered by pull_request_target
+      # (executes in base-repo context; keep steps non-privileged)
+      - name: Checkout PR head (pull_request_target)
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,6 +48,7 @@ jobs:
       - name: Run pytest (non-blocking)
         run: pytest -q || echo "No tests yet"
 
+      # 🔒 Safe sanity check: confirm `app` exists in main.py via AST (no exec/import)
       - name: Sanity: verify FastAPI app symbol exists (AST, no exec)
         run: |
           python - <<'PY'
@@ -33,12 +56,19 @@ jobs:
           p = pathlib.Path("main.py")
           if not p.exists():
               print("main.py not found", file=sys.stderr); sys.exit(1)
-          tree = ast.parse(p.read_text(encoding="utf-8"), filename="main.py")
-          ok = any(
-              isinstance(n, ast.Assign) and any(getattr(t, "id", None) == "app" for t in n.targets)
-              for n in ast.walk(tree)
-          )
-          if not ok:
+          try:
+              tree = ast.parse(p.read_text(encoding="utf-8"), filename="main.py")
+          except SyntaxError as e:
+              print(f"Syntax error in main.py: {e}", file=sys.stderr); sys.exit(1)
+          app_found = False
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Assign):
+                  for tgt in node.targets:
+                      if isinstance(tgt, ast.Name) and tgt.id == "app":
+                          app_found = True
+                          break
+              if app_found: break
+          if not app_found:
               print("Expected a top-level name `app` in main.py", file=sys.stderr); sys.exit(1)
           print("Found top-level `app` symbol ✔")
           PY
