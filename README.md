@@ -1,4 +1,6 @@
-﻿# COLINK Core — Paper Engine Quickstart
+﻿[![CI](https://github.com/rafabran82/colink-core/actions/workflows/ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/ci.yml)
+
+# COLINK Core — Paper Engine Quickstart
 
 ## Run (paper mode)
 1) Copy config:
@@ -49,3 +51,4 @@ Copy `.env.example` to `.env`. Defaults enable **paper mode**:
 - **400 preflight_failed** → check `/_debug/settings` for missing/invalid addrs or seed errors
 - **Invalid checksum** → seed malformed; use fresh testnet faucet seeds
 - **No bids/asks** → seed with `/seed-book`
+
