@@ -2,35 +2,17 @@
 
 on:
   pull_request:
-  pull_request_target:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: pr-ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-test:
-    name: build-test
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout for regular pull_request (runs in PR context)
-      - name: Checkout (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Checkout
         uses: actions/checkout@v4
-
-      # Checkout PR HEAD safely when triggered by pull_request_target
-      # (executes in base-repo context; keep steps non-privileged)
-      - name: Checkout PR head (pull_request_target)
-        if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -48,8 +30,8 @@ jobs:
       - name: Run pytest (non-blocking)
         run: pytest -q || echo "No tests yet"
 
-      # 🔒 Safe sanity check: confirm `app` exists in main.py via AST (no exec/import)
-      - name: Sanity: verify FastAPI app symbol exists (AST, no exec)
+      # Safe sanity check via AST (no exec)
+      - name: Sanity: verify FastAPI app symbol exists
         run: |
           python - <<'PY'
           import ast, sys, pathlib
