@@ -48,9 +48,9 @@ def _maker_sell_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
     res = create_offer(
         client=client,
         side="SELL_COL",
-        trader_seed=settings.TRADER_SEED,
-        issuer_addr=settings.ISSUER_ADDR,
-        currency=settings.COL_CODE,
+        trader_seed=settings.trader_seed,
+        issuer_addr=settings.issuer_addr,
+        currency=settings.col_code,
         iou_amt=str(iou_amt),
         xrp_amt=str(iou_amt * price_xrp_per_col),
     )
@@ -63,9 +63,9 @@ def _maker_buy_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
     res = create_offer(
         client=client,
         side="BUY_COL",
-        trader_seed=settings.TRADER_SEED,
-        issuer_addr=settings.ISSUER_ADDR,
-        currency=settings.COL_CODE,
+        trader_seed=settings.trader_seed,
+        issuer_addr=settings.issuer_addr,
+        currency=settings.col_code,
         iou_amt=str(iou_amt),
         xrp_amt=str(iou_amt * price_xrp_per_col),
     )
@@ -79,8 +79,8 @@ def seed_book(req: SeedBookReq):
     """
     Create a symmetric ladder around mid_price with `steps` levels (including mid).
     """
-    client = client_from(settings.RPC_URL)
-    tl = ensure_trustline(client, settings.TRADER_SEED, settings.ISSUER_ADDR, settings.COL_CODE, limit=str(10_000_000))
+    client = client_from(settings.rpc_url)
+    tl = ensure_trustline(client, settings.trader_seed, settings.issuer_addr, settings.col_code, limit=str(10_000_000))
     if not tl.get("ok"):
         raise HTTPException(status_code=400, detail={"action": "TRUSTLINE", **tl})
 
@@ -99,8 +99,8 @@ def seed_book(req: SeedBookReq):
 
 @router.post("/market-buy")
 def market_buy(req: MarketReq):
-    client = client_from(settings.RPC_URL)
-    ob = orderbook_snapshot(client, settings.ISSUER_ADDR, settings.COL_CODE, limit=req.limit)
+    client = client_from(settings.rpc_url)
+    ob = orderbook_snapshot(client, settings.issuer_addr, settings.col_code, limit=req.limit)
 
     asks: List[Dict[str, Any]] = ob.get("asks", [])
     if not asks:
@@ -133,8 +133,8 @@ def market_buy(req: MarketReq):
 
 @router.post("/market-sell")
 def market_sell(req: MarketReq):
-    client = client_from(settings.RPC_URL)
-    ob = orderbook_snapshot(client, settings.ISSUER_ADDR, settings.COL_CODE, limit=req.limit)
+    client = client_from(settings.rpc_url)
+    ob = orderbook_snapshot(client, settings.issuer_addr, settings.col_code, limit=req.limit)
 
     bids: List[Dict[str, Any]] = ob.get("bids", [])
     if not bids:
@@ -164,3 +164,4 @@ def market_sell(req: MarketReq):
     if to_sell > 0:
         return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_sell)}
     return {"status": "ok", "filled_entries": fills}
+
