@@ -7,3 +7,6 @@ python-dotenv==1.0.1
 httpx==0.24.1
 websockets==11.0.3
 xrpl-py==2.6.0
+
+ruff==0.6.8
+black==24.10.0
