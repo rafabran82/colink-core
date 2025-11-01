@@ -1,5 +1,13 @@
-﻿.venv/
+﻿# Python
 __pycache__/
 *.pyc
+.venv/
+
+# Env + local
 .env
-.DS_Store
+*.log
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/

@@ -1,6 +1,6 @@
 ﻿import json
 from decimal import Decimal
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet
@@ -10,34 +10,31 @@ from xrpl.models.currencies import XRP as XRPModel
 from xrpl.utils import xrp_to_drops
 from xrpl.transaction import autofill, sign, submit_and_wait
 
-# Try to import the reliable-submission exception; if not available in this xrpl-py version, define a stub
-try:
-    from xrpl.transaction.reliable_submission import XRPLReliableSubmissionException as _RSEx
-except Exception:  # pragma: no cover
-    class _RSEx(Exception):  # fallback
-        pass
-
 def sign_submit(tx, wallet: Wallet, client: JsonRpcClient):
     """
-    Autofill + sign + reliable submit. Never throws; returns dict with either:
-      { "ok": True,  "engine": <result dict> } on success
-      { "ok": False, "error": "...", "type": "ExceptionClass", "engine": <partial or None> } on error
+    Autofill + sign + reliable submit wrapper.
+    Returns {"ok": True, "engine": <result>} on success or
+            {"ok": False, "type": "...", "error": "...", "engine": <maybe>} on error.
     """
     try:
         filled = autofill(tx, client)
         signed = sign(filled, wallet)
         res = submit_and_wait(signed, client).result
         return {"ok": True, "engine": res}
-    except _RSEx as e:
-        payload = getattr(e, "result", None) if hasattr(e, "result") else None
-        return {"ok": False, "type": "_RSEx", "error": str(e), "engine": payload}
     except Exception as e:
-        return {"ok": False, "type": e.__class__.__name__, "error": str(e), "engine": None}
+        # Keep it generic to avoid import churn across xrpl-py versions
+        payload = None
+        try:
+            payload = getattr(e, "result", None)
+        except Exception:
+            pass
+        return {"ok": False, "type": e.__class__.__name__, "error": str(e), "engine": payload}
 
 def client_from(url: str) -> JsonRpcClient:
     return JsonRpcClient(url)
 
 def wallet_from_seed(seed: str) -> Wallet:
+    # NOTE: will raise if invalid; callers should handle and convert to 400s
     return Wallet.from_seed(seed)
 
 def addr_from_seed(seed: str) -> str:
@@ -70,7 +67,11 @@ def fetch_col_state(client: JsonRpcClient, trader_seed: str, issuer_addr: str, c
     }
 
 def ensure_trustline(client: JsonRpcClient, trader_seed: str, issuer_addr: str, currency: str, limit: str):
-    w = wallet_from_seed(trader_seed)
+    try:
+        w = wallet_from_seed(trader_seed)
+    except Exception as e:
+        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid trader seed: {e}", "engine": None}
+
     tx = TrustSet(
         account=w.classic_address,
         limit_amount={"currency": currency, "issuer": issuer_addr, "value": str(limit)},
@@ -78,7 +79,11 @@ def ensure_trustline(client: JsonRpcClient, trader_seed: str, issuer_addr: str, 
     return sign_submit(tx, w, client)
 
 def iou_payment(client: JsonRpcClient, issuer_seed: str, dest: str, currency: str, amount: str):
-    w = wallet_from_seed(issuer_seed)
+    try:
+        w = wallet_from_seed(issuer_seed)
+    except Exception as e:
+        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid issuer seed: {e}", "engine": None}
+
     tx = Payment(
         account=w.classic_address,
         destination=dest,
@@ -88,16 +93,18 @@ def iou_payment(client: JsonRpcClient, issuer_seed: str, dest: str, currency: st
 
 def create_offer(client: JsonRpcClient, side: str, trader_seed: str, issuer_addr: str, currency: str, iou_amt: str, xrp_amt: str):
     """
-    SELL_COL (sell COL for XRP): Maker offers COL, wants XRP
-        -> taker_pays = COL, taker_gets = XRP
-    BUY_COL  (buy COL with XRP): Maker offers XRP, wants COL
-        -> taker_pays = XRP, taker_gets = COL
+    SELL_COL: taker_pays = COL, taker_gets = XRP(drops)
+    BUY_COL : taker_pays = XRP(drops), taker_gets = COL
     """
-    w = wallet_from_seed(trader_seed)
+    try:
+        w = wallet_from_seed(trader_seed)
+    except Exception as e:
+        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid trader seed: {e}", "engine": None}
+
     if side == "SELL_COL":
         taker_pays = {"currency": currency, "issuer": issuer_addr, "value": str(Decimal(iou_amt))}
         taker_gets = str(xrp_to_drops(float(xrp_amt)))
-    else:  # BUY_COL
+    else:
         taker_pays = str(xrp_to_drops(float(xrp_amt)))
         taker_gets = {"currency": currency, "issuer": issuer_addr, "value": str(Decimal(iou_amt))}
 
@@ -119,16 +126,14 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
       - bids: makers BUYING COL (taker pays XRP, gets COL)
       - asks: makers SELLING COL (taker pays COL, gets XRP)
     """
-    base = {"currency": currency, "issuer": issuer_addr}   # IOU side (COL)
-    xrp  = XRPModel()                                      # XRP currency object
+    base = {"currency": currency, "issuer": issuer_addr}
+    xrp = XRPModel()
     neutral_taker = "rrrrrrrrrrrrrrrrrrrrBZbvji"
 
-    # BIDS (makers buying COL): taker PAYS XRP, GETS COL
     bids = client.request(
         req.BookOffers(taker=neutral_taker, taker_pays=xrp, taker_gets=base, limit=limit)
     ).result.get("offers", [])
 
-    # ASKS (makers selling COL): taker PAYS COL, GETS XRP
     asks = client.request(
         req.BookOffers(taker=neutral_taker, taker_pays=base, taker_gets=xrp, limit=limit)
     ).result.get("offers", [])
