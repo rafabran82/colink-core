@@ -52,3 +52,5 @@ Copy `.env.example` to `.env`. Defaults enable **paper mode**:
 - **Invalid checksum** → seed malformed; use fresh testnet faucet seeds
 - **No bids/asks** → seed with `/seed-book`
 
+
+
