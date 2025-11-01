@@ -1,7 +1,11 @@
 ﻿name: PR CI
+
 on:
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-test:
@@ -26,19 +30,27 @@ jobs:
       - name: Run pytest (non-blocking)
         run: pytest -q || echo "No tests yet"
 
-      - name: Sanity: verify FastAPI app symbol exists (AST, no exec)
+      # Safe sanity check via AST (no exec)
+      - name: Sanity: verify FastAPI app symbol exists
         run: |
           python - <<'PY'
           import ast, sys, pathlib
           p = pathlib.Path("main.py")
           if not p.exists():
               print("main.py not found", file=sys.stderr); sys.exit(1)
-          tree = ast.parse(p.read_text(encoding="utf-8"), filename="main.py")
-          ok = any(
-              isinstance(n, ast.Assign) and any(getattr(t, "id", None) == "app" for t in n.targets)
-              for n in ast.walk(tree)
-          )
-          if not ok:
+          try:
+              tree = ast.parse(p.read_text(encoding="utf-8"), filename="main.py")
+          except SyntaxError as e:
+              print(f"Syntax error in main.py: {e}", file=sys.stderr); sys.exit(1)
+          app_found = False
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Assign):
+                  for tgt in node.targets:
+                      if isinstance(tgt, ast.Name) and tgt.id == "app":
+                          app_found = True
+                          break
+              if app_found: break
+          if not app_found:
               print("Expected a top-level name `app` in main.py", file=sys.stderr); sys.exit(1)
           print("Found top-level `app` symbol ✔")
           PY
