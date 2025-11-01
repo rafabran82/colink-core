@@ -1,4 +1,4 @@
-﻿name: PR CI
+﻿name: PR CI (v2)
 on:
   workflow_dispatch:
   pull_request:
@@ -48,3 +48,4 @@ jobs:
               print("Expected a top-level name \pp\ in main.py", file=sys.stderr); sys.exit(1)
           print("Found top-level \pp\ symbol ✔")
           PY
+
