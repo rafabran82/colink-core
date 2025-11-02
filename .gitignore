@@ -13,3 +13,5 @@ __pycache__/
 htmlcov/
 
 colink_core/sim/out/
+
+copx_sim/
