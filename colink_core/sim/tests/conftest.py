@@ -1,5 +1,7 @@
-﻿import math
+﻿import sys, pathlib
 
-def approx(a, b, rel=1e-9, abs=1e-12):
-    return math.isclose(a, b, rel_tol=rel, abs_tol=abs)
-
+# tests/ -> sim/ -> colink_core/ -> <repo root>
+ROOT = pathlib.Path(__file__).resolve().parents[3]
+root_str = str(ROOT)
+if root_str not in sys.path:
+    sys.path.insert(0, root_str)
