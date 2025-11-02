@@ -1,4 +1,4 @@
-﻿from limits import TradeLimiter, LimitConfig
+﻿from colink_core.sim.limits import TradeLimiter, LimitConfig
 
 def test_limiter_size_and_dev_caps_and_breaker():
     cfg = LimitConfig(max_col_in=25_000.0, max_dev_bps=2_000.0, strikes_window=2, cooldown_trades=3)
@@ -25,4 +25,5 @@ def test_limiter_size_and_dev_caps_and_breaker():
     # first request after auto-reset tells caller to re-quote
     ok, reason = lim.check_and_record(10_000.0, 100.0)
     assert not ok and "auto_reset" in reason
+
 
