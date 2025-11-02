@@ -11,3 +11,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+
+colink_core/sim/out/
+
+copx_sim/
