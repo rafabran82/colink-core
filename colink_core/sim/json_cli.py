@@ -1,14 +1,19 @@
-﻿import argparse, json, re, subprocess, sys
+import argparse
+import json
+import re
+import subprocess
+import sys
 
-def _num(s: str) -> float:
+def run(args):
+    """
+    Run `python -m <args>` and return stdout as text.
+    """
+    cmd = [sys.executable, "-m"] + list(args)
+    out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    return out.decode("utf-8", errors="replace")
+
+def _num(s):
     return float(s.replace(",", ""))
-
-def run(cmd):
-    full = [sys.executable, "-m"] + cmd
-    p = subprocess.run(full, capture_output=True, text=True)
-    if p.returncode != 0:
-        raise SystemExit(p.stderr.strip() or p.stdout.strip() or f"Command failed: {full}")
-    return p.stdout
 
 def quote_json(col_in, min_out_bps=None, twap_guard=False):
     cmd = ["colink_core.sim", "quote", "--col-in", str(col_in)]
@@ -19,12 +24,21 @@ def quote_json(col_in, min_out_bps=None, twap_guard=False):
 
     out = run(cmd)
 
-    m1 = re.search(r"Quote:\s*([\d,\.]+)\s*COL\s*->\s*([\d,\.]+)\s*COPX\s*\|\s*eff=([\d,\.]+)", out)
-    if not m1:
-        raise SystemExit("Could not parse quote line:\n" + out)
-    col_in_val = _num(m1.group(1))
-    copx_out   = _num(m1.group(2))
-    eff_rate   = _num(m1.group(3))
+    # Example lines:
+    # Quote: 8,000.000000 COL -> 920,685.291906 COPX  | eff=115.085661 COPX/COL
+    #   Min-out @150.0 bps: 906,875.012527 COPX
+    #   TWAP guard: dev=793.1 bps  budget=1043.1 bps  => OK
+
+    m = re.search(
+        r"Quote:\s*([\d,\.]+)\s*COL\s*[-\u2192>]+\s*([\d,\.]+)\s*COPX\s*\|\s*eff=([\d,\.]+)",
+        out
+    )
+    if not m:
+        raise SystemExit("Could not parse quote output:\n" + out)
+
+    col_in_val = _num(m.group(1))
+    copx_out   = _num(m.group(2))
+    eff_rate   = _num(m.group(3))
 
     min_bps = None
     min_out = None
@@ -52,19 +66,26 @@ def quote_json(col_in, min_out_bps=None, twap_guard=False):
         "raw": out.strip()
     }
 
-def sweep_json(outdir=None):\n    cmd = ["colink_core.sim", "sweep"]\n    if outdir:\n        cmd += ["--outdir", outdir]\n    out = run(cmd)\n    # Normalize any arrows to ASCII\n    norm = out.replace(\"\\u2192\", \"->\").replace(\"→\", \"->\")\n
+def sweep_json(outdir=None):
+    cmd = ["colink_core.sim", "sweep"]
+    if outdir:
+        cmd += ["--outdir", outdir]
+    out = run(cmd)
 
-    # Saved CSV / charts (supports both 'â†’' and the unicode escape)
-    csv = re.search(r"Saved CSV\s*->\s*(.+)", norm)
+    # Normalize arrows to ASCII so parsing is stable across consoles
+    norm = out.replace("\u2192", "->").replace("→", "->")
+
+    csv_m = re.search(r"Saved CSV\s*->\s*(.+)", norm)
     charts = []
-    for line in norm.splitlines():\n        m = re.search(r"Saved chart\s*->\s*(.+)", line)
+    for line in norm.splitlines():
+        m = re.search(r"Saved chart\s*->\s*(.+)", line)
         if m:
             charts.append(m.group(1).strip())
 
     return {
-        "csv": csv.group(1).strip() if csv else None,
+        "csv": csv_m.group(1).strip() if csv_m else None,
         "charts": charts,
-        "raw": out.strip()
+        "raw": norm.strip()
     }
 
 def main():
@@ -91,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
