@@ -1,4 +1,4 @@
-# colink_core/sim — COPX AMM Router + Guards
+﻿# colink_core/sim â€” COPX AMM Router + Guards
 
 This module simulates a two-hop route COL -> XRP -> COPX on a constant-product AMM,
 with LP shares & fee splits, a min-out slippage guard, a size-aware TWAP guard,
