@@ -52,17 +52,12 @@ def quote_json(col_in, min_out_bps=None, twap_guard=False):
         "raw": out.strip()
     }
 
-def sweep_json(outdir=None):
-    cmd = ["colink_core.sim", "sweep"]
-    if outdir:
-        cmd += ["--outdir", outdir]
-    out = run(cmd)
+def sweep_json(outdir=None):\n    cmd = ["colink_core.sim", "sweep"]\n    if outdir:\n        cmd += ["--outdir", outdir]\n    out = run(cmd)\n    # Normalize any arrows to ASCII\n    norm = out.replace(\"\\u2192\", \"->\").replace(\"→\", \"->\")\n
 
     # Saved CSV / charts (supports both 'â†’' and the unicode escape)
-    csv = re.search(r"Saved CSV\s*(?:\u2192|â†’)\s*(.+)", out)
+    csv = re.search(r"Saved CSV\s*->\s*(.+)", norm)
     charts = []
-    for line in out.splitlines():
-        m = re.search(r"Saved chart\s*(?:\u2192|â†’)\s*(.+)", line)
+    for line in norm.splitlines():\n        m = re.search(r"Saved chart\s*->\s*(.+)", line)
         if m:
             charts.append(m.group(1).strip())
 
@@ -96,3 +91,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
