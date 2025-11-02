@@ -1,6 +1,6 @@
-﻿from amm import PoolState
-from twap import TWAPOracle
-from price_utils import route_mid_price_copx_per_col, bps_deviation
+﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.twap import TWAPOracle
+from colink_core.sim.price_utils import route_mid_price_copx_per_col, bps_deviation
 
 def seed():
     pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)
@@ -20,3 +20,4 @@ def test_bps_deviation_zero_when_equal():
 def test_bps_deviation_positive_when_below_twap():
     dev = bps_deviation(95.0, 100.0)
     assert 499.0 < dev < 501.0  # ~500 bps
+

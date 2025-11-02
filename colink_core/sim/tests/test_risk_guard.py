@@ -1,8 +1,8 @@
-﻿from amm import PoolState
-from router import quote_col_to_copx
-from twap import TWAPOracle
-from price_utils import route_mid_price_copx_per_col
-from risk_guard import quote_with_slippage, size_aware_twap_guard
+﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.router import quote_col_to_copx
+from colink_core.sim.twap import TWAPOracle
+from colink_core.sim.price_utils import route_mid_price_copx_per_col
+from colink_core.sim.risk_guard import quote_with_slippage, size_aware_twap_guard
 
 def seed():
     pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)
@@ -27,3 +27,4 @@ def test_size_aware_twap_guard_blocks_large_deviation():
     ok, dev_bps, budget_bps = size_aware_twap_guard(a, b, tw, 25_000.0, base_guard_bps=100.0, cushion_bps=150.0, cap_bps=2_000.0)
     assert not ok
     assert dev_bps > budget_bps
+

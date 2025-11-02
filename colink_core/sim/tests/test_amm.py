@@ -1,4 +1,4 @@
-﻿from amm import PoolState
+﻿from colink_core.sim.amm import PoolState
 
 def seed(fee_bps=30):
     # 1 XRP : 2500 COPX pool
@@ -40,3 +40,4 @@ def test_price_monotonicity_basic():
     p.swap_x_for_y(100.0)
     price1 = p.y_reserve / p.x_reserve
     assert price1 < price0  # buying Y with X pushes price down (more X, less Y)
+
