@@ -1,9 +1,14 @@
-﻿[tool.black]
-line-length = 100
-target-version = ["py311"]
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-select = ["E","F","I","UP","B"]
-ignore = ["E203"]  # compatible with Black
+[project]
+name = "colink-core"
+version = "0.2.0"
+description = "COLINK core simulation and CLI"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["colink_core/sim"]
