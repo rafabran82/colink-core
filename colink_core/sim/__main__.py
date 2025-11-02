@@ -100,7 +100,7 @@ def cmd_sweep(args: argparse.Namespace) -> int:
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=rows[0].keys())
         w.writeheader(); w.writerows(rows)
-    print(f"Saved CSV → {csv_path}")
+    print(f"Saved CSV -> {csv_path}")
 
     # Optional charts
     try:
@@ -118,7 +118,7 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.title("Price vs Size"); plt.grid(True, alpha=0.3); plt.legend()
         p1 = outdir / f"sweep_price_vs_size_{stamp}.png"
         plt.tight_layout(); plt.savefig(p1); plt.close()
-        print(f"Saved chart → {p1}")
+        print(f"Saved chart -> {p1}")
 
         devs   = [r["dev_bps"] for r in rows]
         models = [r["modeled_bps"] for r in rows]
@@ -132,7 +132,7 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.title("Deviation & Budget vs Size"); plt.grid(True, alpha=0.3); plt.legend()
         p2 = outdir / f"sweep_devbps_vs_size_{stamp}.png"
         plt.tight_layout(); plt.savefig(p2); plt.close()
-        print(f"Saved chart → {p2}")
+        print(f"Saved chart -> {p2}")
     except Exception as e:
         print("Plotting skipped:", e)
 
@@ -170,4 +170,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

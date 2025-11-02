@@ -1,4 +1,4 @@
-import argparse, json, re, subprocess, sys
+﻿import argparse, json, re, subprocess, sys
 
 def _num(s: str) -> float:
     return float(s.replace(",", ""))
@@ -58,11 +58,11 @@ def sweep_json(outdir=None):
         cmd += ["--outdir", outdir]
     out = run(cmd)
 
-    # Saved CSV / charts (supports both '→' and the unicode escape)
-    csv = re.search(r"Saved CSV\s*(?:\u2192|→)\s*(.+)", out)
+    # Saved CSV / charts (supports both 'â†’' and the unicode escape)
+    csv = re.search(r"Saved CSV\s*(?:\u2192|â†’)\s*(.+)", out)
     charts = []
     for line in out.splitlines():
-        m = re.search(r"Saved chart\s*(?:\u2192|→)\s*(.+)", line)
+        m = re.search(r"Saved chart\s*(?:\u2192|â†’)\s*(.+)", line)
         if m:
             charts.append(m.group(1).strip())
 
