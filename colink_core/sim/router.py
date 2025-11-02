@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from copy import deepcopy
 from typing import Tuple
 
-from amm import PoolState
+from .amm import PoolState
 
 @dataclass
 class RouteResult:
@@ -59,3 +59,4 @@ def exec_copx_to_col(pool_col_x: PoolState, pool_x_copx: PoolState, copx_in: flo
     col_out, _ = pool_col_x.swap_x_for_y(xrp_out)
     eff_price = col_out / copx_in if copx_in > 0 else 0.0
     return RouteResult(copx_in, col_out, eff_price, xrp_out, col_out)
+

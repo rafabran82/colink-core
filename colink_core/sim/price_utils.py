@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from amm import PoolState
+from .amm import PoolState
 
 # ----- Mid-price helpers -----
 def mid_route_price_col_to_copx(pool_col_x: PoolState, pool_x_copx: PoolState) -> float:
@@ -40,10 +40,11 @@ def modeled_bps_impact_for_size(pool_col_x: PoolState, pool_x_copx: PoolState, c
         return 0.0
 
     # Use the router's non-mutating quote
-    from router import quote_col_to_copx
+    from .router import quote_col_to_copx
     q = quote_col_to_copx(pool_col_x, pool_x_copx, col_in)
     eff = q.effective_price  # COPX per COL
 
     # Impact as bps below mid (never negative)
     impact_frac = max(0.0, (mid - eff) / mid)
     return impact_frac * 1e4  # → bps
+
