@@ -1,4 +1,4 @@
-﻿import os, json, time, requests
+﻿import os, json, time, requests, math
 from decimal import Decimal, ROUND_UP
 from dotenv import load_dotenv
 from xrpl.clients import JsonRpcClient
@@ -6,7 +6,7 @@ from xrpl.wallet import Wallet
 from xrpl.transaction import autofill, sign, submit_and_wait
 from xrpl.models.transactions import TrustSet, OfferCreate
 from xrpl.models.amounts import IssuedCurrencyAmount
-from xrpl.models.requests import AccountInfo, AccountLines, BookOffers
+from xrpl.models.requests import AccountInfo, AccountLines, BookOffers, ServerState
 
 load_dotenv(".env.testnet")
 RPC     = os.getenv("XRPL_RPC","https://s.altnet.rippletest.net:51234")
@@ -14,8 +14,9 @@ ISSUER  = os.getenv("XRPL_ISSUER_ADDRESS")
 CODE    = os.getenv("COPX_CODE","COPX")
 
 BUY_QTY = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX","250"))  # COPX to buy
-SLIP    = Decimal(os.getenv("TAKER_SLIPPAGE","0.02"))         # e.g. 0.02 = 2%
+SLIP    = Decimal(os.getenv("TAKER_SLIPPAGE","0.02"))         # 0.02 = 2%
 CUSH_D  = int(os.getenv("CAP_CUSHION_DROPS","20"))            # extra drops for rounding dust
+FEE_D   = 10                                                  # default fee estimate in drops (adjust if needed)
 
 client = JsonRpcClient(RPC)
 
@@ -46,7 +47,7 @@ def wait_seq(addr, timeout=10):
         time.sleep(0.8)
     raise TimeoutError("AccountInfo not ready")
 
-def wait_trustline(addr, timeout=15):
+def wait_trustline(addr, timeout=20):
     t0=time.time()
     while time.time()-t0<timeout:
         res = client.request(AccountLines(account=addr, ledger_index="validated")).result
@@ -56,14 +57,30 @@ def wait_trustline(addr, timeout=15):
         time.sleep(0.8)
     return None
 
+def get_reserves():
+    ss = client.request(ServerState()).result
+    st = ((ss or {}).get("state") or {})
+    vl = st.get("validated_ledger") or {}
+    base = int(vl.get("reserve_base", 10000000))   # fallback 10 XRP in drops
+    inc  = int(vl.get("reserve_inc", 2000000))     # fallback 2 XRP in drops
+    return base, inc
+
+def spendable_drops(addr):
+    ad = client.request(AccountInfo(account=addr, ledger_index="validated", strict=True)).result["account_data"]
+    bal = int(ad["Balance"])
+    owner_count = int(ad.get("OwnerCount", 0))
+    base, inc = get_reserves()
+    needed = base + owner_count * inc
+    spend = bal - needed
+    return max(spend, 0), {"balance":bal, "owner_count":owner_count, "reserve_base":base, "reserve_inc":inc, "needed":needed}
+
 def _get(obj, *names):
     for n in names:
         if n in obj: return obj[n]
     return None
 
 def _drops_from_amount(x):
-    # XRP either "12345" (drops) or {"currency":"XRP","value":"1.2345"}
-    if isinstance(x, str):
+    if isinstance(x, str):  # already drops
         return int(x)
     if isinstance(x, dict) and x.get("currency")=="XRP" and "value" in x:
         return int(Decimal(str(x["value"])) * Decimal(1_000_000))
@@ -75,7 +92,7 @@ def _iou_value(x):
     return None
 
 def top_ask():
-    # Book: maker pays COPX (IOU), maker gets XRP — that’s the ASK book we want to take
+    # maker pays IOU (COPX), maker gets XRP => ASK book
     r = client.request(BookOffers(
         taker_gets={"currency":"XRP"},
         taker_pays={"currency":CUR, "issuer":ISSUER},
@@ -107,41 +124,65 @@ def main():
     taker = Wallet.from_seed(seed)
     wait_seq(addr)
 
-    # 1) Trustline to receive COPX
+    # 1) Trustline (so we can receive COPX)
     ts = TrustSet(
         account=addr,
         limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
     )
     tsr = submit_tx(ts, taker)
     print("TrustSet result:", tsr.get("engine_result"))
-    ln = wait_trustline(addr, timeout=15)
+    ln = wait_trustline(addr, timeout=20)
     if not ln:
         raise SystemExit("Trustline not established yet; stopping to avoid failed fill.")
-    # print(json.dumps(ln, indent=2))
 
-    # 2) Snapshot top ask and compute cap
+    # 2) Top ask + compute target cap
     best = top_ask()
     if not best:
         print("No well-formed asks in the book; aborting.")
         return
     px, size = best
-    eff_px   = px * (Decimal(1)+SLIP)               # pay up to this price
-    cap_xrp  = BUY_QTY * eff_px
-    cap_drops= round_drops(cap_xrp)
-    print(f"Top ask ~ {px:.6f} XRP/COPX; paying up to {eff_px:.6f} for {BUY_QTY} -> cap {cap_xrp:.6f} XRP ({cap_drops} drops)")
+    eff_px   = px * (Decimal(1)+SLIP)  # worst price we accept
+    target_cap_xrp  = BUY_QTY * eff_px
+    target_cap_drops= round_drops(target_cap_xrp)
 
-    # 3) Correct BUY side:
-    #    we PAY XRP (drops) and we GET COPX (IOU)
+    # 3) Reserves-aware spendable guard
+    spend, info = spendable_drops(addr)
+    print(f"Spendable drops: {spend} (balance={info['balance']}, owner_count={info['owner_count']}, "
+          f"reserve_base={info['reserve_base']}, reserve_inc={info['reserve_inc']})")
+
+    max_drops_for_tx = max(spend - FEE_D, 0)  # leave room for fee
+    if target_cap_drops > max_drops_for_tx:
+        # clip BUY_QTY down to what fits the spendable cap
+        # max_qty ≈ (max_drops_for_tx - cushion) / 1e6 / eff_px
+        usable_drops = max(max_drops_for_tx - CUSH_D, 0)
+        max_qty = (Decimal(usable_drops) / Decimal(1_000_000)) / eff_px
+        if max_qty <= 0:
+            print(f"Insufficient spendable XRP for any fill (need >{FEE_D+CUSH_D} drops). Aborting.")
+            return
+        # round down to, say, 6 decimals to avoid value-too-precise issues
+        new_qty = max_qty.quantize(Decimal("0.000001"), rounding=ROUND_UP)  # small bias up, cap will still enforce limit
+        print(f"Clipping buy size: requested {BUY_QTY} → {new_qty} COPX to respect spendable cap.")
+        qty = new_qty
+        cap_drops = min(usable_drops, round_drops(new_qty * eff_px))
+    else:
+        qty = BUY_QTY
+        cap_drops = target_cap_drops
+
+    print(f"Top ask ~ {px:.6f} XRP/COPX; paying up to {eff_px:.6f} for {qty} -> cap {(Decimal(cap_drops)/Decimal(1_000_000)):.6f} XRP ({cap_drops} drops)")
+
+    # 4) BUY: pay XRP (taker_pays), get COPX (taker_gets), IOC
     tx = OfferCreate(
         account    = addr,
-        taker_pays = str(cap_drops),  # <-- XRP we are willing to pay (max)
-        taker_gets = IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(BUY_QTY)),  # <-- COPX we want
+        taker_pays = str(cap_drops),  # XRP drops we are willing to pay (max)
+        taker_gets = IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(qty)),
         flags      = 0x00020000  # tfImmediateOrCancel
     )
     res = submit_tx(tx, taker)
     print("IOC result:", json.dumps(res, indent=2))
-    if res.get("engine_result") == "tecKILLED":
-        print("Note: tecKILLED = no match at/under your cap in that ledger. Increase slippage/cap slightly and retry.")
+
+    er = res.get("engine_result")
+    if er in ("tecUNFUNDED_OFFER","tecKILLED"):
+        print("Hint: If still unfunded or killed, increase spendable (fund more XRP), or increase slippage/cap slightly, or reduce qty.")
 
 if __name__ == "__main__":
     main()
