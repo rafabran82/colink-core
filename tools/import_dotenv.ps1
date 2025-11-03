@@ -1,15 +1,13 @@
 ﻿param(
   [Parameter(Position=0)][string]$Path = ".env.testnet",
-  [switch]$PersistUser,   # also set into User env (optional)
+  [switch]$PersistUser,
   [switch]$Quiet
 )
 
 function Import-Dotenv {
   param([string]$Path, [switch]$PersistUser, [switch]$Quiet)
 
-  if (-not (Test-Path -LiteralPath $Path)) {
-    throw "Dotenv file not found: $Path"
-  }
+  if (-not (Test-Path -LiteralPath $Path)) { throw "Dotenv file not found: $Path" }
 
   $setCount = 0
   Get-Content -LiteralPath $Path | ForEach-Object {
@@ -22,11 +20,8 @@ function Import-Dotenv {
     if (($v.StartsWith('"') -and $v.EndsWith('"')) -or ($v.StartsWith("'") -and $v.EndsWith("'"))) {
       $v = $v.Substring(1, $v.Length-2)
     }
-    # Process env for this PowerShell session
     Set-Item -Path ("Env:{0}" -f $k) -Value $v
-    if ($PersistUser) {
-      [Environment]::SetEnvironmentVariable($k, $v, "User")
-    }
+    if ($PersistUser) { [Environment]::SetEnvironmentVariable($k, $v, "User") }
     $setCount++
     if (-not $Quiet) { Write-Host "set $k" -ForegroundColor DarkGray }
   }
