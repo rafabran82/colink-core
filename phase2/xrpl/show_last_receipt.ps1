@@ -108,3 +108,4 @@ Write-Host "Latest receipt:`n$($chosen.FullName)`n" -ForegroundColor Cyan
   taker_delta_drops = $takerDx
   est_gross_drops   = $gross
 } | Format-List
+
