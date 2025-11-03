@@ -13,7 +13,7 @@ from xrpl.utils import xrp_to_drops
 load_dotenv(".env.testnet")
 
 RPC        = os.getenv("XRPL_RPC", "https://s.altnet.rippletest.net:51234")
-client     = JsonRpcClient(RPC)  # NOTE: no timeout kwarg for this xrpl-py version
+client     = JsonRpcClient(RPC)
 ISSUER     = os.getenv("XRPL_ISSUER_ADDRESS")
 CODE       = os.getenv("COPX_CODE", "COPX")
 TARGET_Q   = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX", "1000"))
@@ -22,17 +22,14 @@ LEDGER_PAUSE = float(os.getenv("LEDGER_SLEEP", "3.0"))
 MAX_RETRIES  = int(os.getenv("SUBMIT_RETRIES", "1"))
 
 def to160(code:str)->str:
-    if len(code) <= 3:
-        return code
+    if len(code) <= 3: return code
     b = code.encode("ascii")
-    if len(b) > 20:
-        raise ValueError("currency code >20 bytes")
+    if len(b) > 20: raise ValueError("currency code >20 bytes")
     return b.hex().upper().ljust(40, "0")
 
 CUR = to160(CODE)
 
 def faucet_new_account():
-    # Simple faucet call; if this flakes, caller can re-run the script.
     r = requests.post("https://faucet.altnet.rippletest.net/accounts", json={}, timeout=20)
     r.raise_for_status()
     p = r.json()
@@ -48,7 +45,7 @@ def wait_trustline(addr, currency_hex, issuer, timeout_s=25):
     while time.time() - t0 < timeout_s:
         res = client.request(AccountLines(account=addr, ledger_index="validated")).result
         for line in res.get("lines", []):
-            if line["currency"] == currency_hex and line["account"] == issuer:
+            if line.get("currency") == currency_hex and line.get("account") == issuer:
                 return True
         time.sleep(1.0)
     return False
@@ -60,6 +57,21 @@ def fetch_asks():
     )).result
     return res.get("offers", [])
 
+def _get_amount_value(amt):
+    """
+    Normalize rippled Amount shapes:
+    - IOU dict => Decimal(value)
+    - XRP string (drops) => Decimal(drops)
+    """
+    if isinstance(amt, dict):
+        # IOU
+        return Decimal(str(amt.get("value", "0")))
+    # XRP in drops as string
+    return Decimal(str(amt))
+
+def _get_key(o, lower_key, upper_key):
+    return o.get(lower_key) if lower_key in o else o.get(upper_key)
+
 def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: Decimal):
     cap_px = (q_best * (Decimal(1) + slippage)).quantize(Decimal("0.0000001"), rounding=ROUND_UP)
     offers = fetch_asks()
@@ -69,13 +81,30 @@ def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: D
     total_copx = Decimal(0)
     total_xrp_drops  = Decimal(0)
 
-    for o in offers:
+    for idx, o in enumerate(offers):
+        # tolerate key casing
+        pays = _get_key(o, "taker_pays", "TakerPays")   # COPX (IOU)
+        gets = _get_key(o, "taker_gets", "TakerGets")   # XRP (drops)
+        if pays is None or gets is None or "quality" not in o:
+            # malformed row; skip
+            continue
+
         px = Decimal(str(o["quality"]))  # XRP/COPX
         if px > cap_px:
             break
-        # maker PAYS COPX, GETS XRP on the book we can take
-        maker_copx = Decimal(str(o["taker_pays"]["value"]))
-        maker_xrp_drops = Decimal(str(o["taker_gets"]))  # drops
+
+        # maker PAYS = COPX quantity (IOU)
+        try:
+            maker_copx = _get_amount_value(pays)  # IOU .value
+            maker_xrp_drops = _get_amount_value(gets)  # XRP drops
+        except Exception:
+            # unexpected shape; skip this row
+            continue
+
+        # sanity: IOU should be >= 0; XRP drops >= 0
+        if maker_copx <= 0 or maker_xrp_drops <= 0:
+            continue
+
         drops_per_copx = (px * Decimal(1_000_000)).quantize(Decimal("1."), rounding=ROUND_UP)
 
         remaining = target_qty_copx - total_copx
@@ -85,6 +114,7 @@ def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: D
         take_copx = maker_copx if maker_copx <= remaining else remaining
         need_drops = (take_copx * drops_per_copx)
 
+        # Guard against rounding beyond maker's available XRP drops on this level
         if need_drops > maker_xrp_drops:
             take_copx = (maker_xrp_drops / drops_per_copx).quantize(Decimal("0.0000001"), rounding=ROUND_UP)
             if take_copx <= 0:
@@ -101,10 +131,6 @@ def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: D
     return total_copx, cap_drops, cap_px
 
 def submit(tx, w, retries=MAX_RETRIES):
-    """
-    Try submit_and_wait; on cancellations/timeouts, fall back to submit-only,
-    then let the caller verify effects (e.g., trustline or balance change).
-    """
     last_err = None
     stx = sign(autofill(tx, client), w)
     for _ in range(retries + 1):
@@ -113,7 +139,6 @@ def submit(tx, w, retries=MAX_RETRIES):
         except Exception as e:
             last_err = e
             time.sleep(LEDGER_PAUSE)
-    # Fire-and-forget fallback
     try:
         res = submit_only(stx, client)
         return getattr(res, "result", res)
@@ -125,7 +150,6 @@ def main():
     print("Taker:", addr)
     taker = Wallet.from_seed(seed)
 
-    # 1) Trustline (submit with fallback; then poll to confirm)
     ts = TrustSet(
         account=addr,
         limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
@@ -135,7 +159,6 @@ def main():
     if not wait_trustline(addr, CUR, ISSUER, 25):
         raise SystemExit("Trustline not found yet; stopping to avoid PATH/UNFUNDED issues.")
 
-    # 2) Read best ask and compute executable size under cap
     asks = fetch_asks()
     if not asks:
         print("No asks on book; nothing to take.")
@@ -150,7 +173,6 @@ def main():
         print("No executable quantity under cap; skipping IOC BUY.")
         return
 
-    # 3) IOC BUY only the executable amount (rounded-up drops cap)
     bid = OfferCreate(
         account=addr,
         taker_gets=cap_drops,  # XRP in drops (rounded up)
