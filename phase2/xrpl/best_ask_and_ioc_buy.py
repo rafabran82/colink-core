@@ -11,13 +11,13 @@ from xrpl.models.requests import AccountLines, BookOffers
 from xrpl.utils import xrp_to_drops
 
 load_dotenv(".env.testnet")
-RPC       = os.getenv("XRPL_RPC", "https://s.altnet.rippletest.net:51234")
-# A larger client timeout helps when the testnet is laggy.
-client    = JsonRpcClient(RPC, timeout=30) if hasattr(JsonRpcClient, "__init__") else JsonRpcClient(RPC)
-ISSUER    = os.getenv("XRPL_ISSUER_ADDRESS")
-CODE      = os.getenv("COPX_CODE", "COPX")
-TARGET_Q  = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX", "1000"))
-SLIPPAGE  = Decimal(os.getenv("TAKER_SLIPPAGE", "0.001"))
+
+RPC        = os.getenv("XRPL_RPC", "https://s.altnet.rippletest.net:51234")
+client     = JsonRpcClient(RPC)  # NOTE: no timeout kwarg for this xrpl-py version
+ISSUER     = os.getenv("XRPL_ISSUER_ADDRESS")
+CODE       = os.getenv("COPX_CODE", "COPX")
+TARGET_Q   = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX", "1000"))
+SLIPPAGE   = Decimal(os.getenv("TAKER_SLIPPAGE", "0.001"))
 LEDGER_PAUSE = float(os.getenv("LEDGER_SLEEP", "3.0"))
 MAX_RETRIES  = int(os.getenv("SUBMIT_RETRIES", "1"))
 
@@ -32,7 +32,8 @@ def to160(code:str)->str:
 CUR = to160(CODE)
 
 def faucet_new_account():
-    r = requests.post("https://faucet.altnet.rippletest.net/accounts", json={})
+    # Simple faucet call; if this flakes, caller can re-run the script.
+    r = requests.post("https://faucet.altnet.rippletest.net/accounts", json={}, timeout=20)
     r.raise_for_status()
     p = r.json()
     seed = p.get("seed")
@@ -72,6 +73,7 @@ def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: D
         px = Decimal(str(o["quality"]))  # XRP/COPX
         if px > cap_px:
             break
+        # maker PAYS COPX, GETS XRP on the book we can take
         maker_copx = Decimal(str(o["taker_pays"]["value"]))
         maker_xrp_drops = Decimal(str(o["taker_gets"]))  # drops
         drops_per_copx = (px * Decimal(1_000_000)).quantize(Decimal("1."), rounding=ROUND_UP)
@@ -100,7 +102,7 @@ def depth_fill_for_budget(target_qty_copx: Decimal, q_best: Decimal, slippage: D
 
 def submit(tx, w, retries=MAX_RETRIES):
     """
-    Try submit_and_wait; on cancellation/timeouts, fall back to submit-only,
+    Try submit_and_wait; on cancellations/timeouts, fall back to submit-only,
     then let the caller verify effects (e.g., trustline or balance change).
     """
     last_err = None
@@ -123,7 +125,7 @@ def main():
     print("Taker:", addr)
     taker = Wallet.from_seed(seed)
 
-    # 1) Trustline (submit with fallback; then poll)
+    # 1) Trustline (submit with fallback; then poll to confirm)
     ts = TrustSet(
         account=addr,
         limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
@@ -148,7 +150,7 @@ def main():
         print("No executable quantity under cap; skipping IOC BUY.")
         return
 
-    # 3) IOC BUY only the executable amount
+    # 3) IOC BUY only the executable amount (rounded-up drops cap)
     bid = OfferCreate(
         account=addr,
         taker_gets=cap_drops,  # XRP in drops (rounded up)
