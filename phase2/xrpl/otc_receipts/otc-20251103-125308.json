@@ -1,0 +1,29 @@
+﻿{
+    "schema":  "1.0",
+    "ts_iso":  "2025-11-03T12:53:08",
+    "params":  {
+                   "slippage":  "0.02",
+                   "cap_drops":  1020010,
+                   "price_xrp":  "0.004",
+                   "qty_copx":  "250"
+               },
+    "step1":  {
+                  "xrp_drops_sent":  1020010,
+                  "fee_drops":  10,
+                  "explorer_url":  "https://testnet.xrpl.org/transactions/E2A3934C23CD99DA4F5B8B5268DD3C6B5009C19E4F9C2314C008386E4107408B",
+                  "hash":  "E2A3934C23CD99DA4F5B8B5268DD3C6B5009C19E4F9C2314C008386E4107408B",
+                  "engine_result":  "tesSUCCESS"
+              },
+    "step2":  {
+                  "explorer_url":  "https://testnet.xrpl.org/transactions/E4F133F285A72F77796994EE43D583FB963575B555C4B8E4A7C7E73235BA5FB0",
+                  "fee_drops":  10,
+                  "issuer_sent":  "250",
+                  "hash":  "E4F133F285A72F77796994EE43D583FB963575B555C4B8E4A7C7E73235BA5FB0",
+                  "engine_result":  "tesSUCCESS"
+              },
+    "results":  {
+                    "maker_delta_drops":  1020010,
+                    "est_gross_drops":  1000000,
+                    "taker_delta_drops":  -1020020
+                }
+}
