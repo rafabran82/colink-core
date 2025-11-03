@@ -193,3 +193,91 @@ def main():
 
 if __name__ == "__main__":
     main()
+# --- PATCH: robust submit accepts tx blob or signed JSON and encodes if needed ---
+from xrpl.core import binarycodec  # add near imports at top if not present
+
+def _extract_blob_from_signed(stx_any) -> str:
+    """
+    Accepts: SignedTransaction object, hex string, or signed tx JSON (dict).
+    Returns: hex blob suitable for rippled `submit` tx_blob.
+    """
+    # 1) SignedTransaction object with tx_blob
+    try:
+        blob = getattr(stx_any, "tx_blob", None)
+        if isinstance(blob, str) and all(c in "0123456789ABCDEFabcdef" for c in blob):
+            return blob
+    except Exception:
+        pass
+
+    # 2) Already a hex string
+    if isinstance(stx_any, str) and all(c in "0123456789ABCDEFabcdef" for c in stx_any):
+        return stx_any
+
+    # 3) Signed JSON dict → encode to blob
+    if isinstance(stx_any, dict):
+        # Must already contain a signature
+        if not (stx_any.get("TxnSignature") and stx_any.get("SigningPubKey")):
+            raise RuntimeError("Provided tx_json is not signed; missing TxnSignature/SigningPubKey.")
+        # Encode to binary hex using binarycodec
+        return binarycodec.encode(stx_any)
+
+    # 4) Fallback: try to_xrpl() then recurse
+    to_x = getattr(stx_any, "to_xrpl", None)
+    if callable(to_x):
+        return _extract_blob_from_signed(to_x())
+
+    raise RuntimeError(f"Cannot extract tx blob from type: {type(stx_any)}")
+
+def rpc_submit_blob(stx_any) -> dict:
+    """
+    Accepts mixed signed tx representations, normalizes to hex blob, then POSTs JSON-RPC submit.
+    """
+    blob = _extract_blob_from_signed(stx_any)
+    r = requests.post(RPC, json={"method": "submit", "params": [{"tx_blob": blob}]}, timeout=20)
+    r.raise_for_status()
+    out = r.json()
+    return out.get("result") or out
+
+def sign_autofill_and_submit(tx, wallet: Wallet) -> dict:
+    atx = autofill(tx, client)
+    stx = sign(atx, wallet)
+    # Hand the SignedTransaction object directly; rpc_submit_blob will normalize it
+    sres = rpc_submit_blob(stx)
+    # Try to get the txid for polling
+    txid = (sres.get("tx_json") or {}).get("hash") or sres.get("hash")
+    if not txid:
+        # If hash missing, try to pull it from the signed tx object
+        txid = getattr(stx, "hash", None)
+
+    if not txid:
+        # As a last resort, poll encode(atx) hash-less, but we still can continue with LastLedgerSequence
+        raise RuntimeError(f"Submit response missing txid/hash: {json.dumps(sres, indent=2)}")
+
+    last_ledger_seq = atx.last_ledger_sequence
+    # Poll for validation
+    t0 = time.time()
+    while True:
+        if time.time() - t0 > TX_TIMEOUT_S:
+            raise TimeoutError(f"Transaction {txid} not validated within {TX_TIMEOUT_S}s")
+
+        try:
+            txr = client.request(Tx(transaction=txid)).result
+        except Exception:
+            time.sleep(POLL_EVERY_S)
+            continue
+
+        if txr.get("validated"):
+            return txr
+
+        cur_val = latest_validated_index()
+        if cur_val >= last_ledger_seq:
+            return {
+                "validated": False,
+                "last_validated": cur_val,
+                "last_ledger_sequence": last_ledger_seq,
+                "note": "LastLedgerSequence passed without validation",
+                "submit_response": sres,
+                "tx_lookup": txr,
+            }
+
+        time.sleep(POLL_EVERY_S)
