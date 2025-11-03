@@ -71,7 +71,7 @@ if ($OutCsv) {
   $acsv = Join-Path $base ("book_asks_{0:yyyyMMdd_HHmmss}.csv" -f (Get-Date))
   if ($bidRows) { $bidRows | Export-Csv -Path $bcsv -NoTypeInformation -Encoding UTF8 }
   if ($askRows) { $askRows | Export-Csv -Path $acsv -NoTypeInformation -Encoding UTF8 }
-  if (Test-Path $bcsv -or Test-Path $acsv) {
+  if ((Test-Path $bcsv) -or (Test-Path $acsv)) {
     "`nSaved:" | Write-Host
     if (Test-Path $bcsv) { " - $bcsv" | Write-Host }
     if (Test-Path $acsv) { " - $acsv" | Write-Host }
