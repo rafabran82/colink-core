@@ -25,7 +25,7 @@ function Activate-Venv {
   }
   . .\.venv\Scripts\Activate.ps1
   python -m pip install --upgrade pip
-  pip install xrpl==2.4.0 python-dotenv==1.0.1
+  pip install "xrpl-py>=2.3,<3" python-dotenv==1.0.1
   Write-Host "Venv ready." -ForegroundColor Green
 }
 
