@@ -18,6 +18,27 @@ CUR = to160(CODE)
 
 client = JsonRpcClient(RPC)
 
+def _get(obj, *names):
+    for n in names:
+        if n in obj: return obj[n]
+    return None
+
+def _drops_from_amount(x):
+    # XRP may be a string of drops OR dict {"currency":"XRP","value":"…"}
+    if isinstance(x, str):
+        return int(x)
+    if isinstance(x, dict):
+        cur = x.get("currency")
+        if (cur == "XRP") and "value" in x:
+            return int(Decimal(str(x["value"])) * Decimal(1_000_000))
+    return None
+
+def _iou_value(x):
+    # IOU amount must be dict with "value"
+    if isinstance(x, dict) and "value" in x:
+        return Decimal(str(x["value"]))
+    return None
+
 def show_book():
     r = client.request(BookOffers(
         taker_gets={"currency":"XRP"},
@@ -30,12 +51,23 @@ def show_book():
     if not offers:
         print("(empty)")
         return None
-    for i,o in enumerate(offers[:10],1):
-        tg, tp = o.get("taker_gets"), o.get("taker_pays")
-        drops = int(tg) if isinstance(tg,str) else int(tg.get("value","0"))
-        copxv = Decimal(str(tp.get("value"))) if isinstance(tp,dict) else Decimal(0)
-        px = (Decimal(drops)/Decimal(1_000_000)) / (copxv if copxv else Decimal(1))
-        print(f"{i:>2}. px≈{px:.6f} XRP/COPX  size={copxv} COPX  owner={o.get('Account')}")
+
+    shown = 0
+    for i,o in enumerate(offers,1):
+        tg = _get(o, "taker_gets","TakerGets")
+        tp = _get(o, "taker_pays","TakerPays")
+        drops = _drops_from_amount(tg)
+        copx  = _iou_value(tp)
+        if drops is None or copx is None or copx == 0:
+            continue
+        px = (Decimal(drops)/Decimal(1_000_000)) / copx  # XRP/COPX
+        acct = o.get("Account","?")
+        print(f"{i:>2}. px≈{px:.6f} XRP/COPX  size={copx} COPX  owner={acct}")
+        shown += 1
+        if shown >= 10:
+            break
+    if shown == 0:
+        print("(no well-formed rows)")
     return offers
 
 def show_trustline(acct):
