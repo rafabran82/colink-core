@@ -3,11 +3,11 @@ from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from dotenv import load_dotenv
 from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet
-from xrpl.transaction import autofill, sign
+from xrpl.transaction import autofill, sign, submit_transaction_blob
 from xrpl.models.transactions import TrustSet, Payment
 from xrpl.models.amounts import IssuedCurrencyAmount
 from xrpl.models.requests import (
-    AccountLines, BookOffers, AccountInfo, Ledger, Submit, Tx
+    AccountLines, BookOffers, AccountInfo, Ledger, Tx
 )
 from xrpl.utils import xrp_to_drops
 
@@ -62,7 +62,6 @@ def issuer_transfer_rate(issuer):
     return tr, flags
 
 def book_top_ask(taker_addr):
-    # Asks: maker pays COPX, gets XRP.
     res = client.request(BookOffers(
         taker_pays={"currency":"XRP"},
         taker_gets={"currency": CUR, "issuer": ISSUER},
@@ -75,7 +74,7 @@ def book_top_ask(taker_addr):
         return None
 
     def to_dec_xrp(a):
-        if isinstance(a, str):  # drops
+        if isinstance(a, str):
             return Decimal(a) / Decimal(1_000_000)
         if isinstance(a, dict) and a.get("currency") == "XRP":
             return Decimal(a["value"])
@@ -98,56 +97,47 @@ def latest_validated_index():
 
 def robust_submit(stx_blob:str, last_ledger_seq:int) -> dict:
     """
-    Submit a signed blob; poll Tx until validated or LastLedgerSequence passes. Hard timeout enforced.
+    Submit a signed blob via submit_transaction_blob; poll Tx until validated
+    or LastLedgerSequence passes. Explicit timeout/backoff.
     """
-    # 1) submit
-    sres = client.request(Submit(tx_blob=stx_blob)).result
-    # sres may have immediate engine_result like 'tesSUCCESS' (queued/applied) or errors.
-    # We still poll 'tx' to get the final validated outcome.
-    txid = sres.get("tx_json", {}).get("hash")
+    sres = submit_transaction_blob(stx_blob, client)
+    txid = sres.result.get("tx_json", {}).get("hash")
     if not txid:
-        # Some nodes return only 'engine_result' & no tx_json; try to extract from sres or decode preimage is not trivial.
-        # Fallback: ask client to echo back via error, else raise.
-        raise RuntimeError(f"Submit response missing txid/hash: {json.dumps(sres, indent=2)}")
+        # Some nodes may not echo tx_json; try best-effort extract:
+        txid = sres.result.get("tx", {}).get("hash")
+    if not txid:
+        raise RuntimeError(f"Submit response missing txid/hash: {json.dumps(sres.result, indent=2)}")
 
-    # 2) poll loop
     t0 = time.time()
     while True:
-        # timeout
         if time.time() - t0 > TX_TIMEOUT_S:
             raise TimeoutError(f"Transaction {txid} not validated within {TX_TIMEOUT_S}s")
 
         try:
             txr = client.request(Tx(transaction=txid)).result
-        except Exception as e:
-            # transient network hiccup; keep polling
+        except Exception:
             time.sleep(POLL_EVERY_S)
             continue
 
-        # if validated, return full tx result
         if txr.get("validated"):
             return txr
 
-        # if past last ledger, abort as failed (like tec)
         cur_val = latest_validated_index()
         if cur_val >= last_ledger_seq:
-            # Return the last seen tx (unvalidated) envelope to aid debugging
             return {
                 "validated": False,
                 "last_validated": cur_val,
                 "last_ledger_sequence": last_ledger_seq,
                 "note": "LastLedgerSequence passed without validation",
-                "submit_response": sres,
+                "submit_response": sres.result,
                 "tx_lookup": txr,
             }
 
         time.sleep(POLL_EVERY_S)
 
 def sign_autofill_and_submit(tx, wallet: Wallet) -> dict:
-    # Autofill to get Fee, Sequence, and LastLedgerSequence
     atx = autofill(tx, client)
     stx = sign(atx, wallet)
-    # Poll until validated / last ledger
     return robust_submit(stx.to_xrpl(), atx.last_ledger_sequence)
 
 def main():
@@ -158,7 +148,7 @@ def main():
     tr, flags = issuer_transfer_rate(ISSUER)
     print(f"Issuer TransferRate={tr} (1e9=no fee), Flags={flags}")
 
-    # 1) Trust line (manual reliable submit)
+    # 1) Trust line
     ts = TrustSet(
         account=taker_addr,
         limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
@@ -168,30 +158,29 @@ def main():
     if not wait_trustline(taker_addr, CUR, ISSUER, 25):
         raise SystemExit("Trustline not visible yet; aborting to avoid path issues.")
 
-    # 2) Read top ask with taker context
+    # 2) Read top ask
     top = book_top_ask(taker_addr)
     if not top:
         print("No asks on the book; nothing to take right now.")
         return
     q = top["q"]  # XRP/COPX
 
-    # Include issuer TransferRate defensively
+    # Include TransferRate defensively
     eff_q = (q * Decimal(tr) / Decimal(1_000_000_000)).quantize(Decimal("0.0000001"), rounding=ROUND_UP)
     cap_px = (eff_q * (Decimal(1) + SLIP)).quantize(Decimal("0.0000001"), rounding=ROUND_UP)
 
-    # Budget / constraints
+    # Budget
     xrp_cap  = (AMOUNT * cap_px).quantize(Decimal("0.000001"), rounding=ROUND_UP)
     drops_cap = int((xrp_cap * Decimal(1_000_000)).to_integral_value(rounding=ROUND_UP)) + CUSHION
     deliver_min = (AMOUNT * (Decimal(1) - SLIP)).quantize(Decimal("0.000001"), rounding=ROUND_DOWN)
 
-    print(f"Top ask ~ {q} XRP/COPX; eff cap px {cap_px} XRP/COPX; "
-          f"SendMax {drops_cap} drops; DeliverMin {deliver_min} {CODE}")
+    print(f"Top ask ~ {q} XRP/COPX; eff cap px {cap_px} XRP/COPX; SendMax {drops_cap} drops; DeliverMin {deliver_min} {CODE}")
 
     pay = Payment(
         account=taker_addr,
-        destination=taker_addr,  # self-payment to consume the book
+        destination=taker_addr,
         amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(AMOUNT)),
-        send_max=str(drops_cap),  # XRP in drops (string per xrpl-py request model)
+        send_max=str(drops_cap),  # string (drops)
         deliver_min=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(deliver_min)),
         flags=0x00020000          # tfPartialPayment
     )
