@@ -217,3 +217,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+# --- BEGIN PATCH: taker_buy_via_payment.py adjustments ---
+# When pathfind returns no alternatives, snapshot top ask and place an IOC OfferCreate
+# at cap = ceil(qty * (best_px * (1+slip))) in drops.
+
