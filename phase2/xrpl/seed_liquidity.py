@@ -14,13 +14,23 @@ RPC = "https://s.altnet.rippletest.net:51234"
 client = JsonRpcClient(RPC)
 
 ISSUER_ADDR = os.getenv("XRPL_ISSUER_ADDRESS")
-HOT_SEED = os.getenv("XRPL_HOT_SEED"); HOT_ADDR = os.getenv("XRPL_HOT_ADDRESS")
-CODE = os.getenv("COPX_CODE","COPX")
-DRY = os.getenv("DRY_RUN","true").lower() == "true"
+HOT_SEED    = os.getenv("XRPL_HOT_SEED"); HOT_ADDR = os.getenv("XRPL_HOT_ADDRESS")
+CODE        = os.getenv("COPX_CODE","COPX")
+DRY         = os.getenv("DRY_RUN","true").lower() == "true"
 
 SEED_LP_COPX = Decimal(os.getenv("SEED_LP_COPX","500000"))
 SEED_LP_COL  = Decimal(os.getenv("SEED_LP_COL","100000"))
 SEED_LP_XRP  = Decimal(os.getenv("SEED_LP_XRP","2000"))
+
+def to_160bit_hex(code: str) -> str:
+    if len(code) <= 3:
+        return code
+    b = code.encode("ascii")
+    if len(b) > 20:
+        raise ValueError("Currency code >20 bytes not allowed")
+    return b.hex().upper().ljust(40, "0")
+
+CUR = to_160bit_hex(CODE)
 
 def iou_amt(value, code, issuer):
     return IssuedCurrencyAmount(currency=code, issuer=issuer, value=str(Decimal(value)))
@@ -29,19 +39,17 @@ def main():
     if not all([HOT_SEED, HOT_ADDR, ISSUER_ADDR]):
         print("Fill .env.testnet secrets first."); sys.exit(1)
 
-    w = Wallet(seed=HOT_SEED, sequence=0)
+    w = Wallet.from_seed(HOT_SEED)
 
-    # Offer 1: pay COPX, get XRP (sell COPX for XRP)
     offer1 = OfferCreate(
         account=HOT_ADDR,
-        taker_pays=iou_amt(SEED_LP_COPX, CODE, ISSUER_ADDR),
-        taker_gets=xrp_to_drops(SEED_LP_XRP)  # drops string
+        taker_pays=iou_amt(SEED_LP_COPX, CUR, ISSUER_ADDR),   # pay COPX
+        taker_gets=xrp_to_drops(SEED_LP_XRP)                  # get XRP (drops str)
     )
-    # Offer 2: pay COL (demo IOU from HOT), get COPX
     offer2 = OfferCreate(
         account=HOT_ADDR,
-        taker_pays=iou_amt(SEED_LP_COL, "COL", HOT_ADDR),
-        taker_gets=iou_amt(SEED_LP_COPX/5, CODE, ISSUER_ADDR)
+        taker_pays=iou_amt(SEED_LP_COL, "COL", HOT_ADDR),     # pay COL IOU (demo)
+        taker_gets=iou_amt(SEED_LP_COPX/5, CUR, ISSUER_ADDR)  # get COPX
     )
 
     if DRY:
