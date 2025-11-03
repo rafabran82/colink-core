@@ -162,9 +162,14 @@ def main():
         print("Insufficient spendable XRP after reserves to place IOC.")
         return
 
-    tx = OfferCreate(
+        tx = OfferCreate(
         account=TAKER,
-        taker_gets=str(cap_drops),  # we pay up to cap in XRP (drops)
+        # We PAY up to the cap in XRP (drops)
+        taker_pays=str(cap_drops),
+        # We GET COPX (Issued Currency)
+        taker_gets=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(qty)),
+        flags=TF_IOC
+    ),  # we pay up to cap in XRP (drops)
         taker_pays=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(qty)),  # we receive qty COPX
         flags=TF_IOC
     )
@@ -183,3 +188,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
