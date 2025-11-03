@@ -4,19 +4,6 @@
   [Parameter(Mandatory=$true)][decimal]$Slippage
 )
 
-function Write-JsonUtf8NoBom {
-  param(
-    [Parameter(Mandatory=$true)][string]$Path,
-    [Parameter(Mandatory=$true)][object]$Object
-  )
-  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-  $json = $Object | ConvertTo-Json -Depth 8
-  $dir = Split-Path -Parent $Path
-  if ($dir -and -not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-  $full = [System.IO.Path]::GetFullPath($Path)
-  [System.IO.File]::WriteAllText($full, $json, $utf8NoBom)
-}
-
 # Quiet import of xrpay
 $__oldWarnPref = $WarningPreference
 try {
@@ -24,19 +11,29 @@ try {
   Import-Module xrpay -DisableNameChecking -ErrorAction SilentlyContinue
 } finally { $WarningPreference = $__oldWarnPref }
 
-# Fail-fast if core envs missing (PS5-safe)
-$req  = @("XRPL_TAKER_ADDRESS","XRPL_TAKER_SEED","XRPL_MAKER_ADDRESS","XRPL_ISSUER_ADDRESS","XRPL_ISSUER_SEED")
+
+
+# --- JSON writer: UTF-8 without BOM (PS5/PS7 safe)
+function Write-JsonUtf8NoBom {
+  param(
+    [Parameter(Mandatory=\True)][string]\.\phase2\xrpl\otc_trade_with_receipt.ps1,
+    [Parameter(Mandatory=\True)]\
+  )
+  \System.Text.UTF8Encoding = New-Object System.Text.UTF8Encoding(\False)
+  Write-JsonUtf8NoBom -Path $path -Object $receipt, \System.Text.UTF8Encoding)
+}# Fail-fast if core envs missing
+$req = @("XRPL_TAKER_ADDRESS","XRPL_TAKER_SEED","XRPL_MAKER_ADDRESS","XRPL_ISSUER_ADDRESS","XRPL_ISSUER_SEED")
 $miss = $req | Where-Object { [string]::IsNullOrWhiteSpace([System.Environment]::GetEnvironmentVariable($_)) }
 if ($miss.Count -gt 0) { throw "Missing environment variables: $($miss -join ', ')" }
 
 # XRPL RPC default (testnet) if not set
 if (-not $env:XRPL_RPC) { $env:XRPL_RPC = "https://s.altnet.rippletest.net:51234" }
 
-# Worst price and cap in drops
-$WorstPx  = [decimal]$PriceXRP * (1 + [decimal]$Slippage)
-$CapDrops = [int]([math]::Ceiling($QtyCOPX * $WorstPx * 1000000)) + 10
+$WorstPx   = [decimal]$PriceXRP * (1 + [decimal]$Slippage)
+$CapDrops  = [int]([math]::Ceiling($QtyCOPX * $WorstPx * 1000000)) + 10
 $env:OTC_XRP_DROPS = "$CapDrops"
 $env:OTC_COPX_QTY  = "$QtyCOPX"
+
 Write-Warning ("Cap drops = {0} at worst={1} XRP/COPX" -f $CapDrops, [decimal]::Round($WorstPx, 8))
 
 function Invoke-PyJson([string]$path) {
@@ -104,9 +101,13 @@ $receipt = [pscustomobject]@{
   }
 }
 
-# Save JSON (UTF-8 without BOM)
-$dir   = Join-Path $PSScriptRoot "otc_receipts"
+# Save JSON (UTF-8)
+$dir  = Join-Path $PSScriptRoot "otc_receipts"
+if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 $fname = "otc-{0}.json" -f (Get-Date).ToString("yyyyMMdd-HHmmss")
-$pathOut = Join-Path $dir $fname
-Write-JsonUtf8NoBom -Path $pathOut -Object $receipt
-Write-Host "Saved receipt:`n$pathOut"
+$path  = Join-Path $dir $fname
+
+$receipt | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 $path
+Write-Host "Saved receipt:`n$path"
+
+

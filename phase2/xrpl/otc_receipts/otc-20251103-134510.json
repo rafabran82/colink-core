@@ -1,6 +1,6 @@
 {
     "schema":  "1.0",
-    "ts_iso":  "2025-11-03T12:53:08",
+    "ts_iso":  "2025-11-03T13:45:10",
     "params":  {
                    "slippage":  "0.02",
                    "cap_drops":  1020010,
@@ -10,15 +10,15 @@
     "step1":  {
                   "xrp_drops_sent":  1020010,
                   "fee_drops":  10,
-                  "explorer_url":  "https://testnet.xrpl.org/transactions/E2A3934C23CD99DA4F5B8B5268DD3C6B5009C19E4F9C2314C008386E4107408B",
-                  "hash":  "E2A3934C23CD99DA4F5B8B5268DD3C6B5009C19E4F9C2314C008386E4107408B",
+                  "explorer_url":  "https://testnet.xrpl.org/transactions/4AC08E035A5CBF4AA4DA8B369217D10F494B5BCCA5877EE90F889BACE28E08E6",
+                  "hash":  "4AC08E035A5CBF4AA4DA8B369217D10F494B5BCCA5877EE90F889BACE28E08E6",
                   "engine_result":  "tesSUCCESS"
               },
     "step2":  {
-                  "explorer_url":  "https://testnet.xrpl.org/transactions/E4F133F285A72F77796994EE43D583FB963575B555C4B8E4A7C7E73235BA5FB0",
+                  "explorer_url":  "https://testnet.xrpl.org/transactions/F93EFCC0FEC599BB84568496E60F3DD1469AAB19659D854C726C1CA8877E3483",
                   "fee_drops":  10,
                   "issuer_sent":  "250",
-                  "hash":  "E4F133F285A72F77796994EE43D583FB963575B555C4B8E4A7C7E73235BA5FB0",
+                  "hash":  "F93EFCC0FEC599BB84568496E60F3DD1469AAB19659D854C726C1CA8877E3483",
                   "engine_result":  "tesSUCCESS"
               },
     "results":  {
