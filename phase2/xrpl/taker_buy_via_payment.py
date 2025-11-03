@@ -3,22 +3,20 @@ from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from dotenv import load_dotenv
 from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet
-from xrpl.transaction import autofill, sign, submit_transaction_blob
+from xrpl.transaction import autofill, sign
 from xrpl.models.transactions import TrustSet, Payment
 from xrpl.models.amounts import IssuedCurrencyAmount
-from xrpl.models.requests import (
-    AccountLines, BookOffers, AccountInfo, Ledger, Tx
-)
+from xrpl.models.requests import AccountLines, BookOffers, AccountInfo, Ledger, Tx
 from xrpl.utils import xrp_to_drops
 
 load_dotenv(".env.testnet")
 RPC      = os.getenv("XRPL_RPC", "https://s.altnet.rippletest.net:51234")
 ISSUER   = os.getenv("XRPL_ISSUER_ADDRESS")
 CODE     = os.getenv("COPX_CODE", "COPX")
-AMOUNT   = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX", "250"))     # desired COPX
-SLIP     = Decimal(os.getenv("TAKER_SLIPPAGE", "0.02"))           # 2% default
-CUSHION  = int(os.getenv("CAP_CUSHION_DROPS", "20"))              # extra drops
-TX_TIMEOUT_S = int(os.getenv("XRPL_TX_TIMEOUT_S", "45"))          # overall per-tx timeout
+AMOUNT   = Decimal(os.getenv("TAKER_BUY_AMOUNT_COPX", "250"))
+SLIP     = Decimal(os.getenv("TAKER_SLIPPAGE", "0.02"))
+CUSHION  = int(os.getenv("CAP_CUSHION_DROPS", "20"))
+TX_TIMEOUT_S = int(os.getenv("XRPL_TX_TIMEOUT_S", "45"))
 POLL_EVERY_S = float(os.getenv("XRPL_POLL_EVERY_S", "1.2"))
 
 client = JsonRpcClient(RPC)
@@ -95,18 +93,23 @@ def latest_validated_index():
     led = client.request(Ledger(ledger_index="validated")).result
     return int(led["ledger_index"])
 
+def rpc_submit_blob(stx_blob:str) -> dict:
+    # Version-agnostic raw JSON-RPC submit
+    r = requests.post(RPC, json={"method": "submit", "params": [{"tx_blob": stx_blob}]}, timeout=20)
+    r.raise_for_status()
+    out = r.json()
+    # Some gateways wrap result under "result" or "result"/"engine_result"
+    result = out.get("result") or out
+    return result
+
 def robust_submit(stx_blob:str, last_ledger_seq:int) -> dict:
-    """
-    Submit a signed blob via submit_transaction_blob; poll Tx until validated
-    or LastLedgerSequence passes. Explicit timeout/backoff.
-    """
-    sres = submit_transaction_blob(stx_blob, client)
-    txid = sres.result.get("tx_json", {}).get("hash")
+    sres = rpc_submit_blob(stx_blob)
+    txid = None
+    tx_json = sres.get("tx_json") or {}
+    txid = tx_json.get("hash") or sres.get("hash")
     if not txid:
-        # Some nodes may not echo tx_json; try best-effort extract:
-        txid = sres.result.get("tx", {}).get("hash")
-    if not txid:
-        raise RuntimeError(f"Submit response missing txid/hash: {json.dumps(sres.result, indent=2)}")
+        # Try to decode from blob failure response — still proceed to poll if unknown
+        raise RuntimeError(f"Submit response missing txid/hash: {json.dumps(sres, indent=2)}")
 
     t0 = time.time()
     while True:
@@ -129,7 +132,7 @@ def robust_submit(stx_blob:str, last_ledger_seq:int) -> dict:
                 "last_validated": cur_val,
                 "last_ledger_sequence": last_ledger_seq,
                 "note": "LastLedgerSequence passed without validation",
-                "submit_response": sres.result,
+                "submit_response": sres,
                 "tx_lookup": txr,
             }
 
@@ -180,7 +183,7 @@ def main():
         account=taker_addr,
         destination=taker_addr,
         amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(AMOUNT)),
-        send_max=str(drops_cap),  # string (drops)
+        send_max=str(drops_cap),  # drops as string
         deliver_min=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(deliver_min)),
         flags=0x00020000          # tfPartialPayment
     )
