@@ -8,7 +8,18 @@ from xrpl.models.requests import AccountInfo, AccountOffers
 from xrpl.models.transactions import OfferCancel
 from xrpl.transaction import autofill_and_sign
 from xrpl.core.binarycodec import encode as encode_tx
-from xrpl.core.hashing import sha512_half
+
+# --- sha512_half import fallback (handles different xrpl-py versions) ---
+try:
+    # newer xrpl-py
+    from xrpl.core.binarycodec.hashing import sha512_half as _sha512_half
+    def sha512half(data: bytes) -> bytes:
+        return _sha512_half(data)
+except Exception:
+    # minimal local fallback
+    import hashlib
+    def sha512half(data: bytes) -> bytes:
+        return hashlib.sha512(data).digest()[:32]
 
 COPX160 = "434F505800000000000000000000000000000000"  # "COPX" 160-bit
 
@@ -36,13 +47,11 @@ def offer_matches(offer: Dict[str, Any], code160: str, issuer: str) -> bool:
 
 def tx_blob_and_hash(signed_tx) -> (str, str):
     """Return (tx_blob_hex, tx_hash_hex) from a signed Transaction."""
-    # encode expects a plain dict
     tx_dict = signed_tx.to_dict()
-    blob = encode_tx(tx_dict)
-    # Local tx hash = SHA512Half(prefix 0x54584E00 + blob)
-    # xrpl hash uses the "TXN_SIGNATURE" prefix (TXN = 0x54584E00)
+    blob = encode_tx(tx_dict)  # hex string
+    # Hash = SHA512Half( 0x54584E00 || blob_bytes )   # "TXN" prefix
     prefixed = bytes.fromhex("54584E00") + bytes.fromhex(blob)
-    tx_hash = sha512_half(prefixed).hex().upper()
+    tx_hash = sha512half(prefixed).hex().upper()
     return blob, tx_hash
 
 def rpc_submit_blob(rpc_url: str, blob: str) -> Dict[str, Any]:
@@ -63,12 +72,10 @@ def submit_and_poll_raw(rpc_url: str, signed_tx) -> Dict[str, Any]:
     """Submit signed blob via raw JSON-RPC and poll until validated (or timeout)."""
     blob, local_hash = tx_blob_and_hash(signed_tx)
     prelim = rpc_submit_blob(rpc_url, blob)
-    # prefer engine-provided hash; fall back to local
     tx_hash = (prelim.get("tx_json", {}) or {}).get("hash") or prelim.get("hash") or local_hash
 
     out = {"prelim": prelim, "hash": tx_hash}
-    # Poll up to ~40s total
-    for _ in range(20):
+    for _ in range(20):  # ~40s
         if not tx_hash:
             break
         res = rpc_tx(rpc_url, tx_hash)
@@ -81,7 +88,7 @@ def submit_and_poll_raw(rpc_url: str, signed_tx) -> Dict[str, Any]:
 def main():
     ap = argparse.ArgumentParser(description="Cancel open offers (optionally filter by issued currency).")
     ap.add_argument("--issuer", help="Issuer classic address when using --only-currency.")
-    ap.add_argument("--only-currency", help="Filter cancels to this currency (e.g., COPX or 160-bit hex).")
+    ap.add_argument("--only-currency", help="Filter to this currency (e.g., COPX or 160-bit hex).")
     ap.add_argument("--seed-env", default="", help="Env var name for seed; default BIDDER_SEED/TAKER_SEED.")
     ap.add_argument("--dry-run", action="store_true", help="List what would be canceled; do not submit.")
     ap.add_argument("--max", type=int, default=500, help="Max offers to cancel this run.")
@@ -116,7 +123,6 @@ def main():
                 selected.append(off)
         else:
             selected.append(off)
-
     selected = selected[: max(1, args.max)]
 
     summary = {
@@ -137,7 +143,6 @@ def main():
         print(json.dumps(summary, indent=2))
         return
 
-    # Submit cancels one-by-one
     for off in selected:
         seq = off.get("seq")
         tx = OfferCancel(account=wallet.classic_address, offer_sequence=seq)
