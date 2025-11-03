@@ -17,25 +17,31 @@ if (!(Test-Path $dir)) { Write-Error "Receipts folder not found: $dir"; exit 1 }
 $files = Get-ChildItem (Join-Path $dir "otc-*.json") | Sort-Object LastWriteTime -Descending
 if (-not $files -or $files.Count -eq 0) { Write-Host "No receipts found."; exit 0 }
 
-# Choose file: newest OR newest that looks "rich"
+# Helper: classify + completeness
+function Classify([object]$o) {
+  $richish  = ($o.schema -or $o.params -or $o.results)
+  $hasS1    = ($o.step1 -and $o.step1.hash)
+  $hasS2    = ($o.step2 -and $o.step2.hash)
+  $complete = ($hasS1 -or $hasS2)
+  if ($richish) { if ($complete) { return "rich-complete" } else { return "rich-incomplete" } }
+  return "legacy"
+}
+
 $chosen = $null
 if ($FindRich) {
-  foreach ($f in $files) {
-    $o = Read-JsonTolerant $f.FullName
-    if ($o.schema -or $o.params -or $o.results) { $chosen = $f; break }
-  }
-  if (-not $chosen) { $chosen = $files[0] } # fallback
+  # 1) newest rich-complete; 2) fallback to newest rich-incomplete; 3) fallback to newest file
+  foreach ($f in $files) { $o = Read-JsonTolerant $f.FullName; if ((Classify $o) -eq "rich-complete") { $chosen = $f; break } }
+  if (-not $chosen) { foreach ($f in $files) { $o = Read-JsonTolerant $f.FullName; if ((Classify $o) -eq "rich-incomplete") { $chosen = $f; break } } }
+  if (-not $chosen) { $chosen = $files[0] }
 } else {
   $chosen = $files[0]
 }
 
 $obj = Read-JsonTolerant $chosen.FullName
+$schemaKind = Classify $obj
 
-# Detect schema type
-$schemaKind = if ($obj.schema -or $obj.params -or $obj.results) { "rich" } else { "legacy" }
-
-# Extract core fields with fallbacks
-if ($schemaKind -eq "rich") {
+# Extract + back-fill
+if ($schemaKind -like "rich*") {
   $ts      = $obj.ts_iso
   $qty     = $obj.params.qty_copx
   $px      = $obj.params.price_xrp
@@ -47,17 +53,15 @@ if ($schemaKind -eq "rich") {
   $tDelta  = $obj.results.taker_delta_drops
   $gross   = $obj.results.est_gross_drops
 } else {
-  # legacy fields
-  $ts      = $obj.ts_iso
-  if (-not $ts) { $ts = $obj.timestamp }  # your legacy uses "timestamp"
-  $qty     = $obj.qty_copx
-  $px      = $obj.price_xrp
-  $slip    = $obj.slippage
-  $cap     = $obj.cap_drops
-  $s1      = $obj.step1
-  $s2      = $obj.step2
+  # legacy
+  $ts   = $obj.ts_iso; if (-not $ts) { $ts = $obj.timestamp }
+  $qty  = $obj.qty_copx
+  $px   = $obj.price_xrp
+  $slip = $obj.slippage
+  $cap  = $obj.cap_drops
+  $s1   = $obj.step1
+  $s2   = $obj.step2
 
-  # compute deltas from balances.before/after if available
   $mDelta = $null; $tDelta = $null; $gross = $null
   if ($obj.balances -and $obj.balances.before -and $obj.balances.after) {
     $mBefore = $obj.balances.before.maker.xrp_drops
@@ -67,29 +71,19 @@ if ($schemaKind -eq "rich") {
     if ($mBefore -ne $null -and $mAfter -ne $null) { $mDelta = [int64]($mAfter - $mBefore) }
     if ($tBefore -ne $null -and $tAfter -ne $null) { $tDelta = [int64]($tAfter - $tBefore) }
   }
-
-  # gross (approx) if not present: qty * px * 1e6 (drops)
   if ($qty -and $px) {
     try { $gross = [int64]([math]::Round(([decimal]$qty * [decimal]$px) * 1000000)) } catch { }
   }
 }
 
-# Build explorer URLs if missing (you’re on testnet)
+# Explorer URLs (build from hashes if missing)
 function Make-Explorer([string]$hash) {
   if (-not $hash) { return $null }
   return "https://testnet.xrpl.org/transactions/$hash"
 }
-
-$step1Explorer = $null
-$step2Explorer = $null
-if ($s1) {
-  $step1Explorer = $s1.explorer_url
-  if (-not $step1Explorer) { $step1Explorer = Make-Explorer $s1.hash }
-}
-if ($s2) {
-  $step2Explorer = $s2.explorer_url
-  if (-not $step2Explorer) { $step2Explorer = Make-Explorer $s2.hash }
-}
+$step1Explorer = $null; $step2Explorer = $null
+if ($s1) { $step1Explorer = $s1.explorer_url; if (-not $step1Explorer) { $step1Explorer = Make-Explorer $s1.hash } }
+if ($s2) { $step2Explorer = $s2.explorer_url; if (-not $step2Explorer) { $step2Explorer = Make-Explorer $s2.hash } }
 
 Write-Host "Latest receipt:`n$($chosen.FullName)`n" -ForegroundColor Cyan
 
