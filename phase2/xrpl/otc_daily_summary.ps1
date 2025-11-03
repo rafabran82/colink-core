@@ -7,11 +7,11 @@ if (Test-Path $balPy) {
   python $balPy
 }
 
-# last receipt
+# last (rich) receipt
 $show = Join-Path $PSScriptRoot "show_last_receipt.ps1"
 if (Test-Path $show) {
-  Write-Host "`n== Last Receipt ==" -ForegroundColor Cyan
-  powershell -ExecutionPolicy Bypass -File $show
+  Write-Host "`n== Last Receipt (rich) ==" -ForegroundColor Cyan
+  powershell -ExecutionPolicy Bypass -File $show -FindRich
 }
 
 # export CSV (overwrites file with all receipts)
