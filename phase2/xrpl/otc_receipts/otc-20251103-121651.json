@@ -1,0 +1,41 @@
+﻿{
+    "timestamp":  "2025-11-03T12:16:51",
+    "qty_copx":  "250",
+    "price_xrp":  "0.004",
+    "slippage":  "0.02",
+    "cap_drops":  1020020,
+    "step1":  {
+                  "engine_result":  "tesSUCCESS",
+                  "hash":  "3A145DBB1F18DD6FDC8B59416293BFF322E470E427BEBCDFDDD4DBAE4E26F302",
+                  "fee_drops":  10,
+                  "xrp_drops_sent":  1020020
+              },
+    "step2":  {
+                  "engine_result":  "tesSUCCESS",
+                  "hash":  "5BF2BC9176A2B62F90AB2017C1420DF0373C6EE931A9B69CE8FB94923E06B088",
+                  "fee_drops":  10,
+                  "issuer_sent":  "250"
+              },
+    "balances":  {
+                     "before":  {
+                                    "maker":  {
+                                                  "xrp_drops":  123460410,
+                                                  "copx":  "5000"
+                                              },
+                                    "taker":  {
+                                                  "xrp_drops":  76538990,
+                                                  "copx":  "5000"
+                                              }
+                                },
+                     "after":  {
+                                   "maker":  {
+                                                 "xrp_drops":  124480430,
+                                                 "copx":  "5000"
+                                             },
+                                   "taker":  {
+                                                 "xrp_drops":  75518960,
+                                                 "copx":  "5250"
+                                             }
+                               }
+                 }
+}
