@@ -64,7 +64,7 @@ $makerDx  = if ($R) { _first $R.maker_delta_drops } else { $null }
 $takerDx  = if ($R) { _first $R.taker_delta_drops } else { $null }
 $gross    = if ($R) { _first $R.est_gross_drops }  else { $null }
 
-[pscustomobject]@{
+[pscustomobject]@{`n  step1_explorer    = $obj.step1.explorer_url`n  step2_explorer    = $obj.step2.explorer_url
   ts_iso            = $ts
   schema            = if ($hasParams -and $hasResults) { 'rich' } else { 'legacy' }
   qty_copx          = $qty
@@ -81,4 +81,5 @@ $gross    = if ($R) { _first $R.est_gross_drops }  else { $null }
   taker_delta_drops = $takerDx
   est_gross_drops   = $gross
 } | Format-List
+
 
