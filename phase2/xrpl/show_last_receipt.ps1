@@ -81,3 +81,4 @@ $gross    = if ($R) { _first $R.est_gross_drops }  else { $null }
   taker_delta_drops = $takerDx
   est_gross_drops   = $gross
 } | Format-List
+

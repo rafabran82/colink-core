@@ -15,3 +15,4 @@ if ($out.ok -eq $true) {
   Write-Host "❌ FAIL: $($last.Name)" -ForegroundColor Red
   $out.messages | ForEach-Object { Write-Host " - $_" -ForegroundColor Yellow }
 }
+

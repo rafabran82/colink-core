@@ -80,3 +80,4 @@ foreach ($r in $rows) {
 Write-Host "`n== BATCH SUMMARY ==" -ForegroundColor Cyan
 Write-Host ("Completed: {0}, Failed: {1}, Total: {2}" -f $ok, $fail, $i)
 if ($fail -gt 0) { exit 2 } else { exit 0 }
+
