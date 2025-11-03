@@ -56,3 +56,4 @@ $name = "otc-$((Get-Date).ToString('yyyyMMdd-HHmmss')).json"
 $path = Join-Path $dir $name
 $receipt | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 $path
 Write-Host "Saved receipt:`n$path"
+
