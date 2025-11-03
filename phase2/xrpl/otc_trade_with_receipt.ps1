@@ -11,7 +11,17 @@ try {
   Import-Module xrpay -DisableNameChecking -ErrorAction SilentlyContinue
 } finally { $WarningPreference = $__oldWarnPref }
 
-# Fail-fast if core envs missing
+
+
+# --- JSON writer: UTF-8 without BOM (PS5/PS7 safe)
+function Write-JsonUtf8NoBom {
+  param(
+    [Parameter(Mandatory=\True)][string]\.\phase2\xrpl\otc_trade_with_receipt.ps1,
+    [Parameter(Mandatory=\True)]\
+  )
+  \System.Text.UTF8Encoding = New-Object System.Text.UTF8Encoding(\False)
+  Write-JsonUtf8NoBom -Path $path -Object $receipt, \System.Text.UTF8Encoding)
+}# Fail-fast if core envs missing
 $req = @("XRPL_TAKER_ADDRESS","XRPL_TAKER_SEED","XRPL_MAKER_ADDRESS","XRPL_ISSUER_ADDRESS","XRPL_ISSUER_SEED")
 $miss = $req | Where-Object { [string]::IsNullOrWhiteSpace([System.Environment]::GetEnvironmentVariable($_)) }
 if ($miss.Count -gt 0) { throw "Missing environment variables: $($miss -join ', ')" }
@@ -99,3 +109,4 @@ $path  = Join-Path $dir $fname
 
 $receipt | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 $path
 Write-Host "Saved receipt:`n$path"
+
