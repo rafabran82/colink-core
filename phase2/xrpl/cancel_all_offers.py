@@ -7,6 +7,8 @@ from xrpl.wallet import Wallet
 from xrpl.models.requests import AccountInfo, AccountOffers
 from xrpl.models.transactions import OfferCancel
 from xrpl.transaction import autofill_and_sign
+from xrpl.core.binarycodec import encode as encode_tx
+from xrpl.core.hashing import sha512_half
 
 COPX160 = "434F505800000000000000000000000000000000"  # "COPX" 160-bit
 
@@ -32,12 +34,22 @@ def offer_matches(offer: Dict[str, Any], code160: str, issuer: str) -> bool:
                 return True
     return False
 
+def tx_blob_and_hash(signed_tx) -> (str, str):
+    """Return (tx_blob_hex, tx_hash_hex) from a signed Transaction."""
+    # encode expects a plain dict
+    tx_dict = signed_tx.to_dict()
+    blob = encode_tx(tx_dict)
+    # Local tx hash = SHA512Half(prefix 0x54584E00 + blob)
+    # xrpl hash uses the "TXN_SIGNATURE" prefix (TXN = 0x54584E00)
+    prefixed = bytes.fromhex("54584E00") + bytes.fromhex(blob)
+    tx_hash = sha512_half(prefixed).hex().upper()
+    return blob, tx_hash
+
 def rpc_submit_blob(rpc_url: str, blob: str) -> Dict[str, Any]:
     payload = {"method": "submit", "params": [{"tx_blob": blob}]}
     r = requests.post(rpc_url, json=payload, timeout=30)
     r.raise_for_status()
     data = r.json()
-    # xrpl RPC puts the actual result under "result"
     return data.get("result", data)
 
 def rpc_tx(rpc_url: str, tx_hash: str) -> Dict[str, Any]:
@@ -48,13 +60,14 @@ def rpc_tx(rpc_url: str, tx_hash: str) -> Dict[str, Any]:
     return data.get("result", data)
 
 def submit_and_poll_raw(rpc_url: str, signed_tx) -> Dict[str, Any]:
-    """Submit signed blob via raw JSON-RPC and poll Tx until validated (or timeout)."""
-    blob = signed_tx.to_xrpl()
+    """Submit signed blob via raw JSON-RPC and poll until validated (or timeout)."""
+    blob, local_hash = tx_blob_and_hash(signed_tx)
     prelim = rpc_submit_blob(rpc_url, blob)
-    tx_hash = prelim.get("tx_json", {}).get("hash") or prelim.get("hash")
+    # prefer engine-provided hash; fall back to local
+    tx_hash = (prelim.get("tx_json", {}) or {}).get("hash") or prelim.get("hash") or local_hash
 
     out = {"prelim": prelim, "hash": tx_hash}
-    # Poll up to ~40s total (20 * 2s)
+    # Poll up to ~40s total
     for _ in range(20):
         if not tx_hash:
             break
@@ -124,18 +137,20 @@ def main():
         print(json.dumps(summary, indent=2))
         return
 
-    # Submit cancels one-by-one (simple + reliable)
+    # Submit cancels one-by-one
     for off in selected:
         seq = off.get("seq")
         tx = OfferCancel(account=wallet.classic_address, offer_sequence=seq)
         signed = autofill_and_sign(tx, client, wallet)
         if args.no_wait:
-            prelim = rpc_submit_blob(rpc, signed.to_xrpl())
+            blob, local_hash = tx_blob_and_hash(signed)
+            prelim = rpc_submit_blob(rpc, blob)
+            tx_hash = (prelim.get("tx_json", {}) or {}).get("hash") or prelim.get("hash") or local_hash
             summary["results"].append({
                 "offer_sequence": seq,
                 "mode": "submitted_no_wait",
                 "prelim_engine": prelim.get("engine_result"),
-                "hash": prelim.get("tx_json", {}).get("hash") or prelim.get("hash"),
+                "hash": tx_hash
             })
         else:
             outcome = submit_and_poll_raw(rpc, signed)
