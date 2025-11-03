@@ -1,57 +1,58 @@
 ﻿param(
-  [double]$PriceXRP = 0.004,
-  [double]$Slippage = 0.02,
-  [int]   $Cushion  = 20,
-  [int]   $QtyCOPX  = 250
+  [Parameter(Mandatory=$true)][decimal]$QtyCOPX,
+  [Parameter(Mandatory=$true)][decimal]$PriceXRP,
+  [Parameter(Mandatory=$true)][decimal]$Slippage
 )
 
-# Load .env into this process
-Get-Content .env.testnet |
-  ? { $_ -match '^\s*[^#=\s]+\s*=' } |
-  % { $k,$v = $_ -split '=',2; [Environment]::SetEnvironmentVariable($k.Trim(), $v.Trim(), 'Process') }
+Import-Module xrpay -ErrorAction SilentlyContinue | Out-Null
 
-# Compute XRP cap (drops)
-$capDrops = [int][math]::Ceiling($QtyCOPX * $PriceXRP * 1000000 * (1 + $Slippage)) + $Cushion
+$Worst    = $PriceXRP * (1+$Slippage)
+$CapDrops = [int]([math]::Ceiling($QtyCOPX * $Worst * 1000000)) + 20
+Write-Warning "Cap drops = $CapDrops at worst=$Worst XRP/COPX"
 
-# Pre snapshot
-$before = python .\phase2\xrpl\tools\show_balances.py | Out-String | ConvertFrom-Json
+$before = python .\phase2\xrpl\tools\show_balances.py | Out-String
 
-# Step 1 – taker pays XRP to maker
-$env:OTC_XRP_DROPS = "$capDrops"
-$step1Raw = python .\phase2\xrpl\otc_step1_taker_pays_xrp.py | Out-String
-$step1    = $step1Raw | ConvertFrom-Json
+$env:OTC_XRP_DROPS = "$CapDrops"
+$j1 = python .\phase2\xrpl\otc_step1_taker_pays_xrp.py | Out-String
+try { $p1 = $j1 | ConvertFrom-Json -ErrorAction Stop } catch { throw "STEP1 not JSON: `n$j1" }
+if (-not $p1.engine_result) { throw "STEP1 missing engine_result (hash=$($p1.hash))" }
+if ($p1.engine_result -ne 'tesSUCCESS') { throw "STEP1 engine_result=$($p1.engine_result) hash=$($p1.hash)" }
 
-# Step 2 – issuer pays COPX to taker
 $env:OTC_COPX_QTY = "$QtyCOPX"
-$step2Raw = python .\phase2\xrpl\otc_step2_issuer_pays_copx.py | Out-String
-$step2    = $step2Raw | ConvertFrom-Json
+$j2 = python .\phase2\xrpl\otc_step2_issuer_pays_copx.py | Out-String
+try { $p2 = $j2 | ConvertFrom-Json -ErrorAction Stop } catch { throw "STEP2 not JSON: `n$j2" }
+if (-not $p2.engine_result) { throw "STEP2 missing engine_result (hash=$($p2.hash))" }
+if ($p2.engine_result -ne 'tesSUCCESS') { throw "STEP2 engine_result=$($p2.engine_result) hash=$($p2.hash)" }
 
-# Post snapshot
-$after = python .\phase2\xrpl\tools\show_balances.py | Out-String | ConvertFrom-Json
+$after = python .\phase2\xrpl\tools\show_balances.py | Out-String
 
-# Build receipt
 $receipt = [ordered]@{
-  ts_iso    = (Get-Date).ToString("s")
-  params    = [ordered]@{
-    qty_copx   = $QtyCOPX
-    price_xrp  = $PriceXRP
-    slippage   = $Slippage
-    cap_drops  = $capDrops
+  timestamp    = (Get-Date).ToString("s")
+  qty_copx     = "$QtyCOPX"
+  price_xrp    = "$PriceXRP"
+  slippage     = "$Slippage"
+  cap_drops    = $CapDrops
+  step1        = [ordered]@{
+    engine_result = $p1.engine_result
+    hash          = $p1.hash
+    fee_drops     = $p1.fee_drops
+    xrp_drops_sent= $p1.xrp_drops_sent
   }
-  before    = $before
-  step1     = $step1
-  step2     = $step2
-  after     = $after
+  step2        = [ordered]@{
+    engine_result = $p2.engine_result
+    hash          = $p2.hash
+    fee_drops     = $p2.fee_drops
+    issuer_sent   = $p2.issuer_sent
+  }
+  balances     = [ordered]@{
+    before = ($before | ConvertFrom-Json)
+    after  = ($after  | ConvertFrom-Json)
+  }
 }
 
-# Ensure receipts folder
-$root = Join-Path $PSScriptRoot "otc_receipts"
-if (!(Test-Path $root)) { New-Item -ItemType Directory -Path $root | Out-Null }
-
-# Save file
-$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$path  = Join-Path $root ("otc-{0}.json" -f $stamp)
+$dir = ".\phase2\xrpl\otc_receipts"
+if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
+$name = "otc-$((Get-Date).ToString('yyyyMMdd-HHmmss')).json"
+$path = Join-Path $dir $name
 $receipt | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 $path
-
-Write-Host "Saved receipt:" -ForegroundColor Green
-Write-Host $path
+Write-Host "Saved receipt:`n$path"
