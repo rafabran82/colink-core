@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet
 from xrpl.account import get_balance
-from xrpl.models.requests import AccountInfo, BookOffers, Ledger
+from xrpl.models.requests import AccountInfo, BookOffers, Ledger, ServerState
 from xrpl.models.transactions import TrustSet, OfferCreate
 from xrpl.models.amounts import IssuedCurrencyAmount
 from xrpl.transaction import autofill, sign, submit_and_wait
@@ -34,34 +34,66 @@ def to160(code:str)->str:
 CUR = to160(CODE)
 
 client = JsonRpcClient(RPC)
-tw = Wallet.from_seed(TSEED)
+tw = Wallet.from_seed(TSEED) if TSEED else None
 
 def acct_root(addr:str):
     return client.request(AccountInfo(account=addr, ledger_index="validated", strict=True)).result
+
+def network_reserves():
+    """
+    Returns (reserve_base_drops, reserve_inc_drops).
+    Tries server_state → ledger (xrp or drops) → defaults (10 XRP, 2 XRP).
+    """
+    # 1) server_state (usually returns drops)
+    try:
+        ss = client.request(ServerState()).result
+        st = ss.get("state", {})
+        vl = st.get("validated_ledger", {})
+        rb = vl.get("reserve_base")
+        ri = vl.get("reserve_inc")
+        if isinstance(rb, int) and isinstance(ri, int):
+            return int(rb), int(ri)
+    except Exception:
+        pass
+
+    # 2) ledger (either *_xrp strings or drops ints)
+    try:
+        led = client.request(Ledger(ledger_index="validated", full=False, accounts=False, transactions=False, expand=False)).result
+        L = led.get("ledger", led)
+        if "reserve_base_xrp" in L and "reserve_inc_xrp" in L:
+            rb = int(Decimal(str(L["reserve_base_xrp"])) * Decimal(1_000_000))
+            ri = int(Decimal(str(L["reserve_inc_xrp"])) * Decimal(1_000_000))
+            return rb, ri
+        if "reserve_base" in L and "reserve_inc" in L:
+            return int(L["reserve_base"]), int(L["reserve_inc"])
+    except Exception:
+        pass
+
+    # 3) Fallback: 10 XRP base, 2 XRP inc
+    return 10_000_000, 2_000_000
 
 def spendable_drops(addr:str):
     info = acct_root(addr)["account_data"]
     bal   = int(info["Balance"])
     oc    = int(info.get("OwnerCount", 0))
-    # Testnet faucet reserves (base/inc) are high; read from validated ledger
-    led = client.request(Ledger(ledger_index="validated", full=False, accounts=False, transactions=False, expand=False)).result
-    base = int(led["ledger"]["reserve_base_xrp"]) * 1_000_000
-    inc  = int(led["ledger"]["reserve_inc_xrp"])  * 1_000_000
+    base, inc = network_reserves()
     need = base + oc * inc
     return max(0, bal - need), bal, oc, base, inc
 
 def ensure_trustline(addr:str, seed:str):
-    # Create/ensure trustline to ISSUER/COPX (limit large enough)
-    ts = TrustSet(
-        account=addr,
-        limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
-    )
+    if not seed:
+        print("No seed provided; cannot ensure trustline.")
+        return
     try:
+        ts = TrustSet(
+            account=addr,
+            limit_amount=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value="20000")
+        )
         txr = submit_and_wait(sign(autofill(ts, client), Wallet.from_seed(seed)), client).result
         print("TrustSet result:", txr.get("engine_result"))
-    except Exception as e:
-        # Often returns temDST_IS_SRC if issuer==addr, or tec* if already present; treat as idempotent
-        print("TrustSet result: already")
+    except Exception:
+        # Already exists or issuer=self etc.
+        print("TrustSet result: None")
 
 def first_executable_ask(taker:str):
     # Maker sells COPX (taker_pays=IC), receives XRP (taker_gets=XRP).
@@ -76,28 +108,28 @@ def first_executable_ask(taker:str):
     if not offers:
         return None, None
 
-    # Pick first non-self owner; compute px and size
     for o in offers:
         owner = o.get("Account")
-        if owner == taker or owner == HOT:
+        if owner == taker or (HOT and owner == HOT):
             continue
-        tg = o.get("TakerGets")  # XRP (drops) as str or dict (should be str)
-        tp = o.get("TakerPays")  # issued currency dict
-        try:
-            drops = int(tg) if isinstance(tg, str) else int(tg.get("value","0"))
-        except Exception:
-            # some servers return object for XRP; normalize
-            if isinstance(tg, dict) and tg.get("currency") == "XRP":
-                drops = int(tg.get("value","0"))
-            else:
-                continue
+        tg = o.get("TakerGets")
+        tp = o.get("TakerPays")
+        # Normalize XRP drops
+        if isinstance(tg, str):
+            drops = int(tg)
+        elif isinstance(tg, dict) and tg.get("currency") == "XRP":
+            drops = int(tg.get("value","0"))
+        else:
+            continue
         if not isinstance(tp, dict): 
             continue
-        val = Decimal(str(tp.get("value","0")))
-        if val <= 0:
+        try:
+            size = Decimal(str(tp.get("value","0")))
+        except Exception:
             continue
-        px = Decimal(drops) / Decimal(1_000_000) / val   # XRP/COPX
-        size = val
+        if size <= 0:
+            continue
+        px = (Decimal(drops) / Decimal(1_000_000)) / size   # XRP/COPX
         return {"owner": owner, "px": px, "size": size}, o
     return None, None
 
@@ -110,14 +142,11 @@ def main():
         return
     print("Taker:", TAKER)
 
-    # Ensure trustline (idempotent)
     ensure_trustline(TAKER, TSEED)
 
-    # Spendable XRP
     spendable, bal, oc, base, inc = spendable_drops(TAKER)
     print(f"Spendable drops: {spendable} (balance={bal}, owner_count={oc}, reserve_base={base}, reserve_inc={inc})")
 
-    # Find a non-self ask
     best, raw = first_executable_ask(TAKER)
     if not best:
         print("No executable asks from your perspective (either empty book or only self/HOT-owned).")
@@ -125,31 +154,20 @@ def main():
 
     print(f"Chosen ask owner={best['owner']} px≈{best['px']:.6f} XRP/COPX size={best['size']} COPX")
 
-    # Desired buy quantity (cannot exceed ask size)
     qty = min(BUY_QTY, best["size"])
-    # Price cap with slippage
     cap_xrp = (best["px"] * qty * (Decimal(1) + SLIP)).quantize(Decimal("0.000001"), rounding=ROUND_UP)
     cap_drops = int((cap_xrp * Decimal(1_000_000)).to_integral_value(rounding=ROUND_UP)) + CUSHION
-    cap_drops = min(cap_drops, spendable)  # cannot spend beyond spendable
+    cap_drops = min(cap_drops, spendable)
     if cap_drops <= 0:
         print("Insufficient spendable XRP after reserves to place IOC.")
         return
 
-    # Build IOC OfferCreate: taker (buyer) pays XRP (cap), gets COPX (qty)
     tx = OfferCreate(
         account=TAKER,
-        taker_gets=str(cap_drops),  # we pay up to cap in XRP drops
+        taker_gets=str(cap_drops),  # we pay up to cap in XRP (drops)
         taker_pays=IssuedCurrencyAmount(currency=CUR, issuer=ISSUER, value=str(qty)),  # we receive qty COPX
         flags=TF_IOC
     )
-
-    # Use validated ledger + small cushion
-    ai = acct_root(TAKER)
-    vli = ai.get("ledger_index", None)
-    # If account_info didn’t include it, fetch ledger explicitly
-    if vli is None:
-        vli = client.request(Ledger(ledger_index="validated")).result["ledger_index"]
-    # autofill will set LastLedgerSequence; but we’ll let autofill do it based on validated+X.
     stx = sign(autofill(tx, client), tw)
 
     print(f"Submitting IOC (cap={cap_xrp} XRP ≈ {cap_drops} drops) for qty={qty} COPX …")
@@ -162,7 +180,6 @@ def main():
     else:
         txj = res.get("tx_json",{})
         print("✅ Filled or killed. Hash:", txj.get("hash"))
-        # Optional: you could fetch account_lines to see updated COPX balance.
 
 if __name__ == "__main__":
     main()
