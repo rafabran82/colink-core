@@ -1,7 +1,8 @@
 ﻿import json, sys, pathlib
 
 def read_json(p):
-    with open(p, "r", encoding="utf-8") as f:
+    # Accept UTF-8 with or without BOM
+    with open(p, "r", encoding="utf-8-sig") as f:
         return json.load(f)
 
 def to_int(x, default=0):
@@ -25,7 +26,7 @@ def main():
         print(json.dumps({"ok": False, "messages": [f"Read/JSON error: {e!r}"], "file": pathlib.Path(path).name}))
         return
 
-    schema = obj.get("schema") or ("legacy" if "timestamp" in obj else "unknown")
+    schema = obj.get("schema") or ("1.0" if "params" in obj and "results" in obj else ("legacy" if "timestamp" in obj else "unknown"))
 
     # Extract fields (schema 1.0 vs legacy)
     if schema == "1.0":
@@ -45,7 +46,6 @@ def main():
         cap_drops = to_int(obj.get("cap_drops"))
         step1     = obj.get("step1", {}) or {}
         step2     = obj.get("step2", {}) or {}
-        # Legacy receipts don’t include results; keep for uniformity
         results   = {
             "maker_delta_drops": None,
             "taker_delta_drops": None,
@@ -68,23 +68,17 @@ def main():
     taker_dx = None if taker_dx is None else to_int(taker_dx)
     est_gross= None if est_gross is None else to_int(est_gross)
 
-    msgs = []
-    ok = True
+    msgs, ok = [], True
 
     if not cap_drops or cap_drops <= 0:
-        ok = False
-        msgs.append("cap_drops <= 0")
+        ok = False; msgs.append("cap_drops <= 0")
 
-    if s1_eng != "tesSUCCESS":
-        ok = False; msgs.append(f"Step1 engine_result != tesSUCCESS: {s1_eng}")
-    if s2_eng != "tesSUCCESS":
-        ok = False; msgs.append(f"Step2 engine_result != tesSUCCESS: {s2_eng}")
-    if not s1_h:
-        ok = False; msgs.append("Step1 hash missing")
-    if not s2_h:
-        ok = False; msgs.append("Step2 hash missing")
+    if s1_eng != "tesSUCCESS": ok = False; msgs.append(f"Step1 engine_result != tesSUCCESS: {s1_eng}")
+    if s2_eng != "tesSUCCESS": ok = False; msgs.append(f"Step2 engine_result != tesSUCCESS: {s2_eng}")
+    if not s1_h: ok = False; msgs.append("Step1 hash missing")
+    if not s2_h: ok = False; msgs.append("Step2 hash missing")
 
-    # Soft sanity checks (don’t flip overall ok)
+    # Soft sanity checks
     soft = []
     if cap_drops and maker_dx is not None:
         allowed_maker = {cap_drops, cap_drops - 10, cap_drops + 10}
