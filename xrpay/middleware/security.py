@@ -1,9 +1,9 @@
-﻿import logging
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import asyncio
 import hashlib
 import hmac
+import logging
 import os
 import time
 from typing import Awaitable, Callable, Iterable, Optional, Union
@@ -16,6 +16,14 @@ from starlette.types import ASGIApp
 SecretProvider = Callable[[str], Union[str, bytes, None, Awaitable[Union[str, bytes, None]]]]
 KeyIdProvider  = Callable[[Request], Optional[str]]
 
+logger = logging.getLogger("xrpay.hmac")
+if not logger.handlers:
+    # simple console logger
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+logger.setLevel(logging.DEBUG if os.getenv("XRPAY_HMAC_DEBUG", "0") == "1" else logging.INFO)
 
 def _default_secret_provider(key_id: str) -> Optional[bytes]:
     """
@@ -27,13 +35,11 @@ def _default_secret_provider(key_id: str) -> Optional[bytes]:
         return secret.encode("utf-8")
     return secret
 
-
 def _default_key_id_provider(req: Request) -> Optional[str]:
     # Client should send X-XRPay-Key
     return req.headers.get("X-XRPay-Key")
 
-
-logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
+class HMACMiddleware(BaseHTTPMiddleware):
     """
     Verifies HMAC headers on mutating requests.
 
@@ -43,7 +49,7 @@ logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
       - X-XRPay-Signature  : hex(HMAC_SHA256(secret, f"{ts}.{body}"))
 
     Message to sign:  "{ts}.{raw_body}"
-    Comparison: case-insensitive, constant-time.
+    Comparison: constant-time.
     """
 
     def __init__(
@@ -54,14 +60,12 @@ logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
         key_id_provider: Optional[KeyIdProvider] = None,
         required_methods: Iterable[str] = ("POST", "PUT", "PATCH", "DELETE"),
         max_skew_seconds: int = 300,
-        skip_paths: Iterable[str] = ("/healthz",),
     ) -> None:
         super().__init__(app)
         self.secret_provider = secret_provider or _default_secret_provider
         self.key_id_provider = key_id_provider or _default_key_id_provider
         self.required_methods = {m.upper() for m in required_methods}
         self.max_skew = int(max_skew_seconds)
-        self.skip_paths = set(skip_paths)
 
     async def _get_secret(self, key_id: str) -> Optional[bytes]:
         # Support sync or async providers
@@ -74,16 +78,10 @@ logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
             return res.encode("utf-8")
         if isinstance(res, (bytes, bytearray)):
             return bytes(res)
-        # Unknown type
         raise HTTPException(status_code=500, detail="Secret provider returned invalid type")
 
     async def dispatch(self, request: Request, call_next):
-        path = request.url.path
         method = request.method.upper()
-
-        if path in self.skip_paths:
-            return await call_next(request)
-
         if method not in self.required_methods:
             # Skip HMAC for non-mutating methods
             return await call_next(request)
@@ -93,46 +91,51 @@ logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
         sig_hdr = request.headers.get("X-XRPay-Signature")
 
         if not key_id or not ts_hdr or not sig_hdr:
-            # === TEMP DEBUG: show exactly what headers the app is receiving ===
-            try:
-                print("HMAC DEBUG headers:", dict(request.headers))
-            except Exception:
-                pass
+            logger.warning("Missing HMAC headers: key=%s ts=%s sig_present=%s",
+                           bool(key_id), bool(ts_hdr), bool(sig_hdr))
             raise HTTPException(status_code=401, detail="Missing HMAC headers")
 
         # Validate timestamp is int and within skew window
         try:
             ts = int(ts_hdr)
         except ValueError:
+            logger.warning("Invalid HMAC timestamp header: %r", ts_hdr)
             raise HTTPException(status_code=401, detail="Invalid HMAC timestamp")
 
         now = int(time.time())
         if abs(now - ts) > self.max_skew:
+            logger.warning("Timestamp outside skew: now=%d ts=%d max_skew=%d", now, ts, self.max_skew)
             raise HTTPException(status_code=401, detail="Timestamp outside allowed skew")
 
         # Read (and later replay) the request body
         raw = await request.body()
 
-        # Starlette consumes the body when read; we must replay it for downstream handlers.
+        # Starlette consumes the body when read; replay it for downstream handlers.
         async def _receive_once() -> dict:
             return {"type": "http.request", "body": raw, "more_body": False}
         request._receive = _receive_once  # type: ignore[attr-defined]
 
         # Build message: "ts.body"
-        msg = f"{ts}.{raw.decode('utf-8', 'replace')}".encode("utf-8")
+        try:
+            body_str = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            body_str = raw.decode("utf-8", "replace")
+        msg = f"{ts}.{body_str}".encode("utf-8")
 
         # Fetch secret for key_id (supports async providers)
         secret = await self._get_secret(key_id)
         if not secret:
+            logger.warning("Unknown HMAC key: %r", key_id)
             raise HTTPException(status_code=401, detail="Unknown HMAC key")
 
         expected = hmac.new(secret, msg, hashlib.sha256).hexdigest().lower()
         provided = sig_hdr.strip().lower()
 
         if not hmac.compare_digest(provided, expected):
-            logger.warning("HMAC mismatch | provided=%s expected=%s | body=%s", provided, expected, raw[:1024].decode("utf-8","replace"))
+            # Verbose diagnostics to unblock you
+            logger.error("HMAC mismatch: provided=%s expected=%s | ts=%s | body=%s",
+                         provided, expected, ts, body_str)
             raise HTTPException(status_code=401, detail="Invalid HMAC")
 
         # OK
         return await call_next(request)
-
