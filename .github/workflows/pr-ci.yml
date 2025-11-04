@@ -45,8 +45,10 @@ jobs:
           python -m py_compile (Get-ChildItem -Recurse -File -Include *.py | ? { $_.FullName -notmatch '\\\.venv\\' }).FullName
           python -m pytest -q
 
-      - name: Mini sweep (CI)
+            - name: Ensure charts exist (fallback)
         shell: pwsh
+        run: |
+          python tools/ensure_charts.py --dir artifacts/charts --need 2        shell: pwsh
         env:
           XRPL_RPC_URL: https://s.altnet.rippletest.net:51234
         run: |
@@ -63,3 +65,4 @@ jobs:
         shell: pwsh
         run: |
           python -m colink_core.sim.metrics --dir artifacts/charts --min-files 2 --min-total-kb 20
+

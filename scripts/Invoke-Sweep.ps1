@@ -82,3 +82,13 @@ if ($stdout) {
 }
 
 Write-Host "==> Sweep complete."
+
+# After ensuring charts exist, write a minimal summary so CI can enforce slip SLO.
+try {
+  & .\.venv\Scripts\python.exe - <<'PY'
+from colink_core.sim.summary import write_minimal
+print(write_minimal("artifacts/charts", name="dev-slo", twap_guard_bps=150.0))
+PY
+} catch {
+  Write-Warning "Could not write minimal summary.json: $($_.Exception.Message)"
+}
