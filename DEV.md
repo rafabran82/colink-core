@@ -1,8 +1,8 @@
 ﻿# colink-core quick dev guide
 
 ## Smoke
-python -m colink_core.sim.json_cli quote --col-in 8000 --min-out-bps 150 --twap-guard
-python -m colink_core.sim.json_cli sweep --outdir charts
+colink-json quote --col-in 8000 --min-out-bps 150 --twap-guard
+colink-json sweep --outdir charts
 
 ## Tests
 pytest -q
@@ -16,3 +16,4 @@ If it fails, fix code or run:
 ## Charts
 Charts PNGs are ignored by git. Clean up:
   pwsh scripts/clean-charts.ps1
+
