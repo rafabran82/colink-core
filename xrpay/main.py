@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 from fastapi import FastAPI
+from xrpay.idempotency import IdempotencyMiddleware, AsyncMemoryStore
 
 app = FastAPI(
     title="XRPay",
@@ -61,3 +62,4 @@ _idem_store = AsyncMemoryStore()
 # Attach idempotency AFTER HMAC so the verified raw body is available
 from xrpay.middleware.idempotency import IdempotencyMiddleware
 app.add_middleware(IdempotencyMiddleware, store=_idem_store)
+
