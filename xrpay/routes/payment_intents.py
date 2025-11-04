@@ -1,53 +1,39 @@
-﻿from fastapi import APIRouter, Body, HTTPException
-import time
-from ..repos import get_quote, attach_quote_to_intent
+﻿from fastapi import APIRouter, Body, HTTPException, Path
 from ..db import session_scope
-from ..models import PaymentIntent
+from ..models import PaymentIntent, Quote
 
 router = APIRouter(prefix="/payments/intents", tags=["payment_intents"])
 
 @router.post("")
 def create_intent(payload: dict = Body(...)):
-    # minimal create (assumes invoice already exists)
-    from ..repos import _uuid
+    invoice_id = payload.get("invoiceId")
+    pay_ccy    = payload.get("paymentCurrency") or "XRP"
     with session_scope() as s:
-        pi = PaymentIntent(
-            id=_uuid(),
-            invoice_id=payload.get("invoiceId"),
-            payment_currency=payload.get("paymentCurrency", "XRP"),
-            status="CREATED",
-        )
-        s.add(pi)
-        s.flush()
-        return {"id": pi.id, "status": pi.status}
+        row = PaymentIntent(invoice_id=invoice_id, payment_currency=pay_ccy, status="CREATED")
+        s.add(row); s.flush()
+        return {"id": row.id, "status": row.status}
 
 @router.post("/{intent_id}/confirm")
-def confirm_intent(intent_id: str, payload: dict = Body(...)):
-    """
-    Body: {"quoteId": "..."}
-    Validates:
-      - Quote exists and is VALID
-      - Not expired (now <= expires_at)
-    Locks price into the PaymentIntent (status -> CONFIRMED)
-    """
-    qid = payload.get("quoteId")
-    if not qid:
+def confirm_intent(intent_id: str = Path(...), payload: dict = Body(...)):
+    quote_id = payload.get("quoteId")
+    if not quote_id:
         raise HTTPException(status_code=400, detail="quoteId required")
-    q = get_quote(qid)
-    if not q:
-        raise HTTPException(status_code=404, detail="quote not found")
-    now = int(time.time())
-    if q.status != "VALID":
-        raise HTTPException(status_code=409, detail=f"quote not valid: {q.status}")
-    if now > q.expires_at:
-        raise HTTPException(status_code=409, detail="quote expired")
+    with session_scope() as s:
+        intent = s.get(PaymentIntent, intent_id)
+        if not intent:
+            raise HTTPException(status_code=404, detail="intent not found")
+        q = s.get(Quote, quote_id)
+        if not q:
+            raise HTTPException(status_code=404, detail="quote not found")
 
-    pi = attach_quote_to_intent(intent_id, qid, q.price)
-    if not pi:
-        raise HTTPException(status_code=404, detail="payment intent not found")
-
-    # mark quote as used
-    from ..repos import use_quote
-    use_quote(q)
-
-    return {"id": pi.id, "status": pi.status, "quoteId": qid, "locked_price": pi.locked_price}
+        # lock price + mark CONFIRMED
+        intent.locked_quote_id = q.id
+        intent.locked_price = q.price
+        intent.status = "CONFIRMED"
+        s.add(intent)
+        return {
+            "id": intent.id,
+            "status": intent.status,
+            "lockedQuoteId": intent.locked_quote_id,
+            "lockedPrice": float(intent.locked_price),
+        }

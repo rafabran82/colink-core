@@ -6,10 +6,9 @@ from xrpay.middleware.idempotency import IdempotencyMiddleware
 from xrpay.liquidity.sim_provider import SimProvider
 from xrpay.services.pricing import PricingEngine
 
-from xrpay.routes.invoices import router as invoices_router
-from xrpay.routes.payment_intents import router as payment_intents_router
-from xrpay.routes.quotes import router as quotes_router
 from xrpay.routes.hooks import router as hooks_router
+from xrpay.routes.quotes import router as quotes_router
+from xrpay.routes.payment_intents import router as payment_intents_router
 from xrpay.routes.webhooks import router as webhooks_router
 from xrpay.routes.debug import router as debug_router
 
@@ -27,7 +26,7 @@ app.add_middleware(HMACMiddleware, secret_provider=secret_provider)
 app.add_middleware(IdempotencyMiddleware, store=InMemoryIdemStore())
 
 _provider = SimProvider()
-_pricing = PricingEngine(_provider)
+_pricing  = PricingEngine(_provider)
 
 @app.get("/healthz")
 async def healthz():
@@ -37,10 +36,15 @@ async def healthz():
 async def version():
     return {"version": app.version}
 
+# Minimal passthrough /quotes for compatibility (kept)
+@app.post("/quotes")
+async def make_quote(payload: dict = Body(...)):
+    data = await _pricing.quote(payload)
+    return JSONResponse(data)
+
 # Routers
-app.include_router(invoices_router)
-app.include_router(payment_intents_router)
-app.include_router(quotes_router)
 app.include_router(hooks_router)
+app.include_router(quotes_router)
+app.include_router(payment_intents_router)
 app.include_router(webhooks_router)
 app.include_router(debug_router)

@@ -1,14 +1,19 @@
 ﻿from contextlib import contextmanager
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-DB_URL = "sqlite:///./xrpay.db"
+DATABASE_URL = "sqlite:///./xrpay.db"
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+Base = declarative_base()
 
-engine = create_engine(DB_URL, future=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+# import models so tables are known before create_all
+# (local import to avoid circulars)
+def _import_models():
+    from . import models  # noqa: F401
 
-class Base(DeclarativeBase):
-    pass
+_import_models()
+Base.metadata.create_all(bind=engine)
 
 @contextmanager
 def session_scope():
@@ -16,7 +21,7 @@ def session_scope():
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
         raise
     finally:
