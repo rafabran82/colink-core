@@ -67,7 +67,6 @@ app.add_middleware(IdempotencyMiddleware, store=_idem_store)
 
 
 # --- XRPay debug: middleware snapshot ---
-@app.get('/_debug/middleware')
 def _mw_snapshot():
     try:
         stack = [mw.cls.__name__ for mw in app.user_middleware]
