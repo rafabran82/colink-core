@@ -20,20 +20,27 @@ _SLUG = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
 def _safe_outdir(name: str | None) -> Path:
     """
-    Accept only a short slug and force writes under artifacts/charts.
-    Prevent absolute paths and directory traversal.
+    Accept any string, but only use the basename as a short slug and
+    force writes under artifacts/charts. This satisfies CodeQL by
+    not writing to arbitrary user paths.
     """
     if not name:
+        slug = None
+    else:
+        # Take only the last component (ignore directories/drives)
+        slug = Path(str(name)).name or None
+
+    if not slug:
         out = SAFE_CHARTS_BASE
     else:
-        if not _SLUG.fullmatch(name):
+        if not _SLUG.fullmatch(slug):
             raise HTTPException(
                 status_code=400, detail="Invalid outdir; use [A-Za-z0-9._-] up to 64 chars."
             )
-        out = (SAFE_CHARTS_BASE / name).resolve()
-        # Ensure the resolved path still resides under SAFE_CHARTS_BASE
+        out = (SAFE_CHARTS_BASE / slug).resolve()
         if not str(out).startswith(str(SAFE_CHARTS_BASE)):
             raise HTTPException(status_code=400, detail="Outdir escapes base directory.")
+
     out.mkdir(parents=True, exist_ok=True)
     return out
 
