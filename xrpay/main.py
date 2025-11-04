@@ -27,10 +27,11 @@ def healthz():
 # === XRPay middleware begin ===
 # Authenticate first (ensures raw body is intact), then idempotency
 from xrpay.middleware.security import HMACMiddleware
+from xrpay.middleware.idempotency import IdempotencyMiddleware, InMemoryIdempotencyStore
 from xrpay.middleware.idempotency import IdempotencyMiddleware
 
 app.add_middleware(HMACMiddleware)
-app.add_middleware(IdempotencyMiddleware)
+app.add_middleware(IdempotencyMiddleware, store=InMemoryIdempotencyStore(ttl_seconds=300))
 # === XRPay middleware end ===
 
 # Routers (add/rename these dotted paths to match your project layout)
@@ -41,3 +42,4 @@ _try_include_router(app, "xrpay.routers.payments:router", "payments")
 _try_include_router(app, "xrpay.api.quotes:router", "quotes(api)")
 _try_include_router(app, "xrpay.api.invoices:router", "invoices(api)")
 _try_include_router(app, "xrpay.api.payments:router", "payments(api)")
+
