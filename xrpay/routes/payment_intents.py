@@ -1,79 +1,135 @@
-﻿from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, Body
+﻿from fastapi import APIRouter, HTTPException, Path
 from pydantic import BaseModel, Field
+
 from ..db import session_scope
 from ..models import Invoice, PaymentIntent, Quote
 
-router = APIRouter(prefix="/payments/intents", tags=["payments:intents"])
 
-class CreateIntentIn(BaseModel):
-    invoiceId: str = Field(..., alias="invoiceId")
-    paymentCurrency: str = Field(..., alias="paymentCurrency")
+router = APIRouter(prefix="/payments/intents", tags=["payment_intents"])
 
-class CreateIntentOut(BaseModel):
+
+class CreatePIIn(BaseModel):
+    invoiceId: str
+    paymentCurrency: str
+
+
+class CreatePIOut(BaseModel):
     id: str
+    invoiceId: str
+    paymentCurrency: str
     status: str
 
-class ConfirmIn(BaseModel):
-    quoteId: int = Field(..., alias="quoteId")
 
-class ConfirmOut(BaseModel):
-    id: str
-    status: str
-    locked_price: float | None = None
-    fee_bps: int | None = None
-    impact_bps: int | None = None
-    expiresAt: int | None = None
-
-@router.post("", response_model=CreateIntentOut)
-def create_intent(payload: CreateIntentIn):
+@router.post("", response_model=CreatePIOut)
+def create_payment_intent(payload: CreatePIIn):
     with session_scope() as s:
         inv = s.get(Invoice, payload.invoiceId)
         if not inv:
             raise HTTPException(status_code=404, detail="Invoice not found")
-        intent = PaymentIntent(
+
+        pi = PaymentIntent(
             invoice_id=inv.id,
             payment_currency=payload.paymentCurrency,
             status="CREATED",
-            locked_price=None,
-            fee_bps=None,
-            impact_bps=None,
-            expires_at=None,
         )
-        s.add(intent)
+        s.add(pi)
         s.flush()
-        return {"id": intent.id, "status": intent.status}
+
+        return {
+            "id": pi.id,
+            "invoiceId": pi.invoice_id,
+            "paymentCurrency": pi.payment_currency,
+            "status": pi.status,
+        }
+
+
+class ConfirmIn(BaseModel):
+    quoteId: int = Field(..., description="Persisted Quote id to lock")
+
+
+class ConfirmOut(BaseModel):
+    id: str
+    status: str
+    locked_price: float
+    fee_bps: int
+    impact_bps: int
+    expiresAt: int
+
 
 @router.post("/{intent_id}/confirm", response_model=ConfirmOut)
-def confirm_intent(intent_id: str, payload: ConfirmIn):
-    now = datetime.now(timezone.utc)
+def confirm_intent( payload: ConfirmIn, intent_id: str = Path(...)):
     with session_scope() as s:
-        intent = s.get(PaymentIntent, intent_id)
-        if not intent:
-            raise HTTPException(status_code=404, detail="Intent not found")
+        pi = s.get(PaymentIntent, intent_id)
+        if not pi:
+            raise HTTPException(status_code=404, detail="PaymentIntent not found")
 
-        q = s.get(Quote, payload.quoteId)
+        qt = s.get(Quote, payload.quoteId)
+        if not qt:
+            raise HTTPException(status_code=404, detail="Quote not found")
+
+        # (Optional) expiry/consistency checks go here
+        # e.g., if qt.expires_at < int(time.time()): raise HTTPException(...)
+
+        # Lock!
+        pi.locked_price = float(qt.price)
+        pi.fee_bps = int(qt.fee_bps or 0)
+        pi.impact_bps = int(qt.impact_bps or 0)
+        pi.expires_at = int(qt.expires_at or 0)
+        pi.status = "LOCKED"
+
+        s.add(pi)
+        s.flush()
+
+        return {
+            "id": pi.id,
+            "status": pi.status,
+            "locked_price": pi.locked_price,
+            "fee_bps": pi.fee_bps,
+            "impact_bps": pi.impact_bps,
+            "expiresAt": pi.expires_at,
+        }
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from ..db import session_scope
+from ..models import PaymentIntent, Quote
+
+class ConfirmRequest(BaseModel):
+    quoteId: int
+
+# If you already have a router, reuse it; otherwise ensure this is attached to the same router you use for PIs.
+from fastapi import HTTPException
+from pydantic import BaseModel, Field
+from ..db import session_scope
+from ..models import PaymentIntent, Quote
+
+class ConfirmRequest(BaseModel):
+    quoteId: int = Field(..., gt=0)
+
+@router.post("/payments/intents/{pi_id}/confirm")
+def confirm_payment_intent(pi_id: str, payload: ConfirmRequest):
+    with session_scope() as s:
+        pi = s.get(PaymentIntent, pi_id)
+        if not pi:
+            raise HTTPException(status_code=404, detail="PaymentIntent not found")
+
+        q = s.get(Quote, int(payload.quoteId))
         if not q:
             raise HTTPException(status_code=404, detail="Quote not found")
 
-        # Expiry check (quotes.expires_at stored as epoch seconds, UTC)
-        if q.expires_at is not None:
-            if int(q.expires_at) < int(now.timestamp()):
-                raise HTTPException(status_code=400, detail="Quote expired")
-
-        # Lock values onto the intent
-        intent.locked_price = float(q.price) if q.price is not None else None
-        intent.fee_bps = int(q.fee_bps) if q.fee_bps is not None else None
-        intent.impact_bps = int(q.impact_bps) if q.impact_bps is not None else None
-        intent.expires_at = int(q.expires_at) if q.expires_at is not None else None
-        intent.status = "CONFIRMED"
-        s.add(intent)
+        pi.quote_id     = q.id
+        pi.locked_price = q.price
+        pi.fee_bps      = q.fee_bps
+        pi.impact_bps   = q.impact_bps
+        pi.expires_at   = q.expires_at
+        s.flush()
 
         return {
-            "id": intent.id,
-            "status": intent.status,
-            "locked_price": intent.locked_price,
-            "fee_bps": intent.fee_bps,
-            "impact_bps": intent.impact_bps,
-            "expiresAt": intent.expires_at,
+            "payment_intent_id": pi.id,
+            "locked": True,
+            "quote_id": q.id,
+            "locked_price": pi.locked_price,
+            "fee_bps": pi.fee_bps,
+            "impact_bps": pi.impact_bps,
+            "expires_at": pi.expires_at,
         }

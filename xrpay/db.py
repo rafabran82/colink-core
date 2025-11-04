@@ -7,22 +7,20 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
-# import models so tables are known before create_all
-# (local import to avoid circulars)
 def _import_models():
-    from . import models  # noqa: F401
+    from . import models  # ensure Outbox, Webhook, Invoice, PaymentIntent, Quote are registered
 
 _import_models()
 Base.metadata.create_all(bind=engine)
 
 @contextmanager
 def session_scope():
-    session = SessionLocal()
+    s = SessionLocal()
     try:
-        yield session
-        session.commit()
+        yield s
+        s.commit()
     except Exception:
-        session.rollback()
+        s.rollback()
         raise
     finally:
-        session.close()
+        s.close()

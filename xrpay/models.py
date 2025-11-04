@@ -1,4 +1,6 @@
 ﻿from __future__ import annotations
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey
+import uuid
 from .db import Base
 from datetime import datetime
 from decimal import Decimal
@@ -17,15 +19,24 @@ class Invoice(Base):
 
 class PaymentIntent(Base):
     __tablename__ = "payment_intents"
-    id: Mapped[str] = mapped_column(String, primary_key=True)
-    status: Mapped[str] = mapped_column(String, default="CREATED")
-    invoice_id: Mapped[str] = mapped_column(String, ForeignKey("invoices.id"), nullable=True)
-    payment_currency: Mapped[str] = mapped_column(String, default="XRP")
-    # New: lock fields
-    quote_id: Mapped[str | None] = mapped_column(String, ForeignKey("quotes.id"), nullable=True)
-    locked_price: Mapped[str | None] = mapped_column(String, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+    # UUID primary key generated client-side so SQLite is happy
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), nullable=False)
+
+    status = Column(String, nullable=False, default="CREATED")
+
+    # relationships
+    invoice_id = Column(String, ForeignKey("invoices.id"), nullable=False)
+    payment_currency = Column(String, nullable=False)
+
+    # quote lock fields (nullable until /confirm)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=True)
+    locked_price = Column(Float, nullable=True)
+    fee_bps = Column(Integer, nullable=True)
+    impact_bps = Column(Integer, nullable=True)
+    expires_at = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 class Quote(Base):
     __tablename__ = "quotes"
     id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -70,5 +81,10 @@ class IdempotencyKey(Base):
     headers_json: Mapped[str] = mapped_column(Text)
     body_bytes: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+
+
+
 
 

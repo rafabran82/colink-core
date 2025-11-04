@@ -1,23 +1,30 @@
 ﻿from fastapi import APIRouter
 from ..db import session_scope
-from ..models import Outbox, Invoice
+from ..models import Quote
 
-router = APIRouter(prefix="/_debug", tags=["_debug"])
+router = APIRouter(tags=["_debug"])
 
-@router.get("/outbox")
-def list_outbox():
+@router.get("/_debug/quotes")
+def debug_quotes(limit: int = 10):
     with session_scope() as s:
-        rows = s.query(Outbox).order_by(Outbox.id.desc()).limit(50).all()
+        rows = (
+            s.query(Quote)
+             .order_by(Quote.id.desc())
+             .limit(limit)
+             .all()
+        )
         return [
-            {"id": r.id, "topic": r.topic, "status": r.status, "retries": r.retries, "webhook_id": r.webhook_id}
-            for r in rows
-        ]
-
-@router.get("/invoices")
-def list_invoices():
-    with session_scope() as s:
-        rows = s.query(Invoice).order_by(Invoice.created_at.desc()).limit(50).all()
-        return [
-            {"id": r.id, "status": r.status, "amount": r.amount, "paid_amount": r.paid_amount, "desc": r.description}
+            {
+                "id": r.id,
+                "base": r.base,
+                "quote": r.quote,
+                "side": r.side,
+                "amount": r.amount,
+                "price": r.price,
+                "fee_bps": r.fee_bps,
+                "impact_bps": r.impact_bps,
+                "expires_at": r.expires_at,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
             for r in rows
         ]
