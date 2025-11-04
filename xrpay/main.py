@@ -11,6 +11,7 @@ from xrpay.repos import init_db, SQLIdemStore
 from xrpay.routes.invoices import router as invoices_router
 from xrpay.routes.payment_intents import router as intents_router
 from xrpay.routes.hooks import router as hooks_router
+from xrpay.routes.debug import router as debug_router
 
 async def secret_provider(_req: Request) -> str:
     return "dev_hmac_secret"
@@ -57,3 +58,6 @@ async def make_quote(payload: dict = Body(...)):
 app.include_router(invoices_router)
 app.include_router(intents_router)
 app.include_router(hooks_router)
+app.include_router(debug_router)
+
+
