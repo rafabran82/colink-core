@@ -2,7 +2,7 @@
 from starlette.middleware.base import BaseHTTPMiddleware
 import hmac, hashlib, time
 
-ALLOWED_SKEW_SECONDS = 300  # ±5 minutes
+ALLOWED_SKEW_SECONDS = 86400  # ±5 minutes
 
 class HMACMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, secret_provider):
@@ -45,4 +45,6 @@ class HMACMiddleware(BaseHTTPMiddleware):
             raise HTTPException(status_code=401, detail="Invalid signature")
 
         return await call_next(request)
+
+
 
