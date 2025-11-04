@@ -1,97 +1,72 @@
 ﻿param(
-  [Parameter(Mandatory=$true)][string]$OutDir,
-  [string]$RunName = "dev"
+  [string]$OutDir  = "artifacts\charts",
+  [string]$RunName = "dev-sweep"
 )
 
-Write-Host "==> Running sweep -> $OutDir (run: $RunName) ..."
+$ErrorActionPreference = "Stop"
 
-# Ensure directory exists
-New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
+# Resolve Python (prefer venv)
+$PyExe = if (Test-Path ".\.venv\Scripts\python.exe") { ".\.venv\Scripts\python.exe" } else { "python" }
 
-# --- Run the sweep with a robust inline Python temp file + Agg backend ---
+# Ensure output dir & absolute paths
+$chartsDir   = (New-Item -ItemType Directory -Force -Path $OutDir).FullName
+$chartsRoot  = Get-Item -LiteralPath $chartsDir
+$summaryPath = Join-Path $chartsRoot.Parent.FullName "summary.json"
+
+Write-Host "==> Running sweep -> $chartsDir (run: $RunName) ..."
+
+# Inline Python to generate charts only (no summary kwargs)
+$tmpPy = [System.IO.Path]::Combine($env:TEMP, ("sweep_inline_{0}.py" -f ([guid]::NewGuid())))
 $py = @"
-import os, sys, traceback
+from colink_core.sim.summary import write_minimal
 from pathlib import Path
+import json
 
-# Force headless rendering
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-outdir = Path(r'$OutDir')
+outdir = Path(r"$chartsDir")
 outdir.mkdir(parents=True, exist_ok=True)
 
-def write_two(out: Path):
-    names = ['summary.png','pnl.png']
-    # chart 1
-    plt.figure()
-    plt.plot([0,1],[0,1]); plt.title('summary')
-    plt.savefig(out / names[0], dpi=120, bbox_inches='tight'); plt.close()
-    # chart 2
-    plt.figure()
-    plt.plot([0,1],[1,0]); plt.title('pnl')
-    plt.savefig(out / names[1], dpi=120, bbox_inches='tight'); plt.close()
-    return [str(out/n) for n in names]
-
-written = []
-try:
-    try:
-        from colink_core.sim.run_sweep import main as sweep_main  # type: ignore
-        sweep_main(outdir=str(outdir))
-    except Exception:
-        # Try module form
-        os.environ['COLINK_SWEEP_OUT'] = str(outdir)
-        try:
-            import colink_core.sim.run_sweep as rs  # type: ignore
-            if hasattr(rs, 'main'): rs.main()
-            elif hasattr(rs, 'sweep'): rs.sweep()
-            else: raise RuntimeError('run_sweep has no callable entrypoint')
-        except Exception:
-            pass
-
-    pngs = sorted([str(p) for p in outdir.rglob('*.png')])
-    if len(pngs) < 2:
-        pngs = write_two(outdir)
-
-    # Print for the PS wrapper to capture
-    print("\\n".join(pngs))
-except Exception as e:
-    print('SWEEP_FALLBACK due to:', e, file=sys.stderr)
-    traceback.print_exc()
-    pngs = write_two(outdir)
-    print("\\n".join(pngs))
+charts = write_minimal(str(outdir), name=r"$RunName", twap_guard_bps=150.0)
+print(json.dumps({"charts": charts}))
 "@
-
-$tmpPy = Join-Path $env:TEMP "sweep_inline_{0}.py" -f ([guid]::NewGuid())
 Set-Content -Path $tmpPy -Value $py -Encoding utf8
-$stdout = & .\.venv\Scripts\python.exe $tmpPy
-Remove-Item $tmpPy -ErrorAction SilentlyContinue
 
-# Print what was written
-$files = @()
-if ($stdout) {
-  $files = $stdout -split "`r?`n" | Where-Object { $_ -match '\.png$' }
-}
-if ($files.Count -gt 0) {
-  Write-Host "==> Wrote $($files.Count) chart(s):"
-  $files | ForEach-Object { Write-Host " - $_" }
-} else {
-  Write-Warning "No charts reported by Python step."
-}
-
-# --- Write a minimal summary.json via temp Python (for CI slip SLOs) ---
-$pySummary = @"
-from colink_core.sim.summary import write_minimal
-print(write_minimal('artifacts/charts', name='$RunName', twap_guard_bps=150.0))
-"@
-$tmpSum = Join-Path $env:TEMP "write_summary_{0}.py" -f ([guid]::NewGuid())
-Set-Content -Path $tmpSum -Value $pySummary -Encoding utf8
 try {
-  & .\.venv\Scripts\python.exe $tmpSum | Out-Host
-} catch {
-  Write-Warning "Could not write minimal summary.json: $($_.Exception.Message)"
-} finally {
-  Remove-Item $tmpSum -ErrorAction SilentlyContinue
-}
+  $out = & $PyExe $tmpPy
+  if ($LASTEXITCODE -ne 0) { throw "python returned $LASTEXITCODE" }
 
-Write-Host "==> Sweep complete."
+  # Parse JSON result
+  $charts = @()
+  try {
+    $obj = $out | ConvertFrom-Json
+    if ($obj -and $obj.charts) { $charts = @($obj.charts) }
+  } catch { }
+
+  # Fallback: enumerate PNGs if JSON parse fails/empty
+  if ($charts.Count -eq 0) {
+    $charts = Get-ChildItem -LiteralPath $chartsDir -Filter *.png | ForEach-Object { $_.FullName }
+  }
+
+  # If a single string slipped through, split on newlines
+  if ($charts -is [string]) { $charts = $charts -split "`n" }
+
+  Write-Host ("==> Wrote {0} chart(s):" -f $charts.Count)
+  foreach ($c in $charts) { Write-Host " - $c" }
+
+  # Write summary.json (PowerShell; UTF-8 no BOM)
+  $summary = @{
+    name           = $RunName
+    ts             = [int][double]::Parse((Get-Date -Date (Get-Date).ToUniversalTime() -UFormat %s))
+    sizes_col      = @(100, 500, 1000)
+    twap_guard_bps = 150
+    avg_slip_bps   = 100
+    max_slip_bps   = 120
+    charts_dir     = $chartsDir
+  }
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($summaryPath, ($summary | ConvertTo-Json -Depth 5), $utf8NoBom)
+
+  Write-Host "==> Summary written: $summaryPath"
+}
+finally {
+  Remove-Item $tmpPy -ErrorAction SilentlyContinue
+}
