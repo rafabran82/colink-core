@@ -59,3 +59,7 @@ jobs:
           name: charts-ci
           path: artifacts/charts/*.png
           if-no-files-found: warn
+      - name: SLO gates (charts present & non-trivial)
+        shell: pwsh
+        run: |
+          python -m colink_core.sim.metrics --dir artifacts/charts --min-files 2 --min-total-kb 20
