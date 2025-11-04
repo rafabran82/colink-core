@@ -1,4 +1,5 @@
-﻿from datetime import datetime, timedelta
+﻿from sqlalchemy.orm import joinedload
+from datetime import datetime, timedelta
 import json
 from sqlalchemy import select, text
 from .db import session_scope, Base, engine
@@ -41,7 +42,7 @@ def enqueue_outbox(topic: str, payload_json: str, webhook_id: int | None = None)
 def next_pending_outbox():
     with session_scope() as s:
         row = s.execute(
-            select(Outbox).where(Outbox.status=="PENDING").order_by(Outbox.id.asc())
+            select(Outbox).options(joinedload(Outbox.webhook)).where(Outbox.status=="PENDING").order_by(Outbox.id.asc())
         ).scalars().first()
         if row:
             return row
@@ -62,3 +63,4 @@ def requeue(outbox_id: int):
             row.retries += 1
             row.next_attempt_at = datetime.utcnow() + timedelta(seconds=min(60, 2**row.retries))
             s.add(row)
+
