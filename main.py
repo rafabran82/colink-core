@@ -18,6 +18,7 @@ app = FastAPI(title="COLINK Core API", version="0.3.0")
 XR_API_PREFIX = os.getenv('XR_API_PREFIX', '').strip()
 app.include_router(core_router, prefix=XR_API_PREFIX)
 # CORS (relaxed for local dev)
+app.add_middleware(IdempotencyMiddleware, store=AsyncMemoryStore(), default_ttl_seconds=300)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
