@@ -3,7 +3,6 @@
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-# --- Primary sim provider used by routes ---
 class SimProvider:
     def get_quote(
         self,
@@ -13,11 +12,20 @@ class SimProvider:
         amount: Decimal,
         *,
         slippage_bps: int = 25,
+        **kwargs,  # accept extras like slippageBps for backward compat
     ) -> dict:
+        # normalize inputs
         base_u = (base or "").upper()
         quote_u = (quote or "").upper()
         side_u = (side or "").upper()
         amt = Decimal(str(amount))
+
+        # allow camelCase arg name too
+        if "slippageBps" in kwargs and kwargs.get("slippageBps") is not None:
+            try:
+                slippage_bps = int(kwargs["slippageBps"])
+            except Exception:
+                pass
 
         # simple deterministic mid
         if base_u == "XRP" and quote_u == "USD":
@@ -42,13 +50,15 @@ class SimProvider:
             "expires_at": expires_at,
         }
 
-# singleton used by new code
+# singleton for new code
 provider = SimProvider()
 
-# ---- Backward-compat aliases so old imports keep working ----
+# ---- Backward-compat aliases ----
 class PricingEngine(SimProvider):
-    """Compat alias for older code that did `from xrpay.services.pricing import PricingEngine` and then `PricingEngine()`."""
-    pass
+    """Compat alias allowing old code to do PricingEngine(_provider)."""
+    def __init__(self, *args, **kwargs):
+        # ignore any injected provider; we don't need it for the sim
+        super().__init__()
 
-# some code may import `pricing_engine` directly
+# some code may import `pricing_engine`
 pricing_engine = provider
