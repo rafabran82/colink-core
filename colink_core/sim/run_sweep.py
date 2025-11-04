@@ -1,61 +1,44 @@
 ﻿from __future__ import annotations
-import math
-from typing import List
+from pathlib import Path
 import numpy as np
+import matplotlib.pyplot as plt
 
-# Headless plotting
-import matplotlib
-matplotlib.use("Agg")  # noqa: E402
-import matplotlib.pyplot as plt  # noqa: E402
+def simulate_gbm_paths(*, n_steps: int, n_paths: int, dt: float, mu: float, sigma: float, s0: float, seed: int | None = None):
+    rng = np.random.default_rng(seed)
+    dt_arr = dt
+    drift = (mu - 0.5 * sigma * sigma) * dt_arr
+    shock = sigma * np.sqrt(dt_arr) * rng.standard_normal(size=(n_steps, n_paths))
+    increments = drift + shock
+    log_paths = np.cumsum(increments, axis=0)
+    s = s0 * np.exp(log_paths)
+    s = np.vstack([np.full((1, n_paths), s0), s])  # prepend s0
+    return s  # shape: (n_steps+1, n_paths)
 
-
-def simulate_gbm_paths(
-    n_paths: int,
-    n_steps: int,
-    s0: float = 1.0,
-    mu: float = 0.0,
-    sigma: float = 0.25,
-    dt: float = 1.0 / 32.0,
-) -> List[List[float]]:
-    """
-    Tiny GBM simulation returning a list-of-lists for stability and ease of JSON dumping.
-    """
-    # Precompute drift/vol
-    drift = (mu - 0.5 * sigma * sigma) * dt
-    vol = sigma * math.sqrt(dt)
-
-    out: List[List[float]] = []
-    rng = np.random.default_rng(42)  # stable seed for reproducible tests
-    for _ in range(n_paths):
-        s = s0
-        path = [s]
-        # n_steps values total; path length == n_steps
-        for _ in range(1, n_steps):
-            z = rng.standard_normal()
-            s = s * math.exp(drift + vol * z)
-            path.append(s)
-        out.append(path)
-    return out
-
-
-def plot_paths(paths: List[List[float]], title: str, outfile: str) -> None:
-    plt.figure()
-    for p in paths:
-        plt.plot(p)
-    plt.title(title)
+def plot_paths(paths, outdir):
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    out_path = outdir / "sweep_paths-0000.png"
+    plt.figure(figsize=(8, 4.5))
+    plt.plot(paths[:, : min(paths.shape[1], 20)])
+    plt.title("GBM sample paths")
     plt.xlabel("step")
     plt.ylabel("price")
     plt.tight_layout()
-    plt.savefig(outfile, dpi=120)
+    plt.savefig(out_path, bbox_inches="tight")
     plt.close()
+    return out_path
 
-
-def plot_hist(samples: List[float], title: str, outfile: str) -> None:
-    plt.figure()
-    plt.hist(samples, bins=20)
-    plt.title(title)
-    plt.xlabel("value")
-    plt.ylabel("freq")
+def plot_hist(paths, outdir):
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    out_path = outdir / "sweep_hist-0000.png"
+    terminal = paths[-1, :]
+    plt.figure(figsize=(6, 4))
+    plt.hist(terminal, bins=30)
+    plt.title("Terminal price distribution")
+    plt.xlabel("price")
+    plt.ylabel("count")
     plt.tight_layout()
-    plt.savefig(outfile, dpi=120)
+    plt.savefig(out_path, bbox_inches="tight")
     plt.close()
+    return out_path
