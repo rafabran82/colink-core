@@ -64,3 +64,29 @@ def requeue(outbox_id: int):
             row.next_attempt_at = datetime.utcnow() + timedelta(seconds=min(60, 2**row.retries))
             s.add(row)
 
+
+def get_active_webhooks():
+    """Return active Webhook rows."""
+    with session_scope() as s:
+        return s.query(Webhook).filter(Webhook.status == "ACTIVE").all()
+
+def enqueue_to_all(topic: str, payload_json: str) -> int:
+    """
+    Fan-out to all active webhooks by creating Outbox rows.
+    Falls back to a single no-op Outbox if none exist.
+    """
+    hooks = get_active_webhooks()
+    try:
+        # reuse existing enqueue_outbox from this module
+        enqueue = enqueue_outbox
+    except NameError:
+        # If the symbol name changed, raise a clear error
+        raise RuntimeError("enqueue_outbox() not found in xrpay.repos")
+
+    if not hooks:
+        enqueue(topic, payload_json, webhook_id=None)
+        return 0
+
+    for w in hooks:
+        enqueue(topic, payload_json, webhook_id=w.id)
+    return len(hooks)
