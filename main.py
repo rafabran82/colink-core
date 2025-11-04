@@ -7,6 +7,7 @@ import os
 from xrpay.idempotency import IdempotencyMiddleware, AsyncMemoryStore
 # Routers
 from xrpay.routes.quotes import router as quotes_router
+from xrpay.routes.paper_seed import router as paper_seed_router
 from xrpay.routes.debug import router as debug_router
 from xrpay.routes.payment_intents import router as pi_router
 from xrpay.routes_core import router as core_router
@@ -47,6 +48,8 @@ def metrics():
 
 # Mount routes
 app.include_router(quotes_router)
+app.include_router(paper_seed_router)
 app.include_router(debug_router)
 app.include_router(pi_router)
 app.include_router(core_router)
+
