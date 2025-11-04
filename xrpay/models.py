@@ -49,7 +49,7 @@ class Quote(Base):
     fee_bps = Column(Integer, nullable=False)
     impact_bps = Column(Integer, nullable=False)
     expires_at = Column(Integer, nullable=False)
-    status = Column(String, nullable=False)
+    status = Column(String, nullable=False, default="VALID")
     terms_hash = Column(String, nullable=True)  # was NOT NULL -> now nullable
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 class Outbox(Base):
@@ -81,6 +81,7 @@ class IdempotencyKey(Base):
     headers_json: Mapped[str] = mapped_column(Text)
     body_bytes: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 
 
 
