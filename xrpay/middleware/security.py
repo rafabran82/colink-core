@@ -1,4 +1,5 @@
-﻿from __future__ import annotations
+﻿import logging
+from __future__ import annotations
 
 import asyncio
 import hashlib
@@ -32,7 +33,7 @@ def _default_key_id_provider(req: Request) -> Optional[str]:
     return req.headers.get("X-XRPay-Key")
 
 
-class HMACMiddleware(BaseHTTPMiddleware):
+logger = logging.getLogger("xrpay.hmac")`r`n`r`n\1
     """
     Verifies HMAC headers on mutating requests.
 
@@ -129,7 +130,9 @@ class HMACMiddleware(BaseHTTPMiddleware):
         provided = sig_hdr.strip().lower()
 
         if not hmac.compare_digest(provided, expected):
+            logger.warning("HMAC mismatch | provided=%s expected=%s | body=%s", provided, expected, raw[:1024].decode("utf-8","replace"))
             raise HTTPException(status_code=401, detail="Invalid HMAC")
 
         # OK
         return await call_next(request)
+
