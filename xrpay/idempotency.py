@@ -1,135 +1,178 @@
-﻿from __future__ import annotations
-import asyncio
+﻿import asyncio
+import hashlib
 import time
 from typing import Any, Dict, Optional, Tuple
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette.types import ASGIApp
 
-class AsyncMemoryStore:
-    def __init__(self, default_ttl_seconds: int = 300):
-        self._data: Dict[str, Tuple[Any, float]] = {}
-        self._locks: Dict[str, asyncio.Lock] = {}
-        self._default_ttl = default_ttl_seconds
-        self._gc_lock = asyncio.Lock()
-    def _now(self) -> float: return time.time()
-    async def get(self, key: str) -> Optional[Any]:
-        item = self._data.get(key)
-        if not item: return None
-        value, expires_at = item
-        if self._now() >= expires_at:
-            self._data.pop(key, None)
-            return None
-        return value
-    async def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
-        ttl = ttl_seconds if ttl_seconds is not None else self._default_ttl
-        self._data[key] = (value, self._now() + ttl)
-    async def delete(self, key: str) -> None:
-        self._data.pop(key, None)
-    async def get_lock(self, key: str) -> asyncio.Lock:
-        lock = self._locks.get(key)
-        if lock is None:
-            lock = asyncio.Lock()
-            self._locks[key] = lock
-        return lock
-    async def gc(self) -> int:
-        removed = 0
-        async with self._gc_lock:
-            now = self._now()
-            for k in list(self._data.keys()):
-                _, exp = self._data.get(k, (None, 0))
-                if now >= exp:
-                    self._data.pop(k, None)
-                    removed += 1
-        return removed
 
-SAFE_HEADER_PREFIXES = ("content-type", "cache-control")
-IDEMPOTENCY_HEADER = "idempotency-key"
-IDEMPOTENCY_TTL_HEADER = "idempotency-ttl"
+def _now() -> float:
+    return time.time()
 
-def _cacheable_method(method: str) -> bool:
-    return method in ("POST", "PUT", "PATCH")
 
-def _build_cache_key(request: Request, idempotency_key: str) -> str:
-    return f"idemp::{request.method}::{request.url.path}::{idempotency_key}"
+def _hash_bytes(b: Optional[bytes]) -> str:
+    h = hashlib.sha256()
+    h.update(b or b"")
+    return h.hexdigest()
 
-def _copy_safe_headers(response: Response) -> Dict[str, str]:
-    out: Dict[str, str] = {}
-    for k, v in response.headers.items():
-        if k.lower().startswith(SAFE_HEADER_PREFIXES):
-            out[k] = v
-    return out
+
+def _copy_safe_headers(resp: Response) -> Dict[str, str]:
+    # Copy response headers into a plain dict (case-insensitive on output is fine)
+    return {k: v for (k, v) in resp.headers.items()}
+
 
 async def _extract_body_bytes(response: Response) -> bytes:
+    """
+    Prefer response.body when present (e.g., JSONResponse/PlainTextResponse),
+    otherwise drain body_iterator.
+    """
     body = getattr(response, "body", None)
     if isinstance(body, (bytes, bytearray)):
         return bytes(body)
+
     chunks = []
     async for chunk in response.body_iterator:
         chunks.append(chunk)
     return b"".join(chunks)
 
+
+class AsyncMemoryStore:
+    """
+    Tiny async in-memory store with TTL.
+    Values are stored as: key -> (value, expires_at)
+    Value for idempotency is a tuple:
+      (body_bytes, status_code, media_type, headers_dict, req_body_hash)
+    """
+
+    def __init__(self) -> None:
+        self._data: Dict[str, Tuple[Any, float]] = {}
+        self._lock = asyncio.Lock()
+
+    async def get(self, key: str) -> Optional[Any]:
+        now = _now()
+        async with self._lock:
+            item = self._data.get(key)
+            if not item:
+                return None
+            value, exp = item
+            if exp is not None and exp <= now:
+                # expired, delete and return None
+                try:
+                    del self._data[key]
+                except KeyError:
+                    pass
+                return None
+            return value
+
+    async def set(self, key: str, value: Any, ttl_seconds: int) -> None:
+        exp = _now() + max(0, int(ttl_seconds))
+        async with self._lock:
+            self._data[key] = (value, exp)
+
+
 class IdempotencyMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, store: AsyncMemoryStore, default_ttl_seconds: int = 300) -> None:
+    """
+    Idempotency middleware:
+
+    - Uses header "Idempotency-Key" (configurable) + method + path to build a cache key.
+    - Optional per-request TTL header "Idempotency-TTL" (defaults to middleware default).
+    - On HIT: returns the cached response. But first it recomputes the *request body hash*
+      and compares it to what was cached originally for that key; mismatch -> 409.
+    - On MISS: calls downstream, captures the response body once, stores it along with the
+      request body hash, returns the response, and adds `X-Idempotency-Cache: miss`.
+    - All idempotent responses add `X-Idempotency-Cache: hit|miss`.
+    """
+
+    def __init__(
+        self,
+        app,
+        *,
+        store: AsyncMemoryStore,
+        header_key: str = "Idempotency-Key",
+        ttl_header: str = "Idempotency-TTL",
+        default_ttl_seconds: int = 300,
+    ) -> None:
         super().__init__(app)
         self.store = store
-        self.default_ttl_seconds = default_ttl_seconds
+        self.header_key = header_key
+        self.ttl_header = ttl_header
+        self.default_ttl_seconds = int(default_ttl_seconds)
 
     async def dispatch(self, request: Request, call_next):
+        # If no key, passthrough
+        idem_key = request.headers.get(self.header_key)
+        if not idem_key:
+            return await call_next(request)
+
+        # Build cache key (include method + path)
         method = request.method.upper()
-        if not _cacheable_method(method):
-            return await call_next(request)
+        path = request.url.path
+        cache_key = f"idemp::{method}::{path}::{idem_key}"
 
-        idemp_key = request.headers.get(IDEMPOTENCY_HEADER)
-        if not idemp_key:
-            return await call_next(request)
+        # TTL from header (optional)
+        ttl_header_val = request.headers.get(self.ttl_header)
+        try:
+            ttl_seconds = int(ttl_header_val) if ttl_header_val is not None else self.default_ttl_seconds
+        except ValueError:
+            ttl_seconds = self.default_ttl_seconds
 
-        ttl_hdr = request.headers.get(IDEMPOTENCY_TTL_HEADER)
-        ttl_seconds: Optional[int] = None
-        if ttl_hdr:
-            try:
-                ttl_seconds = max(1, int(ttl_hdr))
-            except ValueError:
-                ttl_seconds = None
+        # Read request body (Starlette caches it; safe to read here)
+        req_bytes = await request.body()
+        req_hash = _hash_bytes(req_bytes)
 
-        cache_key = _build_cache_key(request, idemp_key)
-
+        # Check cache first
         cached = await self.store.get(cache_key)
         if cached is not None:
-            body_bytes, status_code, media_type, headers_dict = cached
-            headers_out = dict(headers_dict)
+            try:
+                body_bytes, status_code, media_type, headers_dict, cached_req_hash = cached
+            except ValueError:
+                # Backward-compat: older 4-tuple entries => treat as conflict-safe MISS
+                body_bytes = status_code = media_type = headers_dict = None
+                cached_req_hash = None
+
+            if cached_req_hash and cached_req_hash != req_hash:
+                # 409 Conflict: same idempotency key, *different* request body
+                return Response(
+                    content=b'{"detail":"Idempotency key reused with different request body"}',
+                    status_code=409,
+                    media_type="application/json",
+                    headers={"X-Idempotency-Conflict": "body-mismatch"},
+                )
+
+            headers_out = dict(headers_dict or {})
             headers_out["X-Idempotency-Cache"] = "hit"
-            print(f"[Idempotency] HIT {cache_key}")
-            return Response(content=body_bytes, status_code=status_code, media_type=media_type, headers=headers_out)
-
-        lock = await self.store.get_lock(cache_key)
-        async with lock:
-            cached = await self.store.get(cache_key)
-            if cached is not None:
-                body_bytes, status_code, media_type, headers_dict = cached
-                headers_out = dict(headers_dict)
-                headers_out["X-Idempotency-Cache"] = "hit"
-                print(f"[Idempotency] HIT(after-lock) {cache_key}")
-                return Response(content=body_bytes, status_code=status_code, media_type=media_type, headers=headers_out)
-
-            response = await call_next(request)
-            body_bytes = await _extract_body_bytes(response)
-            media_type = getattr(response, "media_type", None)
-            headers_dict = _copy_safe_headers(response)
-            status_code = response.status_code
-
-            headers_out = dict(headers_dict)
-            headers_out["X-Idempotency-Cache"] = "miss"
-
-            new_resp = Response(content=body_bytes, status_code=status_code, media_type=media_type, headers=headers_out)
-
-            await self.store.set(
-                cache_key,
-                (body_bytes, status_code, media_type, headers_dict),
-                ttl_seconds=ttl_seconds if ttl_seconds is not None else self.default_ttl_seconds,
+            return Response(
+                content=body_bytes or b"",
+                status_code=status_code or 200,
+                media_type=media_type,
+                headers=headers_out,
             )
-            print(f"[Idempotency] MISS {cache_key} cached for {ttl_seconds or self.default_ttl_seconds}s")
 
-            return new_resp
+        # MISS: call downstream, capture & cache
+        response = await call_next(request)
+
+        body_bytes = await _extract_body_bytes(response)
+        media_type = getattr(response, "media_type", None)
+        headers_dict = _copy_safe_headers(response)
+        status_code = response.status_code
+
+        # Add visibility header
+        headers_dict2 = dict(headers_dict)
+        headers_dict2["X-Idempotency-Cache"] = "miss"
+
+        new_resp = Response(
+            content=body_bytes,
+            status_code=status_code,
+            media_type=media_type,
+            headers=headers_dict2,
+        )
+
+        # Cache with the request body hash
+        await self.store.set(
+            cache_key,
+            (body_bytes, status_code, media_type, headers_dict, req_hash),
+            ttl_seconds=ttl_seconds,
+        )
+        return new_resp
