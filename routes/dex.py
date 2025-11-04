@@ -20,7 +20,7 @@ def post_offer(body: OfferBody):
         res = create_offer(c, body.side, settings.TRADER_SEED, settings.ISSUER_ADDRESS, settings.COL_CODE, body.iou, body.xrp)
         return res
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e) from e)
+        raise HTTPException(status_code=500, detail=str(e) from e) from e
 
 @router.get("/offers")
 def get_offers():
@@ -30,7 +30,7 @@ def get_offers():
         c = client_from(settings.XRPL_RPC_URL)
         return list_offers(c, settings.TRADER_SEED)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e) from e)
+        raise HTTPException(status_code=500, detail=str(e) from e) from e
 
 @router.delete("/offers/{seq}")
 def delete_offer(seq: int):
@@ -40,7 +40,7 @@ def delete_offer(seq: int):
         c = client_from(settings.XRPL_RPC_URL)
         return cancel_offer(c, settings.TRADER_SEED, seq)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e) from e)
+        raise HTTPException(status_code=500, detail=str(e) from e) from e
 
 @router.get("/orderbook")
 def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
@@ -50,6 +50,8 @@ def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
         c = client_from(settings.XRPL_RPC_URL)
         return orderbook_snapshot(c, settings.ISSUER_ADDRESS, settings.COL_CODE, limit)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e) from e)
+        raise HTTPException(status_code=500, detail=str(e) from e) from e
+
+
 
 

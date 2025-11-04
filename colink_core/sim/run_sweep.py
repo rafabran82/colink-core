@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-
+from pathlib import Path
 import csv
 
 from amm import PoolState
@@ -90,9 +90,10 @@ def main():
         plt.ylabel("Price (COPX per COL)")
         plt.title("Price vs Size")
         plt.legend()
-        plt.grid(\)
+        plt.grid()
         plt.tight_layout()
-        plt.savefig(\)
+        png_path = Path(outdir) / "sweep_price_vs_size.png"
+        plt.savefig(png_path)
         plt.close()
         print("Saved chart → sweep_price_vs_size.png")
 
@@ -108,9 +109,10 @@ def main():
         plt.ylabel("Basis points (bps)")
         plt.title("Deviation vs Size & Guard Budget")
         plt.legend()
-        plt.grid(\)
+        plt.grid()
         plt.tight_layout()
-        plt.savefig(\)
+        png_path = Path(outdir) / "sweep_price_vs_size.png"
+        plt.savefig(png_path)
         plt.close()
         print("Saved chart → sweep_devbps_vs_size.png")
 
@@ -119,6 +121,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
 
 
 

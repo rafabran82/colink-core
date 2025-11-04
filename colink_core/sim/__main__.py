@@ -119,12 +119,12 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.plot(xs, effs, marker="o", label="Eff. price (COPX/COL)")
         plt.plot(xs, tws,  marker="x", label="TWAP")
         plt.xlabel("Size (COL)"); plt.ylabel("Price (COPX/COL)")
-        plt.title(\)
-        plt.grid(\)
+        plt.title()
+        plt.grid(True, alpha=0.3)
         plt.legend()
         p1 = outdir / f"sweep_price_vs_size_{stamp}.png"
         plt.tight_layout()
-        plt.savefig(\)
+        plt.savefig()
         plt.close()
         print(f"Saved chart -> {p1}")
 
@@ -137,12 +137,12 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.plot(xs, models, marker="x", label="Modeled impact (bps)")
         plt.plot(xs, buds,   marker="s", label="Guard budget (bps)")
         plt.xlabel("Size (COL)"); plt.ylabel("Basis points (bps)")
-        plt.title(\)
-        plt.grid(\)
+        plt.title()
+        plt.grid(True, alpha=0.3)
         plt.legend()
         p2 = outdir / f"sweep_devbps_vs_size_{stamp}.png"
         plt.tight_layout()
-        plt.savefig(\)
+        plt.savefig()
         plt.close()
         print(f"Saved chart -> {p2}")
     except Exception as e:
@@ -182,6 +182,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
 
 
 

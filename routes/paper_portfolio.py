@@ -30,3 +30,4 @@ def reset_position():
     PAPER_POSITION["avg_price"] = None
     PAPER_POSITION["realized_pnl_xrp"] = Decimal("0")
     return {"ok": True, "message": "paper position reset"}
+

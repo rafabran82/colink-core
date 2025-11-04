@@ -23,3 +23,4 @@ def my_offers():
 def cancel(seq: int):
     c = client_from(settings.XRPL_RPC_URL)
     return cancel_offer(c, settings.TRADER_SEED, seq)
+
