@@ -1,136 +1,61 @@
 ﻿from __future__ import annotations
-from pathlib import Path
-import csv
+import math
+from typing import List
+import numpy as np
 
-from amm import PoolState
-from price_utils import (
-    bps_deviation,
-    modeled_bps_impact_for_size,
-    route_mid_price_copx_per_col,
-)
-from risk_guard import size_aware_twap_guard
-from router import quote_col_to_copx
-from twap import TWAPOracle
+# Headless plotting
+import matplotlib
+matplotlib.use("Agg")  # noqa: E402
+import matplotlib.pyplot as plt  # noqa: E402
 
 
-def fmt(n: float) -> str:
-    return f"{n:,.6f}"
+def simulate_gbm_paths(
+    n_paths: int,
+    n_steps: int,
+    s0: float = 1.0,
+    mu: float = 0.0,
+    sigma: float = 0.25,
+    dt: float = 1.0 / 32.0,
+) -> List[List[float]]:
+    """
+    Tiny GBM simulation returning a list-of-lists for stability and ease of JSON dumping.
+    """
+    # Precompute drift/vol
+    drift = (mu - 0.5 * sigma * sigma) * dt
+    vol = sigma * math.sqrt(dt)
 
-def seed():
-    # Pool B: XRP⇄COPX — ~2,500 COPX/XRP
-    pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)
-    # Pool A: COL⇄XRP — ~20 COL/XRP  (so ~125 COPX/COL mid-route)
-    pool_col_x  = PoolState(x_reserve=10_000.0, y_reserve=200_000.0,   fee_bps=30)
-    return pool_col_x, pool_x_copx
-
-def main():
-    pool_col_x, pool_x_copx = seed()
-
-    # TWAP over mid-route price; warm with a few identical mids just to init
-    twap = TWAPOracle(window=8)
-    mid0 = route_mid_price_copx_per_col(pool_col_x, pool_x_copx)
-    twap.warm([mid0] * 8)
-    print("TWAP warmed. Initial TWAP =", fmt(twap.value()), " COPX/COL")
-    print()
-
-    sizes = [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000]
-    rows = []
-
-    for col_in in sizes:
-        q = quote_col_to_copx(pool_col_x, pool_x_copx, col_in)
-        eff = q.effective_price
-        tw  = twap.value()
-
-        dev_bps = bps_deviation(eff, tw)
-        # **FIX**: pass both pools + size
-        modeled = modeled_bps_impact_for_size(pool_col_x, pool_x_copx, col_in)
-
-        ok, _dev, budget = size_aware_twap_guard(
-            pool_col_x, pool_x_copx, twap, col_in,
-            base_guard_bps=100.0, cushion_bps=150.0, cap_bps=2000.0
-        )
-
-        rows.append({
-            "col_in": col_in,
-            "quote_copx_out": q.amount_out,
-            "eff_px_copx_per_col": eff,
-            "twap_copx_per_col": tw,
-            "dev_bps_vs_twap": dev_bps,
-            "modeled_impact_bps": modeled,
-            "guard_budget_bps": budget,
-            "approved": int(ok),
-        })
-
-        print(
-            f"Size={fmt(col_in)} COL | eff={fmt(eff)}  TWAP={fmt(tw)}  "
-            f"dev={dev_bps:.1f} bps  modeled={modeled:.1f} bps  "
-            f"budget={budget:.1f} bps  => {'OK' if ok else 'BLOCKED'}"
-        )
-
-    # CSV
-    out_csv = "sweep_col_to_copx.csv"
-    with open(out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-        w.writeheader()
-        w.writerows(rows)
-    print(f"\nSaved CSV → {out_csv}")
-
-    # Charts (optional)
-    try:
-        import matplotlib.pyplot as plt
-
-        xs   = [r["col_in"] for r in rows]
-        effs = [r["eff_px_copx_per_col"] for r in rows]
-        tws  = [r["twap_copx_per_col"] for r in rows]
-
-        plt.figure()
-        plt.plot(xs, effs, marker="o", label="Eff price (COPX/COL)")
-        plt.plot(xs, tws,  marker="o", label="TWAP (COPX/COL)")
-        plt.xlabel("COL size")
-        plt.ylabel("Price (COPX per COL)")
-        plt.title("Price vs Size")
-        plt.legend()
-        plt.grid()
-        plt.tight_layout()
-        png_path = Path(outdir) / "sweep_price_vs_size.png"
-        plt.savefig(png_path)
-        plt.close()
-        print("Saved chart → sweep_price_vs_size.png")
-
-        devs    = [r["dev_bps_vs_twap"] for r in rows]
-        modeled = [r["modeled_impact_bps"] for r in rows]
-        budget  = [r["guard_budget_bps"] for r in rows]
-
-        plt.figure()
-        plt.plot(xs, devs,    marker="o", label="Deviation vs TWAP (bps)")
-        plt.plot(xs, modeled, marker="o", label="Modeled impact (bps)")
-        plt.plot(xs, budget,  marker="o", label="Guard budget (bps)")
-        plt.xlabel("COL size")
-        plt.ylabel("Basis points (bps)")
-        plt.title("Deviation vs Size & Guard Budget")
-        plt.legend()
-        plt.grid()
-        plt.tight_layout()
-        png_path = Path(outdir) / "sweep_price_vs_size.png"
-        plt.savefig(png_path)
-        plt.close()
-        print("Saved chart → sweep_devbps_vs_size.png")
-
-    except Exception as e:
-        print("Plotting skipped (matplotlib not available):", e)
-
-if __name__ == "__main__":
-    main()
+    out: List[List[float]] = []
+    rng = np.random.default_rng(42)  # stable seed for reproducible tests
+    for _ in range(n_paths):
+        s = s0
+        path = [s]
+        # n_steps values total; path length == n_steps
+        for _ in range(1, n_steps):
+            z = rng.standard_normal()
+            s = s * math.exp(drift + vol * z)
+            path.append(s)
+        out.append(path)
+    return out
 
 
+def plot_paths(paths: List[List[float]], title: str, outfile: str) -> None:
+    plt.figure()
+    for p in paths:
+        plt.plot(p)
+    plt.title(title)
+    plt.xlabel("step")
+    plt.ylabel("price")
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=120)
+    plt.close()
 
 
-
-
-
-
-
-
-
-
-
+def plot_hist(samples: List[float], title: str, outfile: str) -> None:
+    plt.figure()
+    plt.hist(samples, bins=20)
+    plt.title(title)
+    plt.xlabel("value")
+    plt.ylabel("freq")
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=120)
+    plt.close()
