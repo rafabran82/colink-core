@@ -162,6 +162,7 @@ class InflightRegistry:
 
 class IdempotencyMiddleware(BaseHTTPMiddleware):
     """
+
     Idempotency middleware:
 
     - Uses header "Idempotency-Key" (configurable) + method + path to build a cache key.
@@ -180,6 +181,7 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
         header_key: str = "Idempotency-Key",
         ttl_header: str = "Idempotency-TTL",
         default_ttl_seconds: int = 300,
+        account_header: str = "X-Account-ID",
     ) -> None:
         super().__init__(app)
         # Choose backend if not provided
@@ -195,6 +197,7 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
         self.header_key = header_key
         self.ttl_header = ttl_header
         self.default_ttl_seconds = int(default_ttl_seconds)
+        self.account_header = account_header
         self._inflight = InflightRegistry()
 
     async def dispatch(self, request: Request, call_next):
@@ -206,7 +209,9 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
         # Build cache key
         method = request.method.upper()
         path = request.url.path
-        cache_key = f"idemp::{method}::{path}::{idem_key}"
+        account = (request.headers.get(self.account_header) or "").strip()
+        acct_part = f"::{account}" if account else ""
+        cache_key = f"idemp::{method}::{path}{acct_part}::{idem_key}"
 
         # TTL from header (optional)
         ttl_header_val = request.headers.get(self.ttl_header)
@@ -301,3 +306,4 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
             raise
         finally:
             await self._inflight.clear(cache_key)
+
