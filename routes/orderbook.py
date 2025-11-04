@@ -21,3 +21,4 @@ def get_orderbook(limit: int = 20) -> Any:
         raise HTTPException(status_code=400, detail={"error": str(e), "type": e.__class__.__name__})
 
 
+

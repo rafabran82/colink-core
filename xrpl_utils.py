@@ -24,10 +24,8 @@ def sign_submit(tx, wallet: Wallet, client: JsonRpcClient):
     except Exception as e:
         # Keep it generic to avoid import churn across xrpl-py versions
         payload = None
-        try:
-            payload = getattr(e, "result", None)
-        except Exception:
-            pass
+with contextlib.suppress(Exception):
+    payload = getattr(e, "result", None)
         return {"ok": False, "type": e.__class__.__name__, "error": str(e), "engine": payload}
 
 def client_from(url: str) -> JsonRpcClient:
@@ -150,5 +148,6 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
         }
 
     return {"bids": [shape(o) for o in bids], "asks": [shape(o) for o in asks]}
+
 
 
