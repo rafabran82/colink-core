@@ -69,3 +69,12 @@ async def _log_mw():
 
 
 
+
+# --- XRPay debug: middleware snapshot ---
+@app.get('/_debug/middleware')
+def _mw_snapshot():
+    try:
+        stack = [mw.cls.__name__ for mw in app.user_middleware]
+        return {'middleware': stack}
+    except Exception as e:
+        return {'error': str(e)}
