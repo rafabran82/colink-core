@@ -1,14 +1,15 @@
-import argparse
+﻿import argparse
 import json
 import re
 import subprocess
 import sys
 
+
 def run(args):
     """
     Run `python -m <args>` and return stdout as text.
     """
-    cmd = [sys.executable, "-m"] + list(args)
+    cmd = [sys.executable, "-m", *list(args)]
     out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     return out.decode("utf-8", errors="replace")
 
@@ -73,7 +74,7 @@ def sweep_json(outdir=None):
     out = run(cmd)
 
     # Normalize arrows to ASCII so parsing is stable across consoles
-    norm = out.replace("\u2192", "->").replace("→", "->")
+    norm = out.replace("\u2192", "->").replace("â†’", "->")
 
     csv_m = re.search(r"Saved CSV\s*->\s*(.+)", norm)
     charts = []
@@ -102,13 +103,12 @@ def main():
 
     args = ap.parse_args()
 
-    if args.cmd == "quote":
-        data = quote_json(args.col_in, args.min_out_bps, args.twap_guard)
-    else:
-        data = sweep_json(args.outdir)
+    data = quote_json(args.col_in, args.min_out_bps, args.twap_guard) if args.cmd == "quote" else sweep_json(args.outdir)
 
     json.dump(data, sys.stdout, indent=2)
     sys.stdout.write("\n")
 
 if __name__ == "__main__":
     main()
+
+

@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
+
 from amm import PoolState
-from router import exec_col_to_copx
 from risk_guard import quote_with_slippage
+from router import exec_col_to_copx
+
 
 def fmt(n): return f"{n:,.6f}"
 
@@ -25,7 +27,7 @@ def main():
 
     # Adverse move #1 on XRP<->COPX: add XRP, pull COPX (reduces COPX per XRP => worse for our x->y hop)
     # Large enough to push price down materially
-    pulled_copx, _effB = poolB2.swap_x_for_y(5_000.0)  # add 5k XRP, withdraw COPX
+    _pulled_copx, _effB = poolB2.swap_x_for_y(5_000.0)  # add 5k XRP, withdraw COPX
 
     # Adverse move #2 on COL<->XRP (optional but makes failure certain): add COL, pull XRP (reduces our hop1 XRP out)
     _xrp_out_front, _effA = poolA2.swap_y_for_x(50_000.0)  # drain XRP liquidity
@@ -41,3 +43,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

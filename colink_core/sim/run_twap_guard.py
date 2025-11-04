@@ -1,12 +1,14 @@
 ﻿from __future__ import annotations
+
 import time
 from copy import deepcopy
 
 from amm import PoolState
-from router import quote_col_to_copx, exec_col_to_copx
-from twap import TWAP
-from price_utils import route_mid_price_copx_per_col, bps_deviation
+from price_utils import bps_deviation, route_mid_price_copx_per_col
 from risk_guard import allowed_deviation_bps
+from router import exec_col_to_copx, quote_col_to_copx
+from twap import TWAP
+
 
 def fmt(n): return f"{n:,.6f}"
 

@@ -1,12 +1,16 @@
 ﻿from __future__ import annotations
-import argparse, os, csv, time
+
+import argparse
+import csv
+import time
 from pathlib import Path
 
 from .amm import PoolState
-from .router import quote_col_to_copx, exec_col_to_copx
-from .risk_guard import quote_with_slippage, size_aware_twap_guard
-from .twap import TWAPOracle
 from .price_utils import modeled_bps_impact_for_size, route_mid_price_copx_per_col
+from .risk_guard import quote_with_slippage, size_aware_twap_guard
+from .router import exec_col_to_copx, quote_col_to_copx
+from .twap import TWAPOracle
+
 
 def fmt(n: float) -> str:
     return f"{n:,.6f}"
@@ -99,12 +103,12 @@ def cmd_sweep(args: argparse.Namespace) -> int:
 
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=rows[0].keys())
-        w.writeheader(); w.writerows(rows)
+        w.writeheader()
+        w.writerows(rows)
     print(f"Saved CSV -> {csv_path}")
 
     # Optional charts
     try:
-        import matplotlib.pyplot as plt  # noqa
         import matplotlib.pyplot as plt
 
         xs   = [r["col_in"] for r in rows]
@@ -115,9 +119,13 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.plot(xs, effs, marker="o", label="Eff. price (COPX/COL)")
         plt.plot(xs, tws,  marker="x", label="TWAP")
         plt.xlabel("Size (COL)"); plt.ylabel("Price (COPX/COL)")
-        plt.title("Price vs Size"); plt.grid(True, alpha=0.3); plt.legend()
+        plt.title(\)
+        plt.grid(\)
+        plt.legend()
         p1 = outdir / f"sweep_price_vs_size_{stamp}.png"
-        plt.tight_layout(); plt.savefig(p1); plt.close()
+        plt.tight_layout()
+        plt.savefig(\)
+        plt.close()
         print(f"Saved chart -> {p1}")
 
         devs   = [r["dev_bps"] for r in rows]
@@ -129,9 +137,13 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         plt.plot(xs, models, marker="x", label="Modeled impact (bps)")
         plt.plot(xs, buds,   marker="s", label="Guard budget (bps)")
         plt.xlabel("Size (COL)"); plt.ylabel("Basis points (bps)")
-        plt.title("Deviation & Budget vs Size"); plt.grid(True, alpha=0.3); plt.legend()
+        plt.title(\)
+        plt.grid(\)
+        plt.legend()
         p2 = outdir / f"sweep_devbps_vs_size_{stamp}.png"
-        plt.tight_layout(); plt.savefig(p2); plt.close()
+        plt.tight_layout()
+        plt.savefig(\)
+        plt.close()
         print(f"Saved chart -> {p2}")
     except Exception as e:
         print("Plotting skipped:", e)
@@ -170,5 +182,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
 
 

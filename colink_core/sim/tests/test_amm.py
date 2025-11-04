@@ -1,5 +1,6 @@
 ﻿from colink_core.sim.amm import PoolState
 
+
 def seed(fee_bps=30):
     # 1 XRP : 2500 COPX pool
     return PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=fee_bps)

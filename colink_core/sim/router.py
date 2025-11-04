@@ -1,9 +1,10 @@
 ﻿from __future__ import annotations
-from dataclasses import dataclass
+
 from copy import deepcopy
-from typing import Tuple
+from dataclasses import dataclass
 
 from .amm import PoolState
+
 
 @dataclass
 class RouteResult:
@@ -13,7 +14,7 @@ class RouteResult:
     hop1_out: float
     hop2_out: float
 
-def _swap_copy(pool: PoolState, side: str, amt: float) -> Tuple[float, float, PoolState]:
+def _swap_copy(pool: PoolState, side: str, amt: float) -> tuple[float, float, PoolState]:
     """Side = 'x_for_y' or 'y_for_x'. Returns (out, eff_px, new_pool_copy)."""
     p = deepcopy(pool)
     if side == "x_for_y":
@@ -30,7 +31,7 @@ def quote_col_to_copx(pool_col_x: PoolState, pool_x_copx: PoolState, col_in: flo
     Hop2: XRP -> COPX on pool_x_copx (x_for_y).
     Does NOT mutate original pools.
     """
-    xrp_out, _eff1, tmp = _swap_copy(pool_col_x, "y_for_x", col_in)
+    xrp_out, _eff1, _tmp = _swap_copy(pool_col_x, "y_for_x", col_in)
     copx_out, _eff2, _tmp2 = _swap_copy(pool_x_copx, "x_for_y", xrp_out)
     eff_price = copx_out / col_in if col_in > 0 else 0.0
     return RouteResult(col_in, copx_out, eff_price, xrp_out, copx_out)
@@ -41,7 +42,7 @@ def quote_copx_to_col(pool_col_x: PoolState, pool_x_copx: PoolState, copx_in: fl
     Hop2: XRP -> COL on pool_col_x (x_for_y).
     Does NOT mutate original pools.
     """
-    xrp_out, _eff1, tmp = _swap_copy(pool_x_copx, "y_for_x", copx_in)
+    xrp_out, _eff1, _tmp = _swap_copy(pool_x_copx, "y_for_x", copx_in)
     col_out, _eff2, _tmp2 = _swap_copy(pool_col_x, "x_for_y", xrp_out)
     eff_price = col_out / copx_in if copx_in > 0 else 0.0
     return RouteResult(copx_in, col_out, eff_price, xrp_out, col_out)
@@ -59,4 +60,6 @@ def exec_copx_to_col(pool_col_x: PoolState, pool_x_copx: PoolState, copx_in: flo
     col_out, _ = pool_col_x.swap_x_for_y(xrp_out)
     eff_price = col_out / copx_in if copx_in > 0 else 0.0
     return RouteResult(copx_in, col_out, eff_price, xrp_out, col_out)
+
+
 

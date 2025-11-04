@@ -1,6 +1,7 @@
 ﻿from amm import PoolState
 from wallet import Wallet
 
+
 def fmt(n): 
     return f"{n:,.6f}"
 
@@ -14,7 +15,8 @@ def main():
     print("Initial price (COPX per XRP):", fmt(pool.price_y_per_x()))
     # add a little more liquidity to demonstrate add/remove
     minted = pool.add_liquidity(dx=1_000.0, dy=2_500_000.0)
-    maker.debit_x(1_000.0); maker.debit_y(2_500_000.0)
+    maker.debit_x(\)
+    maker.debit_y(2_500_000.0)
     print("Added liquidity; LP units ~", fmt(minted))
     print("Reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
     print()
@@ -44,10 +46,15 @@ def main():
     # 4) Remove 10% liquidity
     print("== Remove Liquidity 10% ==")
     dx_w, dy_w = pool.remove_liquidity(0.10)
-    maker.credit_x(dx_w); maker.credit_y(dy_w)
+    maker.credit_x(\)
+    maker.credit_y(dy_w)
     print("Withdrew: X=", fmt(dx_w), " Y=", fmt(dy_w))
     print("Reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
     print("Price (COPX per XRP):", fmt(pool.price_y_per_x()))
 
 if __name__ == "__main__":
     main()
+
+
+
+

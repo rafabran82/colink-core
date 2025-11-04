@@ -1,5 +1,6 @@
 ﻿from pydantic import BaseModel, Field
 
+
 class AirdropReq(BaseModel):
     to: str = Field(description="Destination classic address")
     amount: str = Field(description="IOU value (string)")

@@ -1,4 +1,5 @@
-﻿from colink_core.sim.limits import TradeLimiter, LimitConfig
+﻿from colink_core.sim.limits import LimitConfig, TradeLimiter
+
 
 def test_limiter_size_and_dev_caps_and_breaker():
     cfg = LimitConfig(max_col_in=25_000.0, max_dev_bps=2_000.0, strikes_window=2, cooldown_trades=3)

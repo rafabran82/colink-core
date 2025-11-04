@@ -1,5 +1,6 @@
 ﻿from colink_core.sim.amm import PoolState
-from colink_core.sim.router import quote_col_to_copx, exec_col_to_copx
+from colink_core.sim.router import exec_col_to_copx, quote_col_to_copx
+
 
 def seed():
     pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)

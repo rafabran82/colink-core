@@ -1,14 +1,14 @@
-﻿import json
-from decimal import Decimal
-from typing import Dict, Any, List, Optional
+﻿from decimal import Decimal
+from typing import Any
 
 from xrpl.clients import JsonRpcClient
-from xrpl.wallet import Wallet
 from xrpl.models import requests as req
-from xrpl.models.transactions import Payment, TrustSet, OfferCreate, OfferCancel
 from xrpl.models.currencies import XRP as XRPModel
-from xrpl.utils import xrp_to_drops
+from xrpl.models.transactions import OfferCancel, OfferCreate, Payment, TrustSet
 from xrpl.transaction import autofill, sign, submit_and_wait
+from xrpl.utils import xrp_to_drops
+from xrpl.wallet import Wallet
+
 
 def sign_submit(tx, wallet: Wallet, client: JsonRpcClient):
     """
@@ -44,8 +44,8 @@ def get_xrp_balance(client: JsonRpcClient, address: str) -> int:
     r = client.request(req.AccountInfo(account=address, ledger_index="validated", strict=True))
     return int(r.result["account_data"]["Balance"])
 
-def get_account_lines(client: JsonRpcClient, address: str) -> List[Dict[str, Any]]:
-    lines: List[Dict[str, Any]] = []
+def get_account_lines(client: JsonRpcClient, address: str) -> list[dict[str, Any]]:
+    lines: list[dict[str, Any]] = []
     marker = None
     while True:
         r = client.request(req.AccountLines(account=address, ledger_index="validated", limit=400, marker=marker))
@@ -60,7 +60,7 @@ def fetch_col_state(client: JsonRpcClient, trader_seed: str, issuer_addr: str, c
     ixrp = get_xrp_balance(client, issuer_addr)
     txrp = get_xrp_balance(client, trader_addr)
     lines = get_account_lines(client, trader_addr)
-    ious = [l for l in lines if l.get("account") == issuer_addr and l.get("currency") == currency]
+    ious = [line_ for line_ in lines if line_.get("account") == issuer_addr and line_.get("currency") == currency]
     return {
         "issuer": {"address": issuer_addr, "xrp_drops": ixrp},
         "trader": {"address": trader_addr, "xrp_drops": txrp, "ious": ious},
@@ -138,10 +138,10 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
         req.BookOffers(taker=neutral_taker, taker_pays=base, taker_gets=xrp, limit=limit)
     ).result.get("offers", [])
 
-    def norm(o: Dict[str, Any], up: str, low: str):
+    def norm(o: dict[str, Any], up: str, low: str):
         return o.get(low) if low in o else o.get(up)
 
-    def shape(o: Dict[str, Any]):
+    def shape(o: dict[str, Any]):
         return {
             "seq":       norm(o, "Sequence", "seq"),
             "quality":   o.get("quality"),
@@ -150,3 +150,5 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
         }
 
     return {"bids": [shape(o) for o in bids], "asks": [shape(o) for o in asks]}
+
+

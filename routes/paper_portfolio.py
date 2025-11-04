@@ -1,6 +1,7 @@
-﻿from fastapi import APIRouter
-from decimal import Decimal
-from typing import Any, Dict
+﻿from decimal import Decimal
+from typing import Any
+
+from fastapi import APIRouter
 
 from routes.trade import PAPER_POSITION
 

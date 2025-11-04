@@ -1,9 +1,11 @@
 ﻿from __future__ import annotations
+
 from dataclasses import dataclass
 
+from .price_utils import bps_deviation, modeled_bps_impact_for_size, route_mid_price_copx_per_col
 from .router import quote_col_to_copx
-from .price_utils import route_mid_price_copx_per_col, bps_deviation, modeled_bps_impact_for_size
 from .twap import TWAPOracle
+
 
 @dataclass
 class GuardedQuote:
@@ -12,7 +14,7 @@ class GuardedQuote:
     min_out: float
     slip_bps: float
 
-def quote_with_slippage(pool_col_x, pool_x_copx, col_in: float, slip_bps: float = None, **kwargs) -> GuardedQuote:
+def quote_with_slippage(pool_col_x, pool_x_copx, col_in: float, slip_bps: float | None = None, **kwargs) -> GuardedQuote:
     """
     Build a min-out guard using a slippage tolerance in bps.
     Accepts slip_bps (preferred) or slippage_bps (legacy kw).
@@ -53,4 +55,5 @@ def size_aware_twap_guard(
     modeled = modeled_bps_impact_for_size(pool_col_x, pool_x_copx, col_in)
     budget_bps = min(cap_bps, base_guard_bps + modeled + cushion_bps)
     return (dev_bps <= budget_bps, dev_bps, budget_bps)
+
 

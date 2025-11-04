@@ -1,5 +1,7 @@
-from __future__ import annotations
+﻿from __future__ import annotations
+
 import math
+
 
 class PoolState:
     def __init__(self, x_reserve: float, y_reserve: float, fee_bps: float = 30):
@@ -52,7 +54,8 @@ class PoolState:
         Reserves add the provided dx, dy.
         Returns minted LP.
         """
-        dx = float(dx); dy = float(dy)
+        dx = float(dx)
+        dy = float(dy)
         if dx <= 0 or dy <= 0:
             return 0.0
 
@@ -89,3 +92,5 @@ class PoolState:
         self.y_reserve -= dy
         self.total_lp *= (1.0 - fraction)
         return dx, dy
+
+

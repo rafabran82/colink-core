@@ -1,15 +1,17 @@
 ﻿from __future__ import annotations
+
 import csv
 
 from amm import PoolState
-from router import quote_col_to_copx
-from twap import TWAPOracle
 from price_utils import (
-    route_mid_price_copx_per_col,
     bps_deviation,
     modeled_bps_impact_for_size,
+    route_mid_price_copx_per_col,
 )
 from risk_guard import size_aware_twap_guard
+from router import quote_col_to_copx
+from twap import TWAPOracle
+
 
 def fmt(n: float) -> str:
     return f"{n:,.6f}"
@@ -69,7 +71,8 @@ def main():
     out_csv = "sweep_col_to_copx.csv"
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-        w.writeheader(); w.writerows(rows)
+        w.writeheader()
+        w.writerows(rows)
     print(f"\nSaved CSV → {out_csv}")
 
     # Charts (optional)
@@ -86,8 +89,11 @@ def main():
         plt.xlabel("COL size")
         plt.ylabel("Price (COPX per COL)")
         plt.title("Price vs Size")
-        plt.legend(); plt.grid(True, alpha=0.3); plt.tight_layout()
-        plt.savefig("sweep_price_vs_size.png"); plt.close()
+        plt.legend()
+        plt.grid(\)
+        plt.tight_layout()
+        plt.savefig(\)
+        plt.close()
         print("Saved chart → sweep_price_vs_size.png")
 
         devs    = [r["dev_bps_vs_twap"] for r in rows]
@@ -101,8 +107,11 @@ def main():
         plt.xlabel("COL size")
         plt.ylabel("Basis points (bps)")
         plt.title("Deviation vs Size & Guard Budget")
-        plt.legend(); plt.grid(True, alpha=0.3); plt.tight_layout()
-        plt.savefig("sweep_devbps_vs_size.png"); plt.close()
+        plt.legend()
+        plt.grid(\)
+        plt.tight_layout()
+        plt.savefig(\)
+        plt.close()
         print("Saved chart → sweep_devbps_vs_size.png")
 
     except Exception as e:
@@ -110,3 +119,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+

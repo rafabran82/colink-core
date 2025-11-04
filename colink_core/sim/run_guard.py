@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
+
 from amm import PoolState
-from router import exec_col_to_copx
 from risk_guard import quote_with_slippage
+from router import exec_col_to_copx
+
 
 def fmt(n): return f"{n:,.6f}"
 

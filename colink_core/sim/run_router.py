@@ -1,9 +1,11 @@
 ﻿from __future__ import annotations
+
 import csv
 from copy import deepcopy
 
 from amm import PoolState
-from router import quote_col_to_copx, quote_copx_to_col, exec_col_to_copx, exec_copx_to_col
+from router import exec_col_to_copx, quote_col_to_copx, quote_copx_to_col
+
 
 def fmt(n): return f"{n:,.6f}"
 
@@ -64,10 +66,13 @@ def main():
     out = "swaps.csv"
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=rows[0].keys())
-        w.writeheader(); w.writerows(rows)
+        w.writeheader()
+        w.writerows(rows)
     print(f"Saved slippage table → {out}")
     for r in rows:
         print(f"  COL_in={fmt(r['col_in'])}  -> COPX_out={fmt(r['copx_out'])}  (eff {fmt(r['eff_price_copx_per_col'])} COPX/COL)")
 
 if __name__ == "__main__":
     main()
+
+

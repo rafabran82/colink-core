@@ -1,15 +1,16 @@
-﻿from fastapi import APIRouter, HTTPException
+﻿import time
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from decimal import Decimal, ROUND_HALF_UP
-from typing import List, Dict, Any
-import time
 
 from config import settings
 from xrpl_utils import (
     client_from,
     create_offer,
-    orderbook_snapshot,
     ensure_trustline,
+    orderbook_snapshot,
 )
 
 router = APIRouter(prefix="", tags=["trade"])
@@ -17,7 +18,7 @@ router = APIRouter(prefix="", tags=["trade"])
 # =========================
 # Paper engine state
 # =========================
-PAPER_BOOK: Dict[str, List[Dict[str, Any]]] = {"bids": [], "asks": []}
+PAPER_BOOK: dict[str, list[dict[str, Any]]] = {"bids": [], "asks": []}
 
 # Running paper portfolio (COL against XRP)
 PAPER_POSITION = {
@@ -85,7 +86,7 @@ class MarketReq(BaseModel):
     limit: int = 20
 
 # ---------- Helpers ----------
-def _price_from_ask(ask: Dict[str, Any]) -> Decimal:
+def _price_from_ask(ask: dict[str, Any]) -> Decimal:
     # ask: maker SELLING COL (TakerPays=COL, TakerGets=XRP drops)
     tg = ask["TakerGets"]  # drops as string
     tp = ask["TakerPays"]  # {currency, issuer, value}
@@ -93,7 +94,7 @@ def _price_from_ask(ask: Dict[str, Any]) -> Decimal:
     col = Decimal(str(tp["value"]))
     return (xrp / col)
 
-def _price_from_bid(bid: Dict[str, Any]) -> Decimal:
+def _price_from_bid(bid: dict[str, Any]) -> Decimal:
     # bid: maker BUYING COL (TakerGets=COL, TakerPays=XRP drops)
     tp = bid["TakerPays"]  # drops str
     tg = bid["TakerGets"]  # {currency, issuer, value}
@@ -226,11 +227,11 @@ def market_buy(req: MarketReq):
 
     # XRPL path (snapshot + place IOC-like offers)
     ob = orderbook_snapshot(client, settings.issuer_addr, settings.col_code, limit=req.limit)
-    asks: List[Dict[str, Any]] = ob.get("asks", [])
+    asks: list[dict[str, Any]] = ob.get("asks", [])
     if not asks:
         raise HTTPException(status_code=400, detail="No asks available to buy from.")
 
-    bids: List[Dict[str, Any]] = ob.get("bids", [])
+    bids: list[dict[str, Any]] = ob.get("bids", [])
     if bids:
         best_bid = _price_from_bid(bids[0])
         best_ask = _price_from_ask(asks[0])
@@ -288,11 +289,11 @@ def market_sell(req: MarketReq):
 
     # XRPL path
     ob = orderbook_snapshot(client, settings.issuer_addr, settings.col_code, limit=req.limit)
-    bids: List[Dict[str, Any]] = ob.get("bids", [])
+    bids: list[dict[str, Any]] = ob.get("bids", [])
     if not bids:
         raise HTTPException(status_code=400, detail="No bids available to sell into.")
 
-    asks: List[Dict[str, Any]] = ob.get("asks", [])
+    asks: list[dict[str, Any]] = ob.get("asks", [])
     if asks:
         best_bid = _price_from_bid(bids[0])
         best_ask = _price_from_ask(asks[0])

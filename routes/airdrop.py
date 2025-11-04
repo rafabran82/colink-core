@@ -1,5 +1,6 @@
 ﻿from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
 from config import settings
 from xrpl_utils import client_from, iou_payment
 
@@ -19,3 +20,4 @@ def airdrop(body: AirdropBody):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

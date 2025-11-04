@@ -1,5 +1,7 @@
 ﻿from __future__ import annotations
+
 from amm import PoolState
+
 
 def fmt(n): return f"{n:,.6f}"
 

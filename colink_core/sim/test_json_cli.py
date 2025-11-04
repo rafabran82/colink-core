@@ -1,9 +1,10 @@
-import json
+﻿import json
 import subprocess
 import sys
 
+
 def _run_json(args):
-    out = subprocess.check_output([sys.executable, "-m"] + args, stderr=subprocess.STDOUT)
+    out = subprocess.check_output([sys.executable, "-m", *args], stderr=subprocess.STDOUT)
     return json.loads(out.decode("utf-8"))
 
 def test_quote_json_smoke():
