@@ -1,0 +1,13 @@
+{
+    "name":  "dev",
+    "ts":  1762290266,
+    "sizes_col":  [
+                      100,
+                      500,
+                      1000
+                  ],
+    "twap_guard_bps":  150,
+    "avg_slip_bps":  100,
+    "max_slip_bps":  120,
+    "charts_dir":  "C:\\Users\\sk8br\\desktop\\colink-core\\artifacts\\charts"
+}

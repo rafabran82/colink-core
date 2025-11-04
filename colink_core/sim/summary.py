@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import json, time
+import json
+import time
+
 
 @dataclass
 class SweepSummary:
@@ -13,11 +15,13 @@ class SweepSummary:
     max_slip_bps: float
     charts_dir: str
 
+
 def write_summary(path: str | Path, data: SweepSummary) -> None:
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     with p.open("w", encoding="utf-8") as f:
         json.dump(asdict(data), f, indent=2)
+
 
 # Dumb demo producer for wrappers that don't compute slips:
 def write_minimal(charts_dir: str, name: str = "dev", twap_guard_bps: float = 150.0) -> str:
