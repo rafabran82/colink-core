@@ -19,3 +19,18 @@ def require_idempotency_key(request: Request) -> None:
     # Also reject obviously empty keys
     if not headers.get("Idempotency-Key", "").strip():
         raise HTTPException(status_code=422, detail="Idempotency-Key must not be empty.")
+
+import time
+
+def require_fresh_timestamp(request: Request, max_skew_seconds: int = 120) -> None:
+    ts = request.headers.get("X-Timestamp")
+    if not ts:
+        raise HTTPException(status_code=422, detail="Missing X-Timestamp header.")
+    try:
+        ts_int = int(ts)
+    except ValueError:
+        raise HTTPException(status_code=422, detail="X-Timestamp must be integer epoch seconds.")
+    now = int(time.time())
+    if abs(now - ts_int) > max_skew_seconds:
+        raise HTTPException(status_code=401, detail="Timestamp outside allowed skew window.")
+
