@@ -54,3 +54,10 @@ try:
     print("[xrpay.main] Included: /quotes")
 except Exception as e:
     print(f"[xrpay.main] Skipped /quotes: {e}")
+# --- XRPay idempotency store (awaitable) ---
+from xrpay.middleware.idem_store import AsyncMemoryStore
+_idem_store = AsyncMemoryStore()
+
+# Attach idempotency AFTER HMAC so the verified raw body is available
+from xrpay.middleware.idempotency import IdempotencyMiddleware
+app.add_middleware(IdempotencyMiddleware, store=_idem_store)
