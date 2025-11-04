@@ -78,3 +78,10 @@ def _mw_snapshot():
     except Exception as e:
         return {'error': str(e)}
 
+# --- XRPay idempotency store (awaitable) ---
+from xrpay.middleware.idem_store import AsyncMemoryStore
+_idem_store = AsyncMemoryStore()
+
+# Attach idempotency AFTER HMAC so the verified raw body is available
+from xrpay.middleware.idempotency import IdempotencyMiddleware
+app.add_middleware(IdempotencyMiddleware, store=_idem_store)
