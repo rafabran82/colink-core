@@ -1,16 +1,41 @@
-﻿from fastapi import APIRouter, Query
+﻿from fastapi import APIRouter, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pathlib import Path
 import os
+import re
 import traceback
 
 # Headless rendering for CI/tests
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
 
 router = APIRouter(prefix="/sim", tags=["sim"])
+
+# --- Safe output directory guard for /sim/sweep (CodeQL: uncontrolled data in path) ---
+SAFE_CHARTS_BASE = Path("artifacts/charts").resolve()
+_SLUG = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
+
+
+def _safe_outdir(name: str | None) -> Path:
+    """
+    Accept only a short slug and force writes under artifacts/charts.
+    Prevent absolute paths and directory traversal.
+    """
+    if not name:
+        out = SAFE_CHARTS_BASE
+    else:
+        if not _SLUG.fullmatch(name):
+            raise HTTPException(
+                status_code=400, detail="Invalid outdir; use [A-Za-z0-9._-] up to 64 chars."
+            )
+        out = (SAFE_CHARTS_BASE / name).resolve()
+        # Ensure the resolved path still resides under SAFE_CHARTS_BASE
+        if not str(out).startswith(str(SAFE_CHARTS_BASE)):
+            raise HTTPException(status_code=400, detail="Outdir escapes base directory.")
+    out.mkdir(parents=True, exist_ok=True)
+    return out
 
 
 @router.get("/quote")
@@ -63,9 +88,19 @@ def _write_two_charts(out: Path) -> list[str]:
 
 
 @router.post("/sweep")
-def post_sweep(outdir: str = Query(..., description="Output directory for PNG charts")):
-    """Run real sweep if possible; otherwise emit two tiny PNGs. Always return charts list."""
-    out = Path(outdir)
+def post_sweep(
+    outdir: str | None = Query(
+        None,
+        description="Output subfolder (slug) under artifacts/charts. "
+        "Allowed: letters, numbers, dot, underscore, dash.",
+    )
+):
+    """
+    Run real sweep if possible; otherwise emit two tiny PNGs. Always return charts list.
+    The output directory is validated and sandboxed under artifacts/charts.
+    """
+    # Guard & sandbox the user-provided value
+    out = _safe_outdir(outdir)
     try:
         try:
             from colink_core.sim.run_sweep import main as sweep_main  # type: ignore
