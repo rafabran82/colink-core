@@ -21,3 +21,8 @@ pyproject.toml.bak-*
 charts/*.png
 
 charts/*.png
+
+charts/*.png
+*.egg-info/
+pyproject.toml.bak
+

@@ -2,104 +2,105 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
+from typing import Any, Dict, List
 
-def cmd_quote(args: argparse.Namespace) -> int:
-    """
-    Emit a test-friendly quote JSON with the exact keys the test expects.
-    """
-    col_in = float(args.col_in) if args.col_in is not None else 0.0
-    min_out_bps = float(args.min_out_bps) if args.min_out_bps is not None else 0.0
-    twap_guard = bool(args.twap_guard)
+# Local imports
+from .run_sweep import simulate_gbm_paths, plot_paths, plot_hist  # type: ignore
 
-    # Simple deterministic math for smoke tests
-    haircut = max(0.0, min_out_bps) / 10_000.0
-    min_out = max(0.0, col_in * (1.0 - haircut))
-    copx_out = min_out  # for smoke tests, match min_out
-    eff_copx_per_col = (copx_out / col_in) if col_in > 0 else 0.0
 
-    data = {
-        # Keys expected by the test at top level:
+# ---------- quote ----------
+def _calc_quote(col_in: float, min_out_bps: float, twap_guard: bool) -> Dict[str, Any]:
+    # simple deterministic calc to keep tests stable
+    haircut = (min_out_bps / 10_000.0)
+    eff = 1.0 - haircut
+    copx_out = col_in * eff
+    return {
         "col_in": col_in,
         "min_out_bps": min_out_bps,
-        "min_out": min_out,
+        "min_out": copx_out,
         "copx_out": copx_out,
-        "eff_copx_per_col": eff_copx_per_col,
-        "twap_guard": twap_guard,
+        "eff_copx_per_col": eff,
+        "twap_guard": bool(twap_guard),
         "raw": {
             "note": "smoke-quote",
-            "inputs": {"col_in": col_in, "min_out_bps": min_out_bps, "twap_guard": twap_guard},
+            "inputs": {"col_in": col_in, "min_out_bps": min_out_bps, "twap_guard": bool(twap_guard)},
             "calc": {"haircut": haircut},
         },
     }
-    print(json.dumps(data, ensure_ascii=False))
-    return 0
 
 
-def cmd_sweep(args: argparse.Namespace) -> int:
-    """
-    Headless, dependency-free sweep that always emits ≥1 chart.
-    """
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt  # type: ignore
-    from random import random
+def cmd_quote(ns: argparse.Namespace) -> None:
+    data = _calc_quote(col_in=float(ns.col_in), min_out_bps=float(ns.min_out_bps), twap_guard=bool(ns.twap_guard))
+    print(json.dumps(data))
 
-    outdir = Path(args.outdir)
+
+# ---------- sweep ----------
+def cmd_sweep(ns: argparse.Namespace) -> None:
+    outdir = Path(ns.outdir).resolve()
     outdir.mkdir(parents=True, exist_ok=True)
 
-    charts: list[str] = []
+    # tiny stable sweep: 64 paths, 32 steps
+    paths = simulate_gbm_paths(n_paths=64, n_steps=32, s0=1.0, mu=0.0, sigma=0.25, dt=1/32)
+
+    charts: List[str] = []
+    p0 = outdir / "sweep_paths-0000.png"
+    h0 = outdir / "sweep_hist-0000.png"
     try:
-        y = [1 + 0.02 * i + 0.1 * (random() - 0.5) for i in range(args.steps)]
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.plot(y)
-        ax.set_title("COLINK: Sweep Price Path")
-        ax.set_xlabel("Step")
-        ax.set_ylabel("Value")
-        p = outdir / "sweep_paths-0000.png"
-        fig.savefig(p, dpi=160, bbox_inches="tight")
-        plt.close(fig)
-        charts.append(str(p))
-
-        fig2, ax2 = plt.subplots(figsize=(6, 3))
-        ax2.hist(y, bins=20)
-        ax2.set_title("COLINK: Value Distribution")
-        ax2.set_xlabel("Value")
-        ax2.set_ylabel("Frequency")
-        p2 = outdir / "sweep_hist-0000.png"
-        fig2.savefig(p2, dpi=160, bbox_inches="tight")
-        plt.close(fig2)
-        charts.append(str(p2))
+        plot_paths(paths, title="Simulated price paths", outfile=p0.as_posix())
+        charts.append(p0.as_posix())
     except Exception:
-        fig, ax = plt.subplots(figsize=(6, 3))
-        ax.plot([0, 1], [0, 1])
-        ax.set_title("COLINK: Fallback Chart")
-        p = outdir / "sweep_fallback-0000.png"
-        fig.savefig(p, dpi=160, bbox_inches="tight")
-        plt.close(fig)
-        charts = [str(p)]
+        pass
 
-    print(json.dumps({"charts": charts}, ensure_ascii=False))
-    return 0
+    try:
+        # Use last-step distribution
+        last = [row[-1] for row in paths]
+        plot_hist(last, title="Terminal price distribution", outfile=h0.as_posix())
+        charts.append(h0.as_posix())
+    except Exception:
+        pass
+
+    print(json.dumps({"charts": charts}))
 
 
+# ---------- CLI ----------
 def main() -> int:
-    parser = argparse.ArgumentParser(prog="json_cli", description="Emit JSON for sim actions.")
-    sub = parser.add_subparsers(dest="cmd", required=True)
+    import importlib.metadata as md
 
-    p_quote = sub.add_parser("quote", help="Run quote and emit JSON")
-    p_quote.add_argument("--col-in", type=float, dest="col_in")
-    p_quote.add_argument("--min-out-bps", type=float, dest="min_out_bps")
-    p_quote.add_argument("--twap-guard", action="store_true")
-    p_quote.set_defaults(func=cmd_quote)
+    parser = argparse.ArgumentParser(prog="colink-json", description="COLINK simulation JSON CLI")
+    parser.add_argument("--version", action="store_true", help="print package version and exit")
 
-    p_sweep = sub.add_parser("sweep", help="Run sweep and emit charts JSON")
-    p_sweep.add_argument("--outdir", default="charts")
-    p_sweep.add_argument("--steps", type=int, default=200)
-    p_sweep.set_defaults(func=cmd_sweep)
+    sub = parser.add_subparsers(dest="cmd", required=False)
+
+    p_q = sub.add_parser("quote", help="produce a quote JSON")
+    p_q.add_argument("--col-in", dest="col_in", required=True, type=float)
+    p_q.add_argument("--min-out-bps", dest="min_out_bps", required=True, type=float)
+    p_q.add_argument("--twap-guard", dest="twap_guard", action="store_true")
+    p_q.set_defaults(func=cmd_quote)
+
+    p_s = sub.add_parser("sweep", help="run small GBM sweep and emit charts JSON")
+    p_s.add_argument("--outdir", dest="outdir", required=True, type=str)
+    p_s.set_defaults(func=cmd_sweep)
 
     args = parser.parse_args()
-    return args.func(args)
+
+    if args.version:
+        try:
+            print(md.version("colink-core"))
+        except Exception:
+            # fallback: unknown version in dev
+            print("0.0.0")
+        return 0
+
+    # Default to help if no subcommand
+    if not hasattr(args, "func"):
+        parser.print_help()
+        return 2
+
+    args.func(args)
+    return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
