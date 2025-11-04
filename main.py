@@ -63,22 +63,5 @@ async def _log_mw():
 
 
 
-try:
-    _app_ref = globals().get('app', None)
-    if _app_ref is None:
-        # Try common factory names if app created via a function
-        for fn_name in ('create_app', 'get_app', 'build_app'):
-            _fn = globals().get(fn_name)
-            if callable(_fn):
-                _app_ref = _fn() if _fn.__code__.co_argcount == 0 else None
-                break
-    if _app_ref is not None:
-        if not any(getattr(mw.cls, '__name__', '') == 'IdempotencyMiddleware' for mw in _app_ref.user_middleware):
-            _app_ref.add_middleware(IdempotencyMiddleware, store=AsyncMemoryStore(), default_ttl_seconds=300)
-            print('[Boot] IdempotencyMiddleware mounted')
-    else:
-        print('[Boot] WARNING: could not find app instance to mount IdempotencyMiddleware')
-except Exception as _e:
-    print('[Boot] ERROR mounting IdempotencyMiddleware:', _e)
 
 
