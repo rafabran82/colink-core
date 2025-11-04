@@ -1,19 +1,19 @@
 ﻿[build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "colink-core"
-version = "0.2.0"
-description = "COLINK core simulation and CLI"
-readme = "README.md"
-requires-python = ">=3.11"
-
-[tool.pytest.ini_options]
-addopts = "-q"
-testpaths = ["colink_core/sim"][project.scripts]
-colink-json = "colink_core.sim.json_cli:main"
+version = "0.0.0"
+requires-python = ">=3.10"
+description = "COLINK core components"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { text = "Proprietary" }
+authors = [{ name = "COLINK" }]
 
 [project.scripts]
 colink-json = "colink_core.sim.json_cli:main"
 
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["colink_core"]
