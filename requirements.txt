@@ -13,3 +13,5 @@ black==24.10.0
 
 SQLAlchemy>=2.0
 aiosqlite>=0.20
+
+redis>=5.0.0
