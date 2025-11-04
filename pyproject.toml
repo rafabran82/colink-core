@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "colink-core"
-version = "0.0.0"
+version = "0.3.5"
 requires-python = ">=3.10"
 description = "COLINK core components"
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -20,3 +20,4 @@ testpaths = ["colink_core"]
 
 [tool.setuptools.packages.find]
 include = ["colink_core*"]
+
