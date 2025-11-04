@@ -15,7 +15,7 @@ jobs:
       - name: Install
         run: |
           python -m pip install -U pip
-          pip install -e .[sim]
+          pip install -e ".[sim,test]"[sim]
           pip install -r requirements-dev.txt
       - name: Byte-compile
         shell: pwsh
@@ -23,4 +23,5 @@ jobs:
           Get-ChildItem -Recurse -File -Include *.py | ForEach-Object { python -m py_compile $_.FullName }
       - name: Tests (json_cli)
         run: pytest -q colink_core/sim/test_json_cli.py
+
 
