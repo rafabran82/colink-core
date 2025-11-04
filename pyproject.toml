@@ -13,3 +13,7 @@ requires-python = ">=3.11"
 addopts = "-q"
 testpaths = ["colink_core/sim"][project.scripts]
 colink-json = "colink_core.sim.json_cli:main"
+
+[project.scripts]
+colink-json = "colink_core.sim.json_cli:main"
+
