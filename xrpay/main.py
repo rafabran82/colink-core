@@ -26,13 +26,16 @@ async def secret_provider(_req) -> str:
 
 app = FastAPI(title="XRPay API", version="0.3.1")
 
+
+# === XRPay middleware: auth first, then idempotency ===
+app.add_middleware(HMACMiddleware)        # verifies X-XRPay-* and raw body
+app.add_middleware(IdempotencyMiddleware) # safe to run after HMAC
 # Force tables on startup in case prior create_all missed them
 @app.on_event("startup")
 def _ensure_db():
     Base.metadata.create_all(bind=engine)
 
-app.add_middleware(HMACMiddleware, secret_provider=secret_provider)
-app.add_middleware(IdempotencyMiddleware, store=InMemoryIdemStore())
+)
 
 _provider = SimProvider()
 _pricing  = PricingEngine(_provider)
@@ -78,4 +81,29 @@ def __who_pricing():
         "instance_has_quote": hasattr(globals().get("_pricing", None), "quote"),
     }
     return info
+
+
+
+from fastapi import Request
+
+@app.get("/__who/quotes")
+def __who_quotes(request: Request):
+    # find the route that matches POST /quotes
+    for r in request.app.routes:
+        try:
+            if getattr(r, "path", None) == "/quotes" and "POST" in getattr(r, "methods", []):
+                fn = getattr(r, "endpoint", None)
+                if fn:
+                    g = getattr(fn, "__globals__", {})
+                    return {
+                        "endpoint": str(fn),
+                        "module": getattr(fn, "__module__", None),
+                        "file": g.get("__file__", None),
+                        "qualname": getattr(fn, "__qualname__", None),
+                    }
+        except Exception:
+            pass
+    return {"error":"no POST /quotes route found"}
+
+
 
