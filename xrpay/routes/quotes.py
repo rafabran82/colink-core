@@ -90,3 +90,12 @@ def list_quotes() -> List[dict]:
 
 
 
+
+from fastapi import HTTPException
+
+def _ensure_liquidity_available(base: str, quote: str):
+    # Replace this check with your real paper engine/book lookup
+    from xrpay.paper import book as _paper_book  # if you have this; else adapt
+    ob = _paper_book.snapshot_pair(base, quote) if hasattr(_paper_book, "snapshot_pair") else None
+    if not ob or (not ob.get("bids") and not ob.get("asks")):
+        raise HTTPException(status_code=503, detail="Orderbook empty for pair.")
