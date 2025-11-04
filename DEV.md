@@ -15,5 +15,15 @@ If it fails, fix code or run:
 
 ## Charts
 Charts PNGs are ignored by git. Clean up:
-  pwsh scripts/clean-charts.ps1
+  pwsh scripts/clean-charts.ps1rnrn## Quick smoke (Windows)
 
+```powershell
+pwsh scripts/dev-smoke.ps1
+rn## Quick smoke — Windows
+
+```powershell
+# From repo root
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Bootstrap.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Format.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Invoke-Tests.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Invoke-Sweep.ps1 -OutDir artifacts\charts -RunName dev-smoke

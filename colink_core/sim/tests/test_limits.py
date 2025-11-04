@@ -12,7 +12,7 @@ def test_limiter_size_and_dev_caps_and_breaker():
     # two violations trip breaker
     ok, reason = lim.check_and_record(30_000.0, 100.0)  # size breach
     assert not ok and "size_exceeds_cap" in reason
-    ok, reason = lim.check_and_record(5_000.0, 3_000.0) # dev breach
+    ok, reason = lim.check_and_record(5_000.0, 3_000.0)  # dev breach
     assert not ok and lim.tripped
 
     # while tripped, can_trade blocks and ticks cooldown
@@ -26,5 +26,3 @@ def test_limiter_size_and_dev_caps_and_breaker():
     # first request after auto-reset tells caller to re-quote
     ok, reason = lim.check_and_record(10_000.0, 100.0)
     assert not ok and "auto_reset" in reason
-
-

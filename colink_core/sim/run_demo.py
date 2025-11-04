@@ -2,8 +2,9 @@
 from wallet import Wallet
 
 
-def fmt(n): 
+def fmt(n):
     return f"{n:,.6f}"
+
 
 def main():
     # 1) Seed pool so initial price ~ 2,500 COPX per 1 XRP (example)
@@ -52,14 +53,6 @@ def main():
     print("Reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
     print("Price (COPX per XRP):", fmt(pool.price_y_per_x()))
 
+
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-

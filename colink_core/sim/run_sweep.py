@@ -3,7 +3,17 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-def simulate_gbm_paths(*, n_steps: int, n_paths: int, dt: float, mu: float, sigma: float, s0: float, seed: int | None = None):
+
+def simulate_gbm_paths(
+    *,
+    n_steps: int,
+    n_paths: int,
+    dt: float,
+    mu: float,
+    sigma: float,
+    s0: float,
+    seed: int | None = None,
+):
     rng = np.random.default_rng(seed)
     dt_arr = dt
     drift = (mu - 0.5 * sigma * sigma) * dt_arr
@@ -13,6 +23,7 @@ def simulate_gbm_paths(*, n_steps: int, n_paths: int, dt: float, mu: float, sigm
     s = s0 * np.exp(log_paths)
     s = np.vstack([np.full((1, n_paths), s0), s])  # prepend s0
     return s  # shape: (n_steps+1, n_paths)
+
 
 def plot_paths(paths, outdir):
     outdir = Path(outdir)
@@ -27,6 +38,7 @@ def plot_paths(paths, outdir):
     plt.savefig(out_path, bbox_inches="tight")
     plt.close()
     return out_path
+
 
 def plot_hist(paths, outdir):
     outdir = Path(outdir)

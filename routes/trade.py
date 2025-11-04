@@ -24,15 +24,18 @@ PAPER_BOOK: dict[str, list[dict[str, Any]]] = {"bids": [], "asks": []}
 PAPER_POSITION = {
     "col": Decimal("0"),
     "xrp": Decimal("0"),
-    "avg_price": None,              # XRP per COL (Decimal or None)
-    "realized_pnl_xrp": Decimal("0")
+    "avg_price": None,  # XRP per COL (Decimal or None)
+    "realized_pnl_xrp": Decimal("0"),
 }
+
 
 def _q(x: Decimal, places=6) -> str:
     return str(x.quantize(Decimal(10) ** -places, rounding=ROUND_HALF_UP))
 
+
 def _now_ts() -> int:
     return int(time.time())
+
 
 def _record_fill_buy(amount_col: Decimal, price_xrp_per_col: Decimal) -> None:
     """Buy COL using XRP (paper)."""
@@ -48,9 +51,12 @@ def _record_fill_buy(amount_col: Decimal, price_xrp_per_col: Decimal) -> None:
     if prev_avg is None or prev_col == 0:
         PAPER_POSITION["avg_price"] = price_xrp_per_col
     else:
-        PAPER_POSITION["avg_price"] = (prev_avg * prev_col + price_xrp_per_col * amount_col) / new_col
+        PAPER_POSITION["avg_price"] = (
+            prev_avg * prev_col + price_xrp_per_col * amount_col
+        ) / new_col
 
     PAPER_POSITION["col"] = new_col
+
 
 def _record_fill_sell(amount_col: Decimal, price_xrp_per_col: Decimal) -> None:
     """Sell COL for XRP (paper)."""
@@ -72,18 +78,27 @@ def _record_fill_sell(amount_col: Decimal, price_xrp_per_col: Decimal) -> None:
         PAPER_POSITION["avg_price"] = None
     # else keep the same avg_price for remaining inventory
 
+
 # ---------- Models ----------
 class SeedBookReq(BaseModel):
-    mid_price_xrp_per_col: Decimal = Field(..., description="Target mid price in XRP per COL (e.g., 0.10)")
+    mid_price_xrp_per_col: Decimal = Field(
+        ..., description="Target mid price in XRP per COL (e.g., 0.10)"
+    )
     steps: int = Field(2, description="Levels up and down (0 = only mid)")
-    step_pct: Decimal = Field(Decimal("0.05"), description="Percentage gap per level (e.g., 0.05 = 5%)")
+    step_pct: Decimal = Field(
+        Decimal("0.05"), description="Percentage gap per level (e.g., 0.05 = 5%)"
+    )
     base_size_col: Decimal = Field(Decimal("25"), description="COL size at mid; scales per level")
     size_scale: Decimal = Field(Decimal("1.00"), description="Multiply size each level")
 
+
 class MarketReq(BaseModel):
     amount_col: Decimal = Field(..., gt=Decimal("0"))
-    max_slippage_pct: Decimal = Field(Decimal("0.20"), description="Stop if best price worse than mid*(1+/-slippage)")
+    max_slippage_pct: Decimal = Field(
+        Decimal("0.20"), description="Stop if best price worse than mid*(1+/-slippage)"
+    )
     limit: int = 20
+
 
 # ---------- Helpers ----------
 def _price_from_ask(ask: dict[str, Any]) -> Decimal:
@@ -92,7 +107,8 @@ def _price_from_ask(ask: dict[str, Any]) -> Decimal:
     tp = ask["TakerPays"]  # {currency, issuer, value}
     xrp = Decimal(tg) / Decimal(1_000_000)
     col = Decimal(str(tp["value"]))
-    return (xrp / col)
+    return xrp / col
+
 
 def _price_from_bid(bid: dict[str, Any]) -> Decimal:
     # bid: maker BUYING COL (TakerGets=COL, TakerPays=XRP drops)
@@ -100,18 +116,37 @@ def _price_from_bid(bid: dict[str, Any]) -> Decimal:
     tg = bid["TakerGets"]  # {currency, issuer, value}
     xrp = Decimal(tp) / Decimal(1_000_000)
     col = Decimal(str(tg["value"]))
-    return (xrp / col)
+    return xrp / col
+
 
 def _maker_sell_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
     if settings.paper_mode:
         # add ASKS level locally
-        PAPER_BOOK["asks"].append({
-            "TakerGets": str((price_xrp_per_col * iou_amt * Decimal(1_000_000)).quantize(Decimal("1"))),  # XRP drops
-            "TakerPays": {"currency": settings.col_code, "issuer": settings.issuer_addr or "PAPER", "value": _q(iou_amt, 6)},
-            "quality": _q((price_xrp_per_col * Decimal(1_000_000)), 0),
-            "seq": 0
-        })
-        return {"ok": True, "engine": {"mode": "paper", "side": "SELL_COL", "price_xrp_per_col": _q(price_xrp_per_col, 4), "iou_amt": str(iou_amt), "txid": f"PAPER-SELL_COL-{_now_ts()}", "ledger_index": 0}}
+        PAPER_BOOK["asks"].append(
+            {
+                "TakerGets": str(
+                    (price_xrp_per_col * iou_amt * Decimal(1_000_000)).quantize(Decimal("1"))
+                ),  # XRP drops
+                "TakerPays": {
+                    "currency": settings.col_code,
+                    "issuer": settings.issuer_addr or "PAPER",
+                    "value": _q(iou_amt, 6),
+                },
+                "quality": _q((price_xrp_per_col * Decimal(1_000_000)), 0),
+                "seq": 0,
+            }
+        )
+        return {
+            "ok": True,
+            "engine": {
+                "mode": "paper",
+                "side": "SELL_COL",
+                "price_xrp_per_col": _q(price_xrp_per_col, 4),
+                "iou_amt": str(iou_amt),
+                "txid": f"PAPER-SELL_COL-{_now_ts()}",
+                "ledger_index": 0,
+            },
+        }
 
     # XRPL path
     res = create_offer(
@@ -127,16 +162,35 @@ def _maker_sell_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
         raise HTTPException(status_code=400, detail={"action": "SELL_COL", **res})
     return res
 
+
 def _maker_buy_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
     if settings.paper_mode:
         # add BIDS level locally
-        PAPER_BOOK["bids"].append({
-            "TakerPays": str((price_xrp_per_col * iou_amt * Decimal(1_000_000)).quantize(Decimal("1"))),  # XRP drops
-            "TakerGets": {"currency": settings.col_code, "issuer": settings.issuer_addr or "PAPER", "value": _q(iou_amt, 6)},
-            "quality": _q((price_xrp_per_col * Decimal(1_000_000)), 0),
-            "seq": 0
-        })
-        return {"ok": True, "engine": {"mode": "paper", "side": "BUY_COL", "price_xrp_per_col": _q(price_xrp_per_col, 4), "iou_amt": str(iou_amt), "txid": f"PAPER-BUY_COL-{_now_ts()}", "ledger_index": 0}}
+        PAPER_BOOK["bids"].append(
+            {
+                "TakerPays": str(
+                    (price_xrp_per_col * iou_amt * Decimal(1_000_000)).quantize(Decimal("1"))
+                ),  # XRP drops
+                "TakerGets": {
+                    "currency": settings.col_code,
+                    "issuer": settings.issuer_addr or "PAPER",
+                    "value": _q(iou_amt, 6),
+                },
+                "quality": _q((price_xrp_per_col * Decimal(1_000_000)), 0),
+                "seq": 0,
+            }
+        )
+        return {
+            "ok": True,
+            "engine": {
+                "mode": "paper",
+                "side": "BUY_COL",
+                "price_xrp_per_col": _q(price_xrp_per_col, 4),
+                "iou_amt": str(iou_amt),
+                "txid": f"PAPER-BUY_COL-{_now_ts()}",
+                "ledger_index": 0,
+            },
+        }
 
     # XRPL path
     res = create_offer(
@@ -151,6 +205,7 @@ def _maker_buy_col(client, iou_amt: Decimal, price_xrp_per_col: Decimal):
     if not res.get("ok"):
         raise HTTPException(status_code=400, detail={"action": "BUY_COL", **res})
     return res
+
 
 def _preflight_or_400():
     # Ensure we have usable params before signing any tx (only enforced in non-paper mode)
@@ -168,6 +223,7 @@ def _preflight_or_400():
     if errs:
         raise HTTPException(status_code=400, detail={"error": "preflight_failed", **errs})
 
+
 # ---------- Routes ----------
 @router.post("/seed-book")
 def seed_book(req: SeedBookReq):
@@ -177,7 +233,13 @@ def seed_book(req: SeedBookReq):
 
     # make sure trustline exists (no-op if already present) unless in paper mode
     if not settings.paper_mode:
-        tl = ensure_trustline(client, settings.trader_seed, settings.issuer_addr, settings.col_code, limit=str(10_000_000))
+        tl = ensure_trustline(
+            client,
+            settings.trader_seed,
+            settings.issuer_addr,
+            settings.col_code,
+            limit=str(10_000_000),
+        )
         if not tl.get("ok"):
             raise HTTPException(status_code=400, detail={"action": "TRUSTLINE", **tl})
 
@@ -185,14 +247,29 @@ def seed_book(req: SeedBookReq):
     size0 = Decimal(req.base_size_col)
 
     for i in range(req.steps + 1):
-        size_i = (size0 * (req.size_scale ** i))
-        ask_px = (req.mid_price_xrp_per_col * (Decimal(1) + req.step_pct * i))
-        bid_px = (req.mid_price_xrp_per_col * (Decimal(1) - req.step_pct * i))
+        size_i = size0 * (req.size_scale**i)
+        ask_px = req.mid_price_xrp_per_col * (Decimal(1) + req.step_pct * i)
+        bid_px = req.mid_price_xrp_per_col * (Decimal(1) - req.step_pct * i)
 
-        results["asks"].append({"level": i, "size_col": str(size_i), "price": str(ask_px), "engine": _maker_sell_col(client, size_i, ask_px)})
-        results["bids"].append({"level": i, "size_col": str(size_i), "price": str(bid_px), "engine": _maker_buy_col(client, size_i, bid_px)})
+        results["asks"].append(
+            {
+                "level": i,
+                "size_col": str(size_i),
+                "price": str(ask_px),
+                "engine": _maker_sell_col(client, size_i, ask_px),
+            }
+        )
+        results["bids"].append(
+            {
+                "level": i,
+                "size_col": str(size_i),
+                "price": str(bid_px),
+                "engine": _maker_buy_col(client, size_i, bid_px),
+            }
+        )
 
     return results
+
 
 @router.post("/market-buy")
 def market_buy(req: MarketReq):
@@ -219,7 +296,20 @@ def market_buy(req: MarketReq):
             else:
                 a["TakerPays"]["value"] = _q(new_avail, 6)
             _record_fill_buy(take, price)
-            fills.append({"take_col": str(take), "price_xrp_per_col": str(price), "engine": {"ok": True, "engine": {"mode": "paper", "side": "FILL", "txid": f"PAPER-FILL-{_now_ts()}"}}})
+            fills.append(
+                {
+                    "take_col": str(take),
+                    "price_xrp_per_col": str(price),
+                    "engine": {
+                        "ok": True,
+                        "engine": {
+                            "mode": "paper",
+                            "side": "FILL",
+                            "txid": f"PAPER-FILL-{_now_ts()}",
+                        },
+                    },
+                }
+            )
             to_buy -= take
         if to_buy > 0:
             return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_buy)}
@@ -238,7 +328,9 @@ def market_buy(req: MarketReq):
         mid = (best_bid + best_ask) / Decimal(2)
         max_ok = mid * (Decimal(1) + req.max_slippage_pct)
         if best_ask > max_ok:
-            raise HTTPException(status_code=400, detail=f"Best ask {best_ask} worse than slippage cap {max_ok}")
+            raise HTTPException(
+                status_code=400, detail=f"Best ask {best_ask} worse than slippage cap {max_ok}"
+            )
 
     to_buy = Decimal(req.amount_col)
     fills = []
@@ -255,6 +347,7 @@ def market_buy(req: MarketReq):
     if to_buy > 0:
         return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_buy)}
     return {"status": "ok", "filled_entries": fills}
+
 
 @router.post("/market-sell")
 def market_sell(req: MarketReq):
@@ -281,7 +374,20 @@ def market_sell(req: MarketReq):
             else:
                 b["TakerGets"]["value"] = _q(new_avail, 6)
             _record_fill_sell(take, price)
-            fills.append({"take_col": str(take), "price_xrp_per_col": str(price), "engine": {"ok": True, "engine": {"mode": "paper", "side": "FILL", "txid": f"PAPER-FILL-{_now_ts()}"}}})
+            fills.append(
+                {
+                    "take_col": str(take),
+                    "price_xrp_per_col": str(price),
+                    "engine": {
+                        "ok": True,
+                        "engine": {
+                            "mode": "paper",
+                            "side": "FILL",
+                            "txid": f"PAPER-FILL-{_now_ts()}",
+                        },
+                    },
+                }
+            )
             to_sell -= take
         if to_sell > 0:
             return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_sell)}
@@ -300,7 +406,9 @@ def market_sell(req: MarketReq):
         mid = (best_bid + best_ask) / Decimal(2)
         min_ok = mid * (Decimal(1) - req.max_slippage_pct)
         if best_bid < min_ok:
-            raise HTTPException(status_code=400, detail=f"Best bid {best_bid} worse than slippage floor {min_ok}")
+            raise HTTPException(
+                status_code=400, detail=f"Best bid {best_bid} worse than slippage floor {min_ok}"
+            )
 
     to_sell = Decimal(req.amount_col)
     fills = []
@@ -317,5 +425,3 @@ def market_sell(req: MarketReq):
     if to_sell > 0:
         return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_sell)}
     return {"status": "ok", "filled_entries": fills}
-
-

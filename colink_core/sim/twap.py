@@ -7,6 +7,7 @@ class TWAPOracle:
     Simple rolling time-weighted average price (equal weights over a fixed window).
     push(price) to add a new sample; value() returns the current TWAP.
     """
+
     def __init__(self, window: int = 20):
         if window <= 0:
             raise ValueError("window must be > 0")

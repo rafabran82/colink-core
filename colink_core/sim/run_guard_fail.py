@@ -5,22 +5,27 @@ from risk_guard import quote_with_slippage
 from router import exec_col_to_copx
 
 
-def fmt(n): return f"{n:,.6f}"
+def fmt(n):
+    return f"{n:,.6f}"
+
 
 def seed():
     # Same seeds as before
     pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)  # XRP<->COPX
-    pool_col_x  = PoolState(x_reserve=10_000.0, y_reserve=200_000.0,   fee_bps=30)  # XRP<->COL
+    pool_col_x = PoolState(x_reserve=10_000.0, y_reserve=200_000.0, fee_bps=30)  # XRP<->COL
     return pool_col_x, pool_x_copx
+
 
 def main():
     # Step 1: quote on clean pools
     poolA, poolB = seed()
-    col_in   = 8_000.0
+    col_in = 8_000.0
     slip_bps = 150  # 1.50% tolerance
 
     gq = quote_with_slippage(poolA, poolB, col_in, slip_bps)
-    print(f"Quote: {fmt(col_in)} COL → {fmt(gq.copx_out_quote)} COPX | min_out @{slip_bps} bps = {fmt(gq.min_out)}")
+    print(
+        f"Quote: {fmt(col_in)} COL → {fmt(gq.copx_out_quote)} COPX | min_out @{slip_bps} bps = {fmt(gq.min_out)}"
+    )
 
     # Step 2: new copies for execution... but someone moves the market against us
     poolA2, poolB2 = seed()
@@ -41,6 +46,6 @@ def main():
     # Helpful context
     print("Note: guard should stop the trade if enforced on-chain.")
 
+
 if __name__ == "__main__":
     main()
-

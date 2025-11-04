@@ -54,7 +54,9 @@ def get_account_lines(client: JsonRpcClient, address: str) -> list[dict[str, Any
     lines: list[dict[str, Any]] = []
     marker = None
     while True:
-        r = client.request(req.AccountLines(account=address, ledger_index="validated", limit=400, marker=marker))
+        r = client.request(
+            req.AccountLines(account=address, ledger_index="validated", limit=400, marker=marker)
+        )
         lines.extend(r.result.get("lines", []))
         marker = r.result.get("marker")
         if not marker:
@@ -62,23 +64,36 @@ def get_account_lines(client: JsonRpcClient, address: str) -> list[dict[str, Any
     return lines
 
 
-def fetch_col_state(client: JsonRpcClient, trader_seed: str, issuer_addr: str, currency: str) -> dict[str, Any]:
+def fetch_col_state(
+    client: JsonRpcClient, trader_seed: str, issuer_addr: str, currency: str
+) -> dict[str, Any]:
     trader_addr = addr_from_seed(trader_seed)
     ixrp = get_xrp_balance(client, issuer_addr)
     txrp = get_xrp_balance(client, trader_addr)
     lines = get_account_lines(client, trader_addr)
-    ious = [line_ for line_ in lines if line_.get("account") == issuer_addr and line_.get("currency") == currency]
+    ious = [
+        line_
+        for line_ in lines
+        if line_.get("account") == issuer_addr and line_.get("currency") == currency
+    ]
     return {
         "issuer": {"address": issuer_addr, "xrp_drops": ixrp},
         "trader": {"address": trader_addr, "xrp_drops": txrp, "ious": ious},
     }
 
 
-def ensure_trustline(client: JsonRpcClient, trader_seed: str, issuer_addr: str, currency: str, limit: str) -> dict[str, Any]:
+def ensure_trustline(
+    client: JsonRpcClient, trader_seed: str, issuer_addr: str, currency: str, limit: str
+) -> dict[str, Any]:
     try:
         w = wallet_from_seed(trader_seed)
     except Exception as e:
-        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid trader seed: {e}", "engine": None}
+        return {
+            "ok": False,
+            "type": e.__class__.__name__,
+            "error": f"Invalid trader seed: {e}",
+            "engine": None,
+        }
 
     tx = TrustSet(
         account=w.classic_address,
@@ -87,11 +102,18 @@ def ensure_trustline(client: JsonRpcClient, trader_seed: str, issuer_addr: str, 
     return sign_submit(tx, w, client)
 
 
-def iou_payment(client: JsonRpcClient, issuer_seed: str, dest: str, currency: str, amount: str) -> dict[str, Any]:
+def iou_payment(
+    client: JsonRpcClient, issuer_seed: str, dest: str, currency: str, amount: str
+) -> dict[str, Any]:
     try:
         w = wallet_from_seed(issuer_seed)
     except Exception as e:
-        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid issuer seed: {e}", "engine": None}
+        return {
+            "ok": False,
+            "type": e.__class__.__name__,
+            "error": f"Invalid issuer seed: {e}",
+            "engine": None,
+        }
 
     tx = Payment(
         account=w.classic_address,
@@ -117,7 +139,12 @@ def create_offer(
     try:
         w = wallet_from_seed(trader_seed)
     except Exception as e:
-        return {"ok": False, "type": e.__class__.__name__, "error": f"Invalid trader seed: {e}", "engine": None}
+        return {
+            "ok": False,
+            "type": e.__class__.__name__,
+            "error": f"Invalid trader seed: {e}",
+            "engine": None,
+        }
 
     if side == "SELL_COL":
         taker_pays = {"currency": currency, "issuer": issuer_addr, "value": str(Decimal(iou_amt))}
@@ -141,7 +168,9 @@ def cancel_offer(client: JsonRpcClient, seed: str, seq: int) -> dict[str, Any]:
     return sign_submit(tx, w, client)
 
 
-def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, limit: int = 20) -> dict[str, Any]:
+def orderbook_snapshot(
+    client: JsonRpcClient, issuer_addr: str, currency: str, limit: int = 20
+) -> dict[str, Any]:
     """
     Returns:
       - bids: makers BUYING COL (taker pays XRP, gets COL)
@@ -164,8 +193,8 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
 
     def shape(o: dict[str, Any]):
         return {
-            "seq":       norm(o, "Sequence", "seq"),
-            "quality":   o.get("quality"),
+            "seq": norm(o, "Sequence", "seq"),
+            "quality": o.get("quality"),
             "TakerGets": norm(o, "TakerGets", "taker_gets"),
             "TakerPays": norm(o, "TakerPays", "taker_pays"),
         }

@@ -5,6 +5,7 @@ from xrpl_utils import client_from, fetch_col_state
 
 router = APIRouter()
 
+
 @router.get("/status")
 def status():
     try:
@@ -23,4 +24,3 @@ def status():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
-

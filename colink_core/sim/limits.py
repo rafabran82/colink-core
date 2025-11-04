@@ -7,8 +7,9 @@ from dataclasses import dataclass
 class LimitConfig:
     max_col_in: float = 25_000.0
     max_dev_bps: float = 2_000.0
-    strikes_window: int = 2      # consecutive violations to trip
-    cooldown_trades: int = 3     # number of blocked can_trade() calls while tripped
+    strikes_window: int = 2  # consecutive violations to trip
+    cooldown_trades: int = 3  # number of blocked can_trade() calls while tripped
+
 
 class TradeLimiter:
     def __init__(self, cfg: LimitConfig):
@@ -57,7 +58,10 @@ class TradeLimiter:
             self.strikes += 1
             if self.strikes >= self.cfg.strikes_window:
                 self._trip()
-            return False, f"twap_deviation_exceeds_cap: {dev_bps:.1f} > {self.cfg.max_dev_bps:.1f} bps"
+            return (
+                False,
+                f"twap_deviation_exceeds_cap: {dev_bps:.1f} > {self.cfg.max_dev_bps:.1f} bps",
+            )
 
         # success clears strikes
         self.strikes = 0

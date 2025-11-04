@@ -7,7 +7,7 @@ class PoolState:
     def __init__(self, x_reserve: float, y_reserve: float, fee_bps: float = 30):
         self.x_reserve = float(x_reserve)
         self.y_reserve = float(y_reserve)
-        self.fee_bps   = float(fee_bps)
+        self.fee_bps = float(fee_bps)
 
         # LP supply (initialize from current reserves so seed() has non-zero LP)
         k = max(self.x_reserve * self.y_reserve, 0.0)
@@ -90,7 +90,5 @@ class PoolState:
         dy = self.y_reserve * fraction
         self.x_reserve -= dx
         self.y_reserve -= dy
-        self.total_lp *= (1.0 - fraction)
+        self.total_lp *= 1.0 - fraction
         return dx, dy
-
-

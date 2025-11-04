@@ -3,19 +3,22 @@
 from amm import PoolState
 
 
-def fmt(n): return f"{n:,.6f}"
+def fmt(n):
+    return f"{n:,.6f}"
+
 
 def seed(protocol_fee_bps=5):
     # Start similar to your earlier pool (1 XRP ~ 2,500 COPX)
     pool = PoolState(
         x_reserve=10_000.0,
         y_reserve=25_000_000.0,
-        fee_bps=30,                 # 0.30% total fee
-        protocol_fee_bps=protocol_fee_bps  # e.g., 0.05% out of the 0.30% goes to protocol
+        fee_bps=30,  # 0.30% total fee
+        protocol_fee_bps=protocol_fee_bps,  # e.g., 0.05% out of the 0.30% goes to protocol
     )
     # Mint initial LP: add_liquidity uses sqrt(dx*dy) on first deposit
     pool.add_liquidity(1_000.0, 2_500_000.0)
     return pool
+
 
 def main():
     pool = seed()
@@ -43,7 +46,12 @@ def main():
     print("\n== Post-swaps ==")
     print("Reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
     print("LP fees tallies: X=", fmt(pool.lp_fees_x), " Y=", fmt(pool.lp_fees_y))
-    print("Protocol fees tallies (off-pool): X=", fmt(pool.proto_fees_x), " Y=", fmt(pool.proto_fees_y))
+    print(
+        "Protocol fees tallies (off-pool): X=",
+        fmt(pool.proto_fees_x),
+        " Y=",
+        fmt(pool.proto_fees_y),
+    )
     print("LP total:", fmt(pool.lp_total))
     print("Price (COPX per XRP):", fmt(pool.price_y_per_x))
 
@@ -53,6 +61,7 @@ def main():
     print("Withdrawn: X=", fmt(dx), " Y=", fmt(dy))
     print("New reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
     print("LP total:", fmt(pool.lp_total))
+
 
 if __name__ == "__main__":
     main()

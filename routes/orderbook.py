@@ -7,6 +7,7 @@ from xrpl_utils import client_from, orderbook_snapshot
 
 router = APIRouter(prefix="", tags=["orderbook"])
 
+
 @router.get("/orderbook")
 def get_orderbook(limit: int = 20) -> Any:
     try:
@@ -18,5 +19,6 @@ def get_orderbook(limit: int = 20) -> Any:
         return ob
     except Exception as e:
         # Return a 400 with useful detail (instead of a 500)
-        raise HTTPException(status_code=400, detail={"error": str(e), "type": e.__class__.__name__}) from e
-
+        raise HTTPException(
+            status_code=400, detail={"error": str(e), "type": e.__class__.__name__}
+        ) from e

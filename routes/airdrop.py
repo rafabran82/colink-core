@@ -6,9 +6,11 @@ from xrpl_utils import client_from, iou_payment
 
 router = APIRouter()
 
+
 class AirdropBody(BaseModel):
     to: str
     amount: str
+
 
 @router.post("/airdrop")
 def airdrop(body: AirdropBody):
@@ -20,4 +22,3 @@ def airdrop(body: AirdropBody):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
-
