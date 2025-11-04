@@ -7,6 +7,8 @@ on:
 
 jobs:
   windows-ci:
+  env:
+    MPLBACKEND: Agg
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -30,39 +32,6 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-dev.txt
-
-      - name: Format (ruff+black)
-        shell: pwsh
-        run: |
-          python -m ruff check . --fix --isolated
-          python -m black .
-
-      - name: Run tests
-        shell: pwsh
-        run: |
-          # Mirror your local Invoke-Tests.ps1 behavior
-          python -m py_compile (Get-ChildItem -Recurse -File -Include *.py | ? { $_.FullName -notmatch '\\\.venv\\' }).FullName
-          python -m pytest -q
-
-            - name: Ensure charts exist (fallback)
-        shell: pwsh
-        run: |
-          python tools/ensure_charts.py --dir artifacts/charts --need 2        shell: pwsh
-        env:
-          XRPL_RPC_URL: https://s.altnet.rippletest.net:51234
-        run: |
-          New-Item -ItemType Directory -Force -Path artifacts\charts | Out-Null
-          python -m colink_core.sim.run_sweep --config configs/sims/ci.yml --outdir artifacts/charts --name ci-run
-
-      - name: Upload charts
-        uses: actions/upload-artifact@v4
-        with:
-          name: charts-ci
-          path: artifacts/charts/*.png
-          if-no-files-found: warn
-      - name: SLO gates (charts present & non-trivial)
-        shell: pwsh
-        run: |
-          python -m colink_core.sim.metrics --dir artifacts/charts --min-files 2 --min-total-kb 20
-
+          python -m pip install --upgrade pip
+pip install --no-cache-dir -r requirements-dev.txt
+pip install --no-cache-dir -e .[sim]

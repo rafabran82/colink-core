@@ -6,6 +6,8 @@ on:
     branches: [ main ]
 jobs:
   win:
+  env:
+    MPLBACKEND: Agg
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,5 +25,6 @@ jobs:
           Get-ChildItem -Recurse -File -Include *.py | ForEach-Object { python -m py_compile $_.FullName }
       - name: Tests (json_cli)
         run: pytest -q colink_core/sim/test_json_cli.py
+
 
 
