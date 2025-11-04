@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+import time, uuid
 
 router = APIRouter()
 
@@ -20,20 +21,12 @@ class QuoteOut(BaseModel):
 
 @router.post("/quotes", response_model=QuoteOut)
 async def create_quote(q: QuoteIn):
-    # super simple demo math; replace with real pricing later
-    base = q.base.upper()
-    quote = q.quote.upper()
-    if base != "XRP" or quote != "USD":
+    if q.base.upper() != "XRP" or q.quote.upper() != "USD":
         raise HTTPException(status_code=422, detail="Only XRP/USD supported in demo")
-
-    import time, uuid
-    price = 0.6015
-    fee_bps = 25
-    impact_bps = q.slippageBps
     return {
         "id": uuid.uuid4().hex,
-        "price": price,
-        "fee_bps": fee_bps,
-        "impact_bps": impact_bps,
+        "price": 0.6015,
+        "fee_bps": 25,
+        "impact_bps": q.slippageBps,
         "expiresAt": int(time.time()) + 30,
     }

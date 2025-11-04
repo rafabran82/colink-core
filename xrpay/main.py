@@ -40,3 +40,17 @@ app.add_middleware(IdempotencyMiddleware, store=_idem_store)
 # --- Real routers ---
 from xrpay.routers.quotes import router as quotes_router
 app.include_router(quotes_router)
+# --- XRPay routers ---
+try:
+    from xrpay.routers.test import router as test_router
+    app.include_router(test_router)
+    print("[xrpay.main] Included: /_echo")
+except Exception as e:
+    print(f"[xrpay.main] Skipped /_echo: {e}")
+
+try:
+    from xrpay.routers.quotes import router as quotes_router
+    app.include_router(quotes_router)
+    print("[xrpay.main] Included: /quotes")
+except Exception as e:
+    print(f"[xrpay.main] Skipped /quotes: {e}")
