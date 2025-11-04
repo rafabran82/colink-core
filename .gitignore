@@ -19,3 +19,5 @@ copx_sim/
 pyproject.toml.bak-*
 
 charts/*.png
+
+charts/*.png
