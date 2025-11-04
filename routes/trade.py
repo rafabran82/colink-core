@@ -316,3 +316,4 @@ def market_sell(req: MarketReq):
     if to_sell > 0:
         return {"status": "partial", "filled_entries": fills, "remaining_col": str(to_sell)}
     return {"status": "ok", "filled_entries": fills}
+

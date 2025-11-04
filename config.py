@@ -96,3 +96,4 @@ class Settings(BaseSettings):
 
 # Singleton settings object
 settings = Settings()
+

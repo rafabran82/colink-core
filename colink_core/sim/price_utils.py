@@ -48,3 +48,4 @@ def modeled_bps_impact_for_size(pool_col_x: PoolState, pool_x_copx: PoolState, c
     impact_frac = max(0.0, (mid - eff) / mid)
     return impact_frac * 1e4  # → bps
 
+

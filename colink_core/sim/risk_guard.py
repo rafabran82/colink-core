@@ -54,3 +54,4 @@ def size_aware_twap_guard(
     budget_bps = min(cap_bps, base_guard_bps + modeled + cushion_bps)
     return (dev_bps <= budget_bps, dev_bps, budget_bps)
 
+

@@ -150,3 +150,4 @@ def orderbook_snapshot(client: JsonRpcClient, issuer_addr: str, currency: str, l
         }
 
     return {"bids": [shape(o) for o in bids], "asks": [shape(o) for o in asks]}
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import math
 
 class PoolState:
@@ -89,3 +89,4 @@ class PoolState:
         self.y_reserve -= dy
         self.total_lp *= (1.0 - fraction)
         return dx, dy
+

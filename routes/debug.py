@@ -24,3 +24,4 @@ def debug_settings():
         "trader_seed_error": settings.trader_seed_error,
         "paper_mode": settings.paper_mode,
     }
+

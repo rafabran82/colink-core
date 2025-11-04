@@ -4,3 +4,4 @@
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert hasattr(mod, "app"), "FastAPI app not found in main.py"
+

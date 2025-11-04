@@ -41,3 +41,4 @@ def test_price_monotonicity_basic():
     price1 = p.y_reserve / p.x_reserve
     assert price1 < price0  # buying Y with X pushes price down (more X, less Y)
 
+

@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import json
 import re
 import subprocess
@@ -73,7 +73,7 @@ def sweep_json(outdir=None):
     out = run(cmd)
 
     # Normalize arrows to ASCII so parsing is stable across consoles
-    norm = out.replace("\u2192", "->").replace("→", "->")
+    norm = out.replace("\u2192", "->").replace("â†’", "->")
 
     csv_m = re.search(r"Saved CSV\s*->\s*(.+)", norm)
     charts = []

@@ -18,3 +18,4 @@ def get_orderbook(limit: int = 20) -> Any:
         # Return a 400 with useful detail (instead of a 500)
         raise HTTPException(status_code=400, detail={"error": str(e), "type": e.__class__.__name__})
 
+

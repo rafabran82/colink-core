@@ -19,3 +19,4 @@ def airdrop(body: AirdropBody):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

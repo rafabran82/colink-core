@@ -15,3 +15,4 @@ class OfferReq(BaseModel):
 class OrderbookResp(BaseModel):
     bids: list
     asks: list
+
