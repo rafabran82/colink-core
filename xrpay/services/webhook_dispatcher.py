@@ -1,5 +1,6 @@
-﻿import aiohttp, hmac, hashlib, asyncio, json
-from .repos import next_pending_outbox, mark_delivered, requeue
+﻿import hmac, hashlib, asyncio
+import httpx
+from xrpay.repos import next_pending_outbox, mark_delivered, requeue
 
 class WebhookDispatcher:
     async def run(self):
@@ -11,17 +12,22 @@ class WebhookDispatcher:
             await self._deliver(job)
 
     async def _deliver(self, job):
-        # If job has a webhook with secret, sign; else send raw
+        # No webhook registered -> drain
+        if not job.webhook or not job.webhook.url:
+            mark_delivered(job.id)
+            return
+
         headers = {"Content-Type": "application/json"}
-        secret = None
-        if job.webhook and job.webhook.secret:
-            secret = job.webhook.secret
-            sig = hmac.new(secret.encode(), job.payload_json.encode(), hashlib.sha256).hexdigest()
+        if job.webhook.secret:
+            sig = hmac.new(job.webhook.secret.encode(), job.payload_json.encode(), hashlib.sha256).hexdigest()
             headers["X-XRPay-Hook-Signature"] = sig
 
-        async with aiohttp.ClientSession() as s:
-            r = await s.post(job.webhook.url if job.webhook else "", data=job.payload_json, headers=headers)
-            if 200 <= r.status < 300:
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                r = await client.post(job.webhook.url, content=job.payload_json, headers=headers)
+            if 200 <= r.status_code < 300:
                 mark_delivered(job.id)
             else:
                 requeue(job.id)
+        except Exception:
+            requeue(job.id)
