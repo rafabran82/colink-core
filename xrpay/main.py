@@ -27,9 +27,13 @@ async def secret_provider(_req) -> str:
 app = FastAPI(title="XRPay API", version="0.3.1")
 
 
-# === XRPay middleware: auth first, then idempotency ===
+# === XRPay middleware begin ===
 app.add_middleware(HMACMiddleware)        # verifies X-XRPay-* and raw body
-app.add_middleware(IdempotencyMiddleware) # safe to run after HMAC
+app.add_middleware(IdempotencyMiddleware) # run AFTER HMAC
+# === XRPay middleware end ===
+# === XRPay middleware: auth first, then idempotency ===
+# verifies X-XRPay-* and raw body
+# safe to run after HMAC
 # Force tables on startup in case prior create_all missed them
 @app.on_event("startup")
 def _ensure_db():
@@ -104,6 +108,7 @@ def __who_quotes(request: Request):
         except Exception:
             pass
     return {"error":"no POST /quotes route found"}
+
 
 
 
