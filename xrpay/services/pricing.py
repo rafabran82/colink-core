@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-# Simple deterministic pricing sim for test/dev
+# --- Primary sim provider used by routes ---
 class SimProvider:
     def get_quote(
         self,
@@ -17,19 +17,16 @@ class SimProvider:
         base_u = (base or "").upper()
         quote_u = (quote or "").upper()
         side_u = (side or "").upper()
-
         amt = Decimal(str(amount))
 
-        # Mid prices for a couple of pairs; default to 1.00 if unknown
+        # simple deterministic mid
         if base_u == "XRP" and quote_u == "USD":
             mid = Decimal("0.60")
         else:
             mid = Decimal("1.00")
 
-        # Turn bps into a fractional impact (50 bps = 0.005)
         impact = Decimal(slippage_bps) / Decimal(10_000)
 
-        # Simple half-spread around mid based on side
         if side_u == "BUY":
             px = mid * (Decimal(1) + impact / Decimal(2))
         else:
@@ -45,6 +42,13 @@ class SimProvider:
             "expires_at": expires_at,
         }
 
-
-# Export a singleton for easy import
+# singleton used by new code
 provider = SimProvider()
+
+# ---- Backward-compat aliases so old imports keep working ----
+class PricingEngine(SimProvider):
+    """Compat alias for older code that did `from xrpay.services.pricing import PricingEngine` and then `PricingEngine()`."""
+    pass
+
+# some code may import `pricing_engine` directly
+pricing_engine = provider
