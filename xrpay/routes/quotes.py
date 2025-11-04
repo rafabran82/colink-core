@@ -1,55 +1,67 @@
-﻿from fastapi import APIRouter, Body, HTTPException
-from ..services.pricing import PricingEngine
-from ..liquidity.sim_provider import SimProvider
+﻿from __future__ import annotations
+
+from decimal import Decimal
+from typing import Optional, Literal
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+
 from ..db import session_scope
 from ..models import Quote
-from decimal import Decimal, InvalidOperation
+from ..services.pricing import provider
 
 router = APIRouter(prefix="/quotes", tags=["quotes"])
 
-_provider = SimProvider()
-_engine = PricingEngine(_provider)
+
+class QuoteRequest(BaseModel):
+    base: str = Field(..., description="Base asset symbol, e.g. XRP")
+    quote: str = Field(..., description="Quote asset symbol, e.g. USD")
+    side: Literal["BUY", "SELL"]
+    amount: Decimal
+    # Support both notations from clients
+    slippageBps: Optional[int] = Field(None, ge=0, le=10_000)
+    slippage_bps: Optional[int] = Field(None, ge=0, le=10_000)
+
+    def normalized_slippage(self) -> int:
+        if self.slippage_bps is not None:
+            return self.slippage_bps
+        if self.slippageBps is not None:
+            return self.slippageBps
+        return 25
+
 
 @router.post("")
-def create_quote(payload: dict = Body(...)):
-    base  = payload.get("base")
-    quote = payload.get("quote")
-    side  = payload.get("side")
-    amount_raw = payload.get("amount")
-    slippage = payload.get("slippageBps") or payload.get("slippage_bps")
-    if slippage is None:
-        slippage = 50
-
+def create_quote(req: QuoteRequest):
     try:
-        amount = Decimal(str(amount_raw))
-    except (InvalidOperation, TypeError):
-        raise HTTPException(status_code=400, detail="invalid amount")
-
-    # Normalize to provider’s expected naming (camelCase)
-    q = _engine.quote({
-        "base": base,
-        "quote": quote,
-        "side": side,
-        "amount": str(amount),
-        "slippageBps": int(slippage),
-    })
-
-    # Persist
-    with session_scope() as s:
-        row = Quote(
-            base=base, quote=quote, side=side,
-            amount=str(amount),
-            price=str(q["price"]),
-            fee_bps=q.get("fee_bps", 0),
-            impact_bps=q.get("impact_bps", 0),
-            expires_at=q.get("expiresAt"),
+        q = provider.get_quote(
+            base=req.base,
+            quote=req.quote,
+            side=req.side,
+            amount=req.amount,
+            slippage_bps=req.normalized_slippage(),
         )
-        s.add(row)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"quote_error: {e}")
+
+    with session_scope() as s:
+        quote = Quote(
+            base=req.base.upper(),
+            quote=req.quote.upper(),
+            side=req.side.upper(),
+            amount=str(req.amount),
+            price=str(Decimal(str(q["price"]))),
+            fee_bps=int(q["fee_bps"]),
+            impact_bps=int(q["impact_bps"]),
+            expires_at=int(q["expires_at"]),
+        )
+        s.add(quote)
         s.flush()
-        return {
-            "id": row.id,
-            "price": float(row.price),
-            "fee_bps": row.fee_bps,
-            "impact_bps": row.impact_bps,
-            "expiresAt": row.expires_at,
-        }
+        quote_id = quote.id
+
+    return {
+        "id": quote_id,
+        "price": float(Decimal(str(q["price"]))),
+        "fee_bps": int(q["fee_bps"]),
+        "impact_bps": int(q["impact_bps"]),
+        "expiresAt": int(q["expires_at"]),
+    }
