@@ -1,4 +1,4 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
@@ -11,4 +11,5 @@ requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
 addopts = "-q"
-testpaths = ["colink_core/sim"]
+testpaths = ["colink_core/sim"][project.scripts]
+colink-json = "colink_core.sim.json_cli:main"
