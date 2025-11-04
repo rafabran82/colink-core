@@ -1,10 +1,9 @@
 ﻿from __future__ import annotations
+from .db import Base
 from datetime import datetime
 from decimal import Decimal
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
 from sqlalchemy import Column, String, Integer, DateTime, Text, JSON, ForeignKey, Numeric, Enum, UniqueConstraint, LargeBinary
-
-Base = declarative_base()
 
 class Invoice(Base):
     __tablename__ = "invoices"
@@ -71,3 +70,5 @@ class IdempotencyKey(Base):
     headers_json: Mapped[str] = mapped_column(Text)
     body_bytes: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
