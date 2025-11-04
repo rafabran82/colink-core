@@ -19,8 +19,5 @@ def airdrop(body: AirdropBody):
         res = iou_payment(c, settings.ISSUER_SEED, body.to, settings.COL_CODE, body.amount)
         return res
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e) from e) from e
-
-
-
+        raise HTTPException(status_code=500, detail=str(e)) from e
 

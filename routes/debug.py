@@ -26,3 +26,4 @@ def debug_settings():
         "paper_mode": settings.paper_mode,
     }
 
+

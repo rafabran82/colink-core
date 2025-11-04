@@ -12,3 +12,4 @@ def trustline(body: TrustlineReq):
     res = ensure_trustline(c, settings.TRADER_SEED, settings.COL_ISSUER, settings.COL_CODE, body.limit)
     return res
 
+
