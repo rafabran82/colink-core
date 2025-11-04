@@ -99,3 +99,4 @@ def _ensure_liquidity_available(base: str, quote: str):
     ob = _paper_book.snapshot_pair(base, quote) if hasattr(_paper_book, "snapshot_pair") else None
     if not ob or (not ob.get("bids") and not ob.get("asks")):
         raise HTTPException(status_code=503, detail="Orderbook empty for pair.")
+
