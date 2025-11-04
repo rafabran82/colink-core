@@ -39,19 +39,19 @@ class PaymentIntent(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 class Quote(Base):
     __tablename__ = "quotes"
-    id: Mapped[str] = mapped_column(String, primary_key=True)
-    base: Mapped[str] = mapped_column(String)
-    quote: Mapped[str] = mapped_column(String)
-    side: Mapped[str] = mapped_column(String)
-    amount: Mapped[str] = mapped_column(String)
-    price: Mapped[str] = mapped_column(String)              # decimal string
-    fee_bps: Mapped[int] = mapped_column(Integer, default=25)
-    impact_bps: Mapped[int] = mapped_column(Integer, default=0)
-    expires_at: Mapped[int] = mapped_column(Integer)        # unix ts
-    status: Mapped[str] = mapped_column(String, default="VALID")  # VALID | EXPIRED | USED
-    terms_hash: Mapped[str] = mapped_column(String, index=True)   # hash of request terms
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+    id = Column(Integer, primary_key=True, autoincrement=True)  # SQLite-friendly PK
+    base = Column(String, nullable=False)
+    quote = Column(String, nullable=False)
+    side = Column(String, nullable=False)
+    amount = Column(String, nullable=False)
+    price = Column(String, nullable=False)
+    fee_bps = Column(Integer, nullable=False)
+    impact_bps = Column(Integer, nullable=False)
+    expires_at = Column(Integer, nullable=False)
+    status = Column(String, nullable=False)
+    terms_hash = Column(String, nullable=True)  # was NOT NULL -> now nullable
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 class Outbox(Base):
     __tablename__ = "outbox"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -81,6 +81,7 @@ class IdempotencyKey(Base):
     headers_json: Mapped[str] = mapped_column(Text)
     body_bytes: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 
 
 
