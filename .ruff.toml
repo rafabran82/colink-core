@@ -1,18 +1,17 @@
-﻿[tool.ruff]
 line-length = 110
 target-version = "py311"
 extend-exclude = [
   ".git", ".github", ".venv", "venv", "__pycache__", "dist", "build",
-  "phase2",            # legacy stuff; remove later if you want it linted
-  "scripts/legacy",    # example legacy/scripts folder (safe to keep)
+  "phase2",
+  "scripts/legacy",
 ]
 
-[tool.ruff.lint]
+[lint]
 select = ["E","F","I","UP","B","SIM","PIE","Q","RUF"]
 ignore = [
-  "E402",              # allow imports below top for small scripts
+  "E402",
 ]
 
-[tool.ruff.lint.isort]
+[lint.isort]
 known-first-party = ["xrpay"]
 combine-as-imports = true
