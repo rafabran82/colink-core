@@ -27,10 +27,6 @@ async def secret_provider(_req) -> str:
 app = FastAPI(title="XRPay API", version="0.3.1")
 
 
-# === XRPay middleware begin ===
-app.add_middleware(HMACMiddleware)        # verifies X-XRPay-* and raw body
-app.add_middleware(IdempotencyMiddleware) # run AFTER HMAC
-# === XRPay middleware end ===
 # === XRPay middleware: auth first, then idempotency ===
 # verifies X-XRPay-* and raw body
 # safe to run after HMAC
@@ -112,3 +108,12 @@ def __who_quotes(request: Request):
 
 
 
+
+# === XRPay middleware begin ===
+from xrpay.middleware.security import HMACMiddleware
+from xrpay.middleware.idempotency import IdempotencyMiddleware
+
+# Authenticate first (raw body intact), then idempotency
+app.add_middleware(HMACMiddleware)
+app.add_middleware(IdempotencyMiddleware)
+# === XRPay middleware end ===
