@@ -1,9 +1,15 @@
 ﻿from __future__ import annotations
 
 from fastapi import FastAPI
+import os
+try:
+    _XR_TTL = int(os.getenv("XR_IDEMPOTENCY_TTL", "300"))
+except ValueError:
+    _XR_TTL = 300
 from xrpay.idempotency import IdempotencyMiddleware, AsyncMemoryStore
 
 app = FastAPI(
+app.add_middleware(IdempotencyMiddleware, store=AsyncMemoryStore(), default_ttl_seconds=_XR_TTL)
     title="XRPay",
     version="0.1.0",
     contact={"name": "COLINK / XRPay"},
@@ -37,7 +43,6 @@ class _MemoryStore:
         with self._lock: self._d[key] = value
 
 _idem_store = _MemoryStore()
-app.add_middleware(IdempotencyMiddleware, store=_idem_store)
 # --- Real routers ---
 from xrpay.routers.quotes import router as quotes_router
 app.include_router(quotes_router)
@@ -61,7 +66,6 @@ _idem_store = AsyncMemoryStore()
 
 # Attach idempotency AFTER HMAC so the verified raw body is available
 from xrpay.middleware.idempotency import IdempotencyMiddleware
-app.add_middleware(IdempotencyMiddleware, store=_idem_store)
 
 
 
@@ -73,3 +77,4 @@ def _mw_snapshot():
         return {'middleware': stack}
     except Exception as e:
         return {'error': str(e)}
+
