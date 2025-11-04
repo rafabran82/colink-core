@@ -73,29 +73,25 @@ class AsyncMemoryStore:
 
 
 class IdempotencyMiddleware(BaseHTTPMiddleware):
-    """
-    Idempotency middleware:
-
-    - Uses header "Idempotency-Key" (configurable) + method + path to build a cache key.
-    - Optional per-request TTL header "Idempotency-TTL" (defaults to middleware default).
-    - On HIT: returns the cached response. But first it recomputes the *request body hash*
-      and compares it to what was cached originally for that key; mismatch -> 409.
-    - On MISS: calls downstream, captures the response body once, stores it along with the
-      request body hash, returns the response, and adds `X-Idempotency-Cache: miss`.
-    - All idempotent responses add `X-Idempotency-Cache: hit|miss`.
-    """
-
     def __init__(
         self,
         app,
         *,
-        store: AsyncMemoryStore,
+        store: AsyncMemoryStore | None = None,
         header_key: str = "Idempotency-Key",
         ttl_header: str = "Idempotency-TTL",
         default_ttl_seconds: int = 300,
     ) -> None:
         super().__init__(app)
-        self.store = store
+                if store is None:
+            backend = os.getenv("XR_IDEMPOTENCY_BACKEND", "memory").lower()
+            if backend == "redis":
+                url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+                self.store = AsyncRedisStore(url)
+            else:
+                self.store = AsyncMemoryStore()
+        else:
+            self.store = store
         self.header_key = header_key
         self.ttl_header = ttl_header
         self.default_ttl_seconds = int(default_ttl_seconds)
@@ -176,3 +172,4 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
             ttl_seconds=ttl_seconds,
         )
         return new_resp
+
