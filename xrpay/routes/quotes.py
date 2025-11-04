@@ -1,5 +1,5 @@
 ﻿from datetime import datetime, timedelta
-from fastapi import APIRouter, HTTPException
+from fastapi import \1, Header
 from pydantic import BaseModel, Field
 from typing import Literal, List
 
@@ -83,3 +83,4 @@ def list_quotes() -> List[dict]:
             }
             for r in rows
         ]
+
