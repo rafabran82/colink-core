@@ -30,3 +30,5 @@ exclude = ["artifacts*", "codeql_*", "charts*", "configs*", "compliance*"]
 addopts = "-q"
 testpaths = ["tests"]
 pythonpath = ["."]
+# Runtime dep for config.py
+pydantic-settings = ">=2.6.0"
