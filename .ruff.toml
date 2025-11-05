@@ -1,0 +1,21 @@
+﻿line-length = 220
+target-version = "py311"
+extend-exclude = [
+  ".git", ".github", ".venv", "venv", "__pycache__", "dist", "build",
+  "phase2",
+  "scripts/legacy",
+]
+
+[lint]
+select = ["E","F","I","UP","B","SIM","PIE","Q","RUF"]
+ignore = [
+  "E402",
+]
+
+[lint.isort]
+known-first-party = ["xrpay"]
+combine-as-imports = true
+
+[lint.per-file-ignores]
+# Allow long prints / CLI args in simulator & tests
+"colink_core/sim/**" = ["E501"]

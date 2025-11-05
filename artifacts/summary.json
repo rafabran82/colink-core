@@ -1,0 +1,13 @@
+{
+    "avg_slip_bps":  100,
+    "name":  "pr-check",
+    "sizes_col":  [
+                      100,
+                      500,
+                      1000
+                  ],
+    "charts_dir":  "C:\\Users\\sk8br\\desktop\\colink-core\\artifacts\\charts",
+    "max_slip_bps":  120,
+    "twap_guard_bps":  150,
+    "ts":  1762291389
+}

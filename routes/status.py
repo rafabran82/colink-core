@@ -1,8 +1,10 @@
 ﻿from fastapi import APIRouter, HTTPException
+
 from config import settings
 from xrpl_utils import client_from, fetch_col_state
 
 router = APIRouter()
+
 
 @router.get("/status")
 def status():
@@ -21,4 +23,4 @@ def status():
             **state,
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

@@ -1,0 +1,31 @@
+name: win-smoke
+on:
+  push:
+    branches: [ main, chore/**, feat/** ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  win:
+  env:
+    MPLBACKEND: Agg
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[sim,test]"[sim]
+          pip install -r requirements-dev.txt
+      - name: Byte-compile
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -File -Include *.py | ForEach-Object { python -m py_compile $_.FullName }
+      - name: Tests (json_cli)
+        run: pytest -q colink_core/sim/test_json_cli.py
+
+
+
+

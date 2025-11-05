@@ -1,0 +1,15 @@
+﻿# Full(er) scenario (heavier, for local)
+name: full
+seed: 777
+markets:
+  - pair: COL/COPX
+    init_price: 1.0
+    init_depth_col: 1_000_000
+    init_depth_copx: 1_000_000
+sweep:
+  sizes_col: [100, 500, 1000, 5_000, 10_000, 25_000, 50_000]
+  repeats: 3
+  twap_guard_bps: 150
+charts:
+  - summary
+  - pnl

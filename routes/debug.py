@@ -1,7 +1,9 @@
 ﻿from fastapi import APIRouter
+
 from config import settings
 
 router = APIRouter(prefix="/_debug", tags=["debug"])
+
 
 def _mask(s: str, keep: int = 4) -> str:
     if not s:
@@ -9,6 +11,7 @@ def _mask(s: str, keep: int = 4) -> str:
     if len(s) <= keep:
         return "*" * len(s)
     return s[:keep] + "*" * (len(s) - keep)
+
 
 @router.get("/settings")
 def debug_settings():
