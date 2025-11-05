@@ -3,6 +3,7 @@
 on:
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 jobs:
@@ -21,10 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[sim]"
           python -m pip install pytest ruff
+          python -m pip install pydantic-settings
           python -m pip install xrpl-py httpx
 
-      
-          python -m pip install pydantic-settings- name: Headless Matplotlib
+      - name: Headless Matplotlib
         run: echo "MPLBACKEND=Agg" >> $GITHUB_ENV
 
       - name: Lint & format (ruff)
@@ -34,4 +35,3 @@ jobs:
 
       - name: Tests (quick)
         run: pytest -q
-
