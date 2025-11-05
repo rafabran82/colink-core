@@ -1,4 +1,4 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
@@ -12,6 +12,7 @@ dependencies = [
   "fastapi>=0.110",
   "uvicorn>=0.23",
   "pydantic>=2"
+  'pydantic-settings>=2.6.0',
 ]
 
 [project.optional-dependencies]
@@ -32,3 +33,4 @@ testpaths = ["tests"]
 pythonpath = ["."]
 # Runtime dep for config.py
 pydantic-settings = ">=2.6.0"
+
