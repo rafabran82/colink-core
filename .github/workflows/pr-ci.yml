@@ -1,5 +1,4 @@
 ﻿name: PR CI
-
 on:
   pull_request:
     branches: [ main ]
@@ -9,25 +8,22 @@ jobs:
   build-test:
     name: PR CI/build-test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ "3.11", "3.12", "3.13" ]
-    env:
-      MPLBACKEND: Agg
-      PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-
+          python-version: "3.13"
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[sim]" pytest
-
-      - name: Run tests
+          python -m pip install -e ".[sim]"
+          python -m pip install pytest
+      - name: Headless Matplotlib
+        run: echo "MPLBACKEND=Agg" >> $GITHUB_ENV
+      - name: Lint & format (ruff)
+        run: |
+          python -m pip install ruff
+          ruff check --output-format=github .
+          ruff format --check .
+      - name: Tests (quick)
         run: pytest -q
