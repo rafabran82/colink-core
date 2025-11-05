@@ -1,4 +1,5 @@
 ﻿from config import settings
+
 print("XRPL_RPC_URL:", settings.XRPL_RPC_URL)
 print("ISSUER_ADDRESS:", settings.ISSUER_ADDRESS)
 print("TRADER_ADDRESS:", settings.TRADER_ADDRESS)
