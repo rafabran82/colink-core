@@ -1,4 +1,4 @@
-﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.amm import PoolState
 from colink_core.sim.price_utils import route_mid_price_copx_per_col
 from colink_core.sim.risk_guard import quote_with_slippage, size_aware_twap_guard
 from colink_core.sim.router import quote_col_to_copx

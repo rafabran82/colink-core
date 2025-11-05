@@ -1,8 +1,8 @@
-﻿def test_sweep_returns_pngs(tmp_path):
+def test_sweep_returns_pngs(tmp_path):
     import json
+    import os
     import subprocess
     import sys
-    import os
 
     outdir = tmp_path.as_posix()
     out = subprocess.check_output(

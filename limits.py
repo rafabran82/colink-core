@@ -1,4 +1,4 @@
-﻿try:
+try:
     from colink_core.sim.limits import LimitConfig, TradeLimiter
 
     __all__ = ["LimitConfig", "TradeLimiter"]

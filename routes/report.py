@@ -1,6 +1,8 @@
-﻿from pathlib import Path
+from pathlib import Path
+
 from fastapi import APIRouter
 from fastapi.responses import FileResponse, JSONResponse
+
 from colink_core.sim.report_zip import build_report
 
 router = APIRouter(prefix="/sim", tags=["sim"])

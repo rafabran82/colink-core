@@ -1,4 +1,4 @@
-﻿import json
+import json
 import subprocess
 import sys
 
@@ -23,8 +23,8 @@ def test_quote_json_smoke():
     assert set(
         ["col_in", "copx_out", "eff_copx_per_col", "min_out_bps", "min_out", "twap_guard", "raw"]
     ).issubset(data.keys())
-    assert isinstance(data["col_in"], (int, float))
-    assert isinstance(data["copx_out"], (int, float))
+    assert isinstance(data["col_in"], int | float)
+    assert isinstance(data["copx_out"], int | float)
     assert data["eff_copx_per_col"] > 0
 
 

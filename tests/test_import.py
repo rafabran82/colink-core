@@ -1,4 +1,4 @@
-﻿def test_import_main():
+def test_import_main():
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("main", "main.py")

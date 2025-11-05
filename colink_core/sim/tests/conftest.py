@@ -1,4 +1,4 @@
-﻿import pathlib
+import pathlib
 import sys
 
 # tests/ -> sim/ -> colink_core/ -> <repo root>
