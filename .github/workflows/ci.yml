@@ -27,9 +27,35 @@ jobs:
           for m in ("numpy","matplotlib"):
               print(m, "OK" if pkgutil.find_loader(m) else "MISSING")
           PY
-      - name: Install test extras (sim)
-        run: |
-          python -m pip install --upgrade pip wheel
+      - name: Inspect pyproject encoding
+  run: |
+    echo "== file(1) =="
+    file pyproject.toml || true
+    echo "== xxd first 64 bytes =="
+    xxd -g1 -l 64 -c 16 pyproject.toml || true
+    echo "== od -An -t u1 first 32 bytes =="
+    od -An -t u1 -N 32 pyproject.toml || true
+    echo "== python view head =="
+    python - << 'PY'
+import pathlib, binascii
+p = pathlib.Path("pyproject.toml")
+b = p.read_bytes()
+print("len(bytes) =", len(b))
+print("head_hex   =", binascii.hexlify(b[:64]).decode())
+def show(b):
+    out=[]
+    for x in b[:64]:
+        if 32<=x<127:
+            out.append(chr(x))
+        else:
+            out.append(f"\\x{x:02x}")
+    return "".join(out)
+print("head_ascii =", show(b))
+s = p.read_text("utf-8", errors="backslashreplace")
+for i, line in enumerate(s.splitlines()[:3], 1):
+    print(f"L{i}:", line)
+PY
+
           pip install -e .[sim]
       - name: Install deps
         run: |
@@ -64,5 +90,7 @@ jobs:
           path: |
             colink_core/sim/out/*.csv
             colink_core/sim/out/*.png
+
+
 
 
