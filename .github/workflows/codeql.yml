@@ -1,17 +1,18 @@
 ﻿name: CodeQL
 
 on:
-  push:
-    branches: [ main, chore/ruff-fixes ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: "33 1 * * 0"
+  workflow_dispatch:
 
 permissions:
   contents: read
   actions: read
   security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
@@ -31,7 +32,6 @@ jobs:
           languages: python
           queries: security-and-quality
 
-      # Optional: build step; harmless for Python repos, keeps defaults happy
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
