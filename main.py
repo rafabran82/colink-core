@@ -1,35 +1,37 @@
-﻿from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
 
 from routes.debug import router as debug_router
+
+# Routers
 from routes.sim import router as sim_router
-from routes.orderbook import router as orderbook_router
-from routes.paper_admin import router as paper_admin_router
-from routes.paper_portfolio import router as paper_portfolio_router
-from routes.trade import router as trade_router
 
-app = FastAPI(title="COLINK Core API", version="0.3.0")
+app = FastAPI(title="COLINK Core")
 
-app.include_router(sim_router)
-# CORS (relaxed for local dev)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+def include_prefix_smart(app, router, expected_prefix: str):
+    # If the router already has a prefix, just include it as-is.
+    # Otherwise, mount it at the expected_prefix.
+    rp = getattr(router, "prefix", "") or ""
+    if rp:
+        app.include_router(router)
+    else:
+        app.include_router(router, prefix=expected_prefix)
+
+
+# Always-on routers
+include_prefix_smart(app, sim_router, "/sim")
+include_prefix_smart(app, debug_router, "/debug")
+
+# Optional XRPL routes
+try:
+    from routes.orderbook import router as orderbook_router  # type: ignore
+except Exception:
+    orderbook_router = None
+
+if orderbook_router is not None:
+    include_prefix_smart(app, orderbook_router, "/orderbook")
 
 
 @app.get("/healthz")
 def healthz():
-    return {"ok": True}
-
-
-# Routers
-app.include_router(orderbook_router)
-app.include_router(trade_router)
-app.include_router(debug_router)
-app.include_router(paper_admin_router)
-app.include_router(paper_portfolio_router)
-
-# ci-smoke: no-op change to trigger PR checks
+    return {"status": "ok"}

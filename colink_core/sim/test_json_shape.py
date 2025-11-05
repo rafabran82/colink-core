@@ -1,13 +1,14 @@
-﻿from colink_core.sim.json_cli import cmd_quote
 import json
 from argparse import Namespace
+
+from colink_core.sim.json_cli import cmd_quote
 
 
 def test_quote_keys_shape():
     ns = Namespace(col_in=8000.0, min_out_bps=150.0, twap_guard=True)
     # reuse the CLI function and capture stdout
-    from io import StringIO
     import sys
+    from io import StringIO
 
     old = sys.stdout
     try:

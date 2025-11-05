@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from config import settings
 from xrpl_utils import client_from, fetch_col_state

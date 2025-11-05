@@ -1,9 +1,9 @@
-﻿from __future__ import annotations
-from dataclasses import dataclass
-from pathlib import Path
-from typing import List
+from __future__ import annotations
+
 import csv
 import datetime as dt
+from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -26,13 +26,13 @@ def parse_ts(x: str) -> dt.datetime:
         # 2025-11-04T13:20:00Z / 2025-11-04 13:20:00
         x = x.replace("Z", "")
         return dt.datetime.fromisoformat(x)
-    except Exception:
-        raise ValueError(f"Unrecognized timestamp: {x}")
+    except Exception as err:
+        raise ValueError(f"Unrecognized timestamp: {x}") from err
 
 
-def read_fills_csv(path: Path | str) -> List[Fill]:
+def read_fills_csv(path: Path | str) -> list[Fill]:
     path = Path(path)
-    fills: List[Fill] = []
+    fills: list[Fill] = []
     with path.open("r", newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
         required = {"ts", "side", "col_in", "copx_out", "price", "slip_bps"}
@@ -45,8 +45,8 @@ def read_fills_csv(path: Path | str) -> List[Fill]:
 
         for row in r:
 
-            def pick(k: str) -> str:
-                return row.get(k, row.get(k.lower(), ""))
+            def pick(k: str, _row=row) -> str:
+                return _row.get(k, _row.get(k.lower(), ""))
 
             ts = parse_ts(pick("ts"))
             side = (pick("side") or "").lower()

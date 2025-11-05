@@ -1,8 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -78,7 +77,7 @@ def sim_sweep(outdir: str):
         (p / "twap.png").write_bytes(b"")
         (p / "depth.png").write_bytes(b"")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"cannot create outdir: {e}")
+        raise HTTPException(status_code=400, detail=f"cannot create outdir: {e}") from e
 
     charts = ["twap.png", "depth.png"]
     return {"ok": True, "outdir": str(p), "charts": charts}
