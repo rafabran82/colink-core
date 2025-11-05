@@ -19,6 +19,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install numpy/matplotlib check
+        run: |
+          python - << 'PY'
+          import sys, pkgutil
+          print(sys.version)
+          for m in ("numpy","matplotlib"):
+              print(m, "OK" if pkgutil.find_loader(m) else "MISSING")
+          PY
+      - name: Install test extras (sim)
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -e .[sim]
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
@@ -52,3 +64,4 @@ jobs:
           path: |
             colink_core/sim/out/*.csv
             colink_core/sim/out/*.png
+
