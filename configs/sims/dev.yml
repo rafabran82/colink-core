@@ -1,0 +1,15 @@
+﻿# Dev scenario (balanced)
+name: dev
+seed: 123
+markets:
+  - pair: COL/COPX
+    init_price: 1.0
+    init_depth_col: 200_000
+    init_depth_copx: 200_000
+sweep:
+  sizes_col: [250, 1000, 5000, 10000]
+  repeats: 2
+  twap_guard_bps: 150
+charts:
+  - summary
+  - pnl

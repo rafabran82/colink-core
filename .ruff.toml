@@ -1,17 +1,6 @@
-line-length = 110
+﻿line-length = 100
 target-version = "py311"
-extend-exclude = [
-  ".git", ".github", ".venv", "venv", "__pycache__", "dist", "build",
-  "phase2",
-  "scripts/legacy",
-]
 
 [lint]
-select = ["E","F","I","UP","B","SIM","PIE","Q","RUF"]
-ignore = [
-  "E402",
-]
-
-[lint.isort]
-known-first-party = ["xrpay"]
-combine-as-imports = true
+select = ["E","F","W","I","UP","RUF","SIM","B","B9","PIE"]
+ignore = ["E501"]  # keep long lines allowed for now

@@ -17,3 +17,18 @@ colink_core/sim/out/
 copx_sim/
 
 pyproject.toml.bak-*
+
+charts/*.png
+
+charts/*.png
+
+charts/*.png
+*.egg-info/
+pyproject.toml.bak
+
+
+# Pytest sweep outputs
+artifacts/charts/test_api_*/
+
+# local scratch
+*.broken

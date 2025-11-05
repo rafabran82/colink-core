@@ -1,7 +1,6 @@
 ﻿from __future__ import annotations
 
-from typing import Optional, Tuple
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # xrpl imports are only used when seeds are present/valid
@@ -11,7 +10,7 @@ except Exception:  # xrpl not installed or similar
     Wallet = None  # type: ignore
 
 
-def _derive_address_from_seed(seed: str) -> Tuple[str, str]:
+def _derive_address_from_seed(seed: str) -> tuple[str, str]:
     """
     Returns (classic_address, error_string). If seed is empty or invalid, address="", error explains why.
     Never raises.
@@ -23,7 +22,7 @@ def _derive_address_from_seed(seed: str) -> Tuple[str, str]:
     try:
         w = Wallet.from_seed(seed)
         return w.classic_address, ""
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         return "", f"{type(e).__name__}: {e}"
 
 
@@ -55,9 +54,9 @@ class Settings(BaseSettings):
     trader_seed: str = Field(default="", validation_alias="TRADER_SEED")
 
     # --- Seed validation results (computed lazily) ---
-    _issuer_addr_from_seed: Optional[str] = None
+    _issuer_addr_from_seed: str | None = None
     _issuer_seed_err: str = ""
-    _trader_addr_from_seed: Optional[str] = None
+    _trader_addr_from_seed: str | None = None
     _trader_seed_err: str = ""
 
     def _ensure_seed_checks(self) -> None:

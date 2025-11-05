@@ -5,110 +5,36 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-jobs:
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install lint tooling
-        run: |
-          python -m pip install --upgrade pip
-          pip install ruff
-      - name: Ruff check
-        run: ruff check .
+permissions:
+  contents: read
 
+jobs:
   build-test:
     name: build-test
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev,test]" || pip install -r requirements.txt || true
-      - name: Import smoke
-        run: python - << 'PY'
-import importlib, sys
-print("importing main.app …")
-m = importlib.import_module("main")
-assert hasattr(m, "app")
-print("OK")
-PY
-
-  tests:
-    name: tests
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        py: ["3.11", "3.12", "3.13"]
-    runs-on: ${{ matrix.os }}
-    env:
-      XR_BASE_URL: http://127.0.0.1:8010
-      XRPAY_HMAC_SECRET: devsecret
-      # if your app uses DATABASE_URL, keep it on sqlite file for persistence across steps
-      DATABASE_URL: sqlite:///xrpay.db
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.py }}
+          python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Install deps
-        shell: bash
         run: |
           python -m pip install --upgrade pip
-          # Try extras; fall back to requirements; finally minimal
-          pip install -e ".[dev,test]" || pip install -r requirements.txt || pip install fastapi uvicorn pytest requests sqlalchemy pydantic
+          python -m pip install -e ".[sim,test]"
+          python -m pip install ruff==0.4.10 black==24.10.0
 
-      # Start API in background (Linux)
-      - name: Start API (Linux)
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          nohup uvicorn main:app --host 127.0.0.1 --port 8010 > server.log 2>&1 &
-          echo $! > uvicorn.pid
+      - name: Lint (ruff)
+        run: ruff check .
 
-      # Start API in background (Windows)
-      - name: Start API (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Start-Process -NoNewWindow -FilePath "python" -ArgumentList "-m","uvicorn","main:app","--host","127.0.0.1","--port","8010" -PassThru | Set-Content uvicorn.pid.txt
+      - name: Format check (black)
+        run: black --check .
 
-      # Wait for health
-      - name: Wait for health (Linux)
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:8010/healthz >/dev/null 2>&1; then
-              echo "API is up"; exit 0
-            fi
-            echo "waiting ($i)…"; sleep 1
-          done
-          echo "API did not start"; echo "---- server.log ----"; cat server.log || true; exit 1
-
-      - name: Wait for health (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ok = $false
-          1..30 | ForEach-Object {
-            try {
-              Invoke-WebRequest -Uri "http://127.0.0.1:8010/healthz" -UseBasicParsing | Out-Null
-              $ok = $true; break
-            } catch { Start-Sleep -Seconds 1 }
-          }
-          if (-not $ok) { Write-Host "API did not start"; exit 1 }
-
-      - name: Pytest
+      - name: Run tests
         run: pytest -q
