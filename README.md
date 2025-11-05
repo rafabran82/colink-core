@@ -34,3 +34,6 @@ uvicorn main:app --port 8000
 
 # quick smoke
 .\scripts\smoke.ps1
+
+[![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
+
