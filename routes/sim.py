@@ -36,7 +36,7 @@ def sim_quote(col_in: float, min_out_bps: int = 0, twap_guard: bool = False):
     """
     Minimal placeholder quote that matches tests:
     - effective haircut = max(min_out_bps, 10) bps
-    - return fields: ok, col_in, min_out_bps (float), min_out, twap_guard
+    - return fields: ok, col_in, min_out_bps (float), min_out, eff_copx_per_col, twap_guard
     """
     if col_in <= 0:
         raise HTTPException(status_code=400, detail="col_in must be > 0")
@@ -44,12 +44,14 @@ def sim_quote(col_in: float, min_out_bps: int = 0, twap_guard: bool = False):
     fee_bps = 10
     eff_bps = max(min_out_bps, fee_bps)
     min_out = col_in * (1.0 - eff_bps / 10_000.0)
+    eff_copx_per_col = float(min_out / col_in)  # e.g., 7880 / 8000 = 0.985
 
     return {
         "ok": True,
         "col_in": float(col_in),
         "min_out_bps": float(min_out_bps),
         "min_out": float(min_out),
+        "eff_copx_per_col": eff_copx_per_col,
         "twap_guard": bool(twap_guard),
     }
 
