@@ -1,4 +1,4 @@
-name: ci
+﻿name: ci
 on:
   pull_request:
     branches: [ main ]
@@ -64,4 +64,5 @@ jobs:
           path: |
             colink_core/sim/out/*.csv
             colink_core/sim/out/*.png
+
 
