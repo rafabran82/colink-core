@@ -3,7 +3,9 @@ from fastapi import APIRouter, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pathlib import Path
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
+SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}$')
+
+
 import re
 import osimport os
 import shutil
@@ -169,7 +171,6 @@ import osimport os
 import shutil
 import traceback
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 # Headless rendering for CI/tests
 import matplotlib
 
@@ -327,7 +328,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -482,7 +482,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -909,7 +908,6 @@ import osimport os
 import shutil
 import traceback
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 # Headless rendering for CI/tests
 import matplotlib
 
@@ -1067,7 +1065,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -1222,7 +1219,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -1648,7 +1644,6 @@ import osimport os
 import shutil
 import traceback
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 # Headless rendering for CI/tests
 import matplotlib
 
@@ -1806,7 +1801,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -1961,7 +1955,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -2386,7 +2379,6 @@ import osimport os
 import shutil
 import traceback
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 # Headless rendering for CI/tests
 import matplotlib
 
@@ -2544,7 +2536,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -2699,7 +2690,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -3077,7 +3067,6 @@ import osimport os
 import shutil
 import traceback
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 # Headless rendering for CI/tests
 import matplotlib
 
@@ -3236,7 +3225,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -3391,7 +3379,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -3816,7 +3803,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -3971,7 +3957,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -4395,7 +4380,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -4550,7 +4534,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -4973,7 +4956,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -5128,7 +5110,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -5504,7 +5485,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 # Headless rendering for CI/tests
 import matplotlib
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -5660,7 +5640,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -6085,7 +6064,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -6509,7 +6487,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -6932,7 +6909,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -7308,7 +7284,6 @@ def _safe_outdir(outdir: str, base: Path) -> Path:
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-SAFE_SLUG_RE = re.compile(r'^[A-Za-z0-9._-]{1,64}
 router = APIRouter(prefix="/sim", tags=["sim"])
 
 
@@ -9078,4 +9053,5 @@ slug         = sandbox_out.name
                 "trace": traceback.format_exc()[:2000],
             },
         )
+
 
