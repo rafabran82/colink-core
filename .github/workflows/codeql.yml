@@ -2,15 +2,18 @@
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
   schedule:
-    - cron: "0 5 * * 1"  # weekly
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -20,17 +23,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ "python" ]
+        language: [ "python" ]  # limit to python only
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Python (for autobuild if needed)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
 
+      # For Python this is usually a no-op, but it's fine to keep:
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
