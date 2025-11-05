@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from amm import PoolState
 from risk_guard import quote_with_slippage

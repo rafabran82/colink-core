@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from amm import PoolState
 from price_utils import bps_deviation, route_mid_price_copx_per_col

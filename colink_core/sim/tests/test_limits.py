@@ -1,4 +1,4 @@
-﻿from colink_core.sim.limits import LimitConfig, TradeLimiter
+from colink_core.sim.limits import LimitConfig, TradeLimiter
 
 
 def test_limiter_size_and_dev_caps_and_breaker():

@@ -1,4 +1,4 @@
-﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.amm import PoolState
 
 
 def seed(fee_bps=30):

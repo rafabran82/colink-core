@@ -1,4 +1,4 @@
-﻿from amm import PoolState
+from amm import PoolState
 from wallet import Wallet
 
 

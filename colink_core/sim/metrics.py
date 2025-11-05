@@ -1,7 +1,8 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
 import argparse
-import sys
 import json
+import sys
 from pathlib import Path
 
 
@@ -22,7 +23,7 @@ def main():
 
     print(f"[metrics] charts_root={d} png_count={len(pngs)} total_kb={total_kb:.1f}")
     for p in pngs[:10]:
-        print(f" - {p} ({p.stat().st_size/1024.0:.1f} KB)")
+        print(f" - {p} ({p.stat().st_size / 1024.0:.1f} KB)")
 
     ok = True
     if len(pngs) < args.min_files:

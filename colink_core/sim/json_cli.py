@@ -1,10 +1,9 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
 import os
 import sys
-from typing import List
 
 # Force a headless-safe backend before any pyplot import.
 try:
@@ -15,7 +14,7 @@ except Exception:
     pass
 
 # Local sim/plot helpers (self-contained, no legacy amm dep)
-from .run_sweep import simulate_gbm_paths, plot_paths, plot_hist  # type: ignore
+from .run_sweep import plot_hist, plot_paths, simulate_gbm_paths  # type: ignore
 
 
 def _print(obj) -> None:
@@ -72,7 +71,7 @@ def cmd_sweep(args: argparse.Namespace) -> None:
     seed = getattr(args, "seed", None)
     seed_i = int(seed) if seed is not None else None
 
-    charts: List[str] = []
+    charts: list[str] = []
     try:
         paths = simulate_gbm_paths(
             n_steps=n_steps,

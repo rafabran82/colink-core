@@ -1,4 +1,4 @@
-﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.amm import PoolState
 from colink_core.sim.router import exec_col_to_copx, quote_col_to_copx
 
 

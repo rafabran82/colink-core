@@ -1,4 +1,4 @@
-﻿from colink_core.sim.amm import PoolState
+from colink_core.sim.amm import PoolState
 from colink_core.sim.price_utils import bps_deviation, route_mid_price_copx_per_col
 from colink_core.sim.twap import TWAPOracle
 
