@@ -37,3 +37,8 @@ uvicorn main:app --port 8000
 
 [![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
 
+
+## CI Status
+
+- **Build & Tests (required)**: [![PR CI/build-test (pull_request)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
+- **CodeQL (required)**: [![CodeQL/CodeQL (pull_request)](https://github.com/rafabran82/colink-core/actions/workflows/codeql.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/codeql.yml)
