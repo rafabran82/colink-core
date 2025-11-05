@@ -1,4 +1,4 @@
-﻿name: PR CI (tests + mini-sweep)
+name: PR CI (tests + mini-sweep)
 
 on:
   pull_request:

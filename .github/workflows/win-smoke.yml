@@ -1,4 +1,4 @@
-﻿name: win-smoke
+name: win-smoke
 on:
   push:
     branches: [ main, chore/**, feat/** ]
