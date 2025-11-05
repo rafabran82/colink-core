@@ -1,4 +1,5 @@
-﻿import sys, pathlib
+﻿import pathlib
+import sys
 
 # tests/ -> sim/ -> colink_core/ -> <repo root>
 ROOT = pathlib.Path(__file__).resolve().parents[3]

@@ -1,25 +1,31 @@
 ﻿from __future__ import annotations
-import argparse, os, csv, time
+
+import argparse
+import csv
+import time
 from pathlib import Path
 
 from .amm import PoolState
-from .router import quote_col_to_copx, exec_col_to_copx
-from .risk_guard import quote_with_slippage, size_aware_twap_guard
-from .twap import TWAPOracle
 from .price_utils import modeled_bps_impact_for_size, route_mid_price_copx_per_col
+from .risk_guard import quote_with_slippage, size_aware_twap_guard
+from .router import exec_col_to_copx, quote_col_to_copx
+from .twap import TWAPOracle
+
 
 def fmt(n: float) -> str:
     return f"{n:,.6f}"
 
+
 def seed_pools(
     xrp_copx=(10_000.0, 25_000_000.0, 30),
-    col_xrp=(10_000.0,    200_000.0, 30),
+    col_xrp=(10_000.0, 200_000.0, 30),
 ):
     # XRP is X, COPX is Y
     pool_x_copx = PoolState(x_reserve=xrp_copx[0], y_reserve=xrp_copx[1], fee_bps=xrp_copx[2])
     # XRP is X, COL is Y  (i.e., 1 XRP ~ 20 COL initially)
-    pool_col_x  = PoolState(x_reserve=col_xrp[0],  y_reserve=col_xrp[1],  fee_bps=col_xrp[2])
+    pool_col_x = PoolState(x_reserve=col_xrp[0], y_reserve=col_xrp[1], fee_bps=col_xrp[2])
     return pool_col_x, pool_x_copx
+
 
 def cmd_quote(args: argparse.Namespace) -> int:
     pool_col_x, pool_x_copx = seed_pools()
@@ -27,7 +33,9 @@ def cmd_quote(args: argparse.Namespace) -> int:
 
     # Basic routed quote (no mutation)
     q = quote_col_to_copx(pool_col_x, pool_x_copx, col_in)
-    print(f"Quote: {fmt(col_in)} COL -> {fmt(q.amount_out)} COPX  | eff={fmt(q.effective_price)} COPX/COL")
+    print(
+        f"Quote: {fmt(col_in)} COL -> {fmt(q.amount_out)} COPX  | eff={fmt(q.effective_price)} COPX/COL"
+    )
 
     # Optional min-out guard
     if args.min_out_bps is not None:
@@ -40,7 +48,10 @@ def cmd_quote(args: argparse.Namespace) -> int:
         mid = route_mid_price_copx_per_col(pool_col_x, pool_x_copx)
         tw.warm([mid] * args.twap_window)
         ok, dev, budget = size_aware_twap_guard(
-            pool_col_x, pool_x_copx, tw, col_in,
+            pool_col_x,
+            pool_x_copx,
+            tw,
+            col_in,
             base_guard_bps=args.base_bps,
             cushion_bps=args.cushion_bps,
             cap_bps=args.cap_bps,
@@ -49,22 +60,33 @@ def cmd_quote(args: argparse.Namespace) -> int:
         print(f"  TWAP guard: dev={dev:.1f} bps  budget={budget:.1f} bps  => {verdict}")
     return 0
 
+
 def cmd_exec(args: argparse.Namespace) -> int:
     pool_col_x, pool_x_copx = seed_pools()
     col_in = float(args.col_in)
 
     r = exec_col_to_copx(pool_col_x, pool_x_copx, col_in)
-    print(f"Exec:  {fmt(col_in)} COL -> {fmt(r.amount_out)} COPX  | eff={fmt(r.effective_price)} COPX/COL")
-    print("New prices:",
-          "COL/XRP =", fmt(pool_col_x.y_reserve / pool_col_x.x_reserve),
-          "COPX/XRP =", fmt(pool_x_copx.y_reserve / pool_x_copx.x_reserve))
+    print(
+        f"Exec:  {fmt(col_in)} COL -> {fmt(r.amount_out)} COPX  | eff={fmt(r.effective_price)} COPX/COL"
+    )
+    print(
+        "New prices:",
+        "COL/XRP =",
+        fmt(pool_col_x.y_reserve / pool_col_x.x_reserve),
+        "COPX/XRP =",
+        fmt(pool_x_copx.y_reserve / pool_x_copx.x_reserve),
+    )
     return 0
+
 
 def cmd_sweep(args: argparse.Namespace) -> int:
     pool_col_x, pool_x_copx = seed_pools()
 
-    sizes = [float(s) for s in args.sizes] if args.sizes else \
-        [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000]
+    sizes = (
+        [float(s) for s in args.sizes]
+        if args.sizes
+        else [100, 500, 1_000, 2_500, 5_000, 10_000, 25_000, 50_000]
+    )
 
     outdir = Path(args.outdir or Path(__file__).resolve().parent / "out")
     outdir.mkdir(parents=True, exist_ok=True)
@@ -81,65 +103,83 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         q = quote_col_to_copx(pool_col_x, pool_x_copx, col_in)
         modeled = modeled_bps_impact_for_size(pool_col_x, pool_x_copx, col_in)
         ok, dev, budget = size_aware_twap_guard(
-            pool_col_x, pool_x_copx, tw, col_in,
+            pool_col_x,
+            pool_x_copx,
+            tw,
+            col_in,
             base_guard_bps=args.base_bps,
             cushion_bps=args.cushion_bps,
             cap_bps=args.cap_bps,
         )
-        rows.append({
-            "col_in": col_in,
-            "copx_out": q.amount_out,
-            "eff_copx_per_col": q.effective_price,
-            "twap": tw.value(),
-            "dev_bps": dev,
-            "modeled_bps": modeled,
-            "budget_bps": budget,
-            "approved": ok,
-        })
+        rows.append(
+            {
+                "col_in": col_in,
+                "copx_out": q.amount_out,
+                "eff_copx_per_col": q.effective_price,
+                "twap": tw.value(),
+                "dev_bps": dev,
+                "modeled_bps": modeled,
+                "budget_bps": budget,
+                "approved": ok,
+            }
+        )
 
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=rows[0].keys())
-        w.writeheader(); w.writerows(rows)
+        w.writeheader()
+        w.writerows(rows)
     print(f"Saved CSV -> {csv_path}")
 
     # Optional charts
     try:
-        import matplotlib.pyplot as plt  # noqa
         import matplotlib.pyplot as plt
 
-        xs   = [r["col_in"] for r in rows]
+        xs = [r["col_in"] for r in rows]
         effs = [r["eff_copx_per_col"] for r in rows]
-        tws  = [r["twap"] for r in rows]
+        tws = [r["twap"] for r in rows]
 
         plt.figure()
         plt.plot(xs, effs, marker="o", label="Eff. price (COPX/COL)")
-        plt.plot(xs, tws,  marker="x", label="TWAP")
-        plt.xlabel("Size (COL)"); plt.ylabel("Price (COPX/COL)")
-        plt.title("Price vs Size"); plt.grid(True, alpha=0.3); plt.legend()
+        plt.plot(xs, tws, marker="x", label="TWAP")
+        plt.xlabel("Size (COL)")
+        plt.ylabel("Price (COPX/COL)")
+        plt.title()
+        plt.grid(True, alpha=0.3)
+        plt.legend()
         p1 = outdir / f"sweep_price_vs_size_{stamp}.png"
-        plt.tight_layout(); plt.savefig(p1); plt.close()
+        plt.tight_layout()
+        plt.savefig()
+        plt.close()
         print(f"Saved chart -> {p1}")
 
-        devs   = [r["dev_bps"] for r in rows]
+        devs = [r["dev_bps"] for r in rows]
         models = [r["modeled_bps"] for r in rows]
-        buds   = [r["budget_bps"] for r in rows]
+        buds = [r["budget_bps"] for r in rows]
 
         plt.figure()
-        plt.plot(xs, devs,   marker="o", label="Deviation (bps)")
+        plt.plot(xs, devs, marker="o", label="Deviation (bps)")
         plt.plot(xs, models, marker="x", label="Modeled impact (bps)")
-        plt.plot(xs, buds,   marker="s", label="Guard budget (bps)")
-        plt.xlabel("Size (COL)"); plt.ylabel("Basis points (bps)")
-        plt.title("Deviation & Budget vs Size"); plt.grid(True, alpha=0.3); plt.legend()
+        plt.plot(xs, buds, marker="s", label="Guard budget (bps)")
+        plt.xlabel("Size (COL)")
+        plt.ylabel("Basis points (bps)")
+        plt.title()
+        plt.grid(True, alpha=0.3)
+        plt.legend()
         p2 = outdir / f"sweep_devbps_vs_size_{stamp}.png"
-        plt.tight_layout(); plt.savefig(p2); plt.close()
+        plt.tight_layout()
+        plt.savefig()
+        plt.close()
         print(f"Saved chart -> {p2}")
     except Exception as e:
         print("Plotting skipped:", e)
 
     return 0
 
+
 def main():
-    p = argparse.ArgumentParser(prog="colink-sim", description="COLINK routed AMM simulator (COL ⇄ XRP ⇄ COPX)")
+    p = argparse.ArgumentParser(
+        prog="colink-sim", description="COLINK routed AMM simulator (COL ⇄ XRP ⇄ COPX)"
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     p_q = sub.add_parser("quote", help="Quote COL→COPX")
@@ -168,7 +208,6 @@ def main():
     args = p.parse_args()
     raise SystemExit(args.func(args))
 
+
 if __name__ == "__main__":
     main()
-
-

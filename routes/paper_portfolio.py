@@ -1,10 +1,12 @@
-﻿from fastapi import APIRouter
-from decimal import Decimal
-from typing import Any, Dict
+﻿from decimal import Decimal
+from typing import Any
+
+from fastapi import APIRouter
 
 from routes.trade import PAPER_POSITION
 
 router = APIRouter(prefix="/_paper", tags=["paper-portfolio"])
+
 
 def _s(x: Any) -> str:
     if x is None:
@@ -12,6 +14,7 @@ def _s(x: Any) -> str:
     if isinstance(x, Decimal):
         return str(x)
     return str(x)
+
 
 @router.get("/position")
 def get_position():
@@ -21,6 +24,7 @@ def get_position():
         "avg_price_xrp_per_col": _s(PAPER_POSITION["avg_price"]),
         "realized_pnl_xrp": _s(PAPER_POSITION["realized_pnl_xrp"]),
     }
+
 
 @router.post("/position/reset")
 def reset_position():

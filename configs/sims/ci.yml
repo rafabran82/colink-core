@@ -1,0 +1,15 @@
+﻿# Lean scenario for CI (fast)
+name: ci
+seed: 42
+markets:
+  - pair: COL/COPX
+    init_price: 1.0
+    init_depth_col: 50_000
+    init_depth_copx: 50_000
+sweep:
+  sizes_col: [100, 500, 1000]
+  repeats: 1
+  twap_guard_bps: 150
+charts:
+  - summary
+  - pnl
