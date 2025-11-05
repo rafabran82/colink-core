@@ -29,3 +29,6 @@ pyproject.toml.bak
 
 # Pytest sweep outputs
 artifacts/charts/test_api_*/
+
+# local scratch
+*.broken
