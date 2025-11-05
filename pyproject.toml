@@ -21,6 +21,12 @@ sim = [
   "matplotlib>=3.8"
 ]
 
+[tool.setuptools.packages.find]
+# Only include our real Python packages; exclude CI/codeql/artifacts/etc.
+include = ["colink_core*", "routes*", "xrpay*"]
+exclude = ["artifacts*", "codeql_*", "charts*", "configs*", "compliance*"]
+
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+pythonpath = ["."]
