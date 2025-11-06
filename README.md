@@ -81,3 +81,6 @@ python -m colink_core.sim.run_sweep --steps 100 --slippage .sim_smoke/slippage.p
 **Spread over time (headless Agg):**
 ```powershell
 python -m colink_core.sim.run_sweep --pairs XRP/COL --steps 100 --spread .sim_smoke/spread_{pair}.png --display Agg --no-show
+**Deterministic run (fixed seed):**
+```powershell
+python -m colink_core.sim.run_sweep --pairs XRP/COL --steps 50 --seed 123 --out .sim_smoke/seeded.json --plot .sim_smoke/seeded.png --display Agg --no-show
