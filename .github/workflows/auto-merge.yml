@@ -2,7 +2,7 @@
 
 on:
   schedule:
-    - cron: "0 5 * * *"   # Every day at 05:00 UTC
+    - cron: "0 5,17 * * *"   # Twice daily: 05:00 & 17:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -14,14 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Auto approve & merge all passing PRs
+      - name: Auto approve, merge, and cleanup
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔁 Checking open PRs..."
-          prs=$(gh pr list --state open --json number -q '.[].number')
-          for pr in $prs; do
-            echo "➡️  Processing PR #$pr"
-            gh pr checks $pr --watch || true
-            gh pr merge $pr --squash --admin || echo "⚠️ Could not merge PR #$pr"
+          prs=$(gh pr list --state open --json number,headRefName -q '.[] | [.number, .headRefName]')
+          if [ -z "$prs" ]; then
+            echo "✅ No open PRs to process."
+            exit 0
+          fi
+          echo "$prs" | jq -r '.[]' | while read -r pr branch; do
+            echo "➡️  Processing PR #$pr on branch $branch"
+            gh pr checks "$pr" --watch || true
+            if gh pr merge "$pr" --squash --admin; then
+              echo "🧹 Deleting merged branch $branch"
+              gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/$branch" || true
+            else
+              echo "⚠️ Could not merge PR #$pr"
+            fi
           done
