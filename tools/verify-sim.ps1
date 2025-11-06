@@ -1,5 +1,6 @@
 ﻿param(
-  [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")$root  = Split-Path -Parent $PSScriptRoot
+  [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")
+$root  = Split-Path -Parent $PSScriptRoot
 $outDir = Join-Path $root ".sim_smoke"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null]
   [string]$Which = "all",
@@ -121,5 +122,6 @@ Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ==="
 $script:results | ForEach-Object { Write-Host "* $_" }
 Write-Host "================================="
+
 
 
