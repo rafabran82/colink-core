@@ -50,8 +50,9 @@ jobs:
         with:
           name: sim-smoke-${{ matrix.os }}-${{ matrix.label }}
           path: |
-            .sim_smoke/sim_smoke_agg.png
-            .sim_smoke/sim_from_engine.json
+            sim_smoke/sim_smoke_agg.png
+            sim_smoke/sim_from_engine.json
           if-no-files-found: warn
+
 
 
