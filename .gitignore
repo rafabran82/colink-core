@@ -38,3 +38,4 @@ sim_results/
 sim_results/
 *.csv
 *.png
+.sim_smoke/
