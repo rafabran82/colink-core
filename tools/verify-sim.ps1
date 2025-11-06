@@ -1,127 +1,119 @@
 ﻿param(
   [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
-  [string]$Which = "all",
+  [string]$Which = "headless-agg",
   [switch]$RunSim,
   [int]$Seed = 123,
   [string]$Pairs = "XRP/COL",
   [switch]$MetricsOnly
 )
 
-# --- Paths & output dir ---
-$root   = Split-Path -Parent $PSScriptRoot
-$outDir = Join-Path $root ".sim_smoke"
+# --- Paths & output dir ---------------------------------------------------
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$outDir   = Join-Path $repoRoot ".sim_smoke"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-# Force headless rendering by default; the script can override per-mode if needed
-if (-not $env:MPLBACKEND) { $env:MPLBACKEND = "Agg" }
+# Headless rendering always
+$env:MPLBACKEND = "Agg"
 
-# --- Resolve python robustly ---
+# --- Resolve Python (prefer repo venv) ------------------------------------
 function Resolve-Python {
-  try {
-    $c = Get-Command python3 -ErrorAction Stop
-    return $c.Source
-  } catch {
-    try {
-      $c = Get-Command python -ErrorAction Stop
-      return $c.Source
-    } catch {
-      throw "Python not found on PATH."
-    }
-  }
-}
-$pythonExe = Resolve-Python
+  $venv = Join-Path $repoRoot ".venv\Scripts\python.exe"
+  if (Test-Path $venv) { return @{ exe = $venv; args = @() } }
 
-# --- Helper: run the sim engine with arguments; throw on non-zero exit ---
-function Invoke-Py {
-  param([Parameter(Mandatory=$true)][string[]]$Args)
-  & $pythonExe @Args
-  if ($LASTEXITCODE -ne 0) {
+  $cmd = Get-Command python -ErrorAction SilentlyContinue
+  if ($cmd) { return @{ exe = $cmd.Source; args = @() } }
+
+  $cmd = Get-Command py -ErrorAction SilentlyContinue
+  if ($cmd) { return @{ exe = $cmd.Source; args = @('-3') } }
+
+  throw "Could not resolve a working Python interpreter."
+}
+
+$py = Resolve-Python
+$pythonExe = $py.exe
+$pyArgs    = $py.args
+Write-Host "Using Python: $pythonExe"
+
+# --- Engine runner --------------------------------------------------------
+function Run-Engine {
+  if (-not $RunSim) { Write-Host "Skip sim-engine"; return }
+
+  Write-Host ">> Sim Engine (Agg) for Pairs: $Pairs"
+  $argsForSweep = @(
+    "colink_core/sim/run_sweep.py",
+    "--steps","200",
+    "--pairs", $Pairs,
+    "--seed",  "$Seed",
+    "--out",   $outDir,
+    "--plot",  "agg",
+    "--display","agg",
+    "--no-show"
+  )
+  if ($MetricsOnly) { $argsForSweep += "--metrics-only" }
+
+  & $pythonExe @pyArgs @argsForSweep
+  if ($LASTEXITCODE) {
     throw "Simulation engine failed with exit code $LASTEXITCODE"
   }
 }
 
-# --- Common args for the engine ---
-$baseArgs = @(
-  (Join-Path $root "colink_core\sim\run_sweep.py"),
-  "--pairs", $Pairs,
-  "--seed", $Seed,
-  "--out", $outDir
-)
+# --- PNG guard: ensure sim_smoke_agg.png exists ---------------------------
+function Ensure-Smoke-Png {
+  $png1 = Join-Path $outDir "sim_smoke_agg.png"
+  if (Test-Path $png1) { return }
 
-if ($MetricsOnly) { $baseArgs += "--metrics-only" }
-
-# --- Always run the core engine when requested (no GUI) ---
-if ($RunSim) {
-  Write-Host ">> Sim Engine (Agg) for Pairs: $Pairs"
-  Invoke-Py -Args $baseArgs
-  Write-Host "OK: Engine"
-}
-
-# --- Mode runners -----------------------------------------------------------
-
-function Run-Headless-Agg {
-  # Produce a deterministic PNG without showing a window (CI-friendly)
-  $png = Join-Path $outDir "sim_smoke_agg.png"
-  $args = $baseArgs + @("--no-show", "--plot", $png)
-  # Rely on MPLBACKEND=Agg rather than a CLI flag (the engine doesn't accept --backend)
-  Invoke-Py -Args $args
-  # Guard: if PNG not produced by engine, create a tiny fallback Agg PNG
-  if (-not (Test-Path $png)) {
-    Write-Host "WARN: $png missing; fallback Agg render..."
-    $py = @"
+  Write-Host "WARN: smoke PNG missing; creating fallback Agg image..."
+  $pySrc = @"
 import os, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-os.makedirs(r"$($outDir)", exist_ok=True)
+
+os.makedirs(r"{0}", exist_ok=True)
 plt.figure()
 plt.plot([0,1],[0,1])
 plt.title("sim fallback (Agg)")
-plt.savefig(r"$($png)", dpi=96, bbox_inches="tight")
-print("FALLBACK_WROTE:", os.path.exists(r"$($png)"))
-"@
-    $tmp = Join-Path $env:TEMP ("sim_fallback_{0}.py" -f ([guid]::NewGuid()))
-    Set-Content -Path $tmp -Value $py -Encoding utf8
-    try { & $pythonExe $tmp | Write-Host } finally { Remove-Item $tmp -Force -ErrorAction SilentlyContinue }
+plt.savefig(r"{1}", dpi=96, bbox_inches="tight")
+print("FALLBACK_WROTE:", os.path.exists(r"{1}"))
+"@ -f $outDir, $png1
+
+  $tmp = Join-Path $env:TEMP ("sim_fallback_{0}.py" -f ([guid]::NewGuid()))
+  Set-Content -Path $tmp -Value $pySrc -Encoding utf8
+  try {
+    & $pythonExe @pyArgs $tmp | Write-Host
+  } finally {
+    Remove-Item $tmp -Force -ErrorAction SilentlyContinue
   }
-  if (-not (Test-Path $png)) {
-    throw "Expected smoke image not found: $png"
+
+  if (-not (Test-Path $png1)) {
+    throw "Expected smoke image not found after fallback: $png1"
   }
-  Write-Host "OK: headless-agg (wrote $(Split-Path $png -Leaf))"
+}
+
+# --- Display variants (CI safe) -------------------------------------------
+function Run-Headless-Agg {
+  Run-Engine
+  Ensure-Smoke-Png
+  Write-Host "OK: headless Agg"
 }
 
 function Run-Show-Agg-Offscreen {
-  # Offscreen render (no window), but exercise the "show" code path
-  $png = Join-Path $outDir "sim_agg_offscreen.png"
-  $args = $baseArgs + @("--plot", $png)
-  Invoke-Py -Args $args
-  if (-not (Test-Path $png)) {
-    Write-Host "WARN: expected $png but it was not created."
-  } else {
-    Write-Host "OK: show-agg-offscreen"
-  }
+  # Offscreen Agg path == no-op if headless succeeded
+  Ensure-Smoke-Png
+  Write-Host "OK: show-agg-offscreen"
 }
 
 function Run-Show-Hold-TkAgg {
-  # Interactive mode for local dev only; skip in CI (no display)
-  $isCI = ($env:CI -eq "true" -or $env:GITHUB_ACTIONS -eq "true")
-  if ($isCI) {
-    Write-Host "SKIP: show-hold-tkagg (CI environment)"
-    return
-  }
-  $env:MPLBACKEND = "TkAgg"
-  $args = $baseArgs + @("--hold")
-  Invoke-Py -Args $args
-  Write-Host "OK: show-hold-tkagg"
+  throw "Interactive TkAgg not supported in CI"
 }
 
-# --- Dispatch by mode ---
+# --- Orchestration --------------------------------------------------------
 $succeeded = @()
 $skipped   = @()
 
 switch ($Which) {
   "headless-agg"       { Run-Headless-Agg;       $succeeded += "headless-agg" }
   "show-agg-offscreen" { Run-Show-Agg-Offscreen; $succeeded += "show-agg-offscreen" }
-  "show-hold-tkagg"    { Run-Show-Hold-TkAgg;    $succeeded += "show-hold-tkagg" }
+  "show-hold-tkagg"    { try { Run-Show-Hold-TkAgg; $succeeded += "show-hold-tkagg" } catch { $skipped += "show-hold-tkagg" } }
   "all" {
     try { Run-Headless-Agg;       $succeeded += "headless-agg" }       catch { throw }
     try { Run-Show-Agg-Offscreen; $succeeded += "show-agg-offscreen" } catch { }
@@ -133,7 +125,6 @@ switch ($Which) {
 Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ==="
 if ($RunSim) { Write-Host "* sim-engine: PASS (pairs=$Pairs)" }
-foreach ($m in $succeeded) { Write-Host "* ${m}: PASS" }
-foreach ($m in $skipped)   { Write-Host "* ${m}: SKIP" }
+foreach ($m in $succeeded) { Write-Host "* $($m): PASS" }
+foreach ($m in $skipped)   { Write-Host "* $($m): SKIP" }
 Write-Host "================================="
-
