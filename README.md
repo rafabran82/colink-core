@@ -78,3 +78,6 @@ python -m colink_core.sim.run_sweep --steps 100 --slippage .sim_smoke/slippage.p
 **Slippage curve (headless Agg):**
 ```powershell
 python -m colink_core.sim.run_sweep --steps 100 --slippage .sim_smoke/slippage.png --display Agg --no-show
+**Spread over time (headless Agg):**
+```powershell
+python -m colink_core.sim.run_sweep --pairs XRP/COL --steps 100 --spread .sim_smoke/spread_{pair}.png --display Agg --no-show
