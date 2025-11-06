@@ -1,17 +1,24 @@
 import subprocess
 import sys
 
+import pytest
 
-def test_sim_spread_headless(tmp_path):
+PAIRS = ["XRP/COL", "COPX/COL"]
+
+
+@pytest.mark.parametrize("pair", PAIRS)
+def test_sim_spread_headless(tmp_path, pair):
     png = tmp_path / "spread.png"
     cmd = [
         sys.executable,
         "-m",
         "colink_core.sim.run_sweep",
         "--steps",
-        "10",
+        "12",
         "--spread",
         str(png),
+        "--pairs",
+        pair,
         "--display",
         "Agg",
         "--no-show",

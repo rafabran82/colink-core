@@ -1,8 +1,13 @@
 import subprocess
 import sys
 
+import pytest
 
-def test_sim_headless_agg(tmp_path):
+PAIRS = ["XRP/COL", "COPX/COL"]
+
+
+@pytest.mark.parametrize("pair", PAIRS)
+def test_sim_plot_headless(tmp_path, pair):
     png = tmp_path / "sim.png"
     jsn = tmp_path / "sim.json"
     cmd = [
@@ -15,6 +20,8 @@ def test_sim_headless_agg(tmp_path):
         str(png),
         "--out",
         str(jsn),
+        "--pairs",
+        pair,
         "--display",
         "Agg",
         "--no-show",
