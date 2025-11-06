@@ -1,4 +1,4 @@
-name: Sim Display Smoke
+﻿name: Sim Display Smoke
 
 on:
   pull_request:
@@ -30,14 +30,16 @@ jobs:
 
       - name: Run display+engine smoke (Agg; non-interactive)
         shell: pwsh
-        run: ./tools/verify-sim.ps1 -RunSim -Seed 123 -Pairs "${{ matrix.pair }}"
+        run: ./tools/verify-sim.ps1 -RunSim -Seed 123 -Pairs "XRP/COL,COPX/COL"
 
       - name: Upload Agg artifacts
         uses: actions/upload-artifact@v4
         with:
           name: sim-smoke-${{ matrix.os }}-${{ matrix.pair }}
           path: |
-            .sim_smoke/sim_smoke_agg.png
-            .sim_smoke/sim_from_engine*.png
-          if-no-files-found: warn
+  .sim_smoke/sim_smoke_agg.png
+  .sim_smoke/sim_from_engine*.png
+if-no-files-found: warn
+
+
 
