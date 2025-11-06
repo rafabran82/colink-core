@@ -46,3 +46,4 @@ jobs:
             .sim_smoke/sim_smoke_agg.png
             .sim_smoke/sim_from_engine*.png
           if-no-files-found: error
+
