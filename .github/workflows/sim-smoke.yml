@@ -37,3 +37,4 @@ jobs:
           name: sim-smoke-${{ matrix.os }}
           path: .sim_smoke/sim_smoke_agg.png
           if-no-files-found: warn
+
