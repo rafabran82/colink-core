@@ -1,8 +1,13 @@
 import subprocess
 import sys
 
+import pytest
 
-def test_sim_slippage_headless(tmp_path):
+PAIRS = ["XRP/COL", "COPX/COL"]
+
+
+@pytest.mark.parametrize("pair", PAIRS)
+def test_sim_slippage_headless(tmp_path, pair):
     png = tmp_path / "slip.png"
     cmd = [
         sys.executable,
@@ -12,6 +17,8 @@ def test_sim_slippage_headless(tmp_path):
         "5",
         "--slippage",
         str(png),
+        "--pairs",
+        pair,
         "--display",
         "Agg",
         "--no-show",
