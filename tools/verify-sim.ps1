@@ -93,22 +93,30 @@ function Run-ShowHoldTkAgg {
 }
 
 function Run-SimEngine {
-  # Run the real sweep in headless Agg, saving JSON + PNG
+  # Run the real sweep in headless Agg, saving JSON + PNG (+ slippage)
   $json = Join-Path $OutDir "sim_from_engine.json"
   $png  = Join-Path $OutDir "sim_from_engine.png"
-  Write-Host ">> Sim Engine (Agg) -> $png ; $json" -ForegroundColor Cyan
+  $slip = Join-Path $OutDir "sim_from_engine_slippage.png"
+  Write-Host ">> Sim Engine (Agg) -> $png ; $json ; $slip" -ForegroundColor Cyan
 
   $args = @(
     "-m", "colink_core.sim.run_sweep",
     "--steps", "50",
     "--out", $json,
     "--plot", $png,
+    "--slippage", $slip,
     "--display", "Agg",
     "--no-show"
   )
 
   & python @args
   if ($LASTEXITCODE -ne 0) { throw "Sim engine exited with code $LASTEXITCODE" }
+  if (-not (Test-Path $png))  { throw "Expected PNG not found: $png" }
+  if (-not (Test-Path $json)) { throw "Expected JSON not found: $json" }
+  if (-not (Test-Path $slip)) { throw "Expected PNG not found: $slip" }
+
+  $script:results += "sim-engine: PASS (wrote $(Split-Path $png -Leaf), $(Split-Path $slip -Leaf), $(Split-Path $json -Leaf))"
+}
   if (-not (Test-Path $png))  { throw "Expected PNG not found: $png" }
   if (-not (Test-Path $json)) { throw "Expected JSON not found: $json" }
 
@@ -126,5 +134,6 @@ Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ===" -ForegroundColor Green
 $script:results | ForEach-Object { Write-Host "* $_" }
 Write-Host "================================="
+
 
 

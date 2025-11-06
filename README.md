@@ -72,3 +72,6 @@ Headless (Agg auto):
 ```powershell
 $env:SIM_NO_GUI = "1"
 .\tools\cc-sim-sweep.ps1 -TradesCsv "100,500" -VolCsv "0.01,0.03" -Backend auto
+**Slippage curve (headless Agg):**
+```powershell
+python -m colink_core.sim.run_sweep --steps 100 --slippage .sim_smoke/slippage.png --display Agg --no-show
