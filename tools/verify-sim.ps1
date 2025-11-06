@@ -1,5 +1,7 @@
 ﻿param(
-  [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
+  [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")$root  = Split-Path -Parent $PSScriptRoot
+$outDir = Join-Path $root ".sim_smoke"
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null]
   [string]$Which = "all",
   [switch]$RunSim,
   [int]$Seed = 123,
@@ -15,8 +17,9 @@ function New-Dir {
   param([Parameter(Mandatory=$true)][string]$Path)
   New-Item -ItemType Directory -Path $Path -Force | Out-Null
 }
-
-$OutDir = Join-Path $PSScriptRoot "..\.sim_smoke" | Resolve-Path -Relative
+$root  = Split-Path -Parent $PSScriptRoot
+$outDir = Join-Path $root ".sim_smoke"
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 try { New-Dir $OutDir } catch {}
 
 # split pairs e.g. "XRP/COL,COPX/COL"
@@ -118,3 +121,5 @@ Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ==="
 $script:results | ForEach-Object { Write-Host "* $_" }
 Write-Host "================================="
+
+
