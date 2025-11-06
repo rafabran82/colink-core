@@ -11,6 +11,7 @@
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outDir   = Join-Path $repoRoot ".sim_smoke"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+$outJson = Join-Path $outDir "sim_from_engine.json"
 
 # Headless rendering always
 $env:MPLBACKEND = "Agg"
@@ -44,7 +45,7 @@ function Run-Engine {
     "--steps","200",
     "--pairs", $Pairs,
     "--seed",  "$Seed",
-    "--out",   $outDir,
+    "--out",   $outJson,
     "--plot",  "agg",
     "--display","agg",
     "--no-show"
@@ -128,3 +129,4 @@ if ($RunSim) { Write-Host "* sim-engine: PASS (pairs=$Pairs)" }
 foreach ($m in $succeeded) { Write-Host "* $($m): PASS" }
 foreach ($m in $skipped)   { Write-Host "* $($m): SKIP" }
 Write-Host "================================="
+
