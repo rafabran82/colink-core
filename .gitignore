@@ -32,3 +32,5 @@ artifacts/charts/test_api_*/
 
 # local scratch
 *.broken
+
+sim_results/
