@@ -1,6 +1,7 @@
 param(
   [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
   [string]$Which = "all",
+  [switch]$RunSim,
   [switch]$IncludeInteractive,
   [string]$OutDir = "$PSScriptRoot/../.sim_smoke"
 )
@@ -91,15 +92,39 @@ function Run-ShowHoldTkAgg {
   }
 }
 
+function Run-SimEngine {
+  # Run the real sweep in headless Agg, saving JSON + PNG
+  $json = Join-Path $OutDir "sim_from_engine.json"
+  $png  = Join-Path $OutDir "sim_from_engine.png"
+  Write-Host ">> Sim Engine (Agg) -> $png ; $json" -ForegroundColor Cyan
+
+  $args = @(
+    "-m", "colink_core.sim.run_sweep",
+    "--steps", "50",
+    "--out", $json,
+    "--plot", $png,
+    "--display", "Agg",
+    "--no-show"
+  )
+
+  & python @args
+  if ($LASTEXITCODE -ne 0) { throw "Sim engine exited with code $LASTEXITCODE" }
+  if (-not (Test-Path $png))  { throw "Expected PNG not found: $png" }
+  if (-not (Test-Path $json)) { throw "Expected JSON not found: $json" }
+
+  $script:results += "sim-engine: PASS (wrote $(Split-Path $png -Leaf), $(Split-Path $json -Leaf))"
+}
+
 switch ($Which) {
   "headless-agg"       { Run-HeadlessAgg }
   "show-agg-offscreen" { Run-ShowAggOffscreen }
   "show-hold-tkagg"    { Run-ShowHoldTkAgg }
-  "all"                { Run-HeadlessAgg; Run-ShowAggOffscreen; Run-ShowHoldTkAgg }
+  "all"                { if ($RunSim) { Run-SimEngine }; Run-HeadlessAgg; Run-ShowAggOffscreen; Run-ShowHoldTkAgg }
 }
 
 Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ===" -ForegroundColor Green
 $script:results | ForEach-Object { Write-Host "* $_" }
 Write-Host "================================="
+
 
