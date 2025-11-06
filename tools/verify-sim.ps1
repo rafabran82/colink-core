@@ -11,6 +11,13 @@
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outDir   = Join-Path $repoRoot "sim_smoke"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
+# ---- portable temp root -------------------------------------------------
+$tmpRoot = [System.IO.Path]::GetTempPath()
+if (-not $tmpRoot -or -not (Test-Path $tmpRoot)) {
+  if ($env:TMPDIR -and (Test-Path $env:TMPDIR)) { $tmpRoot = $env:TMPDIR }
+  elseif ($IsLinux) { $tmpRoot = "/tmp" } else { $tmpRoot = $PWD }
+}
 $env:MPLBACKEND = "Agg"
 if ($env:PYTHON_EXE) { $pythonExe = $env:PYTHON_EXE }
 $outJson = Join-Path $outDir "sim_from_engine.json"
@@ -79,7 +86,7 @@ plt.savefig(r"{1}", dpi=96, bbox_inches="tight")
 print("FALLBACK_WROTE:", os.path.exists(r"{1}"))
 "@ -f $outDir, $png1
 
-  $tmp = Join-Path $env:TEMP ("sim_fallback_{0}.py" -f ([guid]::NewGuid()))
+  $tmp = Join-Path $tmpRoot ("sim_fallback_{0}.py" -f ([guid]::NewGuid()))
   Set-Content -Path $tmp -Value $pySrc -Encoding utf8
   try {
     & $pythonExe @pyArgs $tmp | Write-Host
@@ -131,6 +138,10 @@ if ($RunSim) { Write-Host "* sim-engine: PASS (pairs=$Pairs)" }
 foreach ($m in $succeeded) { Write-Host "* $($m): PASS" }
 foreach ($m in $skipped)   { Write-Host "* $($m): SKIP" }
 Write-Host "================================="
+
+
+
+
 
 
 
