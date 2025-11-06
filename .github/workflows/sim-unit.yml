@@ -28,6 +28,7 @@ jobs:
           python -m pip install matplotlib numpy pytest
 
       - name: Run headless sim unit test
-        run: pytest -q tests/test_sim_*_headless.py
+        run: pytest -q -k "headless" tests
+
 
 
