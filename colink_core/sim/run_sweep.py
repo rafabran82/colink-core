@@ -6,6 +6,10 @@ import math
 import os
 import random
 from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+from typing import Any
+
+SCHEMA_VERSION = "colink.sim.v1"
 
 
 @dataclass
@@ -14,6 +18,10 @@ class SweepPoint:
     price: float
     spread_bps: float
     depth: float
+
+
+def _utc_iso() -> str:
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def generate_series(steps: int, seed: int = 42) -> list[SweepPoint]:
@@ -31,11 +39,17 @@ def generate_series(steps: int, seed: int = 42) -> list[SweepPoint]:
     return out
 
 
-def save_json(points: list[SweepPoint], path: str) -> None:
-    d = [asdict(p) for p in points]
+def save_json(points: list[SweepPoint], path: str, *, seed: int, pairs: list[str]) -> None:
+    payload: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": _utc_iso(),
+        "seed": seed,
+        "pairs": pairs,
+        "points": [asdict(p) for p in points],
+    }
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"points": d}, f)
+        json.dump(payload, f)
 
 
 def maybe_plot(
@@ -76,8 +90,8 @@ def slippage_curve_xy(
     trade_sizes: list[float], x_reserve: float, y_reserve: float
 ) -> tuple[list[float], list[float]]:
     # Constant-product AMM: x*y = k; price impact vs. input size (buy Y with X)
-    xs = []
-    impacts_bps = []
+    xs: list[float] = []
+    impacts_bps: list[float] = []
     k = x_reserve * y_reserve
     p0 = y_reserve / x_reserve  # spot price
     for dx in trade_sizes:
@@ -101,7 +115,6 @@ def maybe_plot_slippage(png_path: str | None, backend: str, show: bool, hold: bo
     import matplotlib.pyplot as plt
     import numpy as np
 
-    # Simple curve over input sizes (in X units) for an example pool
     x_reserve = 100_000.0
     y_reserve = 100_000.0
     trade_sizes = np.linspace(10, 5000, 50).tolist()
@@ -125,15 +138,47 @@ def maybe_plot_slippage(png_path: str | None, backend: str, show: bool, hold: bo
         plt.show(block=hold)
 
 
+def maybe_plot_spread(
+    points: list[SweepPoint], png_path: str | None, backend: str, show: bool, hold: bool
+) -> None:
+    import matplotlib
+
+    if backend:
+        matplotlib.use(backend, force=True)
+    import matplotlib.pyplot as plt
+
+    xs = [p.t for p in points]
+    sp = [p.spread_bps for p in points]
+
+    fig = plt.figure(figsize=(7, 4))
+    ax = fig.add_subplot(111)
+    ax.plot(xs, sp)
+    ax.set_xlabel("t")
+    ax.set_ylabel("spread_bps")
+    ax.set_title("Spread over time (bps)")
+    ax.grid(True, alpha=0.25)
+    fig.tight_layout()
+
+    if png_path:
+        os.makedirs(os.path.dirname(png_path) or ".", exist_ok=True)
+        fig.savefig(png_path, dpi=120)
+
+    bname = str(matplotlib.get_backend()).lower()
+    if show and ("agg" not in bname):
+        plt.show(block=hold)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="COLINK Phase 3: sweep + slippage")
     ap.add_argument("--steps", type=int, default=200, help="number of timesteps")
     ap.add_argument(
         "--pairs", type=str, default="XRP/COL", help="comma-separated pairs, e.g. XRP/COL,COPX/COL"
     )
+    ap.add_argument("--seed", type=int, default=42, help="PRNG seed for reproducible series")
     ap.add_argument("--out", type=str, default=None, help="path to write JSON metrics")
     ap.add_argument("--plot", type=str, default=None, help="path to write PNG figure (timeseries)")
     ap.add_argument("--slippage", type=str, default=None, help="path to write slippage PNG")
+    ap.add_argument("--spread", type=str, default=None, help="path to write spread PNG")
     ap.add_argument(
         "--display", type=str, default=None, help="matplotlib backend, e.g., Agg or TkAgg"
     )
@@ -145,18 +190,18 @@ def main(argv: list[str] | None = None) -> int:
 
     backend = args.display or os.environ.get("MPLBACKEND") or "Agg"
     show = not args.no_show
+    pairs = [p.strip() for p in args.pairs.split(",") if p.strip()]
 
-    # NOTE: pairs are accepted and may drive future multi-pair logic; for now we log them
-    _pairs = [p.strip() for p in args.pairs.split(",") if p.strip()]
-
-    points = generate_series(args.steps)
+    points = generate_series(args.steps, seed=args.seed)
 
     if args.out:
-        save_json(points, args.out)
+        save_json(points, args.out, seed=args.seed, pairs=pairs)
     if args.plot:
         maybe_plot(points, args.plot, backend=backend, show=show, hold=args.hold)
     if args.slippage:
         maybe_plot_slippage(args.slippage, backend=backend, show=show, hold=args.hold)
+    if args.spread:
+        maybe_plot_spread(points, args.spread, backend=backend, show=show, hold=args.hold)
 
     return 0
 
