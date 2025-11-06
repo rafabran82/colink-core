@@ -8,11 +8,12 @@ on:
 
 jobs:
   smoke:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        python-version: ["3.11"]
+        pair: [ "XRP/COL", "COPX/COL" ]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,22 +21,22 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           python -m pip install matplotlib numpy
 
-      - name: Run display smoke (non-interactive)
+      - name: Run display+engine smoke (Agg; non-interactive)
         shell: pwsh
-        run: ./tools/verify-sim.ps1
+        run: ./tools/verify-sim.ps1 -RunSim -Pairs "${{ matrix.pair }}"
 
-      - name: Upload Agg PNG
+      - name: Upload Agg artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: sim-smoke-${{ matrix.os }}
-          path: .sim_smoke/sim_smoke_agg.png
+          name: sim-smoke-${{ matrix.os }}-${{ matrix.pair }}
+          path: |
+            .sim_smoke/sim_smoke_agg.png
+            .sim_smoke/sim_from_engine*.png
           if-no-files-found: warn
-
-
