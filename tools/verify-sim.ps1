@@ -31,7 +31,7 @@ $py = Get-Python
 $pyArgs = @(
   '-m','colink_core.sim.run_sweep',
   '--pairs', $Pairs,
-  '--backend','Agg',
+  
   '--no-show',
   '--seed', "$Seed"
 )
@@ -100,3 +100,4 @@ if ($Which -in @('show-agg-offscreen','all')) {
 }
 Write-Host "* show-hold-tkagg: SKIP (interactive not enabled in CI)"
 Write-Host "================================="
+
