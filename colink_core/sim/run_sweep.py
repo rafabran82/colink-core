@@ -1,58 +1,98 @@
-from __future__ import annotations
+"""
+COLINK Liquidity Simulation Sweeper + Summary Overlay
+-----------------------------------------------------
+Runs multiple liquidity simulations with variable parameters (trade size, volatility)
+and exports results + combined overlay plot.
 
-from pathlib import Path
+Usage:
+    python -m colink_core.sim.run_sweep --trades 100 500 1000 --volatility 0.01 0.03
+"""
+
+import argparse
+import csv
+import os
+from datetime import UTC, datetime
 
 import matplotlib.pyplot as plt
-import numpy as np
+
+from colink_core.sim.liquidity_sim import LiquiditySimulation, Pool, SimulationConfig
 
 
-def simulate_gbm_paths(
-    *,
-    n_steps: int,
-    n_paths: int,
-    dt: float,
-    mu: float,
-    sigma: float,
-    s0: float,
-    seed: int | None = None,
-):
-    rng = np.random.default_rng(seed)
-    dt_arr = dt
-    drift = (mu - 0.5 * sigma * sigma) * dt_arr
-    shock = sigma * np.sqrt(dt_arr) * rng.standard_normal(size=(n_steps, n_paths))
-    increments = drift + shock
-    log_paths = np.cumsum(increments, axis=0)
-    s = s0 * np.exp(log_paths)
-    s = np.vstack([np.full((1, n_paths), s0), s])  # prepend s0
-    return s  # shape: (n_steps+1, n_paths)
+def run_and_export(trade_size: float, volatility: float, outdir: str):
+    pool = Pool("COL", "XRP", reserve_a=1_000_000, reserve_b=500_000)
+    cfg = SimulationConfig(steps=200, trade_size=trade_size, volatility=volatility)
+    sim = LiquiditySimulation(pool, cfg)
+    sim.run()
+
+    ts = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+    fname = f"sim_{trade_size}_{volatility}_{ts}.csv"
+    fpath = os.path.join(outdir, fname)
+
+    with open(fpath, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["step", "price", "reserve_a", "reserve_b"])
+        for i, p in enumerate(sim.history["price"]):
+            writer.writerow([i, p, sim.history["reserve_a"][i], sim.history["reserve_b"][i]])
+
+    print(f"✅ Exported {fpath}")
+    return fpath
 
 
-def plot_paths(paths, outdir):
-    outdir = Path(outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
-    out_path = outdir / "sweep_paths-0000.png"
-    plt.figure(figsize=(8, 4.5))
-    plt.plot(paths[:, : min(paths.shape[1], 20)])
-    plt.title("GBM sample paths")
-    plt.xlabel("step")
-    plt.ylabel("price")
+def plot_summary(csv_files):
+    plt.figure(figsize=(9, 6))
+    for fpath in csv_files:
+        label = os.path.basename(fpath).replace("sim_", "").replace(".csv", "")
+        steps, prices = [], []
+        with open(fpath, newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                steps.append(int(row["step"]))
+                prices.append(float(row["price"]))
+        plt.plot(steps, prices, label=label)
+    plt.title("COL/XRP Liquidity Simulation Summary")
+    plt.xlabel("Step")
+    plt.ylabel("Price (B/A)")
+    plt.legend(fontsize=8)
+    plt.grid(True)
     plt.tight_layout()
-    plt.savefig(out_path, bbox_inches="tight")
-    plt.close()
-    return out_path
+    summary_path = os.path.join(os.path.dirname(csv_files[0]), "summary_overlay.png")
+    plt.savefig(summary_path)
+    print(f"📊 Saved overlay summary: {summary_path}")
+    plt.show()
 
 
-def plot_hist(paths, outdir):
-    outdir = Path(outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
-    out_path = outdir / "sweep_hist-0000.png"
-    terminal = paths[-1, :]
-    plt.figure(figsize=(6, 4))
-    plt.hist(terminal, bins=30)
-    plt.title("Terminal price distribution")
-    plt.xlabel("price")
-    plt.ylabel("count")
-    plt.tight_layout()
-    plt.savefig(out_path, bbox_inches="tight")
-    plt.close()
-    return out_path
+def main():
+    parser = argparse.ArgumentParser(description="Run multiple COL-XRP liquidity simulations")
+    parser.add_argument(
+        "--trades",
+        type=float,
+        nargs="+",
+        default=[500],
+        help="List of trade sizes to test (default: 500)",
+    )
+    parser.add_argument(
+        "--volatility",
+        type=float,
+        nargs="+",
+        default=[0.02],
+        help="List of volatility values to test (default: 0.02)",
+    )
+    parser.add_argument(
+        "--outdir", type=str, default="sim_results", help="Output directory for CSVs"
+    )
+
+    args = parser.parse_args()
+    os.makedirs(args.outdir, exist_ok=True)
+
+    exported = []
+    for t in args.trades:
+        for v in args.volatility:
+            print(f"\n=== Running trade={t}, volatility={v} ===")
+            exported.append(run_and_export(t, v, args.outdir))
+
+    if exported:
+        plot_summary(exported)
+
+
+if __name__ == "__main__":
+    main()
