@@ -1,8 +1,8 @@
 param(
   [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
   [string]$Which = "all",
-  [switch]$RunSim,
   [switch]$IncludeInteractive,
+  [switch]$RunSim,
   [string]$OutDir = "$PSScriptRoot/../.sim_smoke"
 )
 
@@ -12,7 +12,8 @@ $ErrorActionPreference = "Stop"
 # paths
 $PlotPy = Join-Path $PSScriptRoot "sim_plot.py"
 if (-not (Test-Path $PlotPy)) {
-  throw "Missing $PlotPy. Create tools\sim_plot.py first."
+  # sim_plot.py is used for the Agg-only/offscreen tests; engine run does not need it.
+  Write-Verbose "Missing tools\sim_plot.py; headless Agg tests will fail without it."
 }
 
 # ensure output dir
@@ -26,7 +27,7 @@ function Invoke-PyFile {
     [Parameter(Mandatory=$true)][string]$File,
     [hashtable]$Env = @{}
   )
-  # backup & apply env safely using .NET (avoids .Value on null)
+  # backup & apply env (safe .NET API)
   $old = @{}
   foreach ($k in $Env.Keys) {
     $prev = [System.Environment]::GetEnvironmentVariable($k, "Process")
@@ -47,9 +48,10 @@ function Invoke-PyFile {
   }
 }
 
-$results = @()
+$script:results = @()
 
 function Run-HeadlessAgg {
+  if (-not (Test-Path $PlotPy)) { throw "Missing $PlotPy (tools\sim_plot.py)" }
   $outfile = Join-Path $OutDir "sim_smoke_agg.png"
   Write-Host ">> Headless (Agg) -> $outfile" -ForegroundColor Cyan
   Invoke-PyFile -File $PlotPy -Env @{
@@ -63,6 +65,7 @@ function Run-HeadlessAgg {
 }
 
 function Run-ShowAggOffscreen {
+  if (-not (Test-Path $PlotPy)) { throw "Missing $PlotPy (tools\sim_plot.py)" }
   Write-Host ">> Show Agg (offscreen)" -ForegroundColor Cyan
   Invoke-PyFile -File $PlotPy -Env @{
     "MPLBACKEND"         = "Agg";
@@ -78,6 +81,7 @@ function Run-ShowHoldTkAgg {
     $script:results += "show-hold-tkagg: SKIP (use -IncludeInteractive to run)";
     return
   }
+  if (-not (Test-Path $PlotPy)) { throw "Missing $PlotPy (tools\sim_plot.py)" }
   Write-Host ">> Show + Hold (TkAgg) - a window will open; close it to continue..." -ForegroundColor Yellow
   try {
     Invoke-PyFile -File $PlotPy -Env @{
@@ -93,7 +97,7 @@ function Run-ShowHoldTkAgg {
 }
 
 function Run-SimEngine {
-  # Run the real sweep in headless Agg, saving JSON + PNG (+ slippage)
+  # Run the real sweep in headless Agg, saving JSON + timeseries PNG + slippage PNG
   $json = Join-Path $OutDir "sim_from_engine.json"
   $png  = Join-Path $OutDir "sim_from_engine.png"
   $slip = Join-Path $OutDir "sim_from_engine_slippage.png"
@@ -117,16 +121,11 @@ function Run-SimEngine {
 
   $script:results += "sim-engine: PASS (wrote $(Split-Path $png -Leaf), $(Split-Path $slip -Leaf), $(Split-Path $json -Leaf))"
 }
-  if (-not (Test-Path $png))  { throw "Expected PNG not found: $png" }
-  if (-not (Test-Path $json)) { throw "Expected JSON not found: $json" }
-
-  $script:results += "sim-engine: PASS (wrote $(Split-Path $png -Leaf), $(Split-Path $json -Leaf))"
-}
 
 switch ($Which) {
-  "headless-agg"       { Run-HeadlessAgg }
-  "show-agg-offscreen" { Run-ShowAggOffscreen }
-  "show-hold-tkagg"    { Run-ShowHoldTkAgg }
+  "headless-agg"       { if ($RunSim) { Run-SimEngine }; Run-HeadlessAgg }
+  "show-agg-offscreen" { if ($RunSim) { Run-SimEngine }; Run-ShowAggOffscreen }
+  "show-hold-tkagg"    { if ($RunSim) { Run-SimEngine }; Run-ShowHoldTkAgg }
   "all"                { if ($RunSim) { Run-SimEngine }; Run-HeadlessAgg; Run-ShowAggOffscreen; Run-ShowHoldTkAgg }
 }
 
@@ -134,6 +133,3 @@ Write-Host ""
 Write-Host "=== SIM DISPLAY SMOKE SUMMARY ===" -ForegroundColor Green
 $script:results | ForEach-Object { Write-Host "* $_" }
 Write-Host "================================="
-
-
-
