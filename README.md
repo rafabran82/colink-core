@@ -84,3 +84,14 @@ python -m colink_core.sim.run_sweep --pairs XRP/COL --steps 100 --spread .sim_sm
 **Deterministic run (fixed seed):**
 ```powershell
 python -m colink_core.sim.run_sweep --pairs XRP/COL --steps 50 --seed 123 --out .sim_smoke/seeded.json --plot .sim_smoke/seeded.png --display Agg --no-show
+**CSV-driven sweep (headless Agg):**
+```powershell
+python -m colink_core.sim.run_sweep `
+  --pairs XRP/COL `
+  --steps 200 `
+  --seed 777 `
+  --trades .sim_smoke/trades.csv `
+  --volatility .sim_smoke/vol.csv `
+  --out .sim_smoke/csv_metrics.json `
+  --plot .sim_smoke/csv_timeseries.png `
+  --display Agg --no-show
