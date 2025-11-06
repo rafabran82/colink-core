@@ -34,3 +34,7 @@ artifacts/charts/test_api_*/
 *.broken
 
 sim_results/
+# simulation outputs
+sim_results/
+*.csv
+*.png
