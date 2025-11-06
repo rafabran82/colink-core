@@ -52,7 +52,7 @@ jobs:
           path: |
             sim_smoke/sim_smoke_agg.png
             sim_smoke/sim_from_engine.json
-          if-no-files-found: warn
+          if-no-files-found: error
 
 
 
