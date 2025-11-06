@@ -6,6 +6,7 @@ import json
 import math
 import os
 import random
+import statistics
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 
@@ -21,63 +22,42 @@ class SweepPoint:
 
 
 def _read_trades_csv(path: str) -> list[dict]:
-    """
-    Expected columns (case-insensitive):
-      - t (int timestep)
-      - side ("buy" or "sell")
-      - size (float units)
-    Extra columns are ignored. Missing columns are tolerated if headers
-    can be mapped case-insensitively; otherwise empty list.
-    """
     if not path or not os.path.exists(path):
         return []
     rows: list[dict] = []
     with open(path, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
-        # case-insensitive map
-        columns = {k.lower(): k for k in r.fieldnames or []}
-        col_t = columns.get("t")
-        col_side = columns.get("side")
-        col_size = columns.get("size")
+        cols = {k.lower(): k for k in (r.fieldnames or [])}
+        col_t = cols.get("t")
+        col_side = cols.get("side")
+        col_size = cols.get("size")
         for raw in r:
             try:
                 t = int(raw[col_t]) if col_t else None
                 side = str(raw[col_side]).strip().lower() if col_side else ""
                 size = float(raw[col_size]) if col_size else 0.0
-                if t is None:
-                    continue
-                if side not in ("buy", "sell"):
-                    continue
-                if size <= 0:
+                if t is None or side not in ("buy", "sell") or size <= 0:
                     continue
                 rows.append({"t": t, "side": side, "size": size})
             except Exception:
-                # skip malformed row
                 continue
     return rows
 
 
 def _read_vol_csv(path: str) -> dict[int, float]:
-    """
-    Expected columns (case-insensitive):
-      - t (int timestep)
-      - sigma (float multiplier applied to shock stddev at t)
-    """
     if not path or not os.path.exists(path):
         return {}
     out: dict[int, float] = {}
     with open(path, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
-        columns = {k.lower(): k for k in r.fieldnames or []}
-        col_t = columns.get("t")
-        col_sigma = columns.get("sigma")
+        cols = {k.lower(): k for k in (r.fieldnames or [])}
+        col_t = cols.get("t")
+        col_sigma = cols.get("sigma")
         for raw in r:
             try:
                 t = int(raw[col_t]) if col_t else None
                 sigma = float(raw[col_sigma]) if col_sigma else 1.0
-                if t is None:
-                    continue
-                if sigma <= 0:
+                if t is None or sigma <= 0:
                     continue
                 out[t] = sigma
             except Exception:
@@ -96,13 +76,9 @@ def generate_series(
     depth = 10_000.0
     out: list[SweepPoint] = []
 
-    # base shock sigma; volatility CSV can override per-t
     base_sigma = 0.003
     vol_overrides = vol_overrides or {}
     trades = trades or []
-
-    # Simple “liquidity nudge” from trades: net buys increase price slightly,
-    # net sells decrease; very small per-step impact, just to drive the example.
     by_t: dict[int, list[dict]] = {}
     for tr in trades:
         by_t.setdefault(tr["t"], []).append(tr)
@@ -113,22 +89,64 @@ def generate_series(
         shock = random.gauss(0.0, sigma)
         price = max(0.0001, price * (1.0 + drift + shock))
 
-        # apply net trade impact if any at this timestep
         step_trades = by_t.get(t, [])
         if step_trades:
             net = 0.0
             for tr in step_trades:
-                if tr["side"] == "buy":
-                    net += tr["size"]
-                else:
-                    net -= tr["size"]
-            # very small price tweak scaled by depth to keep stable
+                net += tr["size"] if tr["side"] == "buy" else -tr["size"]
             price *= max(0.0001, 1.0 + 0.00001 * (net / max(depth, 1.0)))
 
         spread_bps = 10.0 + 8.0 * math.sin(t / 15.0)
         depth = max(100.0, depth * (1.0 + random.uniform(-0.02, 0.02)))
         out.append(SweepPoint(t=t, price=price, spread_bps=spread_bps, depth=depth))
     return out
+
+
+def _compute_summary(
+    points: list[SweepPoint], trades: list[dict], vol_map: dict[int, float]
+) -> dict:
+    prices = [p.price for p in points]
+    spreads = [p.spread_bps for p in points]
+    depths = [p.depth for p in points]
+
+    # realized vol proxy on log returns (population stdev)
+    rets: list[float] = []
+    for i in range(1, len(prices)):
+        if prices[i - 1] > 0 and prices[i] > 0:
+            rets.append(math.log(prices[i] / prices[i - 1]))
+    realized_vol = float(statistics.pstdev(rets)) if len(rets) > 1 else 0.0
+
+    buy_total = sum(tr["size"] for tr in trades if tr["side"] == "buy")
+    sell_total = sum(tr["size"] for tr in trades if tr["side"] == "sell")
+    net_flow = buy_total - sell_total
+
+    return {
+        "count_points": len(points),
+        "price": {
+            "first": prices[0] if prices else 0.0,
+            "last": prices[-1] if prices else 0.0,
+            "min": min(prices) if prices else 0.0,
+            "max": max(prices) if prices else 0.0,
+        },
+        "spread_bps": {
+            "min": min(spreads) if spreads else 0.0,
+            "max": max(spreads) if spreads else 0.0,
+            "avg": (sum(spreads) / len(spreads)) if spreads else 0.0,
+        },
+        "depth": {
+            "min": min(depths) if depths else 0.0,
+            "max": max(depths) if depths else 0.0,
+            "avg": (sum(depths) / len(depths)) if depths else 0.0,
+        },
+        "realized_vol_logret": realized_vol,
+        "trades": {
+            "count": len(trades),
+            "buy_total": buy_total,
+            "sell_total": sell_total,
+            "net_flow": net_flow,
+        },
+        "volatility_overrides_count": len(vol_map),
+    }
 
 
 def save_json(
@@ -139,6 +157,8 @@ def save_json(
     pairs: list[str],
     trades_csv: str | None,
     vol_csv: str | None,
+    trades: list[dict],
+    vol_map: dict[int, float],
 ) -> None:
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     d = {
@@ -150,6 +170,7 @@ def save_json(
             "trades_csv": trades_csv or "",
             "volatility_csv": vol_csv or "",
         },
+        "summary": _compute_summary(points, trades, vol_map),
         "points": [asdict(p) for p in points],
     }
     with open(path, "w", encoding="utf-8") as f:
@@ -193,19 +214,18 @@ def maybe_plot(
 def slippage_curve_xy(
     trade_sizes: list[float], x_reserve: float, y_reserve: float
 ) -> tuple[list[float], list[float]]:
-    # Constant-product AMM: x*y = k; price impact vs. input size (buy Y with X)
     xs = []
     impacts_bps = []
     k = x_reserve * y_reserve
-    p0 = y_reserve / x_reserve  # spot price
+    p0 = y_reserve / x_reserve
     for dx in trade_sizes:
         if dx <= 0.0:
             continue
         x_new = x_reserve + dx
         y_new = k / x_new
-        dy = y_reserve - y_new  # output received (Y sold by pool)
+        dy = y_reserve - y_new
         effective_price = dy / dx if dx > 0 else p0
-        impact = (effective_price / p0 - 1.0) * 10_000.0  # bps
+        impact = (effective_price / p0 - 1.0) * 10_000.0
         xs.append(dx)
         impacts_bps.append(impact)
     return xs, impacts_bps
@@ -273,7 +293,9 @@ def maybe_plot_spread(
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="COLINK Phase 3: sweep + CSV ingest + slippage")
+    ap = argparse.ArgumentParser(
+        description="COLINK Phase 3: sweep + CSV ingest + slippage + metrics"
+    )
     ap.add_argument("--steps", type=int, default=200, help="number of timesteps")
     ap.add_argument(
         "--pairs", type=str, default="XRP/COL", help="comma-separated pairs, e.g. XRP/COL,COPX/COL"
@@ -285,6 +307,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--plot", type=str, default=None, help="path to write PNG figure (timeseries)")
     ap.add_argument("--slippage", type=str, default=None, help="path to write slippage PNG")
     ap.add_argument("--spread", type=str, default=None, help="path to write spread-over-time PNG")
+    ap.add_argument("--metrics-only", action="store_true", help="skip all plots, emit JSON only")
     ap.add_argument(
         "--display", type=str, default=None, help="matplotlib backend, e.g., Agg or TkAgg"
     )
@@ -297,7 +320,6 @@ def main(argv: list[str] | None = None) -> int:
     backend = args.display or os.environ.get("MPLBACKEND") or "Agg"
     show = not args.no_show
 
-    # parse inputs
     _pairs = [p.strip() for p in args.pairs.split(",") if p.strip()]
     trades = _read_trades_csv(args.trades) if args.trades else []
     vol_map = _read_vol_csv(args.volatility) if args.volatility else {}
@@ -312,13 +334,17 @@ def main(argv: list[str] | None = None) -> int:
             pairs=_pairs,
             trades_csv=args.trades,
             vol_csv=args.volatility,
+            trades=trades,
+            vol_map=vol_map,
         )
-    if args.plot:
-        maybe_plot(points, args.plot, backend=backend, show=show, hold=args.hold)
-    if args.slippage:
-        maybe_plot_slippage(args.slippage, backend=backend, show=show, hold=args.hold)
-    if args.spread:
-        maybe_plot_spread(points, args.spread, backend=backend, show=show, hold=args.hold)
+
+    if not args.metrics_only:
+        if args.plot:
+            maybe_plot(points, args.plot, backend=backend, show=show, hold=args.hold)
+        if args.slippage:
+            maybe_plot_slippage(args.slippage, backend=backend, show=show, hold=args.hold)
+        if args.spread:
+            maybe_plot_spread(points, args.spread, backend=backend, show=show, hold=args.hold)
 
     return 0
 
