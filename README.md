@@ -95,3 +95,12 @@ python -m colink_core.sim.run_sweep `
   --out .sim_smoke/csv_metrics.json `
   --plot .sim_smoke/csv_timeseries.png `
   --display Agg --no-show
+**Metrics-only (fast CI path):**
+```powershell
+python -m colink_core.sim.run_sweep `
+  --pairs XRP/COL `
+  --steps 100 `
+  --seed 123 `
+  --out .sim_smoke/metrics_only.json `
+  --metrics-only `
+  --display Agg --no-show
