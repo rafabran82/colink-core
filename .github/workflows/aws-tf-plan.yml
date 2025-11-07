@@ -1,0 +1,50 @@
+﻿name: AWS Terraform — Plan Only
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write     # for OIDC → AWS
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/aws/env/dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          # TODO: create a deploy role in dev account and put its ARN in secrets
+          role-to-assume: ${{ secrets.AWS_DEV_ROLE_ARN }}
+
+      - name: Terraform Init (S3 backend)
+        run: |
+          terraform init -backend-config=../../accounts/dev/backend.hcl
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-plan-dev
+          path: infra/aws/env/dev/tfplan
+          if-no-files-found: error
