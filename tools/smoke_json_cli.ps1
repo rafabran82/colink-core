@@ -14,8 +14,6 @@ Write-Host ("OS: " + [System.Environment]::OSVersion.VersionString)
 Write-Host ("Repo root: " + $RepoRoot)
 Write-Host ("pwd: " + (Get-Location))
 Write-Host ("PYTHONPATH: " + $env:PYTHONPATH)
-Write-Host "Top-level files:"
-Get-ChildItem -Force | Select-Object Mode,Length,Name | Format-Table | Out-String | Write-Host
 
 Write-Host "=== Versions ==="
 Write-Host ("Python: " + (python --version))
@@ -28,18 +26,14 @@ m = importlib.import_module('colink_core.sim.json_cli')
 print('import_ok:', bool(m))
 print('prog:', getattr(m, 'PROG', 'colink-json'))
 "@
-
 $tmp = Join-Path $env:TEMP ("import_check_{0}.py" -f ([guid]::NewGuid()))
-# Write with LF and UTF-8 no BOM
 $pyLF = $py -replace "`r`n","`n" -replace "`r","`n"
 [IO.File]::WriteAllText($tmp, $pyLF, (New-Object System.Text.UTF8Encoding($false)))
-
 try {
   $pyOut = python $tmp
   $pyOut | Out-String | Write-Host
   if ($pyOut -notmatch 'import_ok: True') { throw "Python import failed for colink_core.sim.json_cli" }
-}
-finally {
+} finally {
   Remove-Item $tmp -ErrorAction SilentlyContinue
 }
 
