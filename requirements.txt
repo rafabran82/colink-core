@@ -9,4 +9,4 @@ websockets==11.0.3
 xrpl-py==2.6.0
 
 ruff==0.6.8
-black==24.10.0
+black==25.9.0
