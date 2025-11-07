@@ -11,4 +11,5 @@
 *.gif       binary
 *.pdf       binary
 *.zip       binary
-*.7z        binary
+*.7z        binary*.yml text eol=lf
+*.yaml text eol=lf
