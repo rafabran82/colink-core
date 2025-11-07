@@ -9,3 +9,5 @@
 *.pdf   binary
 *.zip   binary
 *.7z    binary
+*.{yml,yaml} text eol=lf
+
