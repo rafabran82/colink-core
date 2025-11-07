@@ -1,41 +1,15 @@
-﻿# Python
-__pycache__/
-*.pyc
-.venv/
+﻿# Terraform junk & local state
+*.tfstate
+*.tfstate.*
+.crash
+.terraform/
+.terraform.lock.hcl
 
-# Env + local
+# Local env & artifacts
 .env
-*.log
+infra/aws/**/backend.hcl.local
+infra/aws/env/**/tfplan
 
-# pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-colink_core/sim/out/
-
-copx_sim/
-
-pyproject.toml.bak-*
-
-charts/*.png
-
-charts/*.png
-
-charts/*.png
-*.egg-info/
-pyproject.toml.bak
-
-
-# Pytest sweep outputs
-artifacts/charts/test_api_*/
-
-# local scratch
-*.broken
-
-sim_results/
-# simulation outputs
-sim_results/
-*.csv
-*.png
-.sim_smoke/
+# OS/editor
+.DS_Store
+Thumbs.db
