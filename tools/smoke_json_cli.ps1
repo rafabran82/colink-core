@@ -1,4 +1,4 @@
-# Windows/json_cli smoke: fail fast, no flakiness (no pytest)
+# Windows/json_cli smoke: PowerShell-safe (no bash heredocs)
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
@@ -21,15 +21,27 @@ Write-Host "=== Versions ==="
 Write-Host ("Python: " + (python --version))
 Write-Host ("Git: " + (git --version))
 
-Write-Host "=== Import sanity ==="
-$pyOut = python - <<'PYCODE'
+Write-Host "=== Import sanity (via temp .py) ==="
+$py = @"
 import importlib
 m = importlib.import_module('colink_core.sim.json_cli')
 print('import_ok:', bool(m))
 print('prog:', getattr(m, 'PROG', 'colink-json'))
-PYCODE
-$pyOut | Out-String | Write-Host
-if ($pyOut -notmatch 'import_ok: True') { throw "Python import failed for colink_core.sim.json_cli" }
+"@
+
+$tmp = Join-Path $env:TEMP ("import_check_{0}.py" -f ([guid]::NewGuid()))
+# Write with LF and UTF-8 no BOM
+$pyLF = $py -replace "`r`n","`n" -replace "`r","`n"
+[IO.File]::WriteAllText($tmp, $pyLF, (New-Object System.Text.UTF8Encoding($false)))
+
+try {
+  $pyOut = python $tmp
+  $pyOut | Out-String | Write-Host
+  if ($pyOut -notmatch 'import_ok: True') { throw "Python import failed for colink_core.sim.json_cli" }
+}
+finally {
+  Remove-Item $tmp -ErrorAction SilentlyContinue
+}
 
 Write-Host "=== CLI help ==="
 python -m colink_core.sim.json_cli --help | Out-String | Write-Host
