@@ -4,3 +4,6 @@
 *.yml      text eol=lf
 *.yaml     text eol=lf
 *.md       text eol=lf
+# Enforce LF in CI/workflows and tools to avoid CRLF drift
+.github/workflows/*  text eol=lf
+tools/*.ps1          text eol=lf
