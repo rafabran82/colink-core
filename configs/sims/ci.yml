@@ -1,4 +1,4 @@
-﻿# Lean scenario for CI (fast)
+# Lean scenario for CI (fast)
 name: ci
 seed: 42
 markets:
