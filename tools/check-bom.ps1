@@ -1,31 +1,71 @@
-﻿# Fail on BOM at start of file and on any CR characters in workflow YAMLs.
+Param()
+
 $ErrorActionPreference = "Stop"
-$root = Split-Path -Parent $MyInvocation.MyCommand.Path | Split-Path -Parent
 
-$targets = Get-ChildItem -Path (Join-Path $root ".github/workflows") -File -Recurse -Include *.yml,*.yaml
+function Test-YamlClean {
+  param([string]$File)
 
-$badBom  = @()
-$badCRLF = @()
+  [byte[]]$bytes = [System.IO.File]::ReadAllBytes($File)
 
-foreach ($f in $targets) {
-  $bytes = [IO.File]::ReadAllBytes($f.FullName)
-  if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    $badBom += $f.FullName
+  $hasBomAtStart = $false
+  if ($bytes.Length -ge 3) {
+    $hasBomAtStart = ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
   }
 
-  # Read as raw text without rewriting newlines
-  $raw = [System.Text.Encoding]::UTF8.GetString($bytes)
-  if ($raw -match "`r") { $badCRLF += $f.FullName }
+  # detect CRLF
+  $hasCrlf = $false
+  for ($i=0; $i -lt $bytes.Length-1; $i++) {
+    if ($bytes[$i] -eq 0x0D -and $bytes[$i+1] -eq 0x0A) { $hasCrlf = $true; break }
+  }
+
+  # detect any EF BB BF triplets anywhere
+  $embeddedIdx = @()
+  for ($i=0; $i -lt $bytes.Length-2; $i++) {
+    if ($bytes[$i] -eq 0xEF -and $bytes[$i+1] -eq 0xBB -and $bytes[$i+2] -eq 0xBF) {
+      $embeddedIdx += $i
+      $i += 2
+    }
+  }
+
+  [pscustomobject]@{
+    File           = $File
+    HasBomAtStart  = $hasBomAtStart
+    HasCrlf        = $hasCrlf
+    BomPositions   = $embeddedIdx
+  }
 }
 
-if ($badBom.Count -gt 0) {
-  Write-Error ("BOM detected in:`n" + ($badBom -join "`n"))
-  exit 1
+$root  = Join-Path $PSScriptRoot ".."
+$wfDir = Join-Path $root ".github/workflows"
+
+if (-not (Test-Path $wfDir)) { return }
+
+$targets = Get-ChildItem $wfDir -File -Include *.yml,*.yaml -Recurse
+if (-not $targets) { return }
+
+$bad = @()
+
+foreach ($t in $targets) {
+  $r = Test-YamlClean -File $t.FullName
+  if ($r.HasBomAtStart -or $r.HasCrlf -or $r.BomPositions.Count -gt 0) {
+    $bad += $r
+  }
 }
-if ($badCRLF.Count -gt 0) {
-  Write-Error ("CR/CRLF detected in:`n" + ($badCRLF -join "`n"))
+
+if ($bad.Count -gt 0) {
+  $lines = foreach ($b in $bad) {
+    $details = @()
+    if ($b.HasBomAtStart) { $details += "BOM at start" }
+    if ($b.HasCrlf)       { $details += "CRLF present" }
+    if ($b.BomPositions.Count -gt 0) {
+      $pos = ($b.BomPositions -join ",")
+      $details += "embedded EF BB BF at byte offsets: $pos"
+    }
+    "{0}  ->  {1}" -f $b.File, ($details -join " ; ")
+  }
+  Write-Error ("Workflow encoding issues:`n" + ($lines -join "`n"))
   exit 1
 }
 
-Write-Output "OK: workflows are UTF-8 (no BOM) + LF-only"
+Write-Output "[ok] Workflow YAMLs are UTF-8 (no BOM) with LF only."
 exit 0
