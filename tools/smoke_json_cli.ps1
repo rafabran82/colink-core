@@ -30,9 +30,10 @@ $tmp = Join-Path $env:TEMP ("import_check_{0}.py" -f ([guid]::NewGuid()))
 $pyLF = $py -replace "`r`n","`n" -replace "`r","`n"
 [IO.File]::WriteAllText($tmp, $pyLF, (New-Object System.Text.UTF8Encoding($false)))
 try {
-  $pyOut = python $tmp
-  $pyOut | Out-String | Write-Host
-  if ($pyOut -notmatch 'import_ok: True') { throw "Python import failed for colink_core.sim.json_cli" }
+  $pyOut  = python $tmp
+  $pyText = ($pyOut | Out-String)
+  $pyText | Write-Host
+  if ($pyText -notmatch 'import_ok:\s*True') { throw "Python import failed for colink_core.sim.json_cli" }
 } finally {
   Remove-Item $tmp -ErrorAction SilentlyContinue
 }
