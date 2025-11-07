@@ -1,35 +1,43 @@
 from __future__ import annotations
 
 # --- CI shim: optional plotting helpers ---
-# Tries to import plotting/sim helpers; if unavailable in CI (imports-only), provide light fallbacks.
+# Try to import real helpers; if unavailable, use pure-stdlib fallbacks.
 try:
     from .run_sweep import plot_hist, plot_paths, simulate_gbm_paths  # type: ignore
 except Exception:
     import math
     import os
+    import random
 
     def simulate_gbm_paths(
-        n_steps: int, n_paths: int, drift: float = 0.0, vol: float = 0.2, seed: int | None = None
+        n_steps: int,
+        n_paths: int,
+        drift: float = 0.0,
+        vol: float = 0.2,
+        seed: int | None = None,
+        dt: float | None = None,
+        **_kw: object,
     ):
-        import numpy as np
-
-        if seed is not None:
-            np.random.seed(seed)
         n_steps = max(int(n_steps), 1)
         n_paths = max(int(n_paths), 1)
-        dt = 1.0 / n_steps
-        paths = np.empty((n_paths, n_steps + 1), dtype=float)
-        paths[:, 0] = 1.0
+        if dt is None:
+            dt = 1.0 / float(n_steps)
+        rng = random.Random(seed) if seed is not None else random
+        # paths[i][t]
+        paths = [[0.0] * (n_steps + 1) for _ in range(n_paths)]
+        for i in range(n_paths):
+            paths[i][0] = 1.0
+        drift_term = drift - 0.5 * vol * vol
+        sqrt_dt = math.sqrt(dt)
         for t in range(1, n_steps + 1):
-            z = np.random.normal(0.0, 1.0, size=n_paths)
-            paths[:, t] = paths[:, t - 1] * np.exp(
-                (drift - 0.5 * vol * vol) * dt + vol * math.sqrt(dt) * z
-            )
+            for i in range(n_paths):
+                z = rng.gauss(0.0, 1.0)
+                paths[i][t] = paths[i][t - 1] * math.exp(drift_term * dt + vol * sqrt_dt * z)
         return paths
 
-    def _write_dummy_png(path: str, text: str):
+    def _write_dummy_png(path: str, text: str) -> str:
         try:
-            import matplotlib.pyplot as plt
+            import matplotlib.pyplot as plt  # optional
 
             fig = plt.figure()
             plt.text(0.5, 0.5, text, ha="center", va="center")
@@ -37,185 +45,139 @@ except Exception:
             fig.savefig(path, dpi=150, bbox_inches="tight")
             plt.close(fig)
         except Exception:
-            # Fallback to a small text file if matplotlib isn't available
+            # Fallback to a small text file if matplotlib is not available
             with open(path, "w", encoding="utf-8") as f:
                 f.write(text + "\n")
+        return path
 
-    def plot_paths(paths, outdir: str):
+    def plot_paths(paths, outdir: str) -> str:
         os.makedirs(outdir, exist_ok=True)
-        p = os.path.join(outdir, "paths_ci.png")
-        _write_dummy_png(p, "paths (CI shim)")
-        return p
+        p = os.path.join(outdir, "sweep_paths-PLACEHOLDER.png")
+        return _write_dummy_png(p, "paths (CI shim)")
 
-    def plot_hist(paths, outdir: str):
+    def plot_hist(paths, outdir: str) -> str:
         os.makedirs(outdir, exist_ok=True)
-        p = os.path.join(outdir, "hist_ci.png")
-        _write_dummy_png(p, "hist (CI shim)")
-        return p
-
-
+        p = os.path.join(outdir, "sweep_hist-PLACEHOLDER.png")
+        return _write_dummy_png(p, "hist (CI shim)")
 # --- end shim ---
+
 import argparse
+import contextlib
 import json
 import os
 import sys
 
 # Force a headless-safe backend before any pyplot import.
-try:
+with contextlib.suppress(Exception):
     import matplotlib  # type: ignore
 
     matplotlib.use("Agg")
-except Exception:
-    pass
-
-# Local sim/plot helpers (self-contained, no legacy amm dep)
 
 
 def _print(obj) -> None:
     sys.stdout.write(json.dumps(obj))
-    sys.stdout.write("\n")
-    sys.stdout.flush()
-
-
-def cmd_quote(args: argparse.Namespace) -> None:
-    col_in = float(getattr(args, "col_in", 8000.0))
-    min_out_bps = float(getattr(args, "min_out_bps", 150.0))
-    twap_guard = bool(getattr(args, "twap_guard", True))
-
-    haircut = min_out_bps / 10_000.0
-    eff = 1.0 - haircut
-    copx_out = col_in * eff
-
-    out = {
-        "col_in": col_in,
-        "min_out_bps": min_out_bps,
-        "min_out": copx_out,
-        "copx_out": copx_out,
-        "eff_copx_per_col": eff,
-        "twap_guard": twap_guard,
-        "raw": {
-            "note": "smoke-quote",
-            "inputs": {"col_in": col_in, "min_out_bps": min_out_bps, "twap_guard": twap_guard},
-            "calc": {"haircut": haircut},
-        },
-    }
-    _print(out)
-
-
-def cmd_sweep(args: argparse.Namespace) -> None:
-    # All plotting happens headless
-    backend = None
-    try:
-        import matplotlib  # type: ignore
-
-        backend = getattr(matplotlib, "get_backend", lambda: None)()
-    except Exception:
-        backend = "unknown"
-
-    outdir = os.fspath(getattr(args, "outdir", "charts"))
-    os.makedirs(outdir, exist_ok=True)
-
-    # Accept both --n-steps and --steps (alias)
-    n_steps = int(getattr(args, "n_steps", 240))
-    n_paths = int(getattr(args, "n_paths", 200))
-    dt = float(getattr(args, "dt", 1.0 / 240.0))
-    mu = float(getattr(args, "mu", 0.0))
-    sigma = float(getattr(args, "sigma", 0.2))
-    s0 = float(getattr(args, "s0", 1.0))
-    seed = getattr(args, "seed", None)
-    seed_i = int(seed) if seed is not None else None
-
-    charts: list[str] = []
-    try:
-        paths = simulate_gbm_paths(
-            n_steps=n_steps,
-            n_paths=n_paths,
-            dt=dt,
-            mu=mu,
-            sigma=sigma,
-            s0=s0,
-            seed=seed_i,
-        )
-        p1 = plot_paths(paths, outdir)
-        charts.append(os.fspath(p1))
-        p2 = plot_hist(paths, outdir)
-        charts.append(os.fspath(p2))
-        _print({"charts": charts})
-    except Exception as e:
-        # One JSON line only (tests expect a single JSON blob).
-        # Optionally raise when debugging.
-        if bool(getattr(args, "debug", False)) or os.environ.get("COLINK_DEBUG"):
-            raise
-        # Emit placeholders so downstream callers see something in "charts".
-        try:
-            ph1 = os.path.join(outdir, "sweep_paths-PLACEHOLDER.png")
-            open(ph1, "wb").close()
-            charts.append(os.fspath(ph1))
-        except Exception:
-            pass
-        try:
-            ph2 = os.path.join(outdir, "sweep_hist-PLACEHOLDER.png")
-            open(ph2, "wb").close()
-            charts.append(os.fspath(ph2))
-        except Exception:
-            pass
-        _print(
-            {
-                "error": {"type": e.__class__.__name__, "msg": str(e), "backend": backend},
-                "charts": charts,
-            }
-        )
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="colink-json", description="COLINK sim JSON CLI")
-    parser.add_argument("--version", action="store_true", help="print version and exit")
+    p = argparse.ArgumentParser(
+        prog="colink-json",
+        description="COLINK sim JSON CLI",
+    )
+    p.add_argument("--version", action="version", version="0.1.0", help="print version and exit")
 
-    sub = parser.add_subparsers(dest="cmd", required=False)
+    sub = p.add_subparsers(dest="cmd", required=True)
 
+    # quote
     p_quote = sub.add_parser("quote", help="quote calculation -> JSON")
     p_quote.add_argument("--col-in", type=float, required=True)
     p_quote.add_argument("--min-out-bps", type=float, required=True)
     p_quote.add_argument("--twap-guard", action="store_true", default=False)
     p_quote.set_defaults(func=cmd_quote)
 
+    # sweep
     p_sweep = sub.add_parser(
         "sweep",
-        help="generate sweep charts ™š¬Å¡š¬Å¡¬Å¾ JSON list of files",
+        help="generate sweep charts -> JSON list of files",
     )
     p_sweep.add_argument("--outdir", type=str, default="charts")
     p_sweep.add_argument("--n-paths", type=int, default=200, dest="n_paths")
-    p_sweep.add_argument("--n-steps", type=int, default=240, dest="n_steps")
-    p_sweep.add_argument("--steps", type=int, dest="n_steps", help="alias for --n-steps")
-    p_sweep.add_argument("--dt", type=float, default=1.0 / 240.0)
-    p_sweep.add_argument("--mu", type=float, default=0.0)
-    p_sweep.add_argument("--sigma", type=float, default=0.2)
-    p_sweep.add_argument("--s0", type=float, default=1.0)
-    p_sweep.add_argument("--seed", type=int)
-    p_sweep.add_argument("--debug", action="store_true", help="raise on error")
+    p_sweep.add_argument("--n-steps", type=int, default=252, dest="n_steps")
+    p_sweep.add_argument("--drift", type=float, default=0.0)
+    p_sweep.add_argument("--vol", type=float, default=0.2)
+    p_sweep.add_argument("--seed", type=int, default=None)
     p_sweep.set_defaults(func=cmd_sweep)
 
-    return parser
+    return p
+
+
+def cmd_quote(ns: argparse.Namespace) -> int:
+    col_in = float(ns.col_in)
+    bps = float(ns.min_out_bps)
+    haircut = bps / 10_000.0
+    min_out = max(col_in * (1.0 - haircut), 0.0)
+    result = {
+        "col_in": col_in,
+        "min_out_bps": bps,
+        "min_out": round(min_out, 6),
+        "copx_out": round(min_out, 6),
+        "eff_copx_per_col": round(min_out / col_in if col_in else 0.0, 6),
+        "twap_guard": bool(getattr(ns, "twap_guard", False)),
+        "raw": {
+            "note": "smoke-quote",
+            "inputs": {
+                "col_in": col_in,
+                "min_out_bps": bps,
+                "twap_guard": bool(getattr(ns, "twap_guard", False)),
+            },
+            "calc": {"haircut": haircut},
+        },
+    }
+    _print(result)
+    return 0
+
+
+def cmd_sweep(ns: argparse.Namespace) -> int:
+    outdir = os.fspath(ns.outdir)
+    n_paths = int(ns.n_paths)
+    n_steps = int(ns.n_steps)
+    drift = float(ns.drift)
+    vol = float(ns.vol)
+    seed = int(ns.seed) if ns.seed is not None else None
+
+    dt = 1.0 / float(max(n_steps, 1))
+    paths = simulate_gbm_paths(
+        n_steps=n_steps,
+        n_paths=n_paths,
+        drift=drift,
+        vol=vol,
+        seed=seed,
+        dt=dt,
+    )
+    try:
+        p1 = plot_paths(paths, outdir)
+        p2 = plot_hist(paths, outdir)
+        _print({"charts": [p1, p2]})
+        return 0
+    except Exception as e:
+        with contextlib.suppress(Exception):
+            os.makedirs(outdir, exist_ok=True)
+        charts = [
+            os.path.join(outdir, "sweep_paths-PLACEHOLDER.png"),
+            os.path.join(outdir, "sweep_hist-PLACEHOLDER.png"),
+        ]
+        _print(
+            {
+                "error": {"type": type(e).__name__, "msg": str(e), "backend": "unknown"},
+                "charts": charts,
+            }
+        )
+        return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    if getattr(args, "version", False):
-        try:
-            import importlib.metadata as md  # py3.8+
-
-            print(md.version("colink-core"))
-        except Exception:
-            print("0.0.0")
-        return 0
-
-    if not getattr(args, "cmd", None):
-        parser.print_help()
-        return 2
-
-    args.func(args)
-    return 0
+    p = build_parser()
+    ns = p.parse_args(argv)
+    return ns.func(ns)
 
 
 if __name__ == "__main__":
