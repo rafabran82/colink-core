@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload headless artifacts (best effort)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: headless-artifacts-${{ matrix.os }}
           path: |
