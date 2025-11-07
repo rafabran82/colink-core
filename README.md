@@ -1,4 +1,5 @@
-﻿# colink-core
+﻿[![Sim Smoke](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml)
+# colink-core
 
 Core components and simulation CLI for COLINK.
 
@@ -104,3 +105,4 @@ python -m colink_core.sim.run_sweep `
   --out .sim_smoke/metrics_only.json `
   --metrics-only `
   --display Agg --no-show
+
