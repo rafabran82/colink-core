@@ -108,3 +108,5 @@ python -m colink_core.sim.run_sweep `
 
 
 Test pre-commit CI badge seed
+
+![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)
