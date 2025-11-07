@@ -1,9 +1,9 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $badBom = @()
 $badCrlf = @()
 
-Get-ChildItem .github/workflows -File -Include *.yml,*.yaml -Recurse | ForEach-Object {
+Get-ChildItem . -File -Include *.yml,*.yaml -Recurse | ForEach-Object {
   $p = $_.FullName
 
   # --- BOM check (239 187 191) ---
