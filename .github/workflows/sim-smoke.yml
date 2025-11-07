@@ -1,4 +1,4 @@
-﻿name: sim-smoke
+﻿name: Sim Smoke
 
 on:
   workflow_dispatch:
@@ -7,3 +7,53 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: smoke (${{ matrix.os }}, ${{ matrix.pair }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        pair: [XRP-COL, COPX-COL]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-smoke-mpl
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install NumPy and Matplotlib
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy==2.3.*" "matplotlib==3.10.*"
+
+      - name: Run smoke
+        shell: pwsh
+        env:
+          # On Ubuntu, actions/setup-python exposes pythonLocation; use that bin/python3.
+          # On Windows, just let it be "python".
+          PYTHON_EXE: ${{ runner.os == 'Windows' && 'python' || format('{0}/bin/python3', env.pythonLocation) }}
+        run: |
+          ./tools/verify-sim.ps1 -RunSim -Which headless-agg -Pairs "${{ matrix.pair - replace('-', '/') }}"
+
+      - name: Upload smoke artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sim-smoke-${{ matrix.os }}-${{ matrix.pair }}
+          path: artifacts/**
+          if-no-files-found: error
