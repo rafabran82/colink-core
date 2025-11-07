@@ -18,3 +18,9 @@ repos:
         language: system
         pass_filenames: false
         files: ^\.github/workflows/.*\.(yml|yaml)$
+
+      - id: block-adding-venv
+        name: Prevent committing .venv
+        entry: pwsh -NoProfile -ExecutionPolicy Bypass -File tools/block-venv.ps1
+        language: system
+        pass_filenames: false
