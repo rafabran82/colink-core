@@ -1,9 +1,14 @@
-﻿*          text=auto
-*.py       text eol=lf
-*.toml     text eol=lf
-*.yml      text eol=lf
-*.yaml     text eol=lf
-*.md       text eol=lf
-# Enforce LF in CI/workflows and tools to avoid CRLF drift
-.github/workflows/*  text eol=lf
-tools/*.ps1          text eol=lf
+﻿# Normalize text by default (uses .gitattributes eol rules below)
+*           text=auto
+
+# Python: force LF to avoid CRLF/indent issues
+*.py        text eol=lf
+
+# Keep images/binaries untouched
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.pdf       binary
+*.zip       binary
+*.7z        binary
