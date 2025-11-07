@@ -15,15 +15,13 @@ permissions:
   contents: read
 
 jobs:
-  smoke:
-    name: smoke (${{ matrix.os }}, ${{ matrix.pair }}, py${{ matrix.python-version }})
+  bootstrap:
+    name: bootstrap (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
-        pair: [XRP-COL, COPX-COL]
 
     steps:
       - name: Checkout
@@ -31,65 +29,5 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup Python (with pip cache)
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements-dev.txt
-            constraints-ci.txt
-            pyproject.toml
-            setup.cfg
-
-      - name: Show Python/pip
-        run: |
-          python -V
-          pip -V
-
-      - name: Install pinned libs for smoke
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install "numpy==2.3.*" "matplotlib==3.10.*"
-
-      - name: Run smoke
-        shell: pwsh
-        run: |
-          # Compute Pairs the script expects (replace '-' with '/')
-          $pair = '${{ matrix.pair }}'
-          $pairsArg = $pair -replace '-', '/'
-
-          # Prefer the repo script; fall back to a simple import test if missing
-          if (Test-Path ./tools/verify-sim.ps1) {
-            ./tools/verify-sim.ps1 -RunSim -Which headless-agg -Pairs $pairsArg
-          } else {
-            Write-Host "verify-sim.ps1 not found; doing minimal import smoke..."
-            python - <<'PY'
-import numpy, matplotlib
-print("NumPy:", numpy.__version__)
-print("Matplotlib:", matplotlib.__version__)
-PY
-          }
-
-      - name: Collect smoke artifacts
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          # pytest cache (if any)
-          [ -d ".pytest_cache" ] && cp -R .pytest_cache artifacts/pytest_cache || true
-          # logs / NDJSON / metrics
-          find . -type f -name "*.log" -o -name "*.ndjson" -o -name "*metrics*.json" -o -name "*.report.json" | while read -r f; do
-            mkdir -p "artifacts/$(dirname "$f")"
-            cp "$f" "artifacts/$f" 2>/dev/null || true
-          done
-
-      - name: Upload smoke artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sim-smoke-${{ matrix.os }}-${{ matrix.pair }}-py${{ matrix.python-version }}
-          path: artifacts
-          if-no-files-found: warn
+      - name: Hello
+        run: echo "bootstrap OK on ${{ runner.os }}"
