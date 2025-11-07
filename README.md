@@ -106,3 +106,5 @@ python -m colink_core.sim.run_sweep `
   --metrics-only `
   --display Agg --no-show
 
+
+Test pre-commit CI badge seed
