@@ -1,0 +1,32 @@
+name: Windows Smoke (json_cli)
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Windows / Python 3.12
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Show versions
+        shell: pwsh
+        run: |
+          python --version
+          git --version
+
+      - name: Run json_cli smoke
+        shell: pwsh
+        run: |
+          ./tools/smoke_json_cli.ps1

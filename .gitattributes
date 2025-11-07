@@ -1,14 +1,11 @@
-﻿# Normalize text by default
-*           text=auto
-
-# Python: force LF (prevents CRLF/indent gremlins)
-*.py        text eol=lf
-
-# Binary assets (never normalize)
-*.png       binary
-*.jpg       binary
-*.jpeg      binary
-*.gif       binary
-*.pdf       binary
-*.zip       binary
-*.7z        binary
+﻿*       text=auto
+*.py    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.pdf   binary
+*.zip   binary
+*.7z    binary

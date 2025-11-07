@@ -1,14 +1,10 @@
-name: AWS Terraform — Plan Only
+name: AWS Terraform â€” Plan Only
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  id-token: write     # for OIDC → AWS
+  workflow_dispatch:permissions:
+  id-token: write     # for OIDC â†’ AWS
   contents: read
 
 jobs:
@@ -18,7 +14,7 @@ jobs:
       run:
         working-directory: infra/aws/env/dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
