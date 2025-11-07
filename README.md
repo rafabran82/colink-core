@@ -1,4 +1,6 @@
-﻿[![Sim Smoke](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml)
+﻿[![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)
+
+[![Sim Smoke](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml)
 # colink-core
 
 Core components and simulation CLI for COLINK.
@@ -110,3 +112,4 @@ python -m colink_core.sim.run_sweep `
 Test pre-commit CI badge seed
 
 ![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)
+
