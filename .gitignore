@@ -18,3 +18,7 @@ artifacts/
 job_*.zip
 job_*.txt
 logs_job_*.txt
+# CI smoke artifacts (local)
+artifacts-*-zip/
+artifacts-*-ALL.zip
+artifacts-*/
