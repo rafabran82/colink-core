@@ -22,3 +22,21 @@ logs_job_*.txt
 artifacts-*-zip/
 artifacts-*-ALL.zip
 artifacts-*/
+
+# >>> CI/Sim artifacts (auto) >>>
+# Generated / transient
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.bak
+*.bak-*
+.sim_smoke/
+sim_results/
+charts/
+agg.png
+ci-logs-*/
+artifacts-*-zip/
+artifacts-*-ALL.zip
+artifacts-*/
+# <<< CI/Sim artifacts (auto) <<<
+
