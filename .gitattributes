@@ -1,10 +1,10 @@
-﻿# Normalize text by default (uses .gitattributes eol rules below)
+﻿# Normalize text by default
 *           text=auto
 
-# Python: force LF to avoid CRLF/indent issues
+# Python: force LF (prevents CRLF/indent gremlins)
 *.py        text eol=lf
 
-# Keep images/binaries untouched
+# Binary assets (never normalize)
 *.png       binary
 *.jpg       binary
 *.jpeg      binary
