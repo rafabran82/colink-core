@@ -13,3 +13,8 @@ infra/aws/env/**/tfplan
 # OS/editor
 .DS_Store
 Thumbs.db
+# Local CI artifacts & logs
+artifacts/
+job_*.zip
+job_*.txt
+logs_job_*.txt
