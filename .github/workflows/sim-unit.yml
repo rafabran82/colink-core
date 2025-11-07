@@ -1,4 +1,4 @@
-﻿name: Sim Unit (Headless)
+name: Sim Unit (Headless)
 
 on:
   pull_request:
