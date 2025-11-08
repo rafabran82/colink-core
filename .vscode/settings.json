@@ -1,11 +1,4 @@
-{
-  "files.encoding": "utf8",
-  "files.autoGuessEncoding": false,
+﻿{
   "files.eol": "\n",
-  "files.insertFinalNewline": true,
-  "files.autoSave": "off",
-  "editor.formatOnSave": false,
-  "[yaml]": {
-    "editor.formatOnSave": false
-  }
+  "[powershell]": { "files.eol": "\r\n" }
 }
