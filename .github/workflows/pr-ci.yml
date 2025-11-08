@@ -11,9 +11,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        py: ["3.11"]
+    matrix:
+      os: [ubuntu-latest, windows-latest, macos-latest]
+      py: ["3.11"]
 
     env:
       PYTHONDONTWRITEBYTECODE: "1"
@@ -49,6 +49,10 @@ jobs:
             --demo \
             --display "${BACKEND}" \
             --out-prefix "${OUT_PREFIX}"
+
+      - name: Wrap sim JSONs into metrics.json
+        run: |
+          python tools/metrics_wrap.py --artifacts ./.artifacts
 
       - name: Enrich metrics with OS/SHA/Backend
         run: |

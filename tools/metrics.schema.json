@@ -16,8 +16,8 @@
       "additionalProperties": true,
       "required": ["success_rate", "p95_latency_ms"],
       "properties": {
-        "success_rate": { "type": "number" },
-        "p95_latency_ms": { "type": "number" },
+        "success_rate": { "type": ["number","null"] },
+        "p95_latency_ms": { "type": ["number","null"] },
         "orders_total": { "type": "number" },
         "trades_total": { "type": "number" },
         "volume_quote": { "type": "number" },
@@ -28,3 +28,4 @@
     }
   }
 }
+
