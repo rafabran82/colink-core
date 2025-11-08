@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
-# Compatibility runner to satisfy legacy tests and headless smoke usage.
-# Accepts old flags, emits JSON with expected header, and writes simple plots.
+# Compatibility runner to satisfy legacy tests and headless usage.
+# Accepts old flags, emits JSON with expected header/shape, and writes simple plots.
 
 import argparse, json, os, pathlib, sys, random, datetime as dt
 
@@ -12,20 +12,25 @@ except Exception:
     plt = None
 
 def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str):
+    # tests expect: schema_version, pairs as list, and a summary dict
     doc = {
         "schema_version": "colink.sim.v1",
         "ok": True,
         "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
         "seed": seed,
         "steps": steps,
-        "pairs": pair,
+        "pairs": [pair],                 # <-- list, not string
         "display": display,
+        "summary": {                     # <-- minimal summary object
+            "events": steps,
+            "notes": "compat shim",
+        },
     }
     path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
-        path.write_bytes(b"")  # placeholder when matplotlib is unavailable
+        path.write_bytes(b"")  # placeholder when matplotlib unavailable
         return
     xs = list(range(10))
     ys = [random.random() for _ in xs]
@@ -44,7 +49,7 @@ def main(argv=None):
     ap.add_argument("--params", default=None, help="(ignored) JSON params")
     ap.add_argument("--demo", action="store_true", help="(ignored) demo mode")
 
-    # legacy/test flags we accept (some are no-ops here)
+    # legacy/test flags we accept (no-ops here, but parsed)
     ap.add_argument("--steps", type=int, default=10)
     ap.add_argument("--pairs", type=str, default="XRP/COL")
     ap.add_argument("--seed", type=int, default=123)
@@ -54,20 +59,20 @@ def main(argv=None):
     ap.add_argument("--slippage", type=str, default=None)
     ap.add_argument("--spread", type=str, default=None)
     ap.add_argument("--no-show", action="store_true")
-    ap.add_argument("--metrics-only", action="store_true")  # tolerated, no-op
+    ap.add_argument("--metrics-only", action="store_true")  # tolerated, still writes JSON
 
     args = ap.parse_args(argv)
 
-    # Ensure dirs exist
+    # Ensure parent dirs exist for outputs
     for maybe in [args.out, args.plot, args.slippage, args.spread]:
         if maybe:
             pathlib.Path(maybe).parent.mkdir(parents=True, exist_ok=True)
 
-    # JSON output
+    # Always write JSON when --out is provided (tests rely on this)
     if args.out:
         write_json(pathlib.Path(args.out), args.seed, args.steps, args.pairs, args.display)
 
-    # Plots if requested
+    # Write plots if requested
     if args.plot:
         write_png(pathlib.Path(args.plot), f"plot {args.pairs}")
     if args.slippage:
