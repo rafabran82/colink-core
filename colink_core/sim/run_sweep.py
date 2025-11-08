@@ -11,18 +11,24 @@ try:
 except Exception:
     plt = None
 
-def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str):
-    # tests expect: schema_version, pairs as list, and a summary dict
+def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str,
+               trades_csv: str | None, volatility_csv: str | None):
+    # tests expect: schema_version, pairs as list, generated_at (Z), inputs{}, summary{}
     doc = {
         "schema_version": "colink.sim.v1",
         "ok": True,
-        "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),   # full ISO with offset
+        "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "seed": seed,
         "steps": steps,
-        "pairs": [pair],                 # <-- list, not string
+        "pairs": [pair],
         "display": display,
-        "summary": {                     # <-- minimal summary object
-            "events": steps,
+        "inputs": {
+            "trades_csv": trades_csv,
+            "volatility_csv": volatility_csv,
+        },
+        "summary": {
+            "count_points": steps,
             "notes": "compat shim",
         },
     }
@@ -63,14 +69,22 @@ def main(argv=None):
 
     args = ap.parse_args(argv)
 
-    # Ensure parent dirs exist for outputs
+    # Ensure parent dirs exist
     for maybe in [args.out, args.plot, args.slippage, args.spread]:
         if maybe:
             pathlib.Path(maybe).parent.mkdir(parents=True, exist_ok=True)
 
     # Always write JSON when --out is provided (tests rely on this)
     if args.out:
-        write_json(pathlib.Path(args.out), args.seed, args.steps, args.pairs, args.display)
+        write_json(
+            path=pathlib.Path(args.out),
+            seed=args.seed,
+            steps=args.steps,
+            pair=args.pairs,
+            display=args.display,
+            trades_csv=args.trades,
+            volatility_csv=args.volatility,
+        )
 
     # Write plots if requested
     if args.plot:
