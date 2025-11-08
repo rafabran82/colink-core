@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
-# Minimal compatibility runner to satisfy legacy tests and headless smoke usage.
-# It accepts various flags and produces the requested files without failing.
+# Compatibility runner to satisfy legacy tests and headless smoke usage.
+# Accepts old flags, emits JSON with expected header, and writes simple plots.
 
 import argparse, json, os, pathlib, sys, random, datetime as dt
 
@@ -13,6 +13,7 @@ except Exception:
 
 def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str):
     doc = {
+        "schema_version": "colink.sim.v1",
         "ok": True,
         "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
         "seed": seed,
@@ -24,7 +25,7 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
-        path.write_bytes(b"")  # placeholder if matplotlib unavailable
+        path.write_bytes(b"")  # placeholder when matplotlib is unavailable
         return
     xs = list(range(10))
     ys = [random.random() for _ in xs]
@@ -43,7 +44,7 @@ def main(argv=None):
     ap.add_argument("--params", default=None, help="(ignored) JSON params")
     ap.add_argument("--demo", action="store_true", help="(ignored) demo mode")
 
-    # legacy/test flags we accept and ignore/consume
+    # legacy/test flags we accept (some are no-ops here)
     ap.add_argument("--steps", type=int, default=10)
     ap.add_argument("--pairs", type=str, default="XRP/COL")
     ap.add_argument("--seed", type=int, default=123)
@@ -53,19 +54,20 @@ def main(argv=None):
     ap.add_argument("--slippage", type=str, default=None)
     ap.add_argument("--spread", type=str, default=None)
     ap.add_argument("--no-show", action="store_true")
+    ap.add_argument("--metrics-only", action="store_true")  # tolerated, no-op
 
     args = ap.parse_args(argv)
 
-    # Ensure parent directories exist for outputs
+    # Ensure dirs exist
     for maybe in [args.out, args.plot, args.slippage, args.spread]:
         if maybe:
             pathlib.Path(maybe).parent.mkdir(parents=True, exist_ok=True)
 
-    # Write JSON if requested
+    # JSON output
     if args.out:
         write_json(pathlib.Path(args.out), args.seed, args.steps, args.pairs, args.display)
 
-    # Write plots if requested
+    # Plots if requested
     if args.plot:
         write_png(pathlib.Path(args.plot), f"plot {args.pairs}")
     if args.slippage:
