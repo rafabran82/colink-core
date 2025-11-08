@@ -6,79 +6,52 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
-concurrency:
-  group: pr-ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-test:
-    name: Build & Test (Windows self-hosted)
-    runs-on: [self-hosted, windows, sim]
-    timeout-minutes: 45
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.10', '3.11']
+    # If you later want your own runner, replace with:
+    #   runs-on: [self-hosted, Windows]
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show runner context
-        shell: pwsh
-        run: |
-          Write-Host "Runner: $env:RUNNER_NAME"
-          Write-Host "OS: $env:RUNNER_OS $env:ImageOS"
-          Write-Host "Labels: $env:RUNNER_LABELS"
-
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: 'x64'
+          python-version: "3.11"
 
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.python-version }}-pip-
             ${{ runner.os }}-pip-
 
-      - name: Install deps (if requirements.txt exists)
+      - name: Install deps
         shell: pwsh
         run: |
-          if (Test-Path requirements.txt) {
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-          } else {
-            Write-Host "No requirements.txt found; installing test deps only"
-            python -m pip install --upgrade pip
-            pip install pytest coverage
-          }
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-      - name: Run tests with coverage
+      - name: Run tests (quiet)
         shell: pwsh
-        run: |
-          if (-not (Get-Command pytest -ErrorAction SilentlyContinue)) { pip install pytest }
-          if (-not (Get-Command coverage -ErrorAction SilentlyContinue)) { pip install coverage }
-          coverage run -m pytest -q
-          coverage xml -o coverage.xml
-          coverage report -m
+        run: pytest -q
 
-      - name: Upload artifacts (always)
-        if: always()
+      # Produce a deterministic headless plot with Agg and upload it so we can verify.
+      - name: Ensure artifacts dir
+        shell: pwsh
+        run: New-Item -ItemType Directory -Path .artifacts -Force | Out-Null
+
+      - name: Generate demo plot (Agg)
+        shell: pwsh
+        run: python -m colink_core.sim.run_sweep --demo --display Agg --out .artifacts/ci_demo.png
+
+      - name: Upload plot artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pr-ci-${{ matrix.python-version }}
-          path: |
-            .pytest_cache/**
-            coverage.xml
-            **/pytest*.xml
-            logs/**
-          if-no-files-found: warn
+          name: sim-plot
+          path: .artifacts/ci_demo.png
+          if-no-files-found: error
