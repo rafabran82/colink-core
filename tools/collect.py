@@ -5,18 +5,28 @@ import pandas as pd
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_ARTIFACTS = ROOT / ".artifacts"
 
-def read_ndjson_count(p: pathlib.Path) -> int:
-    try:
-        with p.open("r", encoding="utf-8") as f:
-            return sum(1 for _ in f)
-    except FileNotFoundError:
-        return 0
+def read_ndjson_count(dirpath: pathlib.Path) -> int:
+    # Count first *.ndjson in same dir (if any)
+    for nd in sorted(dirpath.glob("*.ndjson")):
+        try:
+            with nd.open("r", encoding="utf-8") as f:
+                return sum(1 for _ in f)
+        except FileNotFoundError:
+            pass
+    return 0
 
 def coalesce(*vals):
     for v in vals:
         if v not in (None, "", []):
             return v
     return None
+
+def is_metrics_json(p: pathlib.Path):
+    try:
+        data = json.loads(p.read_text(encoding="utf-8-sig"))
+        return isinstance(data, dict) and isinstance(data.get("metrics"), dict)
+    except Exception:
+        return False
 
 def main():
     ap = argparse.ArgumentParser()
@@ -33,17 +43,17 @@ def main():
         print(f"No artifacts dir: {artifacts}", file=sys.stderr)
         sys.exit(2)
 
+    metrics_files = [p for p in artifacts.rglob("*.json") if is_metrics_json(p)]
+    if not metrics_files:
+        print("No metrics JSONs found to collect.", file=sys.stderr)
+        sys.exit(3)
+
     rows = []
-    metrics_files = sorted(artifacts.rglob("*.metrics.json"))
+    for mfile in sorted(metrics_files):
+        data = json.loads(mfile.read_text(encoding="utf-8-sig"))
+        nd_count = read_ndjson_count(mfile.parent)
 
-    for mfile in metrics_files:
-        data = json.loads(mfile.read_text(encoding="utf-8"))
-
-        stem = mfile.name[:-len(".metrics.json")]
-        ndjson = list(mfile.parent.glob(f"{stem}.events.ndjson"))
-        nd_count = read_ndjson_count(ndjson[0]) if ndjson else 0
-
-        run_id   = coalesce(data.get("run_id"), stem)
+        run_id   = coalesce(data.get("run_id"), mfile.stem)
         backend  = coalesce(args.backend, data.get("backend"))
         osname   = coalesce(args.osname, data.get("os"))
         sha      = coalesce(args.sha, data.get("sha"))
@@ -65,10 +75,6 @@ def main():
             "pnl": metrics.get("pnl"),
         }
         rows.append(row)
-
-    if not rows:
-        print("No metrics files found to collect.", file=sys.stderr)
-        sys.exit(3)
 
     df = pd.DataFrame(rows)
     key_cols = ["run_id", "timestamp", "backend", "os", "sha", "events_count"]
