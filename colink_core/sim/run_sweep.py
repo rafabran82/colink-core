@@ -2,6 +2,11 @@
 # Compatibility runner to satisfy legacy tests and headless usage.
 
 import argparse, json, os, pathlib, sys, random, datetime as dt, math
+
+# case-insensitive backend normalizer
+BACKENDS = {'agg':'Agg','tkagg':'TkAgg','qt5agg':'Qt5Agg','qtagg':'QtAgg','macosx':'MacOSX'}
+def _norm_backend(s: str) -> str:
+    return BACKENDS.get(s.lower(), s)
 from typing import Optional
 
 try:
@@ -121,5 +126,6 @@ def main(argv=None):
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
