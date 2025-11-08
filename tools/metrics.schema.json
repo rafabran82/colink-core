@@ -18,14 +18,15 @@
       "properties": {
         "success_rate": { "type": ["number","null"] },
         "p95_latency_ms": { "type": ["number","null"] },
-        "orders_total": { "type": "number" },
-        "trades_total": { "type": "number" },
-        "volume_quote": { "type": "number" },
-        "pnl": { "type": "number" },
+        "orders_total": { "type": ["number","null"] },
+        "trades_total": { "type": ["number","null"] },
+        "volume_quote": { "type": ["number","null"] },
+        "pnl": { "type": ["number","null"] },
         "errors": { "type": "array", "items": { "type": "string" } },
         "durations": { "type": "object", "additionalProperties": true }
       }
     }
   }
 }
+
 
