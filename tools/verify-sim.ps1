@@ -169,3 +169,14 @@ foreach ($p in $pairs.Split(',')) {
   if ($LASTEXITCODE -ne 0) { throw "plot_smoke failed for $p" }
 }
 # ============================================================================
+# ---- NDJSON presence check (CI guard) ---------------------------------------
+$nd = Get-ChildItem -Recurse -File -Path "out/smoke" -Include *.ndjson -ErrorAction SilentlyContinue
+if (-not $nd) {
+  Write-Error "No NDJSON produced under out/smoke; failing smoke."
+  exit 1
+}
+$empty = $nd | Where-Object { (Get-Item $_.FullName).Length -lt 10 }
+if ($empty) {
+  Write-Error ("NDJSON exists but appears empty: " + ($empty.FullName -join ", "))
+  exit 1
+}
