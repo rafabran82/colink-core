@@ -44,6 +44,14 @@ jobs:
   shell: pwsh
   run: black --check .
 
+- name: Lint (ruff)
+  shell: pwsh
+  run: ruff check .
+
+- name: Format check (black)
+  shell: pwsh
+  run: black --check .
+
 - name: Run tests (quiet)
         shell: pwsh
         run: pytest -q
@@ -64,5 +72,6 @@ with:
   path: .artifacts/ci_demo.png
   if-no-files-found: error
   retention-days: 14
+
 
 
