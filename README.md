@@ -134,4 +134,18 @@ rnrnrn<!-- SIM QUICKSTART BEGIN -->
 Headless demo (produces PNG + NDJSON + JSON metrics):
 
 ```bash
-python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demorn
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demornrnrn<!-- BRIDGE QUICKSTART BEGIN -->
+### Bridge (Phase 4) quickstart
+
+Emit two-hop CP-AMM bridge artifacts (events NDJSON + metrics JSON):
+
+```bash
+python -m colink_core.bridge.run \
+  --amount 1500 \
+  --pairA COL/COPX \
+  --pairM COPX/XRP \
+  --out-prefix ./.artifacts/bridge_demo \
+  --backend Agg \
+  --sha $(git rev-parse HEAD)
+<!-- BRIDGE QUICKSTART END -->
+
