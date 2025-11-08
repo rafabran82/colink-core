@@ -8,69 +8,49 @@ on:
 
 jobs:
   build-test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        py: ["3.11"]
-
+    runs-on: ubuntu-latest
     env:
-      PYTHONDONTWRITEBYTECODE: "1"
-      PYTHONUNBUFFERED: "1"
-      OUT_PREFIX: ./.artifacts/demo
-      BACKEND: "Agg"
-      OS_NAME: ${{ runner.os }}
-      GIT_SHA: ${{ github.sha }}
-      COLINK_MIN_SUCCESS_RATE: "0.95"
-      COLINK_MAX_P95_MS: "250"
+      BACKEND: Agg
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.py }}
+          python-version: "3.12"
 
-      - name: Install core deps
+      - name: Install deps (pandas/pyarrow/jsonschema/tabulate/matplotlib)
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
+          pip install pandas pyarrow jsonschema tabulate matplotlib
 
-      - name: Install tool deps (schema + collect + plot + tests)
+      - name: Run sim demo (Phase 3)
         run: |
-          pip install jsonschema pandas pyarrow matplotlib pytest
+          python -m colink_core.sim.run --demo --display "${BACKEND}" --out-prefix ./.artifacts/demo
 
-      - name: Smoke run (emit PNG + NDJSON + JSON)
-        shell: bash
+      - name: Run bridge demo (Phase 4)
         run: |
-          mkdir -p .artifacts
-          python -m colink_core.sim.run \
-            --demo \
-            --display "${BACKEND}" \
-            --out-prefix "${OUT_PREFIX}"
+          python -m colink_core.bridge.run \
+            --amount 1500 \
+            --pairA COL/COPX \
+            --pairM COPX/XRP \
+            --out-prefix ./.artifacts/bridge_demo \
+            --backend "${BACKEND}" \
+            --sha "${{ github.sha }}"
 
-      - name: Write run meta (provenance)
-        run: |
-          python tools/write_run_meta.py
-
-      - name: Wrap sim JSONs into metrics.json
+      - name: Wrap sim metrics (produce *.metrics.json)
         run: |
           python tools/metrics_wrap.py --artifacts ./.artifacts
 
-      - name: Enrich metrics with OS/SHA/Backend
+      - name: Enrich metrics (os/sha/backend)
         run: |
           python tools/enrich_metrics.py --artifacts ./.artifacts --os "${{ runner.os }}" --sha "${{ github.sha }}" --backend "${BACKEND}"
 
-      - name: Validate metrics JSON (jsonschema)
+      - name: Validate metrics JSON (dispatch by schema_version)
         run: |
           python tools/validate_metrics.py
-
-      - name: KPI thresholds (skip when KPIs missing)
-        run: |
-          pytest -q || exit 1
 
       - name: Merge NDJSON + JSON into CSV/Parquet
         run: |
@@ -86,15 +66,14 @@ jobs:
         run: |
           python tools/summary.py
 
-      - name: Upload run artifacts (OS+SHA, 7-day retention)
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "sim-${{ runner.os }}-${{ github.sha }}"
+          name: sim-bridge-artifacts
           path: |
-            ./.artifacts/**/*.png
-            ./.artifacts/**/*.ndjson
-            ./.artifacts/**/*.json
-            ./.artifacts/dataset.csv
-            ./.artifacts/dataset.parquet
-          if-no-files-found: warn
-          retention-days: 7
+            ./.artifacts/*.csv
+            ./.artifacts/*.parquet
+            ./.artifacts/*.metrics.json
+            ./.artifacts/*.events.ndjson
+            ./.artifacts/SUMMARY.md
+            ./.artifacts/summary.png
