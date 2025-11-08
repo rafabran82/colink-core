@@ -1,36 +1,73 @@
-name: PR CI
+﻿name: PR CI
 
 on:
   pull_request:
     branches: [ main ]
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    name: Build & Test (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: ["3.11"]
+
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
 
-      - name: Install project + test deps
-        shell: bash
+      - name: Install deps
+        shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          # project (editable)
-          pip install -e .
-          # test tools
-          pip install pytest
-          # optional extras if present
-          [ -f requirements.txt ] && pip install -r requirements.txt || true
-          [ -f requirements-dev.txt ] && pip install -r requirements-dev.txt || true
+          pip install -r requirements.txt
+          # optional: if ruff/black are not in requirements, uncomment:
+          # pip install ruff black
 
-      - name: CI Smoke (imports only)
-        run: |
-          python -m pytest -q -k test_imports --maxfail=1
+      - name: Lint (ruff)
+        shell: pwsh
+        run: ruff check .
 
-      - name: Run full tests (if any)
+      - name: Format check (black)
+        shell: pwsh
+        run: black --check .
+
+      - name: Run tests (quiet)
+        shell: pwsh
+        env:
+          DISPLAY_BACKEND: Agg
         run: |
-          python -m pytest -q
+          pytest -q
+
+      - name: Produce demo artifacts
+        shell: pwsh
+        env:
+          DISPLAY_BACKEND: Agg
+        run: |
+          if (!(Test-Path .artifacts)) { New-Item -ItemType Directory -Path .artifacts | Out-Null }
+          python -m colink_core.sim.run --demo --display Agg --out-prefix .\.artifacts\ci_demo
+
+      - name: Upload artifacts (per-OS)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ github.sha }}-sim-artifacts
+          path: |
+  .artifacts/*.png
+  .artifacts/*.ndjson
+  .artifacts/*.json
+  .artifacts/*.json
+            .artifacts/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+
