@@ -128,4 +128,10 @@ Headless demo (produces PNG + NDJSON + JSON metrics):
 ```bash
 python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demo
 <!-- SIM QUICKSTART END -->
-rn
+rnrnrn<!-- SIM QUICKSTART BEGIN -->
+### Simulation quickstart
+
+Headless demo (produces PNG + NDJSON + JSON metrics):
+
+```bash
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demorn
