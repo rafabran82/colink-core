@@ -114,8 +114,10 @@ python -m colink_core.sim.run_sweep `
 
 Test pre-commit CI badge seed
 
-![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)
+![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)rnrn<!-- SIM QUICKSTART BEGIN -->
+### Simulation quickstart
 
+Headless demo (produces PNG + NDJSON + JSON metrics):
 
-
-
+```bash
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demorn
