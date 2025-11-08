@@ -6,6 +6,13 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     name: Build & Test (Windows self-hosted)
@@ -23,12 +30,48 @@ jobs:
           Write-Host "OS: $env:RUNNER_OS $env:ImageOS"
           Write-Host "Labels: $env:RUNNER_LABELS"
 
-      - name: Python smoke (optional)
-        shell: pwsh
-        run: |
-          python --version 2>$null; if ($LASTEXITCODE) { Write-Host "Python not found, skipping."; exit 0 }
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
 
-      - name: Placeholder — replace with real build/test steps
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies (if requirements.txt exists)
         shell: pwsh
         run: |
-          Write-Host "Hello from self-hosted Windows runner"
+          if (Test-Path requirements.txt) {
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+          } else {
+            Write-Host "No requirements.txt found; skipping pip install."
+          }
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          if (Get-Command pytest -ErrorAction SilentlyContinue) {
+            pytest -q
+          } else {
+            pip install pytest
+            pytest -q
+          }
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            .pytest_cache/**
+            **/pytest*.xml
+            **/coverage*.xml
+            logs/**
+          if-no-files-found: ignore
