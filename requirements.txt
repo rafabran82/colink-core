@@ -1,12 +1,11 @@
 ﻿fastapi==0.121.0
 uvicorn==0.30.6
 pydantic==2.12.4
-pydantic-core==2.23.4
+pydantic-core==2.41.5
 pydantic-settings==2.11.0
 python-dotenv==1.0.1
 httpx==0.28.1
 websockets==11.0.3
 xrpl-py==4.3.0
-
 ruff==0.6.8
 black==25.9.0
