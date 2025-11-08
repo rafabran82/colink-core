@@ -11,26 +11,25 @@ try:
 except Exception:
     plt = None
 
-def _gen_prices(steps: int, seed: int):
+def _gen_series(steps: int, seed: int):
     rnd = random.Random(seed)
     price = 1.0
     series = []
     for i in range(max(steps, 1)):
+        # deterministic price walk (seeded)
         price = max(0.001, price * (1.0 + rnd.uniform(-0.02, 0.03)))
-        # spread is seed-independent; sin(0)=0 -> 10.0 bps at t=0
+        # deterministic spread independent of seed; sin(0)=0 -> 10.0 at t=0
         spread_bps = 10.0 + 5.0 * math.sin(float(i))
-        series.append({"t": i, "price": float(price), "spread_bps": float(spread_bps)})
+        # deterministic depth (seeded), positive and stable across runs with same seed
+        depth = 1000.0 + 100.0 * rnd.uniform(-0.5, 0.5)
+        series.append({"t": i, "price": float(price), "spread_bps": float(spread_bps), "depth": float(depth)})
     return series
 
 def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str,
                trades_csv: Optional[str], volatility_csv: Optional[str]):
-    points = _gen_prices(steps, seed)
-    prices = [p["price"] for p in points]
-    spreads = [p["spread_bps"] for p in points]
-    pmin = float(min(prices)) if prices else 0.0
-    pmax = float(max(prices)) if prices else 0.0
-    smin = float(min(spreads)) if spreads else 0.0
-    smax = float(max(spreads)) if spreads else 0.0
+    pts = _gen_series(steps, seed)
+    prices = [p["price"] for p in pts]
+    spreads = [p["spread_bps"] for p in pts]
 
     doc = {
         "schema_version": "colink.sim.v1",
@@ -45,11 +44,13 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
             "trades_csv": trades_csv,
             "volatility_csv": volatility_csv,
         },
-        "points": points,
+        "points": pts,
         "summary": {
             "count_points": steps,
-            "price": {"min": pmin, "max": pmax},
-            "spread_bps": {"min": smin, "max": smax},
+            "price": {"min": float(min(prices)) if prices else 0.0,
+                      "max": float(max(prices)) if prices else 0.0},
+            "spread_bps": {"min": float(min(spreads)) if spreads else 0.0,
+                           "max": float(max(spreads)) if spreads else 0.0},
             "notes": "compat shim",
         },
     }
@@ -57,10 +58,10 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
-        path.write_bytes(b"")  # placeholder when matplotlib unavailable
+        path.write_bytes(b"")
         return
     xs = list(range(10))
-    ys = [random.random() for _ in xs]
+    ys = [math.sin(x) + 1.0 for x in xs]
     fig, ax = plt.subplots()
     ax.plot(xs, ys)
     ax.set_title(title)
@@ -86,7 +87,7 @@ def main(argv=None):
     ap.add_argument("--slippage", type=str, default=None)
     ap.add_argument("--spread", type=str, default=None)
     ap.add_argument("--no-show", action="store_true")
-    ap.add_argument("--metrics-only", action="store_true")  # tolerated
+    ap.add_argument("--metrics-only", action="store_true")  # when true, skip plots entirely
 
     args = ap.parse_args(argv)
 
@@ -95,6 +96,7 @@ def main(argv=None):
         if maybe:
             pathlib.Path(maybe).parent.mkdir(parents=True, exist_ok=True)
 
+    # Always write JSON when requested
     if args.out:
         write_json(
             path=pathlib.Path(args.out),
@@ -106,12 +108,14 @@ def main(argv=None):
             volatility_csv=args.volatility,
         )
 
-    if args.plot:
-        write_png(pathlib.Path(args.plot), f"plot {args.pairs}")
-    if args.slippage:
-        write_png(pathlib.Path(args.slippage), f"slippage {args.pairs}")
-    if args.spread:
-        write_png(pathlib.Path(args.spread), f"spread {args.pairs}")
+    # Only write plots if NOT metrics-only
+    if not args.metrics_only:
+        if args.plot:
+            write_png(pathlib.Path(args.plot), f"plot {args.pairs}")
+        if args.slippage:
+            write_png(pathlib.Path(args.slippage), f"slippage {args.pairs}")
+        if args.spread:
+            write_png(pathlib.Path(args.spread), f"spread {args.pairs}")
 
     return 0
 
