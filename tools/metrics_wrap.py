@@ -5,7 +5,6 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 ART = ROOT / ".artifacts"
 
 def try_get(d, keys):
-    # search for any key (dot-paths allowed like "stats.p95")
     for k in keys:
         cur = d
         ok = True
@@ -22,10 +21,8 @@ def try_get(d, keys):
 def coerce_number(x):
     if isinstance(x, (int, float)):
         return float(x)
-    # convert bool to number
     if isinstance(x, bool):
         return 1.0 if x else 0.0
-    # string numbers
     try:
         return float(str(x))
     except Exception:
@@ -48,18 +45,16 @@ def main():
 
     produced = 0
     for p in jsons:
-        # Skip already-conforming metrics JSON
         try:
             data = json.loads(p.read_text(encoding="utf-8-sig"))
         except Exception as e:
             print(f"[SKIP] {p}: invalid JSON: {e}")
             continue
 
+        # Already wrapped?
         if isinstance(data, dict) and isinstance(data.get("metrics"), dict):
-            # Already metrics-style, nothing to do
             continue
 
-        # Derive basic fields
         now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
         run_id = p.stem
         backend = try_get(data, ["backend", "display", "renderer"])
@@ -67,16 +62,11 @@ def main():
         sha     = try_get(data, ["sha", "git_sha", "commit"])
         ts      = try_get(data, ["timestamp", "time"]) or now_iso
 
-        # Try to map common summary fields
-        sr = try_get(data, ["success_rate", "successRate", "summary.success_rate", "ok"])
-        sr = coerce_number(sr)
-
-        p95 = try_get(data, [
+        sr = coerce_number(try_get(data, ["success_rate", "successRate", "summary.success_rate", "ok"]))
+        p95 = coerce_number(try_get(data, [
             "p95_latency_ms", "p95", "latency.p95_ms", "summary.p95_latency_ms",
             "latency_p95_ms", "metrics.p95_ms"
-        ])
-        p95 = coerce_number(p95)
-
+        ]))
         orders = coerce_number(try_get(data, ["orders_total", "orders", "summary.orders"]))
         trades = coerce_number(try_get(data, ["trades_total", "trades", "summary.trades"]))
         vol_q  = coerce_number(try_get(data, ["volume_quote", "volume", "summary.volume_quote"]))
@@ -88,9 +78,10 @@ def main():
             "backend": backend,
             "os": osname,
             "sha": sha,
-            "schema_version": 1,\n  "metrics": {
-                "success_rate": sr,            # may be None; schema will allow null
-                "p95_latency_ms": p95,         # may be None; schema will allow null
+            "schema_version": 1,
+            "metrics": {
+                "success_rate": sr,
+                "p95_latency_ms": p95,
                 "orders_total": orders,
                 "trades_total": trades,
                 "volume_quote": vol_q,
@@ -108,6 +99,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
