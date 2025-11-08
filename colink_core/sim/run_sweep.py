@@ -1,6 +1,5 @@
 ﻿#!/usr/bin/env python3
 # Compatibility runner to satisfy legacy tests and headless usage.
-# Accepts old flags, emits JSON with expected header/shape, and writes simple plots.
 
 import argparse, json, os, pathlib, sys, random, datetime as dt
 
@@ -11,13 +10,26 @@ try:
 except Exception:
     plt = None
 
+def _gen_prices(steps: int, seed: int):
+    rnd = random.Random(seed)
+    price = 1.0
+    series = []
+    for i in range(max(steps, 1)):
+        price = max(0.001, price * (1.0 + rnd.uniform(-0.02, 0.03)))
+        series.append({"t": i, "price": float(price)})
+    return series
+
 def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str,
                trades_csv: str | None, volatility_csv: str | None):
-    # tests expect: schema_version, pairs as list, generated_at (Z), inputs{}, summary{}
+    points = _gen_prices(steps, seed)
+    prices = [p["price"] for p in points]
+    pmin = float(min(prices)) if prices else 0.0
+    pmax = float(max(prices)) if prices else 0.0
+
     doc = {
         "schema_version": "colink.sim.v1",
         "ok": True,
-        "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),   # full ISO with offset
+        "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
         "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "seed": seed,
         "steps": steps,
@@ -27,8 +39,10 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
             "trades_csv": trades_csv,
             "volatility_csv": volatility_csv,
         },
+        "points": points,
         "summary": {
             "count_points": steps,
+            "price": {"min": pmin, "max": pmax},
             "notes": "compat shim",
         },
     }
@@ -36,7 +50,7 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
-        path.write_bytes(b"")  # placeholder when matplotlib unavailable
+        path.write_bytes(b"")
         return
     xs = list(range(10))
     ys = [random.random() for _ in xs]
@@ -55,7 +69,7 @@ def main(argv=None):
     ap.add_argument("--params", default=None, help="(ignored) JSON params")
     ap.add_argument("--demo", action="store_true", help="(ignored) demo mode")
 
-    # legacy/test flags we accept (no-ops here, but parsed)
+    # legacy/test flags we accept
     ap.add_argument("--steps", type=int, default=10)
     ap.add_argument("--pairs", type=str, default="XRP/COL")
     ap.add_argument("--seed", type=int, default=123)
@@ -65,16 +79,15 @@ def main(argv=None):
     ap.add_argument("--slippage", type=str, default=None)
     ap.add_argument("--spread", type=str, default=None)
     ap.add_argument("--no-show", action="store_true")
-    ap.add_argument("--metrics-only", action="store_true")  # tolerated, still writes JSON
+    ap.add_argument("--metrics-only", action="store_true")  # tolerated
 
     args = ap.parse_args(argv)
 
-    # Ensure parent dirs exist
+    # Ensure dirs exist
     for maybe in [args.out, args.plot, args.slippage, args.spread]:
         if maybe:
             pathlib.Path(maybe).parent.mkdir(parents=True, exist_ok=True)
 
-    # Always write JSON when --out is provided (tests rely on this)
     if args.out:
         write_json(
             path=pathlib.Path(args.out),
@@ -86,7 +99,6 @@ def main(argv=None):
             volatility_csv=args.volatility,
         )
 
-    # Write plots if requested
     if args.plot:
         write_png(pathlib.Path(args.plot), f"plot {args.pairs}")
     if args.slippage:
