@@ -17,7 +17,12 @@ jobs:
   build-test:
     name: Build & Test (Windows self-hosted)
     runs-on: [self-hosted, windows, sim]
-    timeout-minutes: 30
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11']
 
     steps:
       - name: Checkout
@@ -30,48 +35,50 @@ jobs:
           Write-Host "OS: $env:RUNNER_OS $env:ImageOS"
           Write-Host "Labels: $env:RUNNER_LABELS"
 
-      - name: Set up Python 3.11
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
           architecture: 'x64'
 
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-pip-
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies (if requirements.txt exists)
+      - name: Install deps (if requirements.txt exists)
         shell: pwsh
         run: |
           if (Test-Path requirements.txt) {
             python -m pip install --upgrade pip
             pip install -r requirements.txt
           } else {
-            Write-Host "No requirements.txt found; skipping pip install."
+            Write-Host "No requirements.txt found; installing test deps only"
+            python -m pip install --upgrade pip
+            pip install pytest coverage
           }
 
-      - name: Run tests
+      - name: Run tests with coverage
         shell: pwsh
         run: |
-          if (Get-Command pytest -ErrorAction SilentlyContinue) {
-            pytest -q
-          } else {
-            pip install pytest
-            pytest -q
-          }
+          if (-not (Get-Command pytest -ErrorAction SilentlyContinue)) { pip install pytest }
+          if (-not (Get-Command coverage -ErrorAction SilentlyContinue)) { pip install coverage }
+          coverage run -m pytest -q
+          coverage xml -o coverage.xml
+          coverage report -m
 
-      - name: Upload artifacts on failure
-        if: failure()
+      - name: Upload artifacts (always)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-artifacts
+          name: pr-ci-${{ matrix.python-version }}
           path: |
             .pytest_cache/**
+            coverage.xml
             **/pytest*.xml
-            **/coverage*.xml
             logs/**
-          if-no-files-found: ignore
+          if-no-files-found: warn
