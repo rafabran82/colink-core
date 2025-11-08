@@ -36,7 +36,15 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
-      - name: Run tests (quiet)
+      - name: Lint (ruff)
+  shell: pwsh
+  run: ruff check .
+
+- name: Format check (black)
+  shell: pwsh
+  run: black --check .
+
+- name: Run tests (quiet)
         shell: pwsh
         run: pytest -q
 
@@ -55,3 +63,4 @@ jobs:
           name: sim-plot
           path: .artifacts/ci_demo.png
           if-no-files-found: error
+
