@@ -1,12 +1,32 @@
-﻿[tool.black]
-line-length = 100
-target-version = ["py311"]
+﻿[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-select = ["E","F","I","B","UP","SIM"]
-ignore = ["E501"]
-[tool.ruff.isort]
-known-first-party = ["colink_core"]
-combine-as-imports = true
+[project]
+name = "colink-core"
+version = "0.0.0"
+description = "COLINK core simulation + bridge prototypes"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "R A" }]
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "pyarrow",
+  "tabulate"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-cov"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["colink_core*"]
+exclude = ["tests*"]
