@@ -60,7 +60,7 @@ def main():
             continue
 
         # Derive basic fields
-        now_iso = dt.datetime.utcnow().replace(tzinfo=dt.timezone.utc).isoformat()
+        now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
         run_id = p.stem
         backend = try_get(data, ["backend", "display", "renderer"])
         osname  = try_get(data, ["os", "system"])
@@ -108,3 +108,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
