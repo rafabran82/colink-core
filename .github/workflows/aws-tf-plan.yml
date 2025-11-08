@@ -1,10 +1,10 @@
-name: AWS Terraform â€” Plan Only
+name: AWS Terraform Ã¢â‚¬â€ Plan Only
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:permissions:
-  id-token: write     # for OIDC â†’ AWS
+  id-token: write     # for OIDC Ã¢â€ â€™ AWS
   contents: read
 
 jobs:

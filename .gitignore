@@ -56,3 +56,6 @@ __pycache__/
 .ruff_cache/
 dist/
 build/
+# Local outputs
+out/
+run_*.log

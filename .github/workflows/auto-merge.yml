@@ -18,19 +18,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔁 Checking open PRs..."
+          echo "ðŸ” Checking open PRs..."
           prs=$(gh pr list --state open --json number,headRefName -q '.[] | [.number, .headRefName]')
           if [ -z "$prs" ]; then
-            echo "✅ No open PRs to process."
+            echo "âœ… No open PRs to process."
             exit 0
           fi
           echo "$prs" | jq -r '.[]' | while read -r pr branch; do
-            echo "➡️  Processing PR #$pr on branch $branch"
+            echo "âž¡ï¸  Processing PR #$pr on branch $branch"
             gh pr checks "$pr" --watch || true
             if gh pr merge "$pr" --squash --admin; then
-              echo "🧹 Deleting merged branch $branch"
+              echo "ðŸ§¹ Deleting merged branch $branch"
               gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/$branch" || true
             else
-              echo "⚠️ Could not merge PR #$pr"
+              echo "âš ï¸ Could not merge PR #$pr"
             fi
           done

@@ -1,11 +1,19 @@
-﻿*       text=auto
-*.py    text eol=lf
+# Normalize text by default
+*       text=auto
+
+# Force LF on YAML and code that must be LF-only
 *.yml   text eol=lf
 *.yaml  text eol=lf
-*.png   binary
-*.jpg   binary
-*.jpeg  binary
-*.gif   binary
-*.pdf   binary
-*.zip   binary
-*.7z    binary
+*.py    text eol=lf
+
+# PowerShell scripts usually want CRLF on Windows
+*.ps1   text eol=crlf
+
+# Treat these as binary (no EOL conversion)
+*.png   -text
+*.jpg   -text
+*.jpeg  -text
+*.gif   -text
+*.pdf   -text
+*.zip   -text
+*.7z    -text
