@@ -1,7 +1,8 @@
 ﻿#!/usr/bin/env python3
 # Compatibility runner to satisfy legacy tests and headless usage.
 
-import argparse, json, os, pathlib, sys, random, datetime as dt
+import argparse, json, os, pathlib, sys, random, datetime as dt, math
+from typing import Optional
 
 try:
     import matplotlib
@@ -16,15 +17,20 @@ def _gen_prices(steps: int, seed: int):
     series = []
     for i in range(max(steps, 1)):
         price = max(0.001, price * (1.0 + rnd.uniform(-0.02, 0.03)))
-        series.append({"t": i, "price": float(price)})
+        # spread is seed-independent; sin(0)=0 -> 10.0 bps at t=0
+        spread_bps = 10.0 + 5.0 * math.sin(float(i))
+        series.append({"t": i, "price": float(price), "spread_bps": float(spread_bps)})
     return series
 
 def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str,
-               trades_csv: str | None, volatility_csv: str | None):
+               trades_csv: Optional[str], volatility_csv: Optional[str]):
     points = _gen_prices(steps, seed)
     prices = [p["price"] for p in points]
+    spreads = [p["spread_bps"] for p in points]
     pmin = float(min(prices)) if prices else 0.0
     pmax = float(max(prices)) if prices else 0.0
+    smin = float(min(spreads)) if spreads else 0.0
+    smax = float(max(spreads)) if spreads else 0.0
 
     doc = {
         "schema_version": "colink.sim.v1",
@@ -43,6 +49,7 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
         "summary": {
             "count_points": steps,
             "price": {"min": pmin, "max": pmax},
+            "spread_bps": {"min": smin, "max": smax},
             "notes": "compat shim",
         },
     }
@@ -50,7 +57,7 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
-        path.write_bytes(b"")
+        path.write_bytes(b"")  # placeholder when matplotlib unavailable
         return
     xs = list(range(10))
     ys = [random.random() for _ in xs]
