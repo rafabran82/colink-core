@@ -19,7 +19,7 @@ jobs:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONUNBUFFERED: "1"
       OUT_PREFIX: ./.artifacts/demo
-      BACKEND: "Agg"         # default backend; adjust if needed
+      BACKEND: "Agg"
       OS_NAME: ${{ runner.os }}
       GIT_SHA: ${{ github.sha }}
 
@@ -48,9 +48,11 @@ jobs:
           python -m colink_core.sim.run \
             --demo \
             --display "${BACKEND}" \
-            --out-prefix "${OUT_PREFIX}" \
-            --os "${OS_NAME}" \
-            --sha "${GIT_SHA}"
+            --out-prefix "${OUT_PREFIX}"
+
+      - name: Enrich metrics with OS/SHA/Backend
+        run: |
+          python tools/enrich_metrics.py --artifacts ./.artifacts --os "${{ runner.os }}" --sha "${{ github.sha }}" --backend "${BACKEND}"
 
       - name: Validate metrics JSON (jsonschema)
         run: |
@@ -61,7 +63,10 @@ jobs:
           python tools/collect.py \
             --artifacts ./.artifacts \
             --out-dataset ./.artifacts/dataset.csv \
-            --out-parquet ./.artifacts/dataset.parquet
+            --out-parquet ./.artifacts/dataset.parquet \
+            --os "${{ runner.os }}" \
+            --sha "${{ github.sha }}" \
+            --backend "${BACKEND}"
 
       - name: Upload run artifacts (OS+SHA)
         uses: actions/upload-artifact@v4

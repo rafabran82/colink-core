@@ -8,7 +8,7 @@ ARTIFACTS = ROOT / ".artifacts"
 SCHEMA_PATH = ROOT / "tools" / "metrics.schema.json"
 
 def load_schema():
-    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(SCHEMA_PATH, "r", encoding="utf-8-sig") as f:
         return json.load(f)
 
 def find_metric_files() -> List[pathlib.Path]:
@@ -54,3 +54,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
