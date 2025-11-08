@@ -35,6 +35,28 @@ jobs:
   run: |
     set -euxo pipefail
     python -m pip install -U pip setuptools wheel
+    # Baseline CI deps so tests can run no matter what
+    pip install -r tools/ci-reqs.txt
+    # Try project install with extras; fall back gracefully
+    if ! pip install -e .[test] ; then
+      pip install -e .
+    fi
+    # Quick sanity prints
+    python - <<'PY'
+import sys, pkgutil
+print("Python:", sys.version)
+for m in ("numpy","pandas","matplotlib","pyarrow","tabulate","pytest"):
+    try:
+        mod = __import__(m)
+        ver = getattr(mod, "__version__", "unknown")
+    except Exception as e:
+        ver = f"MISSING ({e})"
+    print(f"{m}: {ver}")
+PY
+  shell: bash
+  run: |
+    set -euxo pipefail
+    python -m pip install -U pip setuptools wheel
     # Try editable install with [test]; if extras are not defined, fall back to plain install
     if ! pip install -e .[test] ; then
       pip install -e .
@@ -74,5 +96,6 @@ PY
           path: |
             .sim_smoke/*.png
           if-no-files-found: ignore
+
 
 
