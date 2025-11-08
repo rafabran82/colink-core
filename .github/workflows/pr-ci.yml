@@ -8,13 +8,20 @@ on:
 
 jobs:
   build-test:
-    name: Build & Test (${{ matrix.os }}, py${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest]
-        python-version: ["3.11"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        py: ["3.11"]
+
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      OUT_PREFIX: ./.artifacts/demo
+      BACKEND: "Agg"         # default backend; adjust if needed
+      OS_NAME: ${{ runner.os }}
+      GIT_SHA: ${{ github.sha }}
 
     steps:
       - name: Checkout
@@ -23,51 +30,47 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
+          python-version: ${{ matrix.py }}
 
-      - name: Install deps
-        shell: pwsh
+      - name: Install core deps (project)
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          # optional: if ruff/black are not in requirements, uncomment:
-          # pip install ruff black
+          pip install -e .
 
-      - name: Lint (ruff)
-        shell: pwsh
-        run: ruff check .
-
-      - name: Format check (black)
-        shell: pwsh
-        run: black --check .
-
-      - name: Run tests (quiet)
-        shell: pwsh
-        env:
-          DISPLAY_BACKEND: Agg
+      - name: Install dev tools (schema + collect)
         run: |
-          pytest -q
+          pip install jsonschema pandas pyarrow
 
-      - name: Produce demo artifacts
-        shell: pwsh
-        env:
-          DISPLAY_BACKEND: Agg
+      - name: Smoke run (emit PNG + NDJSON + JSON)
+        shell: bash
         run: |
-          if (!(Test-Path .artifacts)) { New-Item -ItemType Directory -Path .artifacts | Out-Null }
-          python -m colink_core.sim.run --demo --display Agg --out-prefix .\.artifacts\ci_demo
+          mkdir -p .artifacts
+          python -m colink_core.sim.run \
+            --demo \
+            --display "${BACKEND}" \
+            --out-prefix "${OUT_PREFIX}" \
+            --os "${OS_NAME}" \
+            --sha "${GIT_SHA}"
 
-      - name: Upload artifacts (per-OS)
+      - name: Validate metrics JSON (jsonschema)
+        run: |
+          python tools/validate_metrics.py
+
+      - name: Merge NDJSON + JSON into CSV/Parquet
+        run: |
+          python tools/collect.py \
+            --artifacts ./.artifacts \
+            --out-dataset ./.artifacts/dataset.csv \
+            --out-parquet ./.artifacts/dataset.parquet
+
+      - name: Upload run artifacts (OS+SHA)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-${{ github.sha }}-sim-artifacts
+          name: "sim-${{ runner.os }}-${{ github.sha }}"
           path: |
-  .artifacts/*.png
-  .artifacts/*.ndjson
-  .artifacts/*.json
-  .artifacts/*.json
-            .artifacts/*.json
-          if-no-files-found: error
-          retention-days: 14
-
-
+            ./.artifacts/**/*.png
+            ./.artifacts/**/*.ndjson
+            ./.artifacts/**/*.json
+            ./.artifacts/dataset.csv
+            ./.artifacts/dataset.parquet
+          if-no-files-found: warn
