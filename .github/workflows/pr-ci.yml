@@ -60,12 +60,14 @@ jobs:
       - name: Upload artifacts (per-OS)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-sim-artifacts
+          name: ${{ runner.os }}-${{ github.sha }}-sim-artifacts
           path: |
   .artifacts/*.png
   .artifacts/*.ndjson
   .artifacts/*.json
+  .artifacts/*.json
             .artifacts/*.json
           if-no-files-found: error
           retention-days: 14
+
 
