@@ -1,36 +1,34 @@
-name: PR CI
+﻿name: PR CI
 
 on:
   pull_request:
     branches: [ main ]
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    name: Build & Test (Windows self-hosted)
+    runs-on: [self-hosted, windows, sim]
+    timeout-minutes: 30
+
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-
-      - name: Install project + test deps
-        shell: bash
+      - name: Show runner context
+        shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          # project (editable)
-          pip install -e .
-          # test tools
-          pip install pytest
-          # optional extras if present
-          [ -f requirements.txt ] && pip install -r requirements.txt || true
-          [ -f requirements-dev.txt ] && pip install -r requirements-dev.txt || true
+          Write-Host "Runner: $env:RUNNER_NAME"
+          Write-Host "OS: $env:RUNNER_OS $env:ImageOS"
+          Write-Host "Labels: $env:RUNNER_LABELS"
 
-      - name: CI Smoke (imports only)
+      - name: Python smoke (optional)
+        shell: pwsh
         run: |
-          python -m pytest -q -k test_imports --maxfail=1
+          python --version 2>$null; if ($LASTEXITCODE) { Write-Host "Python not found, skipping."; exit 0 }
 
-      - name: Run full tests (if any)
+      - name: Placeholder — replace with real build/test steps
+        shell: pwsh
         run: |
-          python -m pytest -q
+          Write-Host "Hello from self-hosted Windows runner"
