@@ -8,4 +8,9 @@
 *.gif   binary
 *.pdf   binary
 *.zip   binary
-*.7z    binary
+*.7z    binary# Keep YAMLs LF-only
+*.yml text eol=lf
+*.yaml text eol=lf
+# Scripts and code (you can expand as you like)
+*.ps1 text eol=crlf
+*.py  text eol=lf

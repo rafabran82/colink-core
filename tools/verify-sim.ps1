@@ -146,3 +146,26 @@ Write-Host "================================="
 
 
 
+# ==== COLINK telemetry glue (appended by assistant) ===========================
+# Ensure a stable output dir (works on Linux runners where $env:TEMP may be null)
+$outDir = Join-Path $PWD 'out/smoke'
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
+# Pairs forwarded from workflow or default
+$pairs = $env:SIM_PAIRS
+if (-not $pairs) { $pairs = "XRP/COL,COPX/COL" }
+
+# 1) Run the NDJSON smoke
+$env:SIM_OUT_DIR = $outDir
+$env:RUN_ID      = $env:GITHUB_RUN_ID
+& $env:PYTHON_EXE -m colink_core.sim.run_smoke
+if ($LASTEXITCODE -ne 0) { throw "run_smoke failed with code $LASTEXITCODE" }
+
+# 2) Generate per-pair plots (headless Agg already set above)
+foreach ($p in $pairs.Split(',')) {
+  $p = $p.Trim()
+  if (-not $p) { continue }
+  & $env:PYTHON_EXE -c "from colink_core.sim.plot_smoke import plot_pair; import os; print(plot_pair(r'$outDir', r'$p', seed=123))"
+  if ($LASTEXITCODE -ne 0) { throw "plot_smoke failed for $p" }
+}
+# ============================================================================

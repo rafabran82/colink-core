@@ -27,7 +27,7 @@ jobs:
           languages: python
           # queries: security-extended,security-and-quality  # (optional)
 
-      # For compiled languages you'd autobuild; Python doesn’t need it.
+      # For compiled languages you'd autobuild; Python doesnâ€™t need it.
       # - uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
