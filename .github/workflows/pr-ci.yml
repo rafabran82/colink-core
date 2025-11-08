@@ -62,8 +62,10 @@ jobs:
         with:
           name: ${{ runner.os }}-sim-artifacts
           path: |
-            .artifacts/*.png
-            .artifacts/*.ndjson
+  .artifacts/*.png
+  .artifacts/*.ndjson
+  .artifacts/*.json
             .artifacts/*.json
           if-no-files-found: error
           retention-days: 14
+
