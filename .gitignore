@@ -56,3 +56,5 @@ __pycache__/
 .ruff_cache/
 dist/
 build/
+# ---- local sim artifacts ----
+.artifacts/
