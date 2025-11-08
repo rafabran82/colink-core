@@ -88,7 +88,7 @@ def main():
             "backend": backend,
             "os": osname,
             "sha": sha,
-            "metrics": {
+            "schema_version": 1,\n  "metrics": {
                 "success_rate": sr,            # may be None; schema will allow null
                 "p95_latency_ms": p95,         # may be None; schema will allow null
                 "orders_total": orders,
@@ -108,4 +108,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

@@ -1,10 +1,13 @@
-﻿import json, pathlib, pytest
+﻿import json, os, pathlib, pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ART  = ROOT / ".artifacts"
 
+MIN_SR  = float(os.environ.get("COLINK_MIN_SUCCESS_RATE", "0.95"))
+MAX_P95 = float(os.environ.get("COLINK_MAX_P95_MS", "250.0"))
+
 def metrics_jsons():
-    return sorted(p for p in ART.rglob("*.metrics.json"))
+    return sorted(ART.rglob("*.metrics.json"))
 
 @pytest.mark.parametrize("path", metrics_jsons())
 def test_kpi_thresholds(path: pathlib.Path):
@@ -13,11 +16,12 @@ def test_kpi_thresholds(path: pathlib.Path):
     sr  = m.get("success_rate")
     p95 = m.get("p95_latency_ms")
 
+    # Skip when demo/wrapped outputs don't provide numeric KPIs
     if sr is None and p95 is None:
-        pytest.skip("No KPIs present yet (wrapped demo).")
+        pytest.skip("No KPIs present yet (demo/wrapped).")
 
     if sr is not None:
-        assert sr >= 0.95, f"success_rate too low: {sr}"
+        assert float(sr) >= MIN_SR, f"success_rate too low: {sr} < {MIN_SR}"
 
     if p95 is not None:
-        assert p95 <= 250, f"p95_latency_ms too high: {p95}"
+        assert float(p95) <= MAX_P95, f"p95_latency_ms too high: {p95} > {MAX_P95}"
