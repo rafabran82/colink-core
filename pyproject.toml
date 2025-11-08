@@ -1,25 +1,12 @@
-[build-system]
-requires = ["setuptools>=69", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "colink-core"
-version = "0.1.0"
-description = "COLINK core library"
-authors = [{ name = "Rafaelito" }]
-readme = "README.md"
-requires-python = ">=3.10"
-dependencies = []
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["colink_core*"]
-exclude = ["tests*", "docs*", "examples*"]
+﻿[tool.black]
+line-length = 100
+target-version = ["py311"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
-
-[tool.pytest.ini_options]
-addopts = "-q"
-pythonpath = ["."]
+target-version = "py311"
+select = ["E","F","I","B","UP","SIM"]
+ignore = ["E501"]
+[tool.ruff.isort]
+known-first-party = ["colink_core"]
+combine-as-imports = true
