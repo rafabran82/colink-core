@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
@@ -11,7 +11,7 @@ import statistics
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _select_backend(name: str | None) -> str:
@@ -30,7 +30,9 @@ def _git_sha() -> str | None:
     if sha:
         return sha
     try:
-        out = subprocess.check_output(["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, text=True)
+        out = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, text=True
+        )
         return out.strip()
     except Exception:
         return None
@@ -89,7 +91,7 @@ def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
     # 3) Metrics summary
     metrics = {
         "schema_version": 1,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         "backend": backend,
         "python": platform.python_version(),
         "os": platform.platform(),
@@ -122,8 +124,15 @@ def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="COLINK sim runner (PNG + NDJSON + JSON metrics)")
     p.add_argument("--demo", action="store_true", help="Run the demo series generator")
-    p.add_argument("--display", type=str, default=None, help="Matplotlib backend (default: env DISPLAY_BACKEND or Agg)")
-    p.add_argument("--out-prefix", type=str, required=True, help="Output path prefix (no extension)")
+    p.add_argument(
+        "--display",
+        type=str,
+        default=None,
+        help="Matplotlib backend (default: env DISPLAY_BACKEND or Agg)",
+    )
+    p.add_argument(
+        "--out-prefix", type=str, required=True, help="Output path prefix (no extension)"
+    )
     return p.parse_args(argv)
 
 

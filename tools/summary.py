@@ -1,12 +1,16 @@
-﻿import os, pathlib, pandas as pd
+import os
+import pathlib
+
 import matplotlib
+import pandas as pd
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-ART  = ROOT / ".artifacts"
-csv  = ART / "dataset.csv"
-out  = os.environ.get("GITHUB_STEP_SUMMARY")
+ART = ROOT / ".artifacts"
+csv = ART / "dataset.csv"
+out = os.environ.get("GITHUB_STEP_SUMMARY")
 
 if csv.exists():
     df = pd.read_csv(csv)
@@ -30,7 +34,21 @@ if csv.exists():
         lines.append(f"Rows: **{len(df)}**")
         lines.append("")
         # Table head
-        head_cols = [c for c in df.columns if c in ["run_id","timestamp","backend","os","sha","events_count","success_rate","p95_latency_ms"]]
+        head_cols = [
+            c
+            for c in df.columns
+            if c
+            in [
+                "run_id",
+                "timestamp",
+                "backend",
+                "os",
+                "sha",
+                "events_count",
+                "success_rate",
+                "p95_latency_ms",
+            ]
+        ]
         if head_cols:
             lines.append(df[head_cols].head(10).to_markdown(index=False))
             lines.append("")

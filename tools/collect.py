@@ -1,13 +1,13 @@
-﻿import argparse
+import argparse
 import json
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any
 
 import pandas as pd
 
 
-def _read_metrics(files: List[Path]) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+def _read_metrics(files: list[Path]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     for p in files:
         try:
             obj = json.loads(p.read_text(encoding="utf-8"))
@@ -16,7 +16,7 @@ def _read_metrics(files: List[Path]) -> List[Dict[str, Any]]:
             continue
 
         # Common fields
-        row: Dict[str, Any] = {
+        row: dict[str, Any] = {
             "run_id": obj.get("run_id"),
             "timestamp": obj.get("timestamp"),
             "backend": obj.get("backend"),
@@ -52,9 +52,15 @@ def _read_metrics(files: List[Path]) -> List[Dict[str, Any]]:
 def _sanitize_for_parquet(df: "pd.DataFrame") -> "pd.DataFrame":
     # 1) Coerce known numeric columns to numeric (floats/ints). Non-parsable → NaN
     numeric_cols = [
-        "events_count", "success_rate", "p95_latency_ms",
-        "orders_total", "trades_total", "volume_quote", "pnl",
-        "slippage_bps", "amount_out",
+        "events_count",
+        "success_rate",
+        "p95_latency_ms",
+        "orders_total",
+        "trades_total",
+        "volume_quote",
+        "pnl",
+        "slippage_bps",
+        "amount_out",
     ]
     for col in [c for c in numeric_cols if c in df.columns]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -62,6 +68,7 @@ def _sanitize_for_parquet(df: "pd.DataFrame") -> "pd.DataFrame":
     # 2) Decode bytes in object columns and make them pandas 'string' dtype
     obj_cols = list(df.select_dtypes(include=["object"]).columns)
     if obj_cols:
+
         def _decode(x):
             if isinstance(x, (bytes, bytearray)):
                 try:
@@ -69,22 +76,44 @@ def _sanitize_for_parquet(df: "pd.DataFrame") -> "pd.DataFrame":
                 except Exception:
                     return str(x)
             return x
+
         for col in obj_cols:
             df[col] = df[col].map(_decode)
             df[col] = df[col].astype("string")
 
     # 3) Nice column order
     preferred = [
-        "kind", "run_id", "timestamp", "backend", "os", "sha", "schema_version",
-        "events_count", "success_rate", "p95_latency_ms",
-        "orders_total", "trades_total", "volume_quote", "pnl",
-        "slippage_bps", "amount_out",
+        "kind",
+        "run_id",
+        "timestamp",
+        "backend",
+        "os",
+        "sha",
+        "schema_version",
+        "events_count",
+        "success_rate",
+        "p95_latency_ms",
+        "orders_total",
+        "trades_total",
+        "volume_quote",
+        "pnl",
+        "slippage_bps",
+        "amount_out",
     ]
-    ordered = [c for c in preferred if c in df.columns] + [c for c in df.columns if c not in preferred]
+    ordered = [c for c in preferred if c in df.columns] + [
+        c for c in df.columns if c not in preferred
+    ]
     return df[ordered]
 
 
-def collect(artifacts_dir: Path, out_dataset: Path, out_parquet: Path, os_name: str | None, sha: str | None, backend: str | None) -> None:
+def collect(
+    artifacts_dir: Path,
+    out_dataset: Path,
+    out_parquet: Path,
+    os_name: str | None,
+    sha: str | None,
+    backend: str | None,
+) -> None:
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     # Pick up only *.metrics.json produced by wrappers
     files = sorted(artifacts_dir.glob("*.metrics.json"))
