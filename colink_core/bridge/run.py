@@ -1,6 +1,13 @@
-﻿from __future__ import annotations
-import argparse, json, pathlib, platform, datetime as dt
-from .sim import Pool, BridgeRoute, BridgeSim
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import pathlib
+import platform
+
+from .sim import BridgeRoute, BridgeSim, Pool
+
 
 def _mk_route(pairA: str, pairM: str, fee1_bps: float, fee2_bps: float) -> BridgeRoute:
     # pairA:  A/M  ; pairM:  M/B
@@ -10,8 +17,9 @@ def _mk_route(pairA: str, pairM: str, fee1_bps: float, fee2_bps: float) -> Bridg
         raise ValueError(f"middle asset mismatch: {pairA} vs {pairM}")
     # Asymmetric reserves to create realistic slippage
     p1 = Pool(base=a, quote=m, x=1_000_000.0, y=950_000.0, fee_bps=fee1_bps)
-    p2 = Pool(base=m, quote=b, x=900_000.0,  y=1_050_000.0, fee_bps=fee2_bps)
+    p2 = Pool(base=m, quote=b, x=900_000.0, y=1_050_000.0, fee_bps=fee2_bps)
     return BridgeRoute(hop1=p1, hop2=p2, a=a, m=m, b=b)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -39,7 +47,7 @@ def main():
     ev_path.write_text(json.dumps({"type": "route_result", **res}) + "\n", encoding="utf-8")
 
     # metrics JSON (collector-friendly *.metrics.json)
-    ts = dt.datetime.now(dt.timezone.utc).isoformat()
+    ts = dt.datetime.now(dt.UTC).isoformat()
     metrics = {
         "run_id": stem.name,
         "timestamp": ts,
@@ -64,6 +72,7 @@ def main():
     m_path.write_text(json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(json.dumps({"ok": True, "out_events": str(ev_path), "out_metrics": str(m_path)}))
+
 
 if __name__ == "__main__":
     main()

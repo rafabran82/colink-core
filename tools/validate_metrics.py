@@ -1,21 +1,26 @@
-﻿#!/usr/bin/env python3
-import json, sys, pathlib
-from typing import List
+#!/usr/bin/env python3
+import json
+import pathlib
+import sys
+
 from jsonschema import Draft202012Validator
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / ".artifacts"
 SCHEMA_PATH = ROOT / "tools" / "metrics.schema.json"
 
+
 def load_schema():
     # tolerate BOM
-    with open(SCHEMA_PATH, "r", encoding="utf-8-sig") as f:
+    with open(SCHEMA_PATH, encoding="utf-8-sig") as f:
         return json.load(f)
 
-def candidate_jsons() -> List[pathlib.Path]:
+
+def candidate_jsons() -> list[pathlib.Path]:
     if not ARTIFACTS.exists():
         return []
     return list(ARTIFACTS.rglob("*.json"))
+
 
 def main():
     schema = load_schema()
@@ -49,7 +54,10 @@ def main():
                 print(f"[OK]   {p} (run_id={rid})")
 
     if not metrics_files:
-        print("Found JSONs but none looked like metrics (missing top-level 'metrics' object).", file=sys.stderr)
+        print(
+            "Found JSONs but none looked like metrics (missing top-level 'metrics' object).",
+            file=sys.stderr,
+        )
         sys.exit(4)
 
     if failed:
@@ -58,6 +66,7 @@ def main():
 
     print(f"Validated {len(metrics_files)} metrics JSON file(s).")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

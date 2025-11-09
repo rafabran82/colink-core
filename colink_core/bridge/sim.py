@@ -1,12 +1,13 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
 import dataclasses as dc
-import math
 import random
-from typing import Tuple
+
 
 @dc.dataclass
 class Pool:
     """Constant-product AMM pool x*y=k with fee in bps."""
+
     base: str
     quote: str
     x: float
@@ -16,7 +17,7 @@ class Pool:
     def price_quote_per_base(self) -> float:
         return self.y / max(self.x, 1e-12)
 
-    def swap_out(self, amount_in: float, base_to_quote: bool) -> Tuple[float, float]:
+    def swap_out(self, amount_in: float, base_to_quote: bool) -> tuple[float, float]:
         """
         Return (amount_out, fee_paid). Updates reserves in-place.
         base_to_quote=True → input BASE receive QUOTE.
@@ -44,14 +45,17 @@ class Pool:
             self.x, self.y = x_new, y_new
             return aout, fee
 
+
 @dc.dataclass
 class BridgeRoute:
     """Two-hop route: A -> M -> B (e.g., COL -> COPX -> XRP)."""
+
     hop1: Pool
     hop2: Pool
     a: str
     m: str
     b: str
+
 
 class BridgeSim:
     def __init__(self, seed: int = 777):
@@ -62,8 +66,8 @@ class BridgeSim:
         Perform A->M then M->B swaps; return detailed result with slippage & fees.
         """
         # mid prices at start
-        p1_0 = route.hop1.price_quote_per_base()   # M per A
-        p2_0 = route.hop2.price_quote_per_base()   # B per M
+        p1_0 = route.hop1.price_quote_per_base()  # M per A
+        p2_0 = route.hop2.price_quote_per_base()  # B per M
 
         # Hop 1: A -> M
         out_m, fee1 = route.hop1.swap_out(amount_in, base_to_quote=True)

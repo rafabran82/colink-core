@@ -1,15 +1,27 @@
-﻿import json, sys, subprocess, pathlib
+import json
+import pathlib
+import subprocess
+import sys
+
 
 def test_bridge_smoke(tmp_path: pathlib.Path):
     out_prefix = tmp_path / "bridge_demo"
     cmd = [
-        sys.executable, "-m", "colink_core.bridge.run",
-        "--amount", "1500",
-        "--pairA", "COL/COPX",
-        "--pairM", "COPX/XRP",
-        "--out-prefix", str(out_prefix),
-        "--backend", "Agg",
-        "--sha", "deadbeef"
+        sys.executable,
+        "-m",
+        "colink_core.bridge.run",
+        "--amount",
+        "1500",
+        "--pairA",
+        "COL/COPX",
+        "--pairM",
+        "COPX/XRP",
+        "--out-prefix",
+        str(out_prefix),
+        "--backend",
+        "Agg",
+        "--sha",
+        "deadbeef",
     ]
     r = subprocess.run(cmd, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
