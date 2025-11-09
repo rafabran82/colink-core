@@ -1,4 +1,4 @@
-﻿name: sim-unit-v2b
+name: sim-unit-v2b
 
 on:
   pull_request:
