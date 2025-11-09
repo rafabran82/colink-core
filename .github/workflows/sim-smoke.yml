@@ -1,4 +1,5 @@
-﻿name: Sim Smoke
+#
+ name: Sim Smoke
 
 on:
   workflow_dispatch:
