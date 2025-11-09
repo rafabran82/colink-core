@@ -31,7 +31,7 @@ jobs:
           } elseif (Test-Path requirements.txt) {
             pip install -r requirements.txt
           }
-          pip install pytest numpy "matplotlib<4"
+          pip install pytest numpy "matplotlib<4" fastapi httpx uvicorn
 
       - name: NumPy / Matplotlib smoke
         shell: pwsh
@@ -69,3 +69,4 @@ jobs:
           name: v2-pytest-artifacts
           path: .artifacts/*
           if-no-files-found: warn
+
