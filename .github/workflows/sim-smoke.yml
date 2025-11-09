@@ -86,6 +86,7 @@ jobs:
           } | ConvertTo-Json -Compress
           Set-Content .artifacts/smoke_summary.json -Value $stub -Encoding utf8
 
+<<<<<<< HEAD
       - name: Ensure stub artifact (Linux)
         if: runner.os != 'Windows'
         shell: bash
@@ -94,3 +95,6 @@ jobs:
           printf '{"os":"%s","pair":"%s","python":"%s","status":"ok","branch":"%s","run_id":"%s"}' \
             "$RUNNER_OS" "${{ matrix.pair }}" "${{ matrix.python }}" "${{ github.ref_name }}" "${{ github.run_id }}" \
             > .artifacts/smoke_summary.json
+=======
+
+>>>>>>> origin/main
