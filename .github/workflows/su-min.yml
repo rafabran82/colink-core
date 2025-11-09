@@ -1,0 +1,9 @@
+name: SU-Min
+on:
+  workflow_dispatch: {}
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo hello
+        run: echo "hello from SU-Min"
