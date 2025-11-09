@@ -1,8 +1,13 @@
-﻿#!/usr/bin/env python3
-import argparse, json, os, pathlib, sys
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+import pathlib
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ART = ROOT / ".artifacts"
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -36,6 +41,7 @@ def main():
 
     print(f"Enriched {changed} file(s) with os/sha/backend (if missing).")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

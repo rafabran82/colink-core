@@ -1,4 +1,4 @@
-﻿import json
+import json
 import pathlib
 import subprocess
 import sys
@@ -7,9 +7,14 @@ import sys
 def test_run_demo_emits_artifacts(tmp_path: pathlib.Path):
     prefix = tmp_path / "demo"
     cmd = [
-        sys.executable, "-m", "colink_core.sim.run",
-        "--demo", "--display", "Agg",
-        "--out-prefix", str(prefix),
+        sys.executable,
+        "-m",
+        "colink_core.sim.run",
+        "--demo",
+        "--display",
+        "Agg",
+        "--out-prefix",
+        str(prefix),
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     assert res.returncode == 0, res.stderr

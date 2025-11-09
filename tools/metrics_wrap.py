@@ -1,8 +1,13 @@
-﻿#!/usr/bin/env python3
-import argparse, json, pathlib, sys, datetime as dt
+#!/usr/bin/env python3
+import argparse
+import datetime as dt
+import json
+import pathlib
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ART = ROOT / ".artifacts"
+
 
 def try_get(d, keys):
     for k in keys:
@@ -18,6 +23,7 @@ def try_get(d, keys):
             return cur
     return None
 
+
 def coerce_number(x):
     if isinstance(x, (int, float)):
         return float(x)
@@ -27,6 +33,7 @@ def coerce_number(x):
         return float(str(x))
     except Exception:
         return None
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -55,22 +62,33 @@ def main():
         if isinstance(data, dict) and isinstance(data.get("metrics"), dict):
             continue
 
-        now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+        now_iso = dt.datetime.now(dt.UTC).isoformat()
         run_id = p.stem
         backend = try_get(data, ["backend", "display", "renderer"])
-        osname  = try_get(data, ["os", "system"])
-        sha     = try_get(data, ["sha", "git_sha", "commit"])
-        ts      = try_get(data, ["timestamp", "time"]) or now_iso
+        osname = try_get(data, ["os", "system"])
+        sha = try_get(data, ["sha", "git_sha", "commit"])
+        ts = try_get(data, ["timestamp", "time"]) or now_iso
 
-        sr = coerce_number(try_get(data, ["success_rate", "successRate", "summary.success_rate", "ok"]))
-        p95 = coerce_number(try_get(data, [
-            "p95_latency_ms", "p95", "latency.p95_ms", "summary.p95_latency_ms",
-            "latency_p95_ms", "metrics.p95_ms"
-        ]))
+        sr = coerce_number(
+            try_get(data, ["success_rate", "successRate", "summary.success_rate", "ok"])
+        )
+        p95 = coerce_number(
+            try_get(
+                data,
+                [
+                    "p95_latency_ms",
+                    "p95",
+                    "latency.p95_ms",
+                    "summary.p95_latency_ms",
+                    "latency_p95_ms",
+                    "metrics.p95_ms",
+                ],
+            )
+        )
         orders = coerce_number(try_get(data, ["orders_total", "orders", "summary.orders"]))
         trades = coerce_number(try_get(data, ["trades_total", "trades", "summary.trades"]))
-        vol_q  = coerce_number(try_get(data, ["volume_quote", "volume", "summary.volume_quote"]))
-        pnl    = coerce_number(try_get(data, ["pnl", "summary.pnl"]))
+        vol_q = coerce_number(try_get(data, ["volume_quote", "volume", "summary.volume_quote"]))
+        pnl = coerce_number(try_get(data, ["pnl", "summary.pnl"]))
 
         metrics_doc = {
             "run_id": run_id,
@@ -85,8 +103,8 @@ def main():
                 "orders_total": orders,
                 "trades_total": trades,
                 "volume_quote": vol_q,
-                "pnl": pnl
-            }
+                "pnl": pnl,
+            },
         }
 
         out = p.with_name(f"{p.stem}.metrics.json")
@@ -96,6 +114,7 @@ def main():
 
     print(f"Produced {produced} metrics JSON file(s).")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

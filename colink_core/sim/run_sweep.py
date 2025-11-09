@@ -1,20 +1,37 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Compatibility runner to satisfy legacy tests and headless usage.
 
-import argparse, json, os, pathlib, sys, random, datetime as dt, math
+import argparse
+import datetime as dt
+import json
+import math
+import os
+import pathlib
+import random
+import sys
 
 # case-insensitive backend normalizer
-BACKENDS = {'agg':'Agg','tkagg':'TkAgg','qt5agg':'Qt5Agg','qtagg':'QtAgg','macosx':'MacOSX'}
+BACKENDS = {
+    "agg": "Agg",
+    "tkagg": "TkAgg",
+    "qt5agg": "Qt5Agg",
+    "qtagg": "QtAgg",
+    "macosx": "MacOSX",
+}
+
+
 def _norm_backend(s: str) -> str:
     return BACKENDS.get(s.lower(), s)
-from typing import Optional
+
 
 try:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 except Exception:
     plt = None
+
 
 def _gen_series(steps: int, seed: int):
     rnd = random.Random(seed)
@@ -27,11 +44,21 @@ def _gen_series(steps: int, seed: int):
         spread_bps = 10.0 + 5.0 * math.sin(float(i))
         # deterministic depth (seeded), positive and stable across runs with same seed
         depth = 1000.0 + 100.0 * rnd.uniform(-0.5, 0.5)
-        series.append({"t": i, "price": float(price), "spread_bps": float(spread_bps), "depth": float(depth)})
+        series.append(
+            {"t": i, "price": float(price), "spread_bps": float(spread_bps), "depth": float(depth)}
+        )
     return series
 
-def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: str,
-               trades_csv: Optional[str], volatility_csv: Optional[str]):
+
+def write_json(
+    path: pathlib.Path,
+    seed: int,
+    steps: int,
+    pair: str,
+    display: str,
+    trades_csv: str | None,
+    volatility_csv: str | None,
+):
     pts = _gen_series(steps, seed)
     prices = [p["price"] for p in pts]
     spreads = [p["spread_bps"] for p in pts]
@@ -39,8 +66,8 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
     doc = {
         "schema_version": "colink.sim.v1",
         "ok": True,
-        "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "generated_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "timestamp": dt.datetime.now(dt.UTC).isoformat(),
+        "generated_at": dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "seed": seed,
         "steps": steps,
         "pairs": [pair],
@@ -52,14 +79,19 @@ def write_json(path: pathlib.Path, seed: int, steps: int, pair: str, display: st
         "points": pts,
         "summary": {
             "count_points": steps,
-            "price": {"min": float(min(prices)) if prices else 0.0,
-                      "max": float(max(prices)) if prices else 0.0},
-            "spread_bps": {"min": float(min(spreads)) if spreads else 0.0,
-                           "max": float(max(spreads)) if spreads else 0.0},
+            "price": {
+                "min": float(min(prices)) if prices else 0.0,
+                "max": float(max(prices)) if prices else 0.0,
+            },
+            "spread_bps": {
+                "min": float(min(spreads)) if spreads else 0.0,
+                "max": float(max(spreads)) if spreads else 0.0,
+            },
             "notes": "compat shim",
         },
     }
     path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+
 
 def write_png(path: pathlib.Path, title: str):
     if plt is None:
@@ -74,10 +106,14 @@ def write_png(path: pathlib.Path, title: str):
     fig.savefig(path, dpi=120)
     plt.close(fig)
 
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--display", default=os.environ.get("BACKEND", "Agg"),
-                    choices=["Agg","TkAgg","Qt5Agg","QtAgg","MacOSX"])
+    ap.add_argument(
+        "--display",
+        default=os.environ.get("BACKEND", "Agg"),
+        choices=["Agg", "TkAgg", "Qt5Agg", "QtAgg", "MacOSX"],
+    )
     ap.add_argument("--out", default=None, help="JSON output file")
     ap.add_argument("--params", default=None, help="(ignored) JSON params")
     ap.add_argument("--demo", action="store_true", help="(ignored) demo mode")
@@ -124,8 +160,6 @@ def main(argv=None):
 
     return 0
 
+
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
