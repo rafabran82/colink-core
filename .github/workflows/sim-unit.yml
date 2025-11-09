@@ -3,8 +3,18 @@
 on:
   push:
     branches: [ chore/phase3-metrics-schema-and-collector ]
+    paths:
+      - "colink_core/**"
+      - "tests/**"
+      - ".github/workflows/sim-unit.yml"
+      - "pyproject.toml"
   pull_request:
     branches: [ main ]
+    paths:
+      - "colink_core/**"
+      - "tests/**"
+      - ".github/workflows/sim-unit.yml"
+      - "pyproject.toml"
   workflow_dispatch:
 
 jobs:
