@@ -6,6 +6,11 @@ on:
     branches: [ main ]
     types: [ opened, synchronize, reopened ]
   workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Branch or tag to test"
+        required: true
+        default: "main"
 
 jobs:
   test:
@@ -14,8 +19,10 @@ jobs:
       MPLBACKEND: Agg
 
     steps:
-      - name: Checkout
+      - name: Checkout target ref
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.target_ref || github.ref }}
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
@@ -75,7 +82,6 @@ jobs:
       - name: Write summary
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
           $py  = (& python --version) 2>$null
           $pip = (& pip --version) 2>$null
           @"

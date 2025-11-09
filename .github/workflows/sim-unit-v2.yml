@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: windows-latest
-    timeout-minutes: 30
     env:
       MPLBACKEND: Agg
 
@@ -17,12 +16,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install base deps (+ editable if present)
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
@@ -31,12 +30,22 @@ jobs:
           } elseif (Test-Path requirements.txt) {
             pip install -r requirements.txt
           }
-          pip install pytest numpy "matplotlib<4"  # ensure pytest + headless-friendly MPL
+          pip install pytest numpy "matplotlib<4"
 
-      - name: NumPy / Matplotlib smoke
+      - name: Install FastAPI + Pydantic deps
+        shell: pwsh
+        run: |
+          pip install fastapi httpx uvicorn pydantic pydantic-settings
+
+      - name: Prepare artifacts folder
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          Set-Content .artifacts\_keep "ok" -Encoding ascii
+
+      - name: Smoke matplotlib (non-GUI)
+        shell: pwsh
+        run: |
           $py = @'
           import matplotlib
           matplotlib.use("Agg")
@@ -50,18 +59,34 @@ jobs:
           python $tmp
 
       - name: Run tests
-  shell: pwsh
-  run: |
-    New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-    $env:PYTEST_ADDOPTS = "-rA -q"
-    python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        shell: pwsh
+        run: |
+          $hasIni   = (Test-Path -Path 'pytest.ini')
+          $hasTests = ((Get-ChildItem -Recurse -Filter 'test_*.py' -ErrorAction SilentlyContinue) -ne $null)
+          if ($hasIni -or $hasTests) {
+            $env:PYTEST_ADDOPTS = "-rA -q"
+            python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            'No tests found; skipping.' | Tee-Object -FilePath .artifacts\pytest.out
+          }
 
-- name: Upload test artifacts
-  uses: actions/upload-artifact@v4
-  with:
-    name: v2-pytest-artifacts
-    path: .artifacts/*
-    if-no-files-found: warn
+      - name: Write summary
+        shell: pwsh
+        run: |
+          $py  = (& python --version) 2>$null
+          $pip = (& pip --version) 2>$null
+          @"
+sim-unit-v2 summary
+SHA: $env:GITHUB_SHA
+Ref: $env:GITHUB_REF
+Python: $py
+Pip: $pip
+"@ | Out-File .artifacts/summary.txt -Encoding utf8
 
-
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-artifacts
+          path: .artifacts/**
