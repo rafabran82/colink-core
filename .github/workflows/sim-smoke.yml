@@ -1,4 +1,4 @@
-name: Sim Smoke
+﻿name: Sim Smoke
 
 on:
   workflow_dispatch:
@@ -77,4 +77,5 @@ jobs:
             **/*metrics*.json
             **/*.report.json
             .pytest_cache/**
+
 
