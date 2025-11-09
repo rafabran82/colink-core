@@ -3,26 +3,25 @@
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 jobs:
   test:
-    runs-on: windows-latest
-    timeout-minutes: 30
-    env:
-      MPLBACKEND: Agg
+    runs-on: windows-2025
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        env:
+          MPLBACKEND: Agg
 
-      - name: Setup Python
+      - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install base deps (+ editable if present)
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
@@ -31,24 +30,26 @@ jobs:
           } elseif (Test-Path requirements.txt) {
             pip install -r requirements.txt
           }
-          pip install pytest numpy "matplotlib<4" fastapi httpx uvicorn
-  - name: Install FastAPI test deps
-    run: |
-      python -m pip install "fastapi>=0.110,<0.116" "httpx<0.28" uvicorn
-      python -m pip show fastapi httpx uvicorn || true
+          pip install pytest numpy "matplotlib<4"
 
-      - name: NumPy / Matplotlib smoke
+      - name: Install FastAPI test deps
+        shell: pwsh
+        run: |
+          python -m pip install "fastapi>=0.110,<0.116" "httpx<0.28" uvicorn
+          python -m pip show fastapi httpx uvicorn
+
+      - name: Smoke matplotlib (non-GUI)
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-          $py = @'
+          $py = @"
           import matplotlib
           matplotlib.use("Agg")
           import numpy as np, matplotlib.pyplot as plt
           x = np.linspace(0, 6.28318, 200); y = np.sin(x)
           plt.plot(x, y); plt.title("sim-unit-v2 smoke"); plt.savefig(".artifacts/v2_smoke.png", dpi=120)
           print("backend:", matplotlib.get_backend())
-          '@
+          "@
           $tmp = Join-Path $env:TEMP ("smoke_{0}.py" -f ([guid]::NewGuid()))
           Set-Content -Path $tmp -Value $py -Encoding utf8
           python $tmp
@@ -57,9 +58,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-          $hasIni   = (Test-Path -Path 'pytest.ini')
+          $hasIni   = Test-Path -Path 'pytest.ini'
           $hasTests = ((Get-ChildItem -Recurse -Filter 'test_*.py' -ErrorAction SilentlyContinue) -ne $null)
-          if ( ($hasIni) -or ($hasTests) ) {
+          if ($hasIni -or $hasTests) {
             $env:PYTEST_ADDOPTS = "-rA -q"
             python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -67,12 +68,10 @@ jobs:
             Write-Host "No tests found; skipping."
           }
 
-      - name: Upload test artifacts
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
-      if: always()
         with:
           name: v2-pytest-artifacts
-          path: .artifacts/*
-          if-no-files-found: warn
-
-
+          path: |
+            .artifacts/
