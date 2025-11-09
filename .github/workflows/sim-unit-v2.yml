@@ -50,10 +50,18 @@ jobs:
           python $tmp
 
       - name: Run tests
-        shell: pwsh
-        run: |
-          if (Test-Path pytest.ini -or (Get-ChildItem -Recurse -Filter "test_*.py" -ErrorAction SilentlyContinue)) {
-            Write-Host "Running pytest -q"; pytest -q
-          } else {
-            Write-Host "No tests found; skipping."
-          }
+  shell: pwsh
+  run: |
+    New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+    $env:PYTEST_ADDOPTS = "-rA -q"
+    python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+- name: Upload test artifacts
+  uses: actions/upload-artifact@v4
+  with:
+    name: v2-pytest-artifacts
+    path: .artifacts/*
+    if-no-files-found: warn
+
+
