@@ -1,4 +1,5 @@
-﻿name: AWS Terraform Plan
+# ci-sanitized
+ name: AWS Terraform Plan
 
 on:
   workflow_dispatch:
