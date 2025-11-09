@@ -70,10 +70,25 @@ jobs:
             'No tests found; skipping.' | Tee-Object -FilePath .artifacts\pytest.out
           }
 
+            - name: Write summary
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          $py  = (& python --version) 2>$null
+          $pip = (& pip --version) 2>$null
+          @"
+sim-unit-v2 summary
+SHA: $env:GITHUB_SHA
+Ref: $env:GITHUB_REF
+Python: $py
+Pip: $pip
+"@ | Out-File .artifacts/summary.txt -Encoding utf8
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v2-pytest-artifacts
           path: .artifacts/**
+
 
