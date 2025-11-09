@@ -31,7 +31,7 @@ jobs:
           } elseif (Test-Path requirements.txt) {
             pip install -r requirements.txt
           }
-          pip install pytest numpy "matplotlib<4"  # ensure pytest + headless-friendly MPL
+          pip install pytest numpy "matplotlib<4"
 
       - name: NumPy / Matplotlib smoke
         shell: pwsh
@@ -50,18 +50,22 @@ jobs:
           python $tmp
 
       - name: Run tests
-  shell: pwsh
-  run: |
-    New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-    $env:PYTEST_ADDOPTS = "-rA -q"
-    python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          $hasIni = (Test-Path -Path pytest.ini)
+          $hasTests = (Get-ChildItem -Recurse -Filter 'test_*.py' -ErrorAction SilentlyContinue) -ne $null
+          if ($hasIni -or $hasTests) {
+            $env:PYTEST_ADDOPTS = "-rA -q"
+            python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            Write-Host "No tests found; skipping."
+          }
 
-- name: Upload test artifacts
-  uses: actions/upload-artifact@v4
-  with:
-    name: v2-pytest-artifacts
-    path: .artifacts/*
-    if-no-files-found: warn
-
-
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-pytest-artifacts
+          path: .artifacts/*
+          if-no-files-found: warn
