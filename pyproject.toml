@@ -1,4 +1,4 @@
-﻿[build-system]
+[build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
@@ -9,7 +9,13 @@ description = "COLINK core simulation + bridge prototypes"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "R A" }]
-dependencies = ["numpy","pandas","matplotlib","pyarrow","tabulate"]
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "pyarrow",
+  "tabulate"
+]
 
 [project.optional-dependencies]
 test = ["pytest","pytest-cov"]
