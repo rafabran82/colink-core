@@ -1,0 +1,7 @@
+﻿numpy
+pandas
+matplotlib
+pyarrow
+tabulate
+pytest
+pytest-cov
