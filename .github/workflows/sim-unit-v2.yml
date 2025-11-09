@@ -70,7 +70,7 @@ jobs:
             'No tests found; skipping.' | Tee-Object -FilePath .artifacts\pytest.out
           }
 
-            - name: Write summary
+      - name: Write summary
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
@@ -90,5 +90,3 @@ Pip: $pip
         with:
           name: v2-pytest-artifacts
           path: .artifacts/**
-
-
