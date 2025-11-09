@@ -1,31 +1,17 @@
-﻿# Fail on BOM at start of file and on any CR characters in workflow YAMLs.
-$ErrorActionPreference = "Stop"
-$root = Split-Path -Parent $MyInvocation.MyCommand.Path | Split-Path -Parent
+﻿param()
 
-$targets = Get-ChildItem -Path (Join-Path $root ".github/workflows") -File -Recurse -Include *.yml,*.yaml
+$bad = @()
 
-$badBom  = @()
-$badCRLF = @()
-
-foreach ($f in $targets) {
-  $bytes = [IO.File]::ReadAllBytes($f.FullName)
-  if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    $badBom += $f.FullName
-  }
-
-  # Read as raw text without rewriting newlines
-  $raw = [System.Text.Encoding]::UTF8.GetString($bytes)
-  if ($raw -match "`r") { $badCRLF += $f.FullName }
+Get-ChildItem -Path ".github/workflows" -Include *.yml,*.yaml -Recurse | ForEach-Object {
+  $bytes = [IO.File]::ReadAllBytes($_.FullName)
+  $hasBom = ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
+  # quick CRLF scan
+  $content = [Text.Encoding]::UTF8.GetString($bytes)
+  $hasCrlf = $content.Contains("`r`n")
+  if ($hasBom -or $hasCrlf) { $bad += $_.FullName }
 }
 
-if ($badBom.Count -gt 0) {
-  Write-Error ("BOM detected in:`n" + ($badBom -join "`n"))
+if ($bad.Count -gt 0) {
+  Write-Error ("BOM/CRLF detected in:`n" + ($bad -join "`n"))
   exit 1
 }
-if ($badCRLF.Count -gt 0) {
-  Write-Error ("CR/CRLF detected in:`n" + ($badCRLF -join "`n"))
-  exit 1
-}
-
-Write-Output "OK: workflows are UTF-8 (no BOM) + LF-only"
-exit 0

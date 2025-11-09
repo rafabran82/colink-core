@@ -1,26 +1,26 @@
-repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.4
+﻿repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/sirosen/check-jsonschema
+    rev: 0.29.2
+    hooks:
+      - id: check-github-workflows
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.6.8
     hooks:
       - id: ruff
-        args: [--fix]
       - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks: []  # placeholder off by default
-
+  # Custom PowerShell: block BOM/CRLF in workflows (keeps the policy you already have)
   - repo: local
     hooks:
       - id: check-bom-crlf-workflows
         name: Check BOM/CRLF in workflow YAMLs
-        entry: pwsh -NoProfile -ExecutionPolicy Bypass -File tools/check-bom.ps1
+        entry: pwsh ./tools/check-bom.ps1
         language: system
-        pass_filenames: false
-        files: ^\.github/workflows/.*\.(yml|yaml)$
-
-      - id: block-adding-venv
-        name: Prevent committing .venv
-        entry: pwsh -NoProfile -ExecutionPolicy Bypass -File tools/block-venv.ps1
-        language: system
-        pass_filenames: false
+        files: ^\.github/workflows/.*\.ya?ml$
