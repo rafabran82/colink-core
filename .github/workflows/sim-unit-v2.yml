@@ -1,6 +1,8 @@
 name: sim-unit-v2
 
 on:
+  workflow_dispatch:
+  workflow_dispatch:
   pull_request:
     branches: [ main ]
     types: [ opened, synchronize, reopened ]
@@ -63,5 +65,6 @@ jobs:
     name: v2-pytest-artifacts
     path: .artifacts/*
     if-no-files-found: warn
+
 
 
