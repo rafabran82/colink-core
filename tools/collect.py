@@ -50,7 +50,7 @@ def _read_metrics(files: list[Path]) -> list[dict[str, Any]]:
 
 
 def _sanitize_for_parquet(df: "pd.DataFrame") -> "pd.DataFrame":
-    # 1) Coerce known numeric columns to numeric (floats/ints). Non-parsable → NaN
+    # 1) Coerce known numeric columns to numeric (floats/ints). Non-parsable -> NaN
     numeric_cols = [
         "events_count",
         "success_rate",
@@ -70,7 +70,7 @@ def _sanitize_for_parquet(df: "pd.DataFrame") -> "pd.DataFrame":
     if obj_cols:
 
         def _decode(x):
-            if isinstance(x, (bytes, bytearray)):
+            if isinstance(x, bytes | bytearray):
                 try:
                     return x.decode("utf-8", "ignore")
                 except Exception:
@@ -139,8 +139,8 @@ def collect(
     out_dataset.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_dataset, index=False)
     df.to_parquet(out_parquet, index=False)
-    print(f"Wrote {len(df)} rows → {out_dataset}")
-    print(f"Wrote Parquet → {out_parquet}")
+    print(f"Wrote {len(df)} rows -> {out_dataset}")
+    print(f"Wrote Parquet -> {out_parquet}")
 
 
 def main():
