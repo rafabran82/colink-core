@@ -32,6 +32,10 @@ jobs:
             pip install -r requirements.txt
           }
           pip install pytest numpy "matplotlib<4" fastapi httpx uvicorn
+  - name: Install FastAPI test deps
+    run: |
+      python -m pip install "fastapi>=0.110,<0.116" "httpx<0.28" uvicorn
+      python -m pip show fastapi httpx uvicorn || true
 
       - name: NumPy / Matplotlib smoke
         shell: pwsh
@@ -65,8 +69,10 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
+      if: always()
         with:
           name: v2-pytest-artifacts
           path: .artifacts/*
           if-no-files-found: warn
+
 
