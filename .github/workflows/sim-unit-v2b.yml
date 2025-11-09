@@ -1,10 +1,15 @@
-﻿name: sim-unit-v2
+﻿name: sim-unit-v2b
 
 on:
   pull_request:
     branches: [ main ]
     types: [ opened, synchronize, reopened ]
   workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Branch or tag to test"
+        required: true
+        default: "main"
 
 jobs:
   test:
@@ -13,8 +18,10 @@ jobs:
       MPLBACKEND: Agg
 
     steps:
-      - name: Checkout
+      - name: Checkout target ref
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.target_ref || github.ref }}
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
@@ -41,7 +48,8 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-          Set-Content .artifacts\_keep "ok" -Encoding ascii\r\n
+          Set-Content .artifacts\_keep "ok" -Encoding ascii
+
       - name: Smoke matplotlib (non-GUI)
         shell: pwsh
         run: |
@@ -50,7 +58,7 @@ jobs:
           matplotlib.use("Agg")
           import numpy as np, matplotlib.pyplot as plt
           x = np.linspace(0, 6.28318, 200); y = np.sin(x)
-          plt.plot(x, y); plt.title("sim-unit-v2 smoke"); plt.savefig(".artifacts/v2_smoke.png", dpi=120)
+          plt.plot(x, y); plt.title("sim-unit-v2b smoke"); plt.savefig(".artifacts/v2b_smoke.png", dpi=120)
           print("backend:", matplotlib.get_backend())
           '@
           $tmp = Join-Path $env:TEMP ("smoke_{0}.py" -f ([guid]::NewGuid()))
@@ -73,11 +81,10 @@ jobs:
       - name: Write summary
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
           $py  = (& python --version) 2>$null
           $pip = (& pip --version) 2>$null
           @"
-sim-unit-v2 summary
+sim-unit-v2b summary
 SHA: $env:GITHUB_SHA
 Ref: $env:GITHUB_REF
 Python: $py
@@ -88,6 +95,5 @@ Pip: $pip
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v2-pytest-artifacts
+          name: v2b-artifacts
           path: .artifacts/**
-

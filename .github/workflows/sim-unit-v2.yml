@@ -41,6 +41,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          Set-Content .artifacts\_keep "ok" -Encoding ascii
 
       - name: Smoke matplotlib (non-GUI)
         shell: pwsh
@@ -73,7 +74,6 @@ jobs:
       - name: Write summary
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
           $py  = (& python --version) 2>$null
           $pip = (& pip --version) 2>$null
           @"
@@ -88,5 +88,5 @@ Pip: $pip
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v2-pytest-artifacts
+          name: v2-artifacts
           path: .artifacts/**
