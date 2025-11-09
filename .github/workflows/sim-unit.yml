@@ -1,1 +1,84 @@
-﻿.github/workflows/sim-unit.yml
+﻿name: Sim Unit (Headless)
+
+on:
+  push:
+    branches: [ chore/phase3-metrics-schema-and-collector ]
+    paths:
+      - "colink_core/**"
+      - "tests/**"
+      - ".github/workflows/sim-unit.yml"
+      - "pyproject.toml"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "colink_core/**"
+      - "tests/**"
+      - ".github/workflows/sim-unit.yml"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+jobs:
+  unit:
+    name: unit (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11"]
+
+    env:
+      MPLBACKEND: Agg
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Upgrade pip tooling
+        shell: bash
+        run: |
+          python -m pip install -U pip setuptools wheel
+
+      - name: Install package (editable) + minimal test deps (robust)
+        shell: bash
+        run: |
+          set -e
+          # try the declared extras first
+          pip install -e ".[test]" || true
+          # ensure core deps for the smoke even if extras missing
+          pip install matplotlib pytest tabulate pyarrow || true
+          # final safety: if editable failed for any reason, install plain
+          python - <<'PY'
+import sys, subprocess
+try:
+    import colink_core  # noqa
+    print("Editable OK")
+except Exception as e:
+    print("Editable import failed:", e)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+PY
+
+      - name: Tiny headless smoke (matplotlib works on Agg)
+        shell: bash
+        run: |
+          python - <<'PY'
+import matplotlib, numpy as np
+import matplotlib.pyplot as plt
+print("Backend:", matplotlib.get_backend())
+x = np.linspace(0, 2*np.pi, 200); y = np.sin(x)
+plt.plot(x, y); plt.title("Headless OK"); plt.savefig(".sim_smoke/ok.png", dpi=120)
+print("Saved .sim_smoke/ok.png")
+PY
+
+      - name: Upload headless artifacts (best effort)
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: headless-artifacts-${{ matrix.os }}
+          path: .sim_smoke/*.png
+          if-no-files-found: ignore
