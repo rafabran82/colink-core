@@ -53,9 +53,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
-          $hasIni = (Test-Path -Path pytest.ini)
-          $hasTests = (Get-ChildItem -Recurse -Filter 'test_*.py' -ErrorAction SilentlyContinue) -ne $null
-          if ($hasIni -or $hasTests) {
+          $hasIni   = (Test-Path -Path 'pytest.ini')
+          $hasTests = ((Get-ChildItem -Recurse -Filter 'test_*.py' -ErrorAction SilentlyContinue) -ne $null)
+          if ( ($hasIni) -or ($hasTests) ) {
             $env:PYTEST_ADDOPTS = "-rA -q"
             python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
