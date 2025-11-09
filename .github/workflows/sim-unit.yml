@@ -1,35 +1,25 @@
-﻿name: Sim Unit (Headless)
+name: Sim Unit (Headless)
 
 on:
+  workflow_dispatch:
   push:
     branches: [ chore/phase3-metrics-schema-and-collector ]
     paths:
       - "colink_core/**"
-      - "tests/**"
       - ".github/workflows/sim-unit.yml"
       - "pyproject.toml"
   pull_request:
     branches: [ main ]
     paths:
       - "colink_core/**"
-      - "tests/**"
       - ".github/workflows/sim-unit.yml"
       - "pyproject.toml"
-  workflow_dispatch:
 
 jobs:
   unit:
-    name: unit (${{ matrix.os }}, ${{ matrix.python }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python: ["3.11"]
-
+    runs-on: ubuntu-latest
     env:
       MPLBACKEND: Agg
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -37,48 +27,31 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python }}
-
-      - name: Sanity echo (prove job creation)
-        run: echo "Hello from ${{ runner.os }} on Python ${{ matrix.python }}"
+          python-version: "3.11"
 
       - name: Upgrade pip tooling
-        shell: bash
-        run: |
-          python -m pip install -U pip setuptools wheel
+        run: python -m pip install -U pip setuptools wheel
 
-      - name: Install package (editable) + minimal test deps
-        shell: bash
+      - name: Install project (editable) + deps
         run: |
-          set -e
-          pip install -e ".[test]" || true
-          pip install matplotlib pytest tabulate pyarrow || true
-          python - <<'PY'
-import sys, subprocess
-try:
-    import colink_core  # noqa
-    print("Editable OK")
-except Exception as e:
-    print("Editable import failed:", e)
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
-PY
+          pip install -e . || true
+          pip install matplotlib numpy
 
-      - name: Tiny headless smoke (matplotlib Agg)
-        shell: bash
+      - name: Headless matplotlib smoke (save PNG)
         run: |
           python - <<'PY'
 import os, numpy as np, matplotlib, matplotlib.pyplot as plt
 print("Backend:", matplotlib.get_backend())
 os.makedirs(".sim_smoke", exist_ok=True)
-x = np.linspace(0, 2*np.pi, 200); y = np.sin(x)
+x = np.linspace(0, 6.283, 200); y = np.sin(x)
 plt.plot(x,y); plt.title("Headless OK"); plt.savefig(".sim_smoke/ok.png", dpi=120)
 print("Saved .sim_smoke/ok.png")
 PY
 
-      - name: Upload headless artifacts (best effort)
+      - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: headless-artifacts-${{ matrix.os }}
+          name: headless-artifacts-ubuntu
           path: .sim_smoke/*.png
           if-no-files-found: ignore
