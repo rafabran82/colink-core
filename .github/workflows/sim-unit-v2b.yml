@@ -28,7 +28,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          pytest -q
+          python -m pytest -q
 
       - name: Write summary artifact
         run: |
