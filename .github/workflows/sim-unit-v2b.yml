@@ -36,7 +36,6 @@ jobs:
         if: always()
         run: |
           New-Item -ItemType Directory -Path .artifacts -Force | Out-Null
-
           $summary = @"
           sim-unit-v2b summary
           Branch: $env:GITHUB_REF_NAME
