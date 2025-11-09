@@ -81,7 +81,7 @@ jobs:
           $py  = (& python --version) 2>$null
           $pip = (& pip --version) 2>$null
           @"
-sim-unit-v2b summary
+# sim-unit-v2b summary
 SHA: $env:GITHUB_SHA
 Ref: $env:GITHUB_REF
 Python: $py
