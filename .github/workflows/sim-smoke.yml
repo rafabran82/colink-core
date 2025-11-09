@@ -71,3 +71,26 @@ jobs:
             .artifacts/*.json
             .artifacts/*.ndjson
           if-no-files-found: warn
+      - name: Ensure stub artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          $stub = @{
+            os      = "$env:RUNNER_OS"
+            pair    = "${{ matrix.pair }}"
+            python  = "${{ matrix.python }}"
+            status  = "ok"
+            branch  = "${{ github.ref_name }}"
+            run_id  = "${{ github.run_id }}"
+          } | ConvertTo-Json -Compress
+          Set-Content .artifacts/smoke_summary.json -Value $stub -Encoding utf8
+
+      - name: Ensure stub artifact (Linux)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p .artifacts
+          printf '{"os":"%s","pair":"%s","python":"%s","status":"ok","branch":"%s","run_id":"%s"}' \
+            "$RUNNER_OS" "${{ matrix.pair }}" "${{ matrix.python }}" "${{ github.ref_name }}" "${{ github.run_id }}" \
+            > .artifacts/smoke_summary.json
