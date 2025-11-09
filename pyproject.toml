@@ -1,25 +1,29 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "colink-core"
-version = "0.1.0"
-description = "COLINK core library"
-authors = [{ name = "Rafaelito" }]
+version = "0.0.0"
+description = "COLINK core simulation + bridge prototypes"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = []
+requires-python = ">=3.11"
+authors = [{ name = "R A" }]
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "pyarrow",
+  "tabulate"
+]
+
+[project.optional-dependencies]
+test = ["pytest","pytest-cov"]
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["colink_core*"]
-exclude = ["tests*", "docs*", "examples*"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py310"
-
-[tool.pytest.ini_options]
-addopts = "-q"
-pythonpath = ["."]
+exclude = ["tests*"]

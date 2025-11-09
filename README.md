@@ -1,4 +1,7 @@
-﻿[![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)
+﻿<!-- CI BADGE BEGIN -->
+[![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
+<!-- CI BADGE END -->
+[![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)
 
 [![Sim Smoke](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/sim-smoke.yml)
 # colink-core
@@ -111,6 +114,40 @@ python -m colink_core.sim.run_sweep `
 
 Test pre-commit CI badge seed
 
-![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)
+![pre-commit](https://github.com/rafabran82/colink-core/actions/workflows/pre-commit.yml/badge.svg)rnrn<!-- SIM QUICKSTART BEGIN -->
+### Simulation quickstart
+
+Headless demo (produces PNG + NDJSON + JSON metrics):
+
+```bash
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demornrnrn<!-- SIM QUICKSTART BEGIN -->
+### Simulation quickstart
+
+Headless demo (produces PNG + NDJSON + JSON metrics):
+
+```bash
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demo
+<!-- SIM QUICKSTART END -->
+rnrnrn<!-- SIM QUICKSTART BEGIN -->
+### Simulation quickstart
+
+Headless demo (produces PNG + NDJSON + JSON metrics):
+
+```bash
+python -m colink_core.sim.run --demo --display Agg --out-prefix ./.artifacts/demornrnrn<!-- BRIDGE QUICKSTART BEGIN -->
+### Bridge (Phase 4) quickstart
+
+Emit two-hop CP-AMM bridge artifacts (events NDJSON + metrics JSON):
+
+```bash
+python -m colink_core.bridge.run \
+  --amount 1500 \
+  --pairA COL/COPX \
+  --pairM COPX/XRP \
+  --out-prefix ./.artifacts/bridge_demo \
+  --backend Agg \
+  --sha $(git rev-parse HEAD)
+<!-- BRIDGE QUICKSTART END -->
+
 
 

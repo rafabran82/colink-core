@@ -1,0 +1,32 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://colink.local/schemas/metrics.schema.json",
+  "title": "COLINK Simulation Metrics",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["run_id", "timestamp", "backend", "os", "sha", "metrics"],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "backend": { "type": "string", "minLength": 1 },
+    "os": { "type": "string", "minLength": 1 },
+    "sha": { "type": "string", "minLength": 7 },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["success_rate", "p95_latency_ms"],
+      "properties": {
+        "success_rate": { "type": ["number","null"] },
+        "p95_latency_ms": { "type": ["number","null"] },
+        "orders_total": { "type": ["number","null"] },
+        "trades_total": { "type": ["number","null"] },
+        "volume_quote": { "type": ["number","null"] },
+        "pnl": { "type": ["number","null"] },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "durations": { "type": "object", "additionalProperties": true }
+      }
+    }
+  }
+}
+
+
