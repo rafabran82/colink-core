@@ -1,60 +1,59 @@
-name: Sim Unit (Headless) v2
+﻿name: sim-unit-v2
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths:
-      - "colink_core/**"
-      - ".github/workflows/sim-unit-v2.yml"
-      - "pyproject.toml"
   pull_request:
     branches: [ main ]
-    paths:
-      - "colink_core/**"
-      - ".github/workflows/sim-unit-v2.yml"
-      - "pyproject.toml"
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
 
 jobs:
-  unit:
-    runs-on: ubuntu-latest
-    env:
-      MPLBACKEND: Agg
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      - name: Upgrade pip tooling
-        run: python -m pip install -U pip setuptools wheel
-
-      - name: Install project (editable) + deps
+      - name: Install dependencies
+        shell: pwsh
         run: |
-          pip install -e . || true
-          pip install matplotlib numpy
+          python -m pip install --upgrade pip
+          if (Test-Path pyproject.toml) {
+            pip install -e ".[dev]"
+          } elseif (Test-Path requirements.txt) {
+            pip install -r requirements.txt
+          }
+          pip install numpy matplotlib
 
-      - name: Echo dispatch probe
-        run: echo "DISPATCH_PROBE=$GITHUB_SHA"
-
-      - name: Headless matplotlib smoke (save PNG)
+      - name: NumPy / Matplotlib smoke
+        shell: pwsh
         run: |
-          python - <<'PY'
-import os, numpy as np, matplotlib, matplotlib.pyplot as plt
-print("Backend:", matplotlib.get_backend())
-os.makedirs(".sim_smoke", exist_ok=True)
-x = np.linspace(0, 6.283, 200); y = np.sin(x)
-plt.plot(x,y); plt.title("Headless OK (v2)"); plt.savefig(".sim_smoke/ok.png", dpi=120)
-print("Saved .sim_smoke/ok.png")
-PY
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          $py = @'
+          import os, numpy as np, matplotlib
+          import matplotlib.pyplot as plt
+          x = np.linspace(0, 6.28318, 200)
+          y = np.sin(x)
+          plt.plot(x, y)
+          plt.title("smoke")
+          plt.savefig(".artifacts/smoke.png", dpi=120)
+          print("matplotlib backend:", matplotlib.get_backend())
+          '@
+          $tmp = Join-Path $env:TEMP ("smoke_{0}.py" -f ([guid]::NewGuid()))
+          Set-Content -Path $tmp -Value $py -Encoding utf8
+          python $tmp
 
-      - name: Upload artifact
-        if: always()
-        uses: actions/upload-artifact@v5
-        with:
-          name: headless-artifacts-ubuntu-v2
-          path: .sim_smoke/*.png
-          if-no-files-found: warn
+      - name: Run tests
+        shell: pwsh
+        run: |
+          if (Test-Path pytest.ini -or (Get-ChildItem -Recurse -Filter "test_*.py" -ErrorAction SilentlyContinue)) {
+            pytest -q
+          } else {
+            Write-Host "No tests found; skipping."
+          }
