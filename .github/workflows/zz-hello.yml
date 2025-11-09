@@ -1,4 +1,4 @@
-﻿name: Hello Probe
+name: Hello Probe
 
 on:
   push:
