@@ -62,3 +62,5 @@ build/
 artifacts/
 .venv/
 *.zip
+.ci_last_job.log
+.artifacts_from_ci/
