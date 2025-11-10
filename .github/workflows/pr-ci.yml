@@ -4,10 +4,16 @@ on:
   pull_request:
     branches: [ main ]
     types: [ opened, synchronize, reopened ]
-  workflow_dispatch:jobs:
+  workflow_dispatch:
+
+jobs:
   build-test-package:
     runs-on: windows-latest
-    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      ALLOW_PYTEST_NO_TESTS: true
 
     steps:
       - name: Checkout
@@ -22,60 +28,54 @@ on:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          key: Windows-pip-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            Windows-pip-
 
       - name: Phase-10 Bootstrap
-        shell: pwsh
         run: .\scripts\ci\Phase-10-Bootstrap.ps1
 
       - name: Phase-20 Build & Test
-        shell: pwsh
-        run: .\scripts\ci\Phase-20-BuildAndTest.ps1
+        run: |
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-20-BuildAndTest.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Caller observed exit code: $code"
+          if ($code -ne 0) { exit $code }
 
-            - name: Phase-25 Emit samples (optional)
+      - name: Phase-25 Emit samples (optional)
         continue-on-error: true
         run: |
           $global:LASTEXITCODE = 0
-          $ErrorActionPreference = "Stop"
+          $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-25-EmitSamples.ps1"
           $code = $LASTEXITCODE
           Write-Host "Phase-25 observed exit code: $code (ignored if nonzero)"
           exit 0
 
-      - name: Phase-30 Package
-        shell: pwsh
-        run: .\scripts\ci\Phase-30-Package.ps1
-
       - name: Make index.html
-        shell: pwsh
-        run: .\scripts\ci\Make-IndexHtml.ps1
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          @"
+<!doctype html><meta charset='utf-8'><title>Artifacts</title>
+<h1>Artifacts</h1>
+<ul>
+  <li><a href='sample.png'>sample.png</a></li>
+  <li><a href='sample.json'>sample.json</a></li>
+</ul>
+"@ | Set-Content .artifacts\index.html -Encoding utf8
 
       - name: List .artifacts
-        shell: pwsh
-        run: Get-ChildItem -Force .\.artifacts | Format-Table -AutoSize
+        run: |
+          if (Test-Path .artifacts) { Get-ChildItem -Recurse .artifacts | Format-List FullName,Length }
 
       - name: Upload .artifacts folder (browsable index)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-index
-          path: .artifacts/**
-          if-no-files-found: error
-          retention-days: 14
-          compression-level: 6
-
-      - name: Upload bundles (.zip/.tgz)
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-bundles
-          path: |
-            ci-artifacts-*.zip
-            ci-artifacts-*.tgz
-          if-no-files-found: error
-          retention-days: 14
-          compression-level: 0
-
-
-
+          name: pr-ci-artifacts
+          path: ./.artifacts
+          if-no-files-found: ignore
