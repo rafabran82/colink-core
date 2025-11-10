@@ -5,7 +5,14 @@
 
 function Ensure-Folder($p){ if(-not(Test-Path $p)){ New-Item -ItemType Directory -Force -Path $p | Out-Null } }
 
-if(-not (Test-Path $Artifacts)){ throw "No artifacts at $Artifacts. Run .\run_ci.ps1 first." }
+# Ensure artifacts exist; if not, run local CI
+if (-not (Test-Path $Artifacts)) {
+  Write-Host "No artifacts at $Artifacts. Running local CI first..."
+  pwsh -NoLogo -NoProfile -File .\run_ci.ps1 -ProjectHook "& .\scripts\smoke.ps1"
+}
+
+if (-not (Test-Path $Artifacts)) { throw "Artifacts still missing at $Artifacts." }
+
 $files = Get-ChildItem -File -Recurse $Artifacts
 if(-not $files){ throw "Artifacts folder is empty." }
 
@@ -16,13 +23,13 @@ $base = "release-$ts"
 $zip  = Join-Path $Bundles "$base.zip"
 $tgz  = Join-Path $Bundles "$base.tgz"
 
-# Write/refresh SUMMARY.md (very small, quick parse of pytest results if present)
+# Write/refresh SUMMARY.md
 $summary = Join-Path $Artifacts "SUMMARY.md"
 $pytest  = Join-Path $Artifacts "pytest.txt"
 $pytestLine = ""
 if (Test-Path $pytest) {
-  $tail = Get-Content $pytest -Tail 5
-  $pytestLine = ($tail | Where-Object { $_ -match '\[\s*\d+%]|\d+\s*passed|\d+\s*failed|\d+\s*skipped' }) -join ' '
+  $tail = Get-Content $pytest -Tail 10
+  $pytestLine = ($tail | Where-Object { $_ -match '\bpassed\b|\bfailed\b|\bskipped\b|\[\s*\d+%]'} ) -join ' '
 }
 
 $counts = ($files | Group-Object Extension | Sort-Object Count -Descending | ForEach-Object { "{0} × {1}" -f $_.Count, ($_.Name -replace '^\.', '') }) -join ', '
@@ -42,7 +49,6 @@ Set-Content -Path $summary -Encoding utf8 -Value $body
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path (Join-Path $Artifacts '*') -DestinationPath $zip -Force
 
-# tar is available on modern Windows
 if (Test-Path $tgz) { Remove-Item $tgz -Force }
 Push-Location $Artifacts
 try { tar -czf $tgz * } finally { Pop-Location }
