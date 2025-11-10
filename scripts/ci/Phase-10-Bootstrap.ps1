@@ -5,16 +5,13 @@ $PSNativeCommandUseErrorActionPreference = $true
 
 Write-Host "== Phase-10: Bootstrap venv + deps =="
 
-# Resolve workspace and venv paths
 $Root = if ($env:GITHUB_WORKSPACE) { $env:GITHUB_WORKSPACE } else { (git rev-parse --show-toplevel) }
 $Venv = Join-Path $Root ".venv"
-$PyExe = $null
 
-# Prefer the setup-python shim first, then system python
+# Resolve python from setup-python
 $PyExe = (Get-Command python -ErrorAction SilentlyContinue)?.Source
 if (-not $PyExe) { throw "python not found on PATH (actions/setup-python should run before Phase-10)." }
 
-# Create venv if missing
 if (-not (Test-Path $Venv)) {
   Write-Host "Creating venv at $Venv"
   & $PyExe -m venv $Venv
@@ -26,7 +23,7 @@ if (-not (Test-Path $Vpy)) { throw "Venv python not found at $Vpy" }
 # Upgrade build tooling
 & $Vpy -m pip install --upgrade pip setuptools wheel
 
-# Install dev/test deps
+# Install dev/runtime deps if present
 $reqDev = Join-Path $Root "requirements-dev.txt"
 $reqTxt = Join-Path $Root "requirements.txt"
 
@@ -38,15 +35,20 @@ if (Test-Path $reqDev) {
   & $Vpy -m pip install pytest
 }
 
-# Optionally install runtime requirements (skip if you prefer split deps)
 if (Test-Path $reqTxt) {
   Write-Host "Installing runtime requirements: $reqTxt"
   & $Vpy -m pip install -r $reqTxt
 }
 
-# Expose venv to subsequent steps
-# - Add venv Scripts to PATH
-# - Set VIRTUAL_ENV for downstream scripts
+# Ensure pytest is available even if requirements-dev omitted it
+try {
+  & $Vpy -c "import importlib; importlib.import_module('pytest'); print('pytest import OK')"
+} catch {
+  Write-Host "pytest missing after requirements install — installing pytest..."
+  & $Vpy -m pip install pytest
+}
+
+# Export venv for downstream steps
 if ($env:GITHUB_PATH) {
   (Join-Path $Venv "Scripts") | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 }
