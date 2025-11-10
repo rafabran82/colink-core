@@ -58,3 +58,7 @@ dist/
 build/
 # ---- local sim artifacts ----
 .artifacts/
+.artifacts/
+artifacts/
+.venv/
+*.zip
