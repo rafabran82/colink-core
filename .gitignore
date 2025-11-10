@@ -58,3 +58,5 @@ dist/
 build/
 # ---- local sim artifacts ----
 .artifacts/
+
+.ci_last_job.log
