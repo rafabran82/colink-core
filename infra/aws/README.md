@@ -1,4 +1,4 @@
-﻿# COLINK · AWS Infra
+# COLINK · AWS Infra
 
 This folder holds Infrastructure-as-Code for AWS using Terraform (modules + envs).
 - **modules/**: composable building blocks (network, compute, database, observability, security)

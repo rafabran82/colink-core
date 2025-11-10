@@ -1,4 +1,4 @@
-﻿# colink-core quick dev guide
+# colink-core quick dev guide
 
 ## Smoke
 colink-json quote --col-in 8000 --min-out-bps 150 --twap-guard

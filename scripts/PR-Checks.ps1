@@ -1,4 +1,4 @@
-﻿# === PR-Checks.ps1 (PowerShell-safe) ===
+# === PR-Checks.ps1 (PowerShell-safe) ===
 $ErrorActionPreference = "Stop"
 
 Write-Host "== Byte-compile =="

@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)][string]$TradesCsv,
     [Parameter(Mandatory=$true)][string]$VolCsv,
     [int]$Steps = 200,

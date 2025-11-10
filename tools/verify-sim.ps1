@@ -1,4 +1,4 @@
-﻿param(
+param(
   [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
   [string]$Which = "headless-agg",
   [switch]$RunSim,
@@ -138,13 +138,3 @@ if ($RunSim) { Write-Host "* sim-engine: PASS (pairs=$Pairs)" }
 foreach ($m in $succeeded) { Write-Host "* $($m): PASS" }
 foreach ($m in $skipped)   { Write-Host "* $($m): SKIP" }
 Write-Host "================================="
-
-
-
-
-
-
-
-
-
-

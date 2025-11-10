@@ -1,4 +1,4 @@
-﻿# === Approve-And-Merge v3 ===
+# === Approve-And-Merge v3 ===
 # Smart multi-PR merge helper with -All and -DryRun modes
 
 function Approve-And-Merge {

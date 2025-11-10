@@ -1,4 +1,4 @@
-﻿# Sim Smoke artifacts – quick use
+# Sim Smoke artifacts – quick use
 
 ## Latest successful on main
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\collect-smoke.ps1 -Ref main -LatestSuccessful
