@@ -4,18 +4,34 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 Write-Host "Phase-20: Running tests via python -m pytest -q ..."
-# Resolve python explicitly (actions/setup-python guarantees it)
-$python = (Get-Command python -ErrorAction SilentlyContinue)?.Source
+
+# Prefer venv python, then fallback to shim/system
+$Root = if ($env:GITHUB_WORKSPACE) { $env:GITHUB_WORKSPACE } else { (git rev-parse --show-toplevel) }
+$Vpy  = Join-Path $Root ".venv\Scripts\python.exe"
+$python = $null
+if (Test-Path $Vpy) { $python = $Vpy } else { $python = (Get-Command python -ErrorAction SilentlyContinue)?.Source }
+
 if (-not $python) {
-  Write-Error "python not found on PATH. Ensure actions/setup-python ran."
+  Write-Error "python not found on PATH. Ensure Phase-10 ran and created the venv."
   exit 1
 }
 
-# Compose args
+# Final sanity: ensure pytest is importable; if not, install it quickly
+try {
+  & $python - << 'PY'
+import importlib, sys
+importlib.import_module("pytest")
+print("pytest import OK")
+PY
+} catch {
+  Write-Host "pytest not importable in current interpreter — installing pytest..."
+  & $python -m pip install pytest
+}
+
+# Compose args and run
 $pytestArgs = @("-m","pytest","-q")
 if ($env:PYTEST_ARGS) { $pytestArgs += $env:PYTEST_ARGS -split '\s+' }
 
-# Execute
 & $python @pytestArgs
 $code = $LASTEXITCODE
 Write-Host "Phase-20: raw pytest exit code => $code"
