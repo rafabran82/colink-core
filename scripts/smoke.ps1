@@ -1,14 +1,22 @@
-# scripts/smoke.ps1
-$ErrorActionPreference = 'Stop'
-$base = "http://127.0.0.1:8010"
-Write-Host "Health:" -ForegroundColor Cyan
-Invoke-RestMethod "$base/sim/health" | Format-List
+﻿param()
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
 
-Write-Host "`nQuote:" -ForegroundColor Cyan
-Invoke-RestMethod "$base/sim/quote?col_in=8000&min_out_bps=150&twap_guard=true" | Format-List
+$repo = Split-Path $PSScriptRoot -Parent
+Push-Location $repo
+try {
+  # Prefer venv python if present
+  $py = if (Test-Path .\.venv\Scripts\python.exe) { ".\.venv\Scripts\python.exe" } else { "python" }
 
-Write-Host "`nSweep:" -ForegroundColor Cyan
-$tmp = Join-Path $env:TEMP "colink-smoke-$(Get-Random)"
-$r = Invoke-RestMethod -Uri ("$base/sim/sweep?outdir=" + [uri]::EscapeDataString($tmp)) -Method Post
-$r | Format-List
-Get-ChildItem $tmp
+  # Ensure artifacts folder for pytest log
+  if (-not (Test-Path .\.artifacts)) { New-Item -ItemType Directory -Force -Path .\.artifacts | Out-Null }
+
+  # Minimal deps for our tests
+  & $py -m pip install -q pytest fastapi httpx "pydantic-settings>=2" python-dotenv | Out-Null
+
+  # Run pytest in importlib mode so path aliasing can’t bite us
+  & $py -m pytest -q . --import-mode=importlib *>&1 | Tee-Object -File .\.artifacts\pytest.txt
+}
+finally {
+  Pop-Location
+}
