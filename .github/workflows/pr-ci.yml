@@ -77,3 +77,4 @@ jobs:
             ./.artifacts/*.events.ndjson
             ./.artifacts/SUMMARY.md
             ./.artifacts/summary.png
+
