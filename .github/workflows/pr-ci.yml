@@ -1,74 +1,27 @@
-name: PR CI
-
+name: PR CI (Local)
 on:
   pull_request:
     branches: [ main ]
     types: [opened, synchronize, reopened]
   workflow_dispatch:
-
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    env:
-      BACKEND: Agg
-
+  local-ci:
+    runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Bootstrap venv + deps
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1
+      - name: Run local CI
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\ci.local.ps1
+      - name: Verify manifest exists
+        shell: pwsh
+        run: if (-not (Test-Path .\.artifacts\ci.manifest.json)) { throw "Missing .artifacts\ci.manifest.json" }
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-
-      - name: Install deps (pandas/pyarrow/jsonschema/tabulate/matplotlib)
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas pyarrow jsonschema tabulate matplotlib
-
-      - name: Run sim demo (Phase 3)
-        run: |
-          python -m colink_core.sim.run --demo --display "${BACKEND}" --out-prefix ./.artifacts/demo
-
-      - name: Run bridge demo (Phase 4)
-        run: |
-          python -m colink_core.bridge.run \
-            --amount 1500 \
-            --pairA COL/COPX \
-            --pairM COPX/XRP \
-            --out-prefix ./.artifacts/bridge_demo \
-            --backend "${BACKEND}" \
-            --sha "${{ github.sha }}"
-
-      - name: Wrap sim metrics (produce *.metrics.json)
-        run: |
-          python tools/metrics_wrap.py --artifacts ./.artifacts
-
-      - name: Enrich metrics (os/sha/backend)
-        run: |
-          python tools/enrich_metrics.py --artifacts ./.artifacts --os "${{ runner.os }}" --sha "${{ github.sha }}" --backend "${BACKEND}"
-
-      - name: Validate metrics JSON (dispatch by schema_version)
-        run: |
-          python tools/validate_metrics.py
-
-      - name: Merge NDJSON + JSON into CSV/Parquet
-        run: |
-          python tools/collect.py \
-            --artifacts ./.artifacts \
-            --out-dataset ./.artifacts/dataset.csv \
-            --out-parquet ./.artifacts/dataset.parquet \
-            --os "${{ runner.os }}" \
-            --sha "${{ github.sha }}" \
-            --backend "${BACKEND}"
-
-      - name: Write GitHub Job Summary
-        run: |
-          python tools/summary.py
-- name: Upload artifacts
-  uses: actions/upload-artifact@v4
-  with:
-    name: sim-bridge-artifacts
-    path: |
-      ./.artifacts/**
-    if-no-files-found: warn
+          name: local-ci-artifacts
+          path: .artifacts
