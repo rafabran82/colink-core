@@ -1,1 +1,73 @@
-﻿<PASTE THE YAML ABOVE>
+﻿name: PR CI
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  build-test-package:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Phase-10 Bootstrap
+        shell: pwsh
+        run: .\scripts\ci\Phase-10-Bootstrap.ps1
+
+      - name: Phase-20 Build & Test
+        shell: pwsh
+        run: .\scripts\ci\Phase-20-BuildAndTest.ps1
+
+      - name: Phase-25 Emit samples (optional)
+        shell: pwsh
+        run: .\scripts\ci\Phase-25-EmitSamples.ps1
+
+      - name: Phase-30 Package
+        shell: pwsh
+        run: .\scripts\ci\Phase-30-Package.ps1
+
+      - name: Make index.html
+        shell: pwsh
+        run: .\scripts\ci\Make-IndexHtml.ps1
+
+      - name: List .artifacts
+        shell: pwsh
+        run: Get-ChildItem -Force .\.artifacts | Format-Table -AutoSize
+
+      - name: Upload .artifacts folder (browsable index)
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-index
+          path: .artifacts/**
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
+
+      - name: Upload bundles (.zip/.tgz)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-bundles
+          path: |
+            ci-artifacts-*.zip
+            ci-artifacts-*.tgz
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
