@@ -1,21 +1,30 @@
-﻿param()
-Set-StrictMode -Version Latest
+﻿param(
+  [string]$Repo = (Resolve-Path "$PSScriptRoot\..").Path
+)
+
 $ErrorActionPreference = "Stop"
 
-$repo = Split-Path $PSScriptRoot -Parent
-Push-Location $repo
+# Resolve Python in repo venv first, fall back to system python
+$py = Join-Path $Repo ".venv\Scripts\python.exe"
+if (-not (Test-Path $py)) { $py = "python" }
+
+# Install dev deps (quiet) from pinned file
+$req = Join-Path $Repo "requirements-dev.txt"
+& $py -m pip install -q -r $req | Out-Null
+
+# Run pytest from the repo root and capture output into artifacts
+Push-Location $Repo
 try {
-  # Prefer venv python if present
-  $py = if (Test-Path .\.venv\Scripts\python.exe) { ".\.venv\Scripts\python.exe" } else { "python" }
+  $art = Join-Path $Repo ".artifacts"
+  New-Item -ItemType Directory -Force -Path $art | Out-Null
 
-  # Ensure artifacts folder for pytest log
-  if (-not (Test-Path .\.artifacts)) { New-Item -ItemType Directory -Force -Path .\.artifacts | Out-Null }
+  # Ensure pytest is available even if requirements file changes later
+  if (-not (Test-Path ".\.venv\Scripts\pytest.exe")) {
+    & $py -m pip install -q pytest | Out-Null
+  }
 
-  # Minimal deps for our tests
-  & $py -m pip install -q pytest fastapi httpx "pydantic-settings>=2" python-dotenv | Out-Null
-
-  # Run pytest in importlib mode so path aliasing can’t bite us
-  & $py -m pytest -q . --import-mode=importlib *>&1 | Tee-Object -File .\.artifacts\pytest.txt
+  & $py -m pytest -q . --import-mode=importlib *>&1 `
+    | Tee-Object -FilePath (Join-Path $art "pytest.txt") | Out-Null
 }
 finally {
   Pop-Location
