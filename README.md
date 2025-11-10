@@ -1,4 +1,4 @@
-<!-- CI BADGE BEGIN -->
+﻿<!-- CI BADGE BEGIN -->
 [![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
 <!-- CI BADGE END -->
 [![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)
@@ -152,4 +152,10 @@ python -m colink_core.bridge.run \
 
 
 
-> chore/add-v2b-on-main: touch to trigger required checks ($(Get-Date -Format s))
+> chore/add-v2b-on-main: touch to trigger required checks ($(Get-Date -Format s))rnrn<!-- LOCAL-CI QUICKSTART BEGIN -->
+### Local CI quickstart
+
+```powershell
+pwsh -NoLogo -NoProfile -File .\run_ci.ps1 -ProjectHook "& .\scripts\smoke.ps1" -OpenIndex
+<!-- LOCAL-CI QUICKSTART END -->
+
