@@ -58,3 +58,13 @@ dist/
 build/
 # ---- local sim artifacts ----
 .artifacts/
+.artifacts/
+artifacts/
+.venv/
+*.zip
+.ci_last_job.log
+.artifacts_from_ci/
+# Local CI outputs
+.artifacts/
+ci-artifacts.zip
+ci-artifacts.tgz
