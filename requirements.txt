@@ -9,7 +9,7 @@ websockets==11.0.3
 
 # Tooling
 ruff==0.6.8
-black==25.9.0
+black==25.11.0
 
 # --- Plotting deps for headless CI runs (tests use --display Agg) ---
 # Pin to stable wheels for CPython 3.11 on Windows self-hosted
