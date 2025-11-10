@@ -1,4 +1,4 @@
-﻿# Example wiring of modules (expand later)
+# Example wiring of modules (expand later)
 
 module "network" {
   source      = "../../modules/network"

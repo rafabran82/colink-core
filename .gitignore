@@ -1,4 +1,4 @@
-﻿# Terraform junk & local state
+# Terraform junk & local state
 *.tfstate
 *.tfstate.*
 .crash

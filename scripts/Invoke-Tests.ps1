@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param([switch]$NoCompile)
 $ErrorActionPreference = "Stop"
 $python = ".\.venv\Scripts\python.exe"

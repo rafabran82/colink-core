@@ -1,4 +1,4 @@
-﻿param(
+param(
   [ValidateSet("headless-agg","show-agg-offscreen","show-hold-tkagg","all")]
   [string]$Which = "headless-agg",
   [switch]$RunSim,

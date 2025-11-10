@@ -1,4 +1,4 @@
-﻿<!-- CI BADGE BEGIN -->
+<!-- CI BADGE BEGIN -->
 [![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml)
 <!-- CI BADGE END -->
 [![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)
