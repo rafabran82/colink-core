@@ -1,4 +1,4 @@
-﻿param(
+param(
   [string]$Title,
   [string]$Body = "",
   [string]$BranchName = "",

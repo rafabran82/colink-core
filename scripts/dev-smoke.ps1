@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 Write-Host "== Byte-compile ==" -ForegroundColor Cyan
 Get-ChildItem -Recurse -File -Include *.py |

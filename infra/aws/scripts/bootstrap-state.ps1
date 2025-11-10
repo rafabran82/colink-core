@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Bootstrap per-environment state buckets and DynamoDB lock table.
   NOTE: Run with an AWS profile that can create S3 + DynamoDB in the target account.

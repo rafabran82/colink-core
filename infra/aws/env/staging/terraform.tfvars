@@ -1,4 +1,4 @@
-﻿env         = "staging"
+env         = "staging"
 aws_region  = "us-east-1"
 aws_profile = "colink-staging"
 

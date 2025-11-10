@@ -1,4 +1,4 @@
-﻿param(
+param(
   [string]$BindHost = "127.0.0.1",
   [int]$Port = 8011,
   [string]$Log = "debug"

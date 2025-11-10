@@ -1,11 +1,11 @@
-﻿## What
-- 
+## What
+-
 
 ## Why
-- 
+-
 
 ## How to test
-- 
+-
 
 ## Checklist
 - [ ] CI green

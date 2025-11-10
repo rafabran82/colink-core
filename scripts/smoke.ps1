@@ -1,4 +1,4 @@
-﻿# scripts/smoke.ps1
+# scripts/smoke.ps1
 $ErrorActionPreference = 'Stop'
 $base = "http://127.0.0.1:8010"
 Write-Host "Health:" -ForegroundColor Cyan

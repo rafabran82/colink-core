@@ -1,4 +1,4 @@
-﻿numpy
+numpy
 pandas
 matplotlib
 pyarrow

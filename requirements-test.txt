@@ -1,1 +1,1 @@
-﻿matplotlib>=3.7,<3.10
+matplotlib>=3.7,<3.10
