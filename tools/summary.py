@@ -29,7 +29,7 @@ if csv.exists():
 
     if out:
         lines = []
-        lines.append("## COLINK Phase 3 — Simulation Summary")
+        lines.append("## COLINK Phase 3 - Simulation Summary")
         lines.append("")
         lines.append(f"Rows: **{len(df)}**")
         lines.append("")
