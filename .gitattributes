@@ -1,3 +1,12 @@
-*.yml  text eol=lf
-*.yaml text eol=lf
-
+﻿# Text files use LF in repo; Git will convert on Windows checkout if needed
+*           text=auto
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.py        text eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.toml      text eol=lf
+# Never normalize binaries
+*.png       binary
+*.jpg       binary
+*.gif       binary

@@ -25,7 +25,7 @@ def try_get(d, keys):
 
 
 def coerce_number(x):
-    if isinstance(x, (int, float)):
+    if isinstance(x, int | float):
         return float(x)
     if isinstance(x, bool):
         return 1.0 if x else 0.0
@@ -110,7 +110,7 @@ def main():
         out = p.with_name(f"{p.stem}.metrics.json")
         out.write_text(json.dumps(metrics_doc, ensure_ascii=False, indent=2), encoding="utf-8")
         produced += 1
-        print(f"[OK] Wrapped → {out}")
+        print(f"[OK] Wrapped -> {out}")
 
     print(f"Produced {produced} metrics JSON file(s).")
     return 0
