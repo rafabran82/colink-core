@@ -30,19 +30,26 @@ if ($existing) {
   metrics        = @{ count = 2; mean = 42.0 }
 } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $art "run.metrics.json") -Encoding utf8
 
-# 4) Parquet (best-effort via pandas/pyarrow)
+# 4) Parquet (best-effort via pandas/pyarrow) — use a temp .py file (PowerShell-safe)
 $py = Join-Path $PWD ".venv\Scripts\python.exe"
 if (Test-Path $py) {
   $code = @"
-import pandas as pd, datetime as dt, pyarrow as pa, pyarrow.parquet as pq
+import pandas as pd, pyarrow as pa, pyarrow.parquet as pq
 from pathlib import Path
 art = Path(r'$art')
 df = pd.DataFrame([{'ts': pd.Timestamp.utcnow(), 'value': 42}])
 table = pa.Table.from_pandas(df)
 pq.write_table(table, art/'demo.parquet')
 "@
-  try { & $py - <<#PY# $code PY
-  } catch { Write-Warning "Parquet emit failed (ok to ignore)." }
+  $tmp = Join-Path $env:TEMP ("emit_parquet_{0}.py" -f ([guid]::NewGuid()))
+  Set-Content -Path $tmp -Value $code -Encoding utf8
+  try {
+    & $py $tmp
+  } catch {
+    Write-Warning "Parquet emit failed (ok to ignore): $($_.Exception.Message)"
+  } finally {
+    Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+  }
 }
 
 # 5) SUMMARY.md and tiny PNG placeholder
@@ -62,7 +69,6 @@ try {
   $bmp.Save($pngPath, [System.Drawing.Imaging.ImageFormat]::Png)
   $bmp.Dispose()
 } catch {
-  # Fallback: write a text marker if System.Drawing is unavailable
   "PNG placeholder" | Set-Content (Join-Path $art "summary.png.txt")
 }
 
