@@ -36,9 +36,16 @@ jobs:
         shell: pwsh
         run: .\scripts\ci\Phase-20-BuildAndTest.ps1
 
-      - name: Phase-25 Emit samples (optional)
-        shell: pwsh
-        run: .\scripts\ci\Phase-25-EmitSamples.ps1
+            - name: Phase-25 Emit samples (optional)
+        continue-on-error: true
+        run: |
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-25-EmitSamples.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Phase-25 observed exit code: $code (ignored if nonzero)"
+          exit 0
 
       - name: Phase-30 Package
         shell: pwsh
@@ -71,4 +78,5 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+
 
