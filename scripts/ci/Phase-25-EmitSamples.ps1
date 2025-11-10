@@ -1,67 +1,60 @@
-﻿# --- Phase-25: Emit samples (optional, headless-safe) ---
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+﻿# == Phase-25: Emit sample artifacts (fallback, venv-aware) ==
+$ErrorActionPreference = "Continue"
 $PSNativeCommandUseErrorActionPreference = $true
 
-$Root = if ($env:GITHUB_WORKSPACE) { $env:GITHUB_WORKSPACE } else { (git rev-parse --show-toplevel) }
-$Out  = Join-Path $Root ".artifacts"
-if (-not (Test-Path $Out)) { New-Item -ItemType Directory -Force -Path $Out | Out-Null }
+# Resolve artifacts dir in the current workspace
+$artifacts = Join-Path (Get-Location) ".artifacts"
+New-Item -ItemType Directory -Force -Path $artifacts | Out-Null
 
-# Prefer venv python
-$Vpy = Join-Path $Root ".venv\Scripts\python.exe"
-$python = if (Test-Path $Vpy) { $Vpy } else { (Get-Command python -ErrorAction SilentlyContinue)?.Source }
-if (-not $python) {
-  Write-Warning "python not found; skipping sample emission."
-  exit 0
+# Prefer the venv's python, fallback to PATH
+if ($env:VIRTUAL_ENV -and (Test-Path (Join-Path $env:VIRTUAL_ENV "Scripts/python.exe"))) {
+  $python = Join-Path $env:VIRTUAL_ENV "Scripts/python.exe"
+} else {
+  $python = "python"
 }
 
-# Ensure matplotlib is present (no fail if install misses)
-try {
-  & $python -c "import importlib; importlib.import_module('matplotlib'); print('matplotlib OK')" 2>$null
-} catch {
-  Write-Host "Installing matplotlib for sample emission..."
-  try { & $python -m pip install matplotlib | Out-Null } catch { Write-Warning "Could not install matplotlib; skipping."; exit 0 }
-}
+Write-Host "== Phase-25: Emit sample artifacts (fallback) =="
+Write-Host "Using python: $python"
+Write-Host "Artifacts dir: $artifacts"
 
-# Emit a PNG + JSON safely (Agg backend)
+# Inline Python: write CSV/NDJSON/JSON via stdlib; Parquet via pandas/pyarrow if available
 $py = @"
-import os, json
-os.environ['MPLBACKEND'] = 'Agg'
-from pathlib import Path
-from math import sin
-import matplotlib.pyplot as plt
+import os, json, csv, time, sys
+art = os.path.join(os.getcwd(), ".artifacts")
+os.makedirs(art, exist_ok=True)
 
-out = Path(r'$Out')
-out.mkdir(parents=True, exist_ok=True)
+rows = [{"t": i, "value": i*i} for i in range(5)]
 
-# simple plot
-x = [i/50 for i in range(0, 501)]
-y = [sin(6.28318530718 * t) for t in x]
-plt.figure()
-plt.plot(x, y)
-plt.title('CI sample')
-plt.xlabel('t'); plt.ylabel('sin(2πt)')
-plt.savefig(out / 'sample.png', dpi=120)
-plt.close()
+with open(os.path.join(art, "dataset.csv"), "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=rows[0].keys())
+    w.writeheader(); w.writerows(rows)
 
-# simple metrics
-m = {'points': len(x), 'min': min(y), 'max': max(y)}
-(out / 'sample.json').write_text(json.dumps(m, indent=2))
-print('Emitted:', (out / 'sample.png'), (out / 'sample.json'))
+with open(os.path.join(art, "sample.metrics.json"), "w") as f:
+    json.dump({"schema_version":"1.0", "os": os.name, "ts": time.time()}, f, indent=2)
+
+with open(os.path.join(art, "sample.events.ndjson"), "w") as f:
+    for r in rows:
+        f.write(json.dumps(r) + "\\n")
+
+print("Wrote CSV/JSON/NDJSON")
+
+# Optional Parquet: try pandas/pyarrow if present; otherwise skip gracefully
+try:
+    import pandas as pd
+    df = pd.DataFrame(rows)
+    df.to_parquet(os.path.join(art, "dataset.parquet"))
+    print("Wrote dataset.parquet via pandas/pyarrow")
+except Exception as e:
+    print("Parquet skipped:", e)
 "@
 
-$tmp = [IO.Path]::Combine([IO.Path]::GetTempPath(), "emit_{0}.py" -f ([guid]::NewGuid()))
-[IO.File]::WriteAllText($tmp, $py, [Text.Encoding]::UTF8)
+# Write temp file and run
+$tmp = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), "emit_parquet_{0}.py" -f ([guid]::NewGuid()))
+Set-Content -Path $tmp -Value $py -Encoding utf8
 
-try {
-  & $python $tmp
-} catch {
-  Write-Warning "Sample emission failed, but step is optional. Error: $($_.Exception.Message)"
-  # do not fail
-  exit 0
-} finally {
-  Remove-Item -Force $tmp -ErrorAction SilentlyContinue
-}
+& $python $tmp
+$code = $LASTEXITCODE
+Write-Host "EmitSamples Python exit code: $code (ignored)"
 
-Write-Host "Phase-25 complete."
+# Always succeed: Phase-25 is optional
 exit 0
