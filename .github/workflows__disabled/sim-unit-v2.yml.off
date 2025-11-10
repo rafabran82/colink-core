@@ -1,0 +1,67 @@
+name: sim-unit-v2
+
+on:
+  workflow_dispatch:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      MPLBACKEND: Agg
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path pyproject.toml) {
+            pip install -e ".[dev]" 2>$null
+          } elseif (Test-Path requirements.txt) {
+            pip install -r requirements.txt
+          }
+          pip install pytest numpy "matplotlib<4"  # ensure pytest + headless-friendly MPL
+
+      - name: NumPy / Matplotlib smoke
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          $py = @'
+          import matplotlib
+          matplotlib.use("Agg")
+          import numpy as np, matplotlib.pyplot as plt
+          x = np.linspace(0, 6.28318, 200); y = np.sin(x)
+          plt.plot(x, y); plt.title("sim-unit-v2 smoke"); plt.savefig(".artifacts/v2_smoke.png", dpi=120)
+          print("backend:", matplotlib.get_backend())
+          '@
+          $tmp = Join-Path $env:TEMP ("smoke_{0}.py" -f ([guid]::NewGuid()))
+          Set-Content -Path $tmp -Value $py -Encoding utf8
+          python $tmp
+
+      - name: Run tests
+  shell: pwsh
+  run: |
+    New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+    $env:PYTEST_ADDOPTS = "-rA -q"
+    python -m pytest 2>&1 | Tee-Object -FilePath .artifacts\pytest.out
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+- name: Upload test artifacts
+  uses: actions/upload-artifact@v4
+  with:
+    name: v2-pytest-artifacts
+    path: .artifacts/*
+    if-no-files-found: warn

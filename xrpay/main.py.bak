@@ -104,6 +104,3 @@ def __who_quotes(request: Request):
         except Exception:
             pass
     return {"error":"no POST /quotes route found"}
-
-
-

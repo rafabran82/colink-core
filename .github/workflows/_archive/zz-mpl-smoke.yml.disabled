@@ -1,22 +1,11 @@
-name: Sim Unit (Headless)
+name: MPL Smoke
 
 on:
-  workflow_dispatch:
   push:
     branches: [ chore/phase3-metrics-schema-and-collector ]
-    paths:
-      - "colink_core/**"
-      - ".github/workflows/sim-unit.yml"
-      - "pyproject.toml"
-  pull_request:
-    branches: [ main ]
-    paths:
-      - "colink_core/**"
-      - ".github/workflows/sim-unit.yml"
-      - "pyproject.toml"
 
 jobs:
-  unit:
+  smoke:
     runs-on: ubuntu-latest
     env:
       MPLBACKEND: Agg
@@ -24,20 +13,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      - name: Upgrade pip tooling
-        run: python -m pip install -U pip setuptools wheel
+      - name: Upgrade pip
+        run: python -m pip install -U pip
 
-      - name: Install project (editable) + deps
-        run: |
-          pip install -e . || true
-          pip install matplotlib numpy
+      - name: Install tiny deps
+        run: pip install numpy matplotlib
 
-      - name: Headless matplotlib smoke (save PNG)
+      - name: Headless PNG
         run: |
           python - <<'PY'
 import os, numpy as np, matplotlib, matplotlib.pyplot as plt
@@ -52,6 +39,6 @@ PY
         if: always()
         uses: actions/upload-artifact@v5
         with:
-          name: headless-artifacts-ubuntu
+          name: mpl-smoke
           path: .sim_smoke/*.png
-          if-no-files-found: ignore
+          if-no-files-found: error
