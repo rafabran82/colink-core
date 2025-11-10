@@ -1,50 +1,50 @@
-param(
-  [Parameter(Mandatory=$true)][string]$Path,
+Param(
+  [Parameter(Position=0)][string]$Path = ".",
   [switch]$Fail
 )
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+# Text-only whitelist (avoid binaries)
+$exts = @(
+  ".ps1",".psm1",".psd1",
+  ".py",".toml",".md",".txt",".json",".yaml",".yml",
+  ".tf",".tfvars",".ini",".cfg",".conf",".sh",".bat",".cmd"
+)
 
-# Directories to skip (regex on full path, both slashes)
-$SkipDir = '(?i)(\\|/)(\.venv|\.ruff_cache|\.pytest_cache|build|dist|__pycache__)(\\|/)'
+# Exclude common junk/caches & VCS
+$exclude = [regex]"\\(\.git|\.venv|\.ruff_cache|\.pytest_cache|node_modules|dist|build)(\\|$)"
 
-# File extensions to treat as binary and skip
-$BinExt = '(?i)\.(png|jpe?g|gif|bmp|tiff?|webp|ico|svgz?|mp4|mov|avi|mkv|webm|mp3|wav|flac|ogg|pdf|zip|7z|gz|tar|tgz|bz2|xz|exe|dll|so|dylib|bin|pyc|pyo|pyd|db|sqlite3?|lock|ttf|otf)$'
+$results = New-Object System.Collections.Generic.List[Object]
 
-# Expand to files
-$files = @()
-Get-ChildItem -Path $Path -Recurse -File -ErrorAction SilentlyContinue | ForEach-Object {
-  $p = $_.FullName
-  if ($p -match $SkipDir) { return }
-  if ($p -match $BinExt)  { return }
-  $files += $p
-}
+Get-ChildItem -Path $Path -Recurse -File -Force |
+  Where-Object {
+    $_.FullName -notmatch $exclude -and $exts -contains $_.Extension.ToLower()
+  } |
+  ForEach-Object {
+    $p = $_.FullName
+    $bytes = [IO.File]::ReadAllBytes($p)
 
-if (-not $files -or $files.Count -eq 0) {
-  Write-Host "No eligible files to check under: $Path"
-  exit 0
-}
+    # UTF-8 BOM?
+    $hasBom = $false
+    if ($bytes.Length -ge 3) {
+      $hasBom = ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
+    }
 
-$violations = @()
+    # CRLF check using raw bytes (0x0D 0x0A sequence)
+    $hasCrlf = $false
+    for ($i=0; $i -lt $bytes.Length-1; $i++) {
+      if ($bytes[$i] -eq 0x0D -and $bytes[$i+1] -eq 0x0A) { $hasCrlf = $true; break }
+    }
 
-foreach ($f in $files) {
-  $bytes = [IO.File]::ReadAllBytes($f)
-  if ($bytes.Length -eq 0) { continue }
-
-  $hasBom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
-  $hasCR  = $false
-  foreach ($b in $bytes) { if ($b -eq 0x0D) { $hasCR = $true; break } }
-
-  if ($hasBom -or $hasCR) {
-    $violations += [pscustomobject]@{ Path = $f; BOM = $hasBom; CRLF = $hasCR }
+    $results.Add([PSCustomObject]@{
+      Path = $p
+      BOM  = $hasBom
+      CRLF = $hasCrlf
+    })
   }
-}
 
-if ($violations.Count -gt 0) {
-  $violations | Sort-Object Path | Format-Table -AutoSize | Out-String | Write-Host
-  if ($Fail) { Write-Error "BOM/CRLF detected."; exit 1 } else { Write-Warning "BOM/CRLF detected."; exit 0 }
-} else {
-  Write-Host "OK: No BOM and LF-only line endings."
-  exit 0
+$results | Sort-Object Path | Format-Table -AutoSize
+
+if ($Fail -and ($results | Where-Object { $_.BOM -or $_.CRLF })) {
+  Write-Error "BOM/CRLF detected."
+  exit 1
 }
