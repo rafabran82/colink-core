@@ -1,0 +1,55 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://colink.local/schemas/metrics.bridge.schema.json",
+  "title": "COLINK Bridge Metrics",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["run_id", "timestamp", "backend", "os", "sha", "schema_version", "metrics"],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "backend": { "type": "string", "minLength": 1 },
+    "os": { "type": "string", "minLength": 1 },
+    "sha": { "type": "string", "minLength": 7 },
+    "schema_version": { "type": "string", "enum": ["colink.bridge.v1"] },
+    "route": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "pairs": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["hop1", "hop2"],
+      "properties": {
+        "hop1": { "type": "string", "minLength": 3 },
+        "hop2": { "type": "string", "minLength": 3 }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "success_rate",
+        "p95_latency_ms",
+        "fees_total",
+        "slippage_bps",
+        "effective_price_ab",
+        "ideal_price_ab",
+        "amount_in",
+        "amount_out"
+      ],
+      "properties": {
+        "success_rate": { "type": "number" },
+        "p95_latency_ms": { "type": ["number","null"] },
+        "fees_total": { "type": "number" },
+        "slippage_bps": { "type": "number" },
+        "effective_price_ab": { "type": "number" },
+        "ideal_price_ab": { "type": "number" },
+        "amount_in": { "type": "number" },
+        "amount_out": { "type": "number" }
+      }
+    }
+  }
+}
