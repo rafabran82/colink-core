@@ -65,15 +65,10 @@ jobs:
       - name: Write GitHub Job Summary
         run: |
           python tools/summary.py
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: sim-bridge-artifacts
-          path: |
-            ./.artifacts/*.csv
-            ./.artifacts/*.parquet
-            ./.artifacts/*.metrics.json
-            ./.artifacts/*.events.ndjson
-            ./.artifacts/SUMMARY.md
-            ./.artifacts/summary.png
+- name: Upload artifacts
+  uses: actions/upload-artifact@v4
+  with:
+    name: sim-bridge-artifacts
+    path: |
+      ./.artifacts/**
+    if-no-files-found: warn
