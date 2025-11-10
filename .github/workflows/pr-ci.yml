@@ -3,10 +3,8 @@
 on:
   pull_request:
     branches: [ main ]
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
-
-jobs:
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:jobs:
   build-test-package:
     runs-on: windows-latest
     timeout-minutes: 30
@@ -78,5 +76,6 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+
 
 
