@@ -45,3 +45,9 @@ __pycache__/
 !.artifacts/ci/pytest.txt
 !.artifacts/ci/trend_stats.json
 # === local-ci allowlist END ===
+# Local CI artifacts
+.artifacts/
+!.artifacts/.gitkeep
+# Local-CI backups
+scripts/Local-CI.backup_*.ps1
+scripts/*.bak
