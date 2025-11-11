@@ -1,6 +1,7 @@
 ﻿param(
   [string]$IndexPath = ".artifacts\index.html",
-  [string]$ChartRelPath = "ci/runs/runs_trend.png"
+  [string]$ChartRelPath = "ci/runs/runs_trend.png",
+  [string]$ExtraHtml = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,6 +10,7 @@ $html = @"
 <h2>Local CI Summary</h2>
 <p>Generated: $(Get-Date)</p>
 <img src="$ChartRelPath" width="600">
+$ExtraHtml
 </body></html>
 "@
 Set-Content -Path $IndexPath -Value $html -Encoding utf8
