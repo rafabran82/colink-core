@@ -1,34 +1,50 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>Artifacts</title>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Local CI — 
+trend-final-fix
+</title>
 <style>
-  body{font:16px system-ui,Segoe UI,Arial,sans-serif;margin:24px;line-height:1.45}
-  h1{font-size:32px;margin:0 0 8px}
-  .badge{margin:10px 0 16px;padding:8px 12px;background:#f6f8fa;border:1px solid #e5e7eb;border-radius:10px;display:inline-block}
-  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
-  ul{margin:6px 0 18px 20px} li span{color:#6b7280;margin-left:6px}
-  h2{font-size:18px;margin:16px 0 6px}
+body{font-family:Segoe UI,Arial,sans-serif;padding:24px;}
+.badge{margin-bottom:16px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
+ul{line-height:1.6}
+span{color:#555;font-size:12px;margin-left:6px}
+h2{margin-top:0}
 </style>
-<h1>Artifacts</h1>
-<div class="badge"><span class="dot" style="background:#6b7280"></span><strong></strong> — </div>
-<h2>CI files</h2><ul><li><a href="ci/ci_badge.json">ci_badge.json</a> <span>(7 B)</span></li>
-<li><a href="ci/ci_run.stderr.log">ci_run.stderr.log</a></li>
-<li><a href="ci/ci_run.stdout.log">ci_run.stdout.log</a></li>
-<li><a href="ci/ci_summary.csv">ci_summary.csv</a> <span>(68 B)</span></li>
-<li><a href="ci/ci_summary.json">ci_summary.json</a> <span>(5 KB)</span></li>
-<li><a href="ci/junit.xml">junit.xml</a> <span>(86 B)</span></li>
-<li><a href="ci/pytest.txt">pytest.txt</a> <span>(17 B)</span></li>
-<li><a href="ci/trend_stats.json">trend_stats.json</a> <span>(141 B)</span></li></ul>
-<h2>Plots</h2><ul><li><a href="plots/slow_by_module.png">slow_by_module.png</a> <span>(11 KB)</span></li>
-<li><a href="plots/sparkline.png">sparkline.png</a> <span>(24 KB)</span></li>
-<li><a href="plots/summary.png">summary.png</a> <span>(20 KB)</span></li></ul>
-<h2>Metrics</h2><ul><li><a href="metrics/run.ndjson">run.ndjson</a> <span>(24 B)</span></li></ul>
-<h2>Bundles</h2><ul><li><a href="bundles/run-20251111-054507.zip">run-20251111-054507.zip</a> <span>(10 KB)</span></li>
-<li><a href="bundles/run-20251111-054708.zip">run-20251111-054708.zip</a> <span>(10 KB)</span></li>
-<li><a href="bundles/run-20251111-055016.zip">run-20251111-055016.zip</a> <span>(12 KB)</span></li>
-<li><a href="bundles/run-20251111-055810.zip">run-20251111-055810.zip</a> <span>(13 KB)</span></li>
-<li><a href="bundles/run-20251111-055818.zip">run-20251111-055818.zip</a> <span>(13 KB)</span></li>
-<li><a href="bundles/run-20251111-055922.zip">run-20251111-055922.zip</a> <span>(13 KB)</span></li>
-<li><a href="bundles/run-20251111-055930.zip">run-20251111-055930.zip</a> <span>(13 KB)</span></li>
-<li><a href="bundles/run-20251111-083232.zip">run-20251111-083232.zip</a> <span>(4 KB)</span></li>
-<li><a href="bundles/run-20251111-083257.zip">run-20251111-083257.zip</a> <span>(4 KB)</span></li></ul>
+</head>
+<body>
+<h2>Local CI — 
+trend-final-fix
+</h2>
+<div class="badge"><span class="dot green"></span><b></b> —  passed; skipped ; failed ; time 0s</div>
+<h3>Artifacts</h3><ul>
+<li><a href=".gitkeep">.gitkeep</a></li>
+<li><a href="dataset.csv">dataset.csv</a> <span>(307 B)</span></li>
+<li><a href="index.html">index.html</a> <span>(2034 B)</span></li>
+<li><a href="pytest.txt">pytest.txt</a> <span>(81 B)</span></li>
+<li><a href="sample.events.ndjson">sample.events.ndjson</a> <span>(418 B)</span></li>
+<li><a href="sample.metrics.json">sample.metrics.json</a> <span>(142 B)</span></li>
+<li><a href="sim.events.ndjson">sim.events.ndjson</a> <span>(4483 B)</span></li>
+<li><a href="sim.metrics.json">sim.metrics.json</a> <span>(150 B)</span></li>
+<li><a href="sim.summary.csv">sim.summary.csv</a> <span>(1257 B)</span></li>
+<li><a href="SUMMARY.md">SUMMARY.md</a> <span>(277 B)</span></li>
+</ul>
+<h3>Plots</h3><ul>
+<li><a href="slow_by_module.png">slow_by_module.png</a> <span>(2406 B)</span></li>
+<li><a href="sparkline.png">sparkline.png</a> <span>(1166 B)</span></li>
+<li><a href="summary.png">summary.png</a> <span>(5674 B)</span></li>
+</ul>
+<h3>Metrics</h3><ul>
+<li><a href="ci_badge.json">ci_badge.json</a> <span>(7 B)</span></li>
+<li><a href="ci_summary.json">ci_summary.json</a> <span>(4777 B)</span></li>
+<li><a href="trend_stats.json">trend_stats.json</a> <span>(141 B)</span></li>
+</ul>
+<h3>Data</h3><ul>
+<li><a href=".gitkeep">.gitkeep</a></li>
+</ul>
+<hr/><h3>CI Trend History</h3><img src='ci/runs/runs_trend.png' style='max-width:920px;border:1px solid #ddd;border-radius:8px'/>
+</body>
+</html>
+
