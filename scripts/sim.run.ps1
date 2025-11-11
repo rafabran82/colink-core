@@ -1,79 +1,100 @@
-﻿$ErrorActionPreference = "Stop"
+﻿# --- Python syntax guard (fast fail) ---
+. "scripts/ci.guard-python.ps1"
+Invoke-PythonSyntaxGuard -Root "scripts" -Include @("*.py")
+Write-Host "✅ Python lint check passed for all scripts." -ForegroundColor Green
+# --- end guard ---
+$ErrorActionPreference = "Stop"
 
-# --- Sim Run Stub (Phase 3, Step 1) ---
-$repo   = (git rev-parse --show-toplevel)
-Set-Location $repo
+function New-Stamp { (Get-Date -AsUTC).ToString("yyyyMMdd-HHmmss") }
 
-$stamp  = Get-Date -Format "yyyyMMdd-HHmmss"
-$outDir = Join-Path $repo ".artifacts\data\$stamp"
+# --- 1) Prepare run folder + meta ---
+$stamp  = New-Stamp
+$outDir = Join-Path ".artifacts\data" $stamp
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-Write-Host "🧩 Sim run started: $stamp"
-Write-Host "📂 Output folder: $outDir"
-
-# For now, just write a tiny meta JSON
-$meta = @{
-    run_id     = $stamp
-    created_at = (Get-Date).ToString("s")
-    note       = "Phase3-Step1 stub run"
+$meta = [ordered]@{
+  run_id     = $stamp
+  created_at = (Get-Date).ToUniversalTime().ToString("s")
+  note       = "Phase3-Step1 stub run"
 }
-$meta | ConvertTo-Json | Set-Content (Join-Path $outDir "run_meta.json") -Encoding utf8
+$metaPath = Join-Path $outDir "run_meta.json"
+$meta | ConvertTo-Json | Set-Content -LiteralPath $metaPath -Encoding utf8
 
+Write-Host "🧩 Sim run started: $stamp"
+Write-Host "📂 Output folder: $((Resolve-Path $outDir).Path)"
 Write-Host "✅ Created run_meta.json"
-Write-Host "✅ Dashboard refreshed (simulated) at .artifacts\index.html"
-# --- CALL PYTHON STUB (Step 2) ---
-# Resolve python exe robustly (PS 5.1-safe)
-$cmd = Get-Command python -ErrorAction SilentlyContinue
-$pyExe = if ($cmd) { $cmd.Path } else { "python" }
 
-Write-Host "🐍 Running Python sim stub ..."
+# --- 2) Locate Python ---
+$pyExe = (Get-Command python -ErrorAction SilentlyContinue | Select-Object -First 1).Source
+if (-not $pyExe) { $pyExe = (Get-Command py -ErrorAction SilentlyContinue | Select-Object -First 1).Source }
+if (-not $pyExe) { throw "Python executable not found on PATH" }
+
+# --- 3) Run sim stub (writes events.ndjson + metrics.json) ---
 & $pyExe "scripts/sim.run.py" --out $outDir --n 60 --dt 0.01
-if ($LASTEXITCODE -ne 0) { throw "Python sim stub failed ($LASTEXITCODE)" }
+if ($LASTEXITCODE -ne 0) { throw "sim.run.py failed with exit $LASTEXITCODE" }
 
-# List produced files
-Write-Host "   - " (Join-Path $outDir "events.ndjson")
-Write-Host "   - " (Join-Path $outDir "metrics.json")
+Write-Host "   -  $(Join-Path $outDir 'events.ndjson')"
+Write-Host "   -  $(Join-Path $outDir 'metrics.json')"
 
-# (Optional next step) Refresh dashboard when ready
-# .\rebuild_ci.cmd
-# --- APPEND SUMMARY CSV (Step 3) ---
+# --- 4) Append summary row + plot ---
 $metricsPath = Join-Path $outDir "metrics.json"
-$summaryCsv  = Join-Path $repo ".artifacts\metrics\summary.csv"
-
-# Ensure metrics folder
-$summaryDir = Split-Path -Parent $summaryCsv
+$summaryDir  = ".artifacts/metrics"
+$summaryCsv  = Join-Path $summaryDir "summary.csv"
+$summaryPng  = Join-Path $summaryDir "summary.png"
 New-Item -ItemType Directory -Force -Path $summaryDir | Out-Null
 
-if (-not (Test-Path -LiteralPath $metricsPath)) {
-    throw "Expected metrics.json not found: $metricsPath"
+# ensure header
+if (-not (Test-Path $summaryCsv)) {
+  "timestamp_utc,samples,total_mb_avg,total_mb_p95,total_mb_max,latency_ms_p95" | Out-File $summaryCsv -Encoding utf8
 }
 
-$m = Get-Content -Raw -LiteralPath $metricsPath | ConvertFrom-Json
-# Values we’ll track across runs (minimal set for now)
-$ts     = (Get-Date).ToUniversalTime().ToString("s")
-$samples= [int]$m.samples
-$avg    = [double]$m.total_mb_avg
-$p95    = [double]$m.total_mb_p95
-$max    = [double]$m.total_mb_max
+if (Test-Path $metricsPath) {
+  $m = Get-Content $metricsPath -Raw | ConvertFrom-Json
+  $ts     = $m.generated_at
+  $samples= $m.samples
+  $avg    = $m.total_mb_avg
+  $p95    = $m.total_mb_p95
+  $max    = $m.total_mb_max
+  $latp95 = $m.latency_ms_p95
 
-# Write header if file missing
-if (-not (Test-Path -LiteralPath $summaryCsv)) {
-    "timestamp_utc,samples,total_mb_avg,total_mb_p95,total_mb_max" | Set-Content -LiteralPath $summaryCsv -Encoding utf8
+  $row = "{0},{1},{2},{3},{4},{5}" -f $ts,$samples,$avg,$p95,$max,$latp95
+  $row | Out-File $summaryCsv -Append -Encoding utf8
+
+  Write-Host "🧮 Appended summary:`n   $((Resolve-Path $summaryCsv).Path)"
+
+  # plot summary
+  & $pyExe "scripts/sim.plot.py" --csv $summaryCsv --out $summaryPng
+  if ($LASTEXITCODE -eq 0) {
+    Write-Host "[OK] Wrote $((Resolve-Path $summaryPng).Path)"
+    Write-Host "🖼  Summary plot: $((Resolve-Path $summaryPng).Path)"
+  } else {
+    Write-Warning "summary plot failed ($LASTEXITCODE)"
+  }
+} else {
+  Write-Warning "metrics.json not found at $metricsPath"
 }
 
-# Append row
-"$ts,$samples,$avg,$p95,$max" | Add-Content -LiteralPath $summaryCsv -Encoding utf8
-
-Write-Host "🧮 Appended summary:" -ForegroundColor Green
-Write-Host "   $summaryCsv"
-# --- PLOT SUMMARY (Step 4) ---
-$summaryCsv = Join-Path $repo ".artifacts\metrics\summary.csv"
-$summaryPng = Join-Path $repo ".artifacts\metrics\summary.png"
-
-$cmd = Get-Command python -ErrorAction SilentlyContinue
-$pyExe = if ($cmd) { $cmd.Path } else { "python" }
-
-& $pyExe "scripts/sim.plot.py" --csv "$summaryCsv" --out "$summaryPng"
-if ($LASTEXITCODE -ne 0) { Write-Warning "summary plot failed ($LASTEXITCODE)" } else {
-  Write-Host "🖼  Summary plot:" $summaryPng
+# --- 5) Best-effort dashboard refresh ---
+try {
+  Write-Host "🔄 Refreshing dashboard..."
+  if (Test-Path ".\rebuild_ci.cmd") {
+    & .\rebuild_ci.cmd
+    if ($LASTEXITCODE -ne 0) {
+      Write-Warning "rebuild_ci.cmd exited with code $LASTEXITCODE"
+    } else {
+      Write-Host "✅ Dashboard refreshed via rebuild_ci.cmd."
+    }
+  } elseif (Test-Path "scripts\ci.rebuild.ps1") {
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "scripts\ci.rebuild.ps1"
+    if ($LASTEXITCODE -ne 0) {
+      Write-Warning "ci.rebuild.ps1 exited with code $LASTEXITCODE"
+    } else {
+      Write-Host "✅ Dashboard refreshed via scripts\ci.rebuild.ps1."
+    }
+  } else {
+    Write-Warning "No rebuild script found."
+  }
+} catch {
+  Write-Host ("⚠️ Skipped dashboard refresh: " + $_.Exception.Message)
 }
+
