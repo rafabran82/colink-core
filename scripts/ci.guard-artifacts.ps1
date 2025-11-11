@@ -21,7 +21,6 @@ Set-Location -Path $Repo
 
 # Explicit allowlist of versioned files under .artifacts (tracked by Git).
 $allowed = @(
-  ".artifacts/summary.md",
   ".artifacts/reports/weekly.csv",
   ".artifacts/reports/summary.json",
   ".artifacts/.gitkeep",
@@ -56,6 +55,7 @@ if ($unexpected.Count -gt 0) {
 
 Write-Host ("Guard OK. Tracked files under {0} are allowed (count={1})." -f $ArtifactsRel, $tracked.Count)
 exit 0
+
 
 
 
