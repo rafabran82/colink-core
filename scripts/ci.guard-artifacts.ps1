@@ -1,15 +1,15 @@
 ﻿# ci.guard-artifacts.ps1
 # Fail the build if any *tracked* file exists under .artifacts that is not explicitly allowed.
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
-
 param(
   [string]$Repo,                      # resolved after param if not provided
   [string]$ArtifactsRel = ".artifacts"
 )
 
-# Resolve $Repo only after parameters are bound (avoid $(...) in param defaults)
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+# Resolve $Repo only after parameters are bound
 if ([string]::IsNullOrWhiteSpace($Repo)) {
   $Repo = (& git rev-parse --show-toplevel).Trim()
 }
