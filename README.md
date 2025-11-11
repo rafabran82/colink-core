@@ -157,5 +157,8 @@ python -m colink_core.bridge.run \
 
 ```powershell
 pwsh -NoLogo -NoProfile -File .\run_ci.ps1 -ProjectHook "& .\scripts\smoke.ps1" -OpenIndex
-<!-- LOCAL-CI QUICKSTART END -->
+<!-- LOCAL-CI QUICKSTART END -->rnrn<!-- ARTIFACT_HOOKS_BEGIN -->
+### Enable Git hooks (one time per clone)
 
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\EnableRepoHooks.ps1
