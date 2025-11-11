@@ -21,6 +21,24 @@
 <option value="Mountain">Mountain</option>
 <option value="Pacific">Pacific</option>
 <option value="UTC">UTC</option></select>
+<!-- LIVE TZ CLOCK BEGIN -->
+<div id="tzNowWrap" style="margin:6px 0 0 0;color:#666;font-size:12px">
+  <span id="tzNowLabel">Now (TZ):</span>
+  <span id="tzNow">--:--:--</span>
+</div>
+<script>
+(function(){
+  const iana = { local:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'),
+    eastern:'America/New_York', central:'America/Chicago',
+    mountain:'America/Denver', pacific:'America/Los_Angeles', utc:'UTC' };
+  function sel(){ return document.getElementById('tzSelect')||document.querySelector('select[name="tz"]')||document.querySelector('select'); }
+  const s = sel(), span = document.getElementById('tzNow');
+  function fmt(z){ const d=new Date(); return d.toLocaleString(undefined,{timeZone:z,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}); }
+  function tick(){ const v=(s&&s.value)||'local'; span && (span.textContent = fmt(iana[v]||iana.local)+'  ('+v.toUpperCase()+')'); }
+  if (s){ s.addEventListener('change', tick); setInterval(tick,1000); tick(); }
+})();
+</script>
+<!-- LIVE TZ CLOCK END -->
     <button id="tzBtn" class="badge">TZ: Local time (default)</button>
   </div>
 
@@ -156,4 +174,7 @@
 <!-- TZ SWITCH PATCH END -->
 </body>
 </html>
+
+
+
 

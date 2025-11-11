@@ -1,72 +1,44 @@
-﻿import pandas as pd, matplotlib.pyplot as plt, os, re
-
-RUNS_DEFAULT = r".artifacts/ci/runs/runs_log.csv"
-OUT  = r".artifacts/ci/runs/runs_trend.png"
-
-import argparse
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--log', default=RUNS_DEFAULT)
-args, _ = parser.parse_known_args()
-RUNS = args.log
-OUT  = r".artifacts/ci/runs/runs_trend.png"
-
-def looks_like_iso_ts(s: str) -> bool:
-    return bool(re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", s or ""))
+﻿import argparse, os, pandas as pd, matplotlib.pyplot as plt
 
 def main():
-    if not os.path.exists(RUNS):
-        print("[WARN] Log file not found:", RUNS)
+    p = argparse.ArgumentParser()
+    p.add_argument("--csv", default=r".artifacts/ci/runs/runs_log.csv")
+    p.add_argument("--out", default=r".artifacts/ci/runs/runs_trend.png")
+    args = p.parse_args()
+
+    runs = args.csv
+    out  = args.out
+
+    if not os.path.exists(runs):
+        print("[WARN] Log file not found:", runs)
         return
 
-    df = pd.read_csv(RUNS, names=["Timestamp","Files","SizeMB"], dtype=str)
-
-    # Clean rows and coerce numbers
-    df = df[df["Timestamp"].astype(str).apply(looks_like_iso_ts)]
-    df["Files"]  = pd.to_numeric(df["Files"],  errors="coerce")
+    df = pd.read_csv(runs, names=["Timestamp","Files","SizeMB"], dtype=str)
+    import re
+    looks = lambda s: bool(re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", str(s or "")))
+    df = df[df["Timestamp"].apply(looks)]
+    df["Files"]  = pd.to_numeric(df["Files"], errors="coerce")
     df["SizeMB"] = pd.to_numeric(df["SizeMB"], errors="coerce")
     df = df.dropna(subset=["Files","SizeMB"])
-
-    # Parse timestamps (assume local time was written) and build HH:MM labels
-    df["Time"]  = pd.to_datetime(df["Timestamp"], format="%Y-%m-%dT%H:%M:%S", errors="coerce")
-    df = df.dropna(subset=["Time"])
-    df["Label"] = df["Time"].dt.strftime("%H:%M")
-
-    # Keep last 50 for readability
-    if len(df) > 50:
-        df = df.tail(50)
-
-    # Plot using numeric x positions + HH:MM tick labels
-    x = list(range(len(df)))
+    if len(df) > 50: df = df.tail(50)
 
     fig, ax1 = plt.subplots(figsize=(6,3))
-    ax1.plot(x, df["SizeMB"], marker="o", color="tab:blue", label="Total MB")
+    ax1.plot(df["Timestamp"], df["SizeMB"], marker="o", label="Total MB")
     ax1.set_xlabel("Run Timestamp")
     ax1.set_ylabel("Total MB", color="tab:blue")
-    ax1.tick_params(axis="y", labelcolor="tab:blue")
-    # Plain ticks, no scientific notation and no offset text
     ax1.ticklabel_format(style="plain", axis="y")
     ax1.get_yaxis().get_major_formatter().set_scientific(False)
     ax1.yaxis.get_offset_text().set_visible(False)
 
     ax2 = ax1.twinx()
-    ax2.plot(x, df["Files"], marker="x", color="tab:orange", label="Files")
+    ax2.plot(df["Timestamp"], df["Files"], marker="x", color="tab:orange", label="Files")
     ax2.set_ylabel("Files", color="tab:orange")
-    ax2.tick_params(axis="y", labelcolor="tab:orange")
-
-    # X-axis HH:MM labels, thin if crowded
-    ax1.set_xticks(x)
-    labels = df["Label"].tolist()
-    if len(labels) > 16:
-        step = max(1, len(labels)//12)
-        for i in range(len(labels)):
-            if i % step != 0:
-                labels[i] = ""
-    ax1.set_xticklabels(labels, rotation=45, ha="right", fontsize=8)
 
     fig.suptitle("Local CI Run Trend")
+    plt.xticks(rotation=45, ha="right", fontsize=8)
     fig.tight_layout()
-    plt.savefig(OUT, dpi=150)
-    print("[OK] Trend chart written:", OUT)
+    plt.savefig(out, dpi=150)
+    print("[OK] Trend chart written:", out)
 
 if __name__ == "__main__":
     main()
