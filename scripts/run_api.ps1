@@ -5,5 +5,6 @@
 )
 $pidOnPort = (Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess)
 if ($pidOnPort) { taskkill /PID $pidOnPort /F | Out-Null }
-.\.venv\Scripts\python.exe -m uvicorn main:app --host $BindHost --port $Port --csv-level $Log
+.\.venv\Scripts\python.exe -m uvicorn main:app --host $BindHost --port $Port --log-level $Log
+
 
