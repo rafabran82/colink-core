@@ -34,3 +34,15 @@ __pycache__/
 !/ .artifacts/bundles/
 !/ .artifacts/bundles/.gitkeep
 
+
+# === local-ci allowlist BEGIN ===
+!.artifacts/
+!.artifacts/index.html
+!.artifacts/ci/
+!.artifacts/ci/ci_badge.json
+!.artifacts/ci/ci_summary.json
+!.artifacts/ci/junit.xml
+!.artifacts/ci/pytest.txt
+!.artifacts/ci/trend_stats.json
+# === local-ci allowlist END ===
+
