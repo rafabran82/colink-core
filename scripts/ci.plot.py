@@ -28,7 +28,7 @@ def main():
     if len(df) > 50:
         df = df.tail(50)
 
-    # Plot using numeric x positions + HH:MM tick labels (prevents overlap)
+    # Plot using numeric x positions + HH:MM tick labels
     x = list(range(len(df)))
 
     fig, ax1 = plt.subplots(figsize=(6,3))
@@ -36,6 +36,8 @@ def main():
     ax1.set_xlabel("Run Timestamp")
     ax1.set_ylabel("Total MB", color="tab:blue")
     ax1.tick_params(axis="y", labelcolor="tab:blue")
+    ax1.ticklabel_format(style="plain", axis="y")  # force plain tick labels
+    ax1.get_yaxis().get_major_formatter().set_scientific(False)
 
     ax2 = ax1.twinx()
     ax2.plot(x, df["Files"], marker="x", color="tab:orange", label="Files")
@@ -49,7 +51,7 @@ def main():
         step = max(1, len(labels)//12)
         for i in range(len(labels)):
             if i % step != 0:
-                labels[i] = ""  # thin labels for readability
+                labels[i] = ""
     ax1.set_xticklabels(labels, rotation=45, ha="right", fontsize=8)
 
     fig.suptitle("Local CI Run Trend")
