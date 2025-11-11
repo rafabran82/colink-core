@@ -1,7 +1,16 @@
 ﻿param(
-    [string]$Root = (Split-Path -Parent $MyInvocation.MyCommand.Definition),
+    [string]$Root,
     [string[]]$Include = @("*.py")
 )
+
+if (-not $Root -or $Root -eq "") {
+    try {
+        # Resolve this script's folder robustly for both dot-source and call
+        $Root = Split-Path -Parent (Get-Item $MyInvocation.PSCommandPath).FullName
+    } catch {
+        $Root = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
+    }
+}
 
 function Invoke-PythonSyntaxGuard {
     param([string]$ScanRoot, [string[]]$Patterns)
