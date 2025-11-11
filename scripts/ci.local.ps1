@@ -1,6 +1,5 @@
 ﻿# scripts/ci.local.ps1
-# Local CI: tests -> JSON summary + NDJSON metrics + plot + index + zip bundle
-# Usage: pwsh -NoProfile -File scripts/ci.local.ps1 [-Python python] [-Out .artifacts] [-NoTests] [-NoPlot]
+# Local CI: run pytest, emit JSON summary, append NDJSON metrics, plot, index.html, and zip bundle.
 
 [CmdletBinding()]
 param(
@@ -13,18 +12,19 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# --- Layout
-$ciDir      = Join-Path $Out "ci"
-$logsDir    = Join-Path $ciDir "logs"
-$plotsDir   = Join-Path $Out "plots"
-$metricsDir = Join-Path $Out "metrics"
-$bundlesDir = Join-Path $Out "bundles"
+# --- Paths/layout
+$ciDir       = Join-Path $Out "ci"
+$logsDir     = Join-Path $ciDir "logs"
+$plotsDir    = Join-Path $Out "plots"
+$metricsDir  = Join-Path $Out "metrics"
+$bundlesDir  = Join-Path $Out "bundles"
 
-$summaryJsonPath = Join-Path $ciDir "ci_summary.json"
-$pytestLogPath   = Join-Path $ciDir "pytest.txt"
-$ndjsonPath      = Join-Path $metricsDir "run.ndjson"
-$plotPath        = Join-Path $plotsDir "summary.png"
-$indexHtml       = Join-Path $Out "index.html"
+$summaryJson = Join-Path $ciDir "ci_summary.json"
+$pytestLog   = Join-Path $ciDir "pytest.txt"
+$junitXml    = Join-Path $ciDir "junit.xml"
+$ndjsonPath  = Join-Path $metricsDir "run.ndjson"
+$plotPath    = Join-Path $plotsDir "summary.png"
+$indexHtml   = Join-Path $Out "index.html"
 
 # --- Ensure directories
 $null = New-Item -ItemType Directory -Force -Path $Out,$ciDir,$logsDir,$plotsDir,$metricsDir,$bundlesDir
@@ -34,25 +34,24 @@ $pytestExit  = 0
 $durationSec = 0.0
 $sw = [Diagnostics.Stopwatch]::StartNew()
 if (-not $NoTests) {
-  Write-Host "Running tests with $Python -m pytest -rA --durations=0 --junitxml .artifacts/ci/junit.xml ..."
-  # Capture stdout+stderr in-process (works on Windows PowerShell + pwsh)
-  $out = & $Python -m pytest -rA --durations=0 --junitxml .artifacts/ci/junit.xml 2>&1
+  Write-Host "Running tests with $Python -m pytest -rA --durations=0 --junitxml $junitXml ..."
+  $out = & $Python -m pytest -rA --durations=0 --junitxml $junitXml 2>&1
   $pytestExit = $LASTEXITCODE
-  Set-Content -Path $pytestLogPath -Value ($out -join [Environment]::NewLine) -Encoding utf8
+  Set-Content -Path $pytestLog -Value ($out -join [Environment]::NewLine) -Encoding utf8
 } else {
   Write-Host "Skipping tests (--NoTests)."
 }
 $sw.Stop()
 $durationSec = [Math]::Round($sw.Elapsed.TotalSeconds,2)
 
-# --- Parse pytest reports (XML first, text fallback) with a small Python helper
+# --- Parse reports (XML first, text fallback) via helper Python
 $pyParse = @"
 import sys, re, json, pathlib, datetime, xml.etree.ElementTree as ET
 log_path   = pathlib.Path(sys.argv[1])
 out_json   = pathlib.Path(sys.argv[2])
 ndjson     = pathlib.Path(sys.argv[3])
 exitcode   = int(sys.argv[4])
-junit_path = pathlib.Path('.artifacts/ci/junit.xml')
+junit_path = pathlib.Path(sys.argv[5])
 
 counts = {"passed": 0, "failed": 0, "skipped": 0, "errors": 0}
 tot = None
@@ -66,32 +65,30 @@ def parse_from_junit(p: pathlib.Path):
     try:
         tree = ET.parse(str(p))
         root = tree.getroot()
-        # JUnit structure: <testsuite tests=".." failures=".." errors=".." skipped=".." time=".."> with <testcase time="..">
-        # pytest can nest <testsuite>, so accumulate
-        suites = root.findall(".//testsuite") or [root]
+        suites = root.findall('.//testsuite') or [root]
         tests = failures = errors = skipped = 0
         total_time = 0.0
         for s in suites:
-            tests    += int(s.attrib.get("tests", 0))
-            failures += int(s.attrib.get("failures", 0))
-            errors   += int(s.attrib.get("errors", 0))
-            skipped  += int(s.attrib.get("skipped", 0))
+            tests    += int(s.attrib.get('tests', 0))
+            failures += int(s.attrib.get('failures', 0))
+            errors   += int(s.attrib.get('errors', 0))
+            skipped  += int(s.attrib.get('skipped', 0))
             try:
-                total_time += float(s.attrib.get("time", 0) or 0)
+                total_time += float(s.attrib.get('time', 0) or 0)
             except Exception:
                 pass
-            for tc in s.findall(".//testcase"):
+            for tc in s.findall('.//testcase'):
+                name = (tc.attrib.get('classname','') + '::' + tc.attrib.get('name','')).strip(':')
                 try:
-                    t = float(tc.attrib.get("time", 0) or 0)
+                    t = float(tc.attrib.get('time', 0) or 0)
                 except Exception:
                     t = None
-                name = tc.attrib.get("classname","") + "::" + tc.attrib.get("name","")
-                durations.append({"name": name.strip(":") , "seconds": t})
+                durations.append({'name': name, 'seconds': t})
         counts = {
-            "passed": max(tests - failures - errors - skipped, 0),
-            "failed": failures + errors,
-            "skipped": skipped,
-            "errors": errors
+            'passed': max(tests - failures - errors - skipped, 0),
+            'failed': failures + errors,
+            'skipped': skipped,
+            'errors': errors
         }
         tot = tests
         dur_total = total_time if total_time > 0 else None
@@ -101,23 +98,23 @@ def parse_from_junit(p: pathlib.Path):
 
 def parse_from_text(p: pathlib.Path):
     global counts, tot, dur_total
-    text = p.read_text(encoding="utf-8") if p.exists() else ""
-    m = re.search(r"=+\\s*(.+?)\\s+in\\s+([0-9]*\\.?[0-9]+)s\\s*=+", text)
+    text = p.read_text(encoding='utf-8') if p.exists() else ''
+    m = re.search(r'=+\\s*(.+?)\\s+in\\s+([0-9]*\\.?[0-9]+)s\\s*=+', text)
     if not m:
         return False
-    parts = m.group(1).split(",")
+    parts = m.group(1).split(',')
     c = {}
     T = 0
     for part in parts:
         part = part.strip()
-        mm = re.match(r"(\\d+)\\s+(\\w+)", part)
+        mm = re.match(r'(\\d+)\\s+(\\w+)', part)
         if mm:
             n, label = int(mm.group(1)), mm.group(2).lower()
             c[label] = c.get(label, 0) + n
             T += n
-    counts["passed"]  = c.get("passed", 0)
-    counts["failed"]  = c.get("failed", 0) + c.get("errors", 0) + c.get("error", 0)
-    counts["skipped"] = c.get("skipped", 0) + c.get("xfailed", 0) + c.get("xpassed", 0)
+    counts['passed']  = c.get('passed', 0)
+    counts['failed']  = c.get('failed', 0) + c.get('errors', 0) + c.get('error', 0)
+    counts['skipped'] = c.get('skipped', 0) + c.get('xfailed', 0) + c.get('xpassed', 0)
     tot = T or None
     try:
         dur_total = float(m.group(2))
@@ -128,37 +125,36 @@ def parse_from_text(p: pathlib.Path):
 ok = parse_from_junit(junit_path) or parse_from_text(log_path)
 
 result = {
-    "exit_code": exitcode,
-    "tests_total": tot,
-    "passed": counts.get("passed",0),
-    "failed": counts.get("failed",0),
-    "skipped": counts.get("skipped",0),
-    "time_total_sec": dur_total,
-    "durations": [d for d in durations if d.get("seconds") is not None][:200]
+    'exit_code': exitcode,
+    'tests_total': tot,
+    'passed': counts.get('passed',0),
+    'failed': counts.get('failed',0),
+    'skipped': counts.get('skipped',0),
+    'time_total_sec': dur_total,
+    'durations': [d for d in durations if d.get('seconds') is not None][:200]
 }
-out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
 
-ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00","Z")
+ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='milliseconds').replace('+00:00','Z')
 nd = {
-    "ts": ts,
-    "exit": exitcode,
-    "tests_total": result["tests_total"],
-    "passed": result["passed"],
-    "failed": result["failed"],
-    "skipped": result["skipped"],
-    "time_total_sec": result["time_total_sec"]
+    'ts': ts,
+    'exit': exitcode,
+    'tests_total': result['tests_total'],
+    'passed': result['passed'],
+    'failed': result['failed'],
+    'skipped': result['skipped'],
+    'time_total_sec': result['time_total_sec']
 }
 ndjson.parent.mkdir(parents=True, exist_ok=True)
-with ndjson.open("a", encoding="utf-8") as f:
-    f.write(json.dumps(nd, ensure_ascii=False) + "\\n")
+with ndjson.open('a', encoding='utf-8') as f:
+    f.write(json.dumps(nd, ensure_ascii=False) + '\\n')
 "@
 $tmpPy = Join-Path $env:TEMP ("ci_parse_{0}.py" -f ([guid]::NewGuid()))
 Set-Content -Path $tmpPy -Value $pyParse -Encoding utf8
 try {
-  & $Python $tmpPy $pytestLogPath $summaryJsonPath $ndjsonPath $pytestExit | Out-Null
+  & $Python $tmpPy $pytestLog $summaryJson $ndjsonPath $pytestExit $junitXml | Out-Null
 } finally {
   Remove-Item $tmpPy -Force -ErrorAction SilentlyContinue
-}
 }
 
 # --- Plot (optional; pass=1 fail=0)
@@ -178,7 +174,7 @@ plt.savefig(out)
   $tmpPy2 = Join-Path $env:TEMP ("ci_plot_{0}.py" -f ([guid]::NewGuid()))
   Set-Content -Path $tmpPy2 -Value $py -Encoding utf8
   try {
-    & $Python $tmpPy2 $summaryJsonPath $plotPath | Out-Null
+    & $Python $tmpPy2 $summaryJson $plotPath | Out-Null
   } catch {
     Write-Warning "Plot generation failed (matplotlib not available?). Continuing."
   } finally {
@@ -187,7 +183,7 @@ plt.savefig(out)
 }
 
 # --- index.html
-$sum = ConvertFrom-Json (Get-Content -Raw $summaryJsonPath)
+$sum = ConvertFrom-Json (Get-Content -Raw $summaryJson)
 $passFail = if ($sum.exit_code -eq 0) { "PASS" } else { "FAIL" }
 $html = @"
 <!doctype html>
@@ -210,9 +206,9 @@ $html = @"
   <div>Status: <span class="chip ${passFail=='PASS' ? 'ok' : 'bad'}">$passFail</span></div>
   <div class="grid">
     <div><strong>pytest exit:</strong> <code>$($sum.exit_code)</code></div>
-    <div><strong>duration:</strong> <code>$durationSec s</code></div>
+    <div><strong>duration (wall):</strong> <code>$durationSec s</code></div>
     <div><strong>generated:</strong> <code>$((Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ssZ"))</code></div>
-    <div><a href="ci/ci_summary.json">ci/ci_summary.json</a> • <a href="ci/pytest.txt">ci/pytest.txt</a> • <a href="metrics/run.ndjson">metrics/run.ndjson</a></div>
+    <div><a href="ci/ci_summary.json">ci/ci_summary.json</a> • <a href="ci/pytest.txt">ci/pytest.txt</a> • <a href="ci/junit.xml">ci/junit.xml</a> • <a href="metrics/run.ndjson">metrics/run.ndjson</a></div>
     <div><em>summary plot (if generated)</em><br/><img src="plots/summary.png" alt="summary plot"/></div>
   </div>
   <h3>Counts</h3>
@@ -228,13 +224,13 @@ Set-Content -Path $indexHtml -Value $html -Encoding utf8
 # --- Bundle snapshot (zip)
 $stamp  = Get-Date -Format "yyyyMMdd-HHmmss"
 $bundle = Join-Path $bundlesDir ("run-{0}.zip" -f $stamp)
-
 $bundleInputs = @()
-$bundleInputs += $summaryJsonPath
-if (Test-Path $pytestLogPath) { $bundleInputs += $pytestLogPath }
-if (Test-Path $plotPath)      { $bundleInputs += $plotPath }
-if (Test-Path $indexHtml)     { $bundleInputs += $indexHtml }
-if (Test-Path $ndjsonPath)    { $bundleInputs += $ndjsonPath }
+$bundleInputs += $summaryJson
+if (Test-Path $pytestLog) { $bundleInputs += $pytestLog }
+if (Test-Path $junitXml)  { $bundleInputs += $junitXml }
+if (Test-Path $plotPath)  { $bundleInputs += $plotPath }
+if (Test-Path $indexHtml) { $bundleInputs += $indexHtml }
+if (Test-Path $ndjsonPath){ $bundleInputs += $ndjsonPath }
 
 if (Test-Path $bundle) { Remove-Item $bundle -Force }
 if ($bundleInputs.Count -gt 0) {
@@ -242,9 +238,7 @@ if ($bundleInputs.Count -gt 0) {
   Write-Host "Bundle created: $bundle"
 }
 
-Write-Host "Local CI completed. Summary: $summaryJsonPath"
+Write-Host "Local CI completed. Summary: $summaryJson"
 Write-Host "Index: $indexHtml"
 if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
 exit $sum.exit_code
-
-
