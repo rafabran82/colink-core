@@ -1,62 +1,33 @@
-﻿# ci.guard-artifacts.ps1
-# Fail the build if any *tracked* file exists under .artifacts that is not explicitly allowed.
-
-param(
-  [string]$Repo,                      # resolved after param if not provided
-  [string]$ArtifactsRel = ".artifacts"
-)
-
-Set-StrictMode -Version Latest
+﻿param()
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 
-# Resolve $Repo only after parameters are bound
-if ([string]::IsNullOrWhiteSpace($Repo)) {
-  $Repo = (& git rev-parse --show-toplevel).Trim()
-}
-if ([string]::IsNullOrWhiteSpace($Repo)) {
-  throw "Unable to resolve repository root."
-}
+# repo root
+$repo = (& git rev-parse --show-toplevel 2>$null).Trim()
+if (-not $repo) { $repo = (Get-Location).Path }
+Set-Location $repo
 
-Set-Location -Path $Repo
-
-# Explicit allowlist of versioned files under .artifacts (tracked by Git).
+# allowlist
 $allowed = @(
-  ".artifacts/reports/weekly.csv",
-  ".artifacts/reports/summary.json",
-  ".artifacts/.gitkeep",
   ".artifacts/index.html",
-  ".artifacts/ci/.gitkeep",
   ".artifacts/ci/ci_summary.json",
-  ".artifacts/metrics/.gitkeep",
-  ".artifacts/plots/.gitkeep",
-  ".artifacts/data/.gitkeep",
-  ".artifacts/bundles/.gitkeep"
+  ".artifacts/ci/ci_badge.json"
 )
 
-# Gather tracked files beneath .artifacts (not runtime outputs)
-$tracked = (& git ls-files -z -- $ArtifactsRel) -split "`0" | Where-Object { $_ }
+# tracked files under .artifacts
+$all = (& git ls-files -- .artifacts 2>$null) -split "`n" | Where-Object { $_ -ne "" }
 
-if (-not $tracked -or $tracked.Count -eq 0) {
-  Write-Host ("Guard OK. No files are tracked under {0}." -f $ArtifactsRel)
-  exit 0
+$blocked = @()
+foreach ($p in $all) {
+  if ($p -like "*.gitkeep") { continue }
+  if ($allowed -contains $p) { continue }
+  $blocked += $p
 }
 
-# Anything tracked but not in the allowlist is a violation.
-$unexpected = @()
-foreach ($p in $tracked) {
-  if (-not ($allowed -contains $p)) { $unexpected += $p }
-}
-
-if ($unexpected.Count -gt 0) {
-  $list = ($unexpected | ForEach-Object { " - $_" }) -join "`n"
-  Write-Error ("Guard failed: unexpected tracked files under {0}:{1}`n{2}" -f $ArtifactsRel, [Environment]::NewLine, $list)
+if ($blocked.Count -gt 0) {
+  Write-Error ("Guard failed: unexpected tracked files under .artifacts:`n  - " + ($blocked -join "`n  - "))
   exit 1
 }
 
-Write-Host ("Guard OK. Tracked files under {0} are allowed (count={1})." -f $ArtifactsRel, $tracked.Count)
+Write-Host "Guard OK: only allowlisted .artifacts files are tracked."
 exit 0
-
-
-
-
-
