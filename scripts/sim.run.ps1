@@ -66,3 +66,14 @@ if (-not (Test-Path -LiteralPath $summaryCsv)) {
 
 Write-Host "🧮 Appended summary:" -ForegroundColor Green
 Write-Host "   $summaryCsv"
+# --- PLOT SUMMARY (Step 4) ---
+$summaryCsv = Join-Path $repo ".artifacts\metrics\summary.csv"
+$summaryPng = Join-Path $repo ".artifacts\metrics\summary.png"
+
+$cmd = Get-Command python -ErrorAction SilentlyContinue
+$pyExe = if ($cmd) { $cmd.Path } else { "python" }
+
+& $pyExe "scripts/sim.plot.py" --csv "$summaryCsv" --out "$summaryPng"
+if ($LASTEXITCODE -ne 0) { Write-Warning "summary plot failed ($LASTEXITCODE)" } else {
+  Write-Host "🖼  Summary plot:" $summaryPng
+}
