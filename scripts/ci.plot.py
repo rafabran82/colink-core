@@ -37,9 +37,8 @@ def main():
     fig.suptitle("Local CI Run Trend")
     plt.xticks(rotation=45, ha="right", fontsize=8)
     fig.tight_layout()
-        import numpy as np
-    from matplotlib.ticker import FixedLocator
-
+import numpy as np
+from matplotlib.ticker import FixedLocator
     ax = plt.gca()
 
     # Count current ticks (positions), fall back to length of line x-data if needed
@@ -66,8 +65,8 @@ except Exception:
     pass
 # -- END TICK THINNING# -- BEGIN TICK THINNING (index-based, ~4 labels)
 try:
-    import numpy as np
-    from matplotlib.ticker import FixedLocator
+import numpy as np
+from matplotlib.ticker import FixedLocator
     ax = plt.gca()
 
     # Count current ticks; if too few, fall back to x-data length
@@ -98,6 +97,7 @@ except Exception:
 
 if __name__ == "__main__":
     main()
+
 
 
 
