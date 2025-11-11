@@ -203,3 +203,18 @@ fi -Encoding ascii
 - Optional: run your local CI script before pushing if you have one.
 
 <!-- CI HOOKS END -->
+### Managing allowed .artifacts files
+
+If you intentionally want to keep a new tracked file under `.artifacts/`, update the guard’s allow-list:
+
+```powershell
+# Add one or more paths
+$paths=@('.artifacts/reports/weekly.csv','.artifacts/reports/summary.json')
+# Paste this block in PowerShell
+$repo=(git rev-parse --show-toplevel); Set-Location $repo
+$gp=Join-Path $repo 'scripts/ci.guard-artifacts.ps1'
+$code=Get-Content -Raw $gp; $needle='$allowed = @('
+foreach($p in $paths){ if($code -notmatch [regex]::Escape($p)){ $code=$code -replace [regex]::Escape($needle), "$needle`r`n  `"$p`"," } }
+Set-Content $gp -Value $code -Encoding utf8
+git add -- $gp
+git commit -m ("ci(guard): allow {0}" -f ($paths -join ', '))
