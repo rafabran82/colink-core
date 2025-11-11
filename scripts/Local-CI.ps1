@@ -51,3 +51,4 @@ if (-not $NoOpen) {
 }
 
 Write-Host "`n🏁 Local CI complete."
+

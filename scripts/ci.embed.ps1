@@ -47,44 +47,43 @@ $html = @"
 
   <h3>Local CI Run Trend</h3>
   <div class="chart">
-    <img src="$ChartRelPath" width="600" />
+    <img id="chartImg" src="$ChartRelPath" width="600" />
   </div>
 
-  <div id="extra" style="margin-top:18px;">$ExtraHtml</div>
+  <div id="tables">$ExtraHtml</div>
   <div class="foot">$FooterHtml</div>
 
   <script>
-    // Read ?tz= param
     const params = new URLSearchParams(location.search);
     const tz = (params.get("tz") || "").trim();
-
     const sel = document.getElementById("tzSelect");
     const badge = document.getElementById("tzBadge");
 
-    // Preselect dropdown
-    Array.from(sel.options).forEach(opt => {
-      if ((opt.value || "") === tz) opt.selected = true;
-    });
+    const labelMap = {"":"Local time (default)","Eastern":"Eastern","Central":"Central","Mountain":"Mountain","Pacific":"Pacific","UTC":"UTC"};
+    function applyTZ(z) {
+      const img = document.getElementById("chartImg");
+      const suff = z ? z : "local";
+      img.src = "ci/runs/runs_trend_" + suff + ".png";
 
-    // Human label map for badge
-    const labelMap = {
-      "": "Local time (default)",
-      "Eastern": "Eastern",
-      "Central": "Central",
-      "Mountain": "Mountain",
-      "Pacific": "Pacific",
-      "UTC": "UTC"
-    };
-    badge.textContent = "TZ: " + (labelMap[tz] ?? "Local time (default)");
+      document.querySelectorAll(".tz-table").forEach(d => d.style.display = "none");
+      const toShow = document.querySelector(`.tz-table[data-tz="${z}"]`) || document.querySelector(`.tz-table[data-tz=""]`);
+      if (toShow) toShow.style.display = "block";
+      badge.textContent = "TZ: " + (labelMap[z] ?? "Local time (default)");
+    }
 
-    // On change → reload with ?tz=<zone>
-    sel.addEventListener("change", () => {
-      const v = sel.value;
-      const url = new URL(location.href);
-      if (v) { url.searchParams.set("tz", v); }
-      else   { url.searchParams.delete("tz"); }
-      location.href = url.toString();
-    });
+    // Init from URL
+    applyTZ(tz);
+    // Reflect current in dropdown
+    if (sel) {
+      Array.from(sel.options).forEach(o => { o.selected = ((o.value||"")===tz); });
+      sel.addEventListener("change", () => {
+        const v = sel.value;
+        const url = new URL(location.href);
+        if (v) url.searchParams.set("tz", v); else url.searchParams.delete("tz");
+        history.replaceState(null, "", url.toString());
+        applyTZ(v);
+      });
+    }
   </script>
 </body>
 </html>
@@ -92,3 +91,4 @@ $html = @"
 
 Set-Content -Path $IndexPath -Value $html -Encoding utf8
 Write-Host "✅ Embedded trend chart into $IndexPath"
+
