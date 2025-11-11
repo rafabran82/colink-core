@@ -1,4 +1,5 @@
 ﻿Param()
+
 $ErrorActionPreference = "Stop"$allowed = @(
 ".artifacts/.gitkeep",
 ".artifacts/index.html",
