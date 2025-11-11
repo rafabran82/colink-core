@@ -4,7 +4,7 @@ RUNS = r".artifacts/ci/runs/runs_log.csv"
 OUT  = r".artifacts/ci/runs/runs_trend.png"
 
 def looks_like_iso_ts(s: str) -> bool:
-    return bool(re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", s or ""))
+    return bool(re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", s or ""))
 
 def main():
     if not os.path.exists(RUNS):
@@ -19,8 +19,8 @@ def main():
     df["SizeMB"] = pd.to_numeric(df["SizeMB"], errors="coerce")
     df = df.dropna(subset=["Files","SizeMB"])
 
-    # Parse timestamps and build compact HH:MM labels
-    df["Time"]  = pd.to_datetime(df["Timestamp"], errors="coerce")
+    # Parse timestamps (assume local time was written) and build HH:MM labels
+    df["Time"]  = pd.to_datetime(df["Timestamp"], format="%Y-%m-%dT%H:%M:%S", errors="coerce")
     df = df.dropna(subset=["Time"])
     df["Label"] = df["Time"].dt.strftime("%H:%M")
 
@@ -35,19 +35,18 @@ def main():
     ax1.plot(x, df["SizeMB"], marker="o", color="tab:blue", label="Total MB")
     ax1.set_xlabel("Run Timestamp")
     ax1.set_ylabel("Total MB", color="tab:blue")
+    ax1.tick_params(axis="y", labelcolor="tab:blue")
+    # Plain ticks, no scientific notation and no offset text
     ax1.ticklabel_format(style="plain", axis="y")
     ax1.get_yaxis().get_major_formatter().set_scientific(False)
-    ax1.yaxis.get_offset_text().set_visible(False)`nax1.ticklabel_format(style="plain", axis="y")`nax1.get_yaxis().get_major_formatter().set_scientific(False)`nax1.yaxis.get_offset_text().set_visible(False)
-    ax1.tick_params(axis="y", labelcolor="tab:blue")
-    ax1.ticklabel_format(style="plain", axis="y")  # force plain tick labels
-    ax1.get_yaxis().get_major_formatter().set_scientific(False)
+    ax1.yaxis.get_offset_text().set_visible(False)
 
     ax2 = ax1.twinx()
     ax2.plot(x, df["Files"], marker="x", color="tab:orange", label="Files")
     ax2.set_ylabel("Files", color="tab:orange")
     ax2.tick_params(axis="y", labelcolor="tab:orange")
 
-    # X-axis labels (HH:MM), rotate & thin if many points
+    # X-axis HH:MM labels, thin if crowded
     ax1.set_xticks(x)
     labels = df["Label"].tolist()
     if len(labels) > 16:
@@ -64,5 +63,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
