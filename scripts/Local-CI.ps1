@@ -30,7 +30,7 @@ if ($TimeZone -and $TimeZone -ne 'Local') {
   $logForPlot = $tmpCsv
 }
 
-& python "scripts/ci.plot.py" --log "$logForPlot" 2>&1 | ForEach-Object { Write-Host $_ }
+& python "scripts/ci.plot.py" --csv "$logForPlot" 2>&1 | ForEach-Object { Write-Host $_ }
 
 # --- Phase 3: Build "Last 5 Runs" table (with TZ + badge)
 $last5 = & "$PSScriptRoot\ci.table.ps1" -RunsLog $meta.LogPath -Count 5 -TimeZone $TimeZone
@@ -51,4 +51,5 @@ if (-not $NoOpen) {
 }
 
 Write-Host "`n🏁 Local CI complete."
+
 
