@@ -3,12 +3,18 @@
     [string[]]$Include = @("*.py")
 )
 
+# --- Resolve working root robustly ---
 if (-not $Root -or $Root -eq "") {
-    try {
-        # Resolve this script's folder robustly for both dot-source and call
-        $Root = Split-Path -Parent (Get-Item $MyInvocation.PSCommandPath).FullName
-    } catch {
-        $Root = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
+    if ($PSScriptRoot) {
+        $Root = $PSScriptRoot
+    } elseif ($MyInvocation.PSCommandPath) {
+        $Root = Split-Path -Parent $MyInvocation.PSCommandPath
+    } else {
+        try {
+            $Root = Split-Path -Parent $MyInvocation.MyCommand.Definition
+        } catch {
+            $Root = "."
+        }
     }
 }
 
