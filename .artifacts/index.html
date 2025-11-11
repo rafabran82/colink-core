@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-  <p>Generated: 11/11/2025 13:43:24</p>
+  <p>Generated: 11/11/2025 14:55:03</p>
 
   <div class="row">
     <label><b>Timezone:</b></label>
@@ -21,24 +21,6 @@
 <option value="Mountain">Mountain</option>
 <option value="Pacific">Pacific</option>
 <option value="UTC">UTC</option></select>
-<!-- LIVE TZ CLOCK BEGIN -->
-<div id="tzNowWrap" style="margin:6px 0 0 0;color:#666;font-size:12px">
-  <span id="tzNowLabel">Now (TZ):</span>
-  <span id="tzNow">--:--:--</span>
-</div>
-<script>
-(function(){
-  const iana = { local:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'),
-    eastern:'America/New_York', central:'America/Chicago',
-    mountain:'America/Denver', pacific:'America/Los_Angeles', utc:'UTC' };
-  function sel(){ return document.getElementById('tzSelect')||document.querySelector('select[name="tz"]')||document.querySelector('select'); }
-  const s = sel(), span = document.getElementById('tzNow');
-  function fmt(z){ const d=new Date(); return d.toLocaleString(undefined,{timeZone:z,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}); }
-  function tick(){ const v=(s&&s.value)||'local'; span && (span.textContent = fmt(iana[v]||iana.local)+'  ('+v.toUpperCase()+')'); }
-  if (s){ s.addEventListener('change', tick); setInterval(tick,1000); tick(); }
-})();
-</script>
-<!-- LIVE TZ CLOCK END -->
     <button id="tzBtn" class="badge">TZ: Local time (default)</button>
   </div>
 
@@ -56,12 +38,12 @@
 <tr><td>2025-11-11T12:54:52</td><td style='text-align:right'>11762</td><td style='text-align:right'>1237.012</td></tr>
 </table>
 </div>
-<div class='tz-table' data-tz='central' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<div class='tz-table' data-tz='eastern' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
 <table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
 <tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
 </table>
 </div>
-<div class='tz-table' data-tz='eastern' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<div class='tz-table' data-tz='central' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
 <table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
 <tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
 </table>
@@ -119,62 +101,5 @@
   document.getElementById('tzBtn').addEventListener('click', ()=>applyTZ(sel.value));
 })();
 </script>
-<!-- TZ SWITCH PATCH BEGIN -->
-<script>
-(function(){
-  function findTzSelect(){
-    return document.getElementById('tzSelect')
-        || document.querySelector('select[name="tz"]')
-        || document.querySelector('select');
-  }
-  function findChartImg(){
-    // pick the first <img> whose src looks like our trend image
-    const imgs = Array.from(document.querySelectorAll('img'));
-    return imgs.find(i => /ci\/runs\/runs_trend_/i.test(i.getAttribute('src')||i.src));
-  }
-  const tzMap = { local:'local', eastern:'Eastern', central:'Central', mountain:'Mountain', pacific:'Pacific', utc:'UTC' };
-
-  const sel  = findTzSelect();
-  const img  = findChartImg();
-  const label= document.getElementById('tzLabel');
-
-  function show(tz){
-    if (!img) return;
-    const suf = tzMap[tz] || 'local';
-    // update chart src
-    const base = 'ci/runs/runs_trend_' + suf + '.png';
-    img.setAttribute('src', base);
-
-    // toggle tables
-    document.querySelectorAll('.tz-table').forEach(d => {
-      d.style.display = (d.dataset.tz === tz) ? '' : 'none';
-    });
-
-    // update label + url param
-    if (label) label.textContent = 'TZ: ' + tz.toUpperCase();
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set('tz', tz);
-      history.replaceState(null, '', url);
-    } catch (_) {}
-  }
-
-  if (sel) {
-    // init from ?tz= if present
-    try {
-      const urlTz = new URL(window.location.href).searchParams.get('tz');
-      if (urlTz && tzMap[urlTz]) sel.value = urlTz;
-    } catch (_) {}
-
-    sel.addEventListener('change', e => show(e.target.value));
-    show(sel.value || 'local');
-  }
-})();
-</script>
-<!-- TZ SWITCH PATCH END -->
 </body>
 </html>
-
-
-
-

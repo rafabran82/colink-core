@@ -37,9 +37,72 @@ def main():
     fig.suptitle("Local CI Run Trend")
     plt.xticks(rotation=45, ha="right", fontsize=8)
     fig.tight_layout()
-    plt.savefig(out, dpi=150)
+        import numpy as np
+    from matplotlib.ticker import FixedLocator
+
+    ax = plt.gca()
+
+    # Count current ticks (positions), fall back to length of line x-data if needed
+    ticks = ax.get_xticks()
+    m = len(ticks)
+    if m < 2:
+        # fallback: try line x-data length
+        lines = ax.get_lines()
+        if lines:
+            m = len(lines[0].get_xdata())
+            ticks = np.arange(m)
+
+    # choose ~4 evenly spaced indices
+    keep_idx = sorted(set(int(round(p*(m-1))) for p in (0, 1/3, 2/3, 1))) if m > 1 else [0]
+    ax.xaxis.set_major_locator(FixedLocator([ticks[i] for i in keep_idx if 0 <= i < m]))
+
+    # readability
+    ax.tick_params(axis="x", labelrotation=15)
+    for lb in ax.get_xticklabels():
+        lb.set_ha("right")
+
+    ax.figure.subplots_adjust(bottom=0.22)
+except Exception:
+    pass
+# -- END TICK THINNING# -- BEGIN TICK THINNING (index-based, ~4 labels)
+try:
+    import numpy as np
+    from matplotlib.ticker import FixedLocator
+    ax = plt.gca()
+
+    # Count current ticks; if too few, fall back to x-data length
+    ticks = ax.get_xticks()
+    m = len(ticks)
+    if m < 2:
+        lines = ax.get_lines()
+        if lines:
+            m = len(lines[0].get_xdata())
+            ticks = np.arange(m)
+
+    if m >= 1:
+        # choose ~4 evenly spaced indices
+        keep_idx = sorted(set(int(round(p*(m-1))) for p in (0, 1/3, 2/3, 1))) if m > 1 else [0]
+        safe_pos = [ticks[i] for i in keep_idx if 0 <= i < m]
+        if safe_pos:
+            ax.xaxis.set_major_locator(FixedLocator(safe_pos))
+
+    # readability
+    ax.tick_params(axis="x", labelrotation=15)
+    for lb in ax.get_xticklabels():
+        lb.set_ha("right")
+    ax.figure.subplots_adjust(bottom=0.22)
+except Exception:
+    pass
+# -- END TICK THINNINGplt.savefig(out, dpi=150)
     print("[OK] Trend chart written:", out)
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
 
