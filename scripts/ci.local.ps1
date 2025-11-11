@@ -1,97 +1,121 @@
-﻿param(
-  [switch]$Publish,
-  [string]$OutDir = ".artifacts",
-  [switch]$Wait
+﻿# scripts/ci.local.ps1
+# Local CI: run tests, emit JSON summary + plot + index.html under .artifacts/
+# Usage: pwsh -NoProfile -File scripts/ci.local.ps1 [-Python python] [-Out .artifacts] [-NoTests] [-NoPlot]
+
+[CmdletBinding()]
+param(
+  [string]$Python = "python",
+  [string]$Out = ".artifacts",
+  [switch]$NoTests,
+  [switch]$NoPlot
 )
+
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-try { if ($PSVersionTable.PSVersion.Major -ge 7) { $PSStyle.OutputRendering = "PlainText" } } catch {}
-function Section($m,[ConsoleColor]$c='Cyan'){ Write-Host $m -ForegroundColor $c }
 
-# Resolve repo root from this file's location (robust from anywhere)
-$Here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Root = (git -C (Resolve-Path $Here).Path rev-parse --show-toplevel)
-Set-Location $Root
+# --- 0) Layout
+$ciDir     = Join-Path $Out "ci"
+$plotsDir  = Join-Path $Out "plots"
+$metricsDir= Join-Path $Out "metrics"
+$dataDir   = Join-Path $Out "data"
+$bundlesDir= Join-Path $Out "bundles"
+$summary   = Join-Path $ciDir "ci_summary.json"
+$plotPath  = Join-Path $plotsDir "summary.png"
+$indexHtml = Join-Path $Out "index.html"
 
-Section "== COLINK Local CI =="
+# --- 1) Ensure directories
+$null = New-Item -ItemType Directory -Force -Path $Out,$ciDir,$plotsDir,$metricsDir,$dataDir,$bundlesDir
 
-# Workspace
-New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-$newline = [Environment]::NewLine
-
-# ---- Python toolchain (venv, self-bootstrap) ----
-$venvPy = Join-Path $Root ".venv\Scripts\python.exe"
-if (-not (Test-Path $venvPy)) {
-  $bootstrap = Join-Path $Root "scripts\bootstrap.ps1"
-  if (-not (Test-Path $bootstrap)) { throw "Missing $bootstrap" }
-  & pwsh -NoProfile -ExecutionPolicy Bypass -File $bootstrap
-  if ($LASTEXITCODE -ne 0) { throw "bootstrap.ps1 failed (exit $LASTEXITCODE)" }
+# --- 2) Run pytest (optional)
+$pytestExit = 0
+$durationSec = 0.0
+$sw = [Diagnostics.Stopwatch]::StartNew()
+if (-not $NoTests) {
+  Write-Host "Running tests with $Python -m pytest -q ..."
+  & $Python -m pytest -q
+  $pytestExit = $LASTEXITCODE
+} else {
+  Write-Host "Skipping tests (--NoTests)."
 }
-Section "• Python (venv):" -color Gray; & $venvPy -V
+$sw.Stop()
+$durationSec = [Math]::Round($sw.Elapsed.TotalSeconds,2)
 
-Section "• Ensuring minimal deps (requirements.lock)" -color Gray
-$reqPath = Join-Path $Root "requirements.lock"
-& $venvPy -m pip install --upgrade pip | Out-Null
-& $venvPy -m pip install -r $reqPath   | Out-Null
+# --- 3) Write JSON summary
+$summaryObj = [ordered]@{
+  timestamp_iso   = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+  python          = $Python
+  pytest_exit     = $pytestExit
+  duration_sec    = $durationSec
+  cwd             = (Get-Location).Path
+  notes           = "Local CI summary. 0 = tests passed; non-zero = failures or errors."
+}
+$summaryJson = $summaryObj | ConvertTo-Json -Depth 5
+Set-Content -Path $summary -Value $summaryJson -Encoding utf8
 
-# ---- Deterministic artifacts under .artifacts ----
-$must = @("demo.csv","demo.events.ndjson","run.metrics.json","SUMMARY.md","summary.png","summary.csv")
-foreach($name in $must){
-  $path = Join-Path $OutDir $name
-  if(-not (Test-Path $path)){
-    New-Item -ItemType Directory -Force -Path (Split-Path $path) | Out-Null
-    switch -Wildcard ($name){
-      "*.csv"            { Set-Content $path ("a,b{0}1,2" -f $newline) -Encoding utf8 }
-      "*.ndjson"         { Set-Content $path '{ "ok": true }' -Encoding utf8 }
-      "run.metrics.json" { Set-Content $path '{ "ok": true, "schema_version": 1 }' -Encoding utf8 }
-      "*.json"           { Set-Content $path '{ "ok": true }' -Encoding utf8 }
-      "*.md"             { Set-Content $path ("# Summary{0}Local CI synthesized files." -f $newline) -Encoding utf8 }
-      "*.png"            { [IO.File]::WriteAllBytes($path,[byte[]](137,80,78,71,13,10,26,10)) }
-      default            { Set-Content $path '' -Encoding utf8 }
-    }
+# --- 4) Plot (optional, requires matplotlib)
+if (-not $NoPlot) {
+  $py = @"
+import json, sys, pathlib, matplotlib
+from matplotlib import pyplot as plt
+
+summary = json.load(open(sys.argv[1], "r", encoding="utf-8"))
+# Simple bar: 1=pass, 0=fail
+value = 1 if int(summary.get("pytest_exit", 1)) == 0 else 0
+plt.figure()
+plt.bar(["tests"], [value])
+plt.title("Local CI: pass=1, fail=0")
+out = pathlib.Path(sys.argv[2])
+out.parent.mkdir(parents=True, exist_ok=True)
+plt.savefig(out)
+"@
+  $tmpPy = Join-Path $env:TEMP ("ci_plot_{0}.py" -f ([guid]::NewGuid()))
+  Set-Content -Path $tmpPy -Value $py -Encoding utf8
+  try {
+    & $Python $tmpPy $summary $plotPath | Out-Null
+  } catch {
+    Write-Warning "Plot generation failed (matplotlib not available?). Continuing."
+  } finally {
+    Remove-Item $tmpPy -Force -ErrorAction SilentlyContinue
   }
+} else {
+  Write-Host "Skipping plot (--NoPlot)."
 }
 
-# Manifest (stable, commit may be $null without git)
-$sha        = (git rev-parse --short HEAD) 2>$null
-$createdUtc = (Get-Date).ToUniversalTime().ToString("o")
-$files = Get-ChildItem $OutDir -File | ForEach-Object { [pscustomobject]@{ path=$_.Name; bytes=$_.Length } }
-$manifestObj = [pscustomobject]@{
-  schema_version = 1
-  created_utc    = $createdUtc
-  commit         = $sha
-  machine        = $env:COMPUTERNAME
-  files          = $files
-}
-$manifestPath = Join-Path $OutDir "ci.manifest.json"
-$manifestObj | ConvertTo-Json -Depth 4 | Set-Content $manifestPath -Encoding utf8
+# --- 5) index.html
+$passFail = if ($pytestExit -eq 0) { "PASS" } else { "FAIL" }
+$html = @"
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"/>
+<title>Local CI Summary</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:2rem;line-height:1.5}
+  .chip{display:inline-block;padding:.25rem .6rem;border-radius:9999px;font-weight:600}
+  .ok{background:#e6ffed;border:1px solid #b7ebc6;color:#096c38}
+  .bad{background:#ffecec;border:1px solid #ffb3b3;color:#8a1f11}
+  code{background:#f5f5f5;padding:.15rem .35rem;border-radius:.25rem}
+  .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:820px}
+  img{max-width:560px;border:1px solid #ddd;border-radius:8px}
+</style>
+<body>
+  <h1>Local CI Summary</h1>
+  <div>Status: <span class="chip ${passFail=='PASS' ? 'ok' : 'bad'}">$passFail</span></div>
+  <div class="grid">
+    <div><strong>pytest exit:</strong> <code>$pytestExit</code></div>
+    <div><strong>duration:</strong> <code>$durationSec s</code></div>
+    <div><strong>generated:</strong> <code>$((Get-Date).ToString("u"))</code></div>
+    <div><a href="ci/ci_summary.json">ci/ci_summary.json</a></div>
+    <div>
+      <div><em>summary plot (if generated)</em></div>
+      <img src="plots/summary.png" alt="summary plot"/>
+    </div>
+  </div>
+</body>
+</html>
+"@
+Set-Content -Path $indexHtml -Value $html -Encoding utf8
 
-# Pack ZIP to /artifacts (timestamp intentionally outside determinism surface)
-$stamp   = Get-Date -Format 'yyyyMMdd-HHmmss'
-$inner   = "colink-ci/{0}" -f ($sha ?? 'nogit')
-$staging = Join-Path $OutDir ("__pack__" + $stamp)
-Remove-Item $staging -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
-New-Item -ItemType Directory -Force -Path (Join-Path $staging $inner) | Out-Null
-Get-ChildItem $OutDir -File | ForEach-Object {
-  Copy-Item $_.FullName -Destination (Join-Path (Join-Path $staging $inner) $_.Name)
-}
-$zipDir = Join-Path $Root "artifacts"; New-Item -ItemType Directory -Force -Path $zipDir | Out-Null
-$zip = Join-Path $zipDir ("ci-{0}.zip" -f $stamp)
-if(Test-Path $zip){ Remove-Item $zip -Force }
-Compress-Archive -Path (Join-Path $staging "*") -DestinationPath $zip -Force
-Remove-Item $staging -Recurse -Force
-Section ("• Built {0}" -f $zip) -color Green
-
-# Optional prerelease
-if($Publish){
-  $branch = git branch --show-current
-  $tag    = "ci-$($branch)-$stamp"
-  $ttl    = "Local CI artifacts ($branch @ $stamp)"
-  $body   = "Local CI artifacts from $env:COMPUTERNAME on $stamp`nBranch: $branch`nCommit: $sha"
-  gh release create $tag $zip --title "$ttl" --notes "$body" --prerelease --target $branch
-  Section ("📦 Published {0} → {1}" -f $zip,$tag) -color Green
-}
-
-Section "`n✅ Local CI complete." -color Green
-if($Wait){ Write-Host ""; Read-Host "Press ENTER to close" }
-
-
+Write-Host "Local CI completed. Summary: $summary"
+Write-Host "Index: $indexHtml"
+if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
+exit $pytestExit
