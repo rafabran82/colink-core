@@ -5,7 +5,7 @@ Write-Host "✅ Python lint check passed for all scripts." -ForegroundColor Gree
 # --- end guard ---
 $ErrorActionPreference = "Stop"
 
-function New-Stamp { (Get-Date -AsUTC).ToString("yyyyMMdd-HHmmss") }
+function New-Stamp { ([DateTime]::UtcNow).ToString("yyyyMMdd-HHmmss") }
 
 # --- 1) Prepare run folder + meta ---
 $stamp  = New-Stamp
@@ -97,5 +97,6 @@ try {
 } catch {
   Write-Host ("⚠️ Skipped dashboard refresh: " + $_.Exception.Message)
 }
+
 
 
