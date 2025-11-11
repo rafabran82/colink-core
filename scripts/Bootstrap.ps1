@@ -1,33 +1,32 @@
-[CmdletBinding()]
-param(
-  [string]$Python = "python",
-  [switch]$Force
+﻿Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+$root = (git rev-parse --show-toplevel)
+Set-Location $root
+
+# Prefer py -3.11, fall back to python
+$havePy = $false
+try { & py -3.11 -V | Out-Null; $havePy = $true } catch {}
+
+$venvDir = Join-Path $root '.venv'
+if (-not (Test-Path $venvDir)) {
+  if ($havePy) { & py -3.11 -m venv $venvDir } else { & python -m venv $venvDir }
+}
+
+$venvPy = Join-Path $venvDir 'Scripts\python.exe'
+if (-not (Test-Path $venvPy)) { throw "Venv python not found at $venvPy" }
+
+# Write requirements.lock as plain lines (no here-strings needed)
+$reqLines = @(
+  'pandas==2.2.3',
+  'pyarrow==18.0.0',
+  'jsonschema==4.23.0',
+  'tabulate==0.9.0',
+  'matplotlib==3.9.2'
 )
-Write-Host "==> Bootstrapping venv & dev deps..."
-if ($Force -and (Test-Path ".venv")) {
-  Write-Host "Removing existing .venv because -Force was specified..."
-  Remove-Item -Recurse -Force ".venv"
-}
-if (-not (Test-Path ".venv")) {
-  & $Python -m venv .venv
-}
-$pip = ".\.venv\Scripts\pip.exe"
-$python = ".\.venv\Scripts\python.exe"
+$reqPath = Join-Path $root 'requirements.lock'
+[IO.File]::WriteAllLines($reqPath, $reqLines, (New-Object System.Text.UTF8Encoding($false)))
 
-# Prefer local requirements if present
-$reqs = @()
-if (Test-Path "requirements-dev.txt") { $reqs += "requirements-dev.txt" }
-elseif (Test-Path "requirements.txt") { $reqs += "requirements.txt" }
-
-if ($reqs.Count -gt 0) {
-  & $pip install -U pip wheel
-  foreach ($r in $reqs) {
-    Write-Host "Installing from $r..."
-    & $pip install -r $r
-  }
-} else {
-  Write-Host "No requirements files found; installing common dev tools only (safe to skip if you already pin these)."
-  & $pip install -U pip wheel
-  & $pip install pytest ruff black matplotlib numpy pandas
-}
-Write-Host "Bootstrap complete."
+& $venvPy -m pip install --upgrade pip
+& $venvPy -m pip install -r $reqPath
+Write-Host "Venv ready: $venvPy" -ForegroundColor Green

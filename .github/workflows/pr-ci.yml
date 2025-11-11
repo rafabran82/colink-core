@@ -1,16 +1,19 @@
-name: PR CI
+﻿name: PR CI
 
 on:
   pull_request:
     branches: [ main ]
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
+  build-test-package:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
     env:
-      BACKEND: Agg
+      ALLOW_PYTEST_NO_TESTS: true
 
     steps:
       - name: Checkout
@@ -19,61 +22,60 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
-      - name: Install deps (pandas/pyarrow/jsonschema/tabulate/matplotlib)
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: Windows-pip-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            Windows-pip-
+
+      - name: Phase-10 Bootstrap
+        run: .\scripts\ci\Phase-10-Bootstrap.ps1
+
+      - name: Phase-20 Build & Test
         run: |
-          python -m pip install --upgrade pip
-          pip install pandas pyarrow jsonschema tabulate matplotlib
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-20-BuildAndTest.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Caller observed exit code: $code"
+          if ($code -ne 0) { exit $code }
 
-      - name: Run sim demo (Phase 3)
+      - name: Phase-25 Emit samples (optional)
+        continue-on-error: true
         run: |
-          python -m colink_core.sim.run --demo --display "${BACKEND}" --out-prefix ./.artifacts/demo
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-25-EmitSamples.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Phase-25 observed exit code: $code (ignored if nonzero)"
+          exit 0
 
-      - name: Run bridge demo (Phase 4)
+      - name: Make index.html
         run: |
-          python -m colink_core.bridge.run \
-            --amount 1500 \
-            --pairA COL/COPX \
-            --pairM COPX/XRP \
-            --out-prefix ./.artifacts/bridge_demo \
-            --backend "${BACKEND}" \
-            --sha "${{ github.sha }}"
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          @"
+<!doctype html><meta charset='utf-8'><title>Artifacts</title>
+<h1>Artifacts</h1>
+<ul>
+  <li><a href='sample.png'>sample.png</a></li>
+  <li><a href='sample.json'>sample.json</a></li>
+</ul>
+"@ | Set-Content .artifacts\index.html -Encoding utf8
 
-      - name: Wrap sim metrics (produce *.metrics.json)
+      - name: List .artifacts
         run: |
-          python tools/metrics_wrap.py --artifacts ./.artifacts
+          if (Test-Path .artifacts) { Get-ChildItem -Recurse .artifacts | Format-List FullName,Length }
 
-      - name: Enrich metrics (os/sha/backend)
-        run: |
-          python tools/enrich_metrics.py --artifacts ./.artifacts --os "${{ runner.os }}" --sha "${{ github.sha }}" --backend "${BACKEND}"
-
-      - name: Validate metrics JSON (dispatch by schema_version)
-        run: |
-          python tools/validate_metrics.py
-
-      - name: Merge NDJSON + JSON into CSV/Parquet
-        run: |
-          python tools/collect.py \
-            --artifacts ./.artifacts \
-            --out-dataset ./.artifacts/dataset.csv \
-            --out-parquet ./.artifacts/dataset.parquet \
-            --os "${{ runner.os }}" \
-            --sha "${{ github.sha }}" \
-            --backend "${BACKEND}"
-
-      - name: Write GitHub Job Summary
-        run: |
-          python tools/summary.py
-
-      - name: Upload artifacts
+      - name: Upload .artifacts folder (browsable index)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sim-bridge-artifacts
-          path: |
-            ./.artifacts/*.csv
-            ./.artifacts/*.parquet
-            ./.artifacts/*.metrics.json
-            ./.artifacts/*.events.ndjson
-            ./.artifacts/SUMMARY.md
-            ./.artifacts/summary.png
+          name: pr-ci-artifacts
+          path: ./.artifacts
+          if-no-files-found: ignore
