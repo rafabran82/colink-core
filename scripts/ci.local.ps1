@@ -6,7 +6,8 @@ param(
   [string]$Python = "python",
   [string]$Out = ".artifacts",
   [switch]$NoTests,
-  [switch]$NoPlot
+  [switch]$NoPlot,
+  [double]$FailIfSlowSec = 0
 )
 
 Set-StrictMode -Version Latest
@@ -183,8 +184,8 @@ plt.savefig(out)
 }
 
 # --- index.html
-$sum = ConvertFrom-Json (Get-Content -Raw $summaryJson)
-$passFail = if ($sum.exit_code -eq 0) { "PASS" } else { "FAIL" }
+$passFail = if ($finalExit -eq 0) { "PASS" } else { "FAIL" }
+$gateNote = if ($FailIfSlowSec -gt 0) { "(gate: ≥ $FailIfSlowSec s ⇒ exit 2)" } else { "" }
 $html = @"
 <!doctype html>
 <html lang="en">
@@ -196,29 +197,47 @@ $html = @"
   .ok{background:#e6ffed;border:1px solid #b7ebc6;color:#096c38}
   .bad{background:#ffecec;border:1px solid #ffb3b3;color:#8a1f11}
   code{background:#f5f5f5;padding:.15rem .35rem;border-radius:.25rem}
-  .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:880px}
+  .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:960px}
   img{max-width:560px;border:1px solid #ddd;border-radius:8px}
   table{border-collapse:collapse}
-  th,td{padding:.25rem .5rem;border:1px solid #eee}
+  th,td{padding:.35rem .6rem;border:1px solid #eee}
+  th{background:#fafafa;text-align:left}
+  td:last-child{white-space:nowrap}
 </style>
 <body>
   <h1>Local CI Summary</h1>
-  <div>Status: <span class="chip ${passFail=='PASS' ? 'ok' : 'bad'}">$passFail</span></div>
+  <div>Status: <span class="chip ${passFail=='PASS' ? 'ok' : 'bad'}">$passFail</span> <small>$gateNote</small></div>
   <div class="grid">
     <div><strong>pytest exit:</strong> <code>$($sum.exit_code)</code></div>
+    <div><strong>final exit:</strong> <code>$finalExit</code></div>
     <div><strong>duration (wall):</strong> <code>$durationSec s</code></div>
     <div><strong>generated:</strong> <code>$((Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ssZ"))</code></div>
-    <div><a href="ci/ci_summary.json">ci/ci_summary.json</a> • <a href="ci/pytest.txt">ci/pytest.txt</a> • <a href="ci/junit.xml">ci/junit.xml</a> • <a href="metrics/run.ndjson">metrics/run.ndjson</a></div>
+    <div>
+      <a href="ci/ci_summary.json">ci/ci_summary.json</a> •
+      <a href="ci/pytest.txt">ci/pytest.txt</a> •
+      <a href="ci/junit.xml">ci/junit.xml</a> •
+      <a href="metrics/run.ndjson">metrics/run.ndjson</a>
+    </div>
     <div><em>summary plot (if generated)</em><br/><img src="plots/summary.png" alt="summary plot"/></div>
   </div>
+
   <h3>Counts</h3>
   <table>
     <tr><th>total</th><th>passed</th><th>failed</th><th>skipped</th><th>time_total_sec</th></tr>
     <tr><td>$($sum.tests_total)</td><td>$($sum.passed)</td><td>$($sum.failed)</td><td>$($sum.skipped)</td><td>$($sum.time_total_sec)</td></tr>
   </table>
+
+  <h3>Top 10 slowest tests</h3>
+  <table>
+    <tr><th>test</th><th>seconds</th></tr>
+    $slowRows
+  </table>
+
+  <p><small>Max observed test time this run: <code>{0:N3}s</code>.</small></p>
 </body>
 </html>
-"@
+"@ -f ([double]$maxSeconds)
+
 Set-Content -Path $indexHtml -Value $html -Encoding utf8
 
 # --- Bundle snapshot (zip)
@@ -241,4 +260,5 @@ if ($bundleInputs.Count -gt 0) {
 Write-Host "Local CI completed. Summary: $summaryJson"
 Write-Host "Index: $indexHtml"
 if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
-exit $sum.exit_code
+exit $finalExit
+
