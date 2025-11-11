@@ -1,17 +1,25 @@
-﻿param(
-  [string]$Root = "scripts",
-  [string[]]$Include = @("*.py")
-)
-function Invoke-PythonSyntaxGuard {
-  param([string]$Root = $Root, [string[]]$Include = $Include)
+﻿# --- Python syntax guard (compatible with PowerShell 5.1 and 7+) ---
+$cmd = Get-Command python -ErrorAction SilentlyContinue
+$py  = if ($null -ne $cmd) { $cmd.Source } else { $null }
 
-  $py = (Get-Command python -ErrorAction SilentlyContinue)?.Source
-  if (-not $py) { throw "python not found on PATH" }
-
-  $files = foreach ($pat in $Include) { Get-ChildItem -Path $Root -Recurse -Filter $pat -File }
-  foreach ($f in $files) {
-    & $py -m py_compile $f.FullName 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Syntax error in $($f.FullName)" }
-  }
+if (-not $py) {
+    Write-Error "❌ Python not found in PATH. Please install Python 3.x."
+    return 1
 }
-Invoke-PythonSyntaxGuard -Root $Root -Include $Include
+
+$pyFiles = Get-ChildItem -Path scripts -Filter *.py -Recurse
+foreach ($f in $pyFiles) {
+    try {
+        $out = & python -m py_compile $f.FullName 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ Syntax error in $($f.Name): $out"
+            return 1
+        }
+    } catch {
+        Write-Warning "⚠️ Error checking $($f.Name): $($_.Exception.Message)"
+        return 1
+    }
+}
+
+Write-Host "✅ Python lint check passed for all scripts." -ForegroundColor Green
+return 0
