@@ -10,7 +10,7 @@ if (!(Test-Path $RunsLog)) { return "" }
 . "$PSScriptRoot\ci.tz.ps1"
 
 $rows = Get-Content $RunsLog | Where-Object { $_ -match $pat }
-$validCount = $rows.Count
+$validCount = ($rows | Measure-Object).Count
 $rows = $rows | Select-Object -Last $Count
 
 $sb = New-Object System.Text.StringBuilder
@@ -29,3 +29,6 @@ foreach ($r in $rows) {
 }
 [void]$sb.AppendLine("</table>")
 $sb.ToString()
+
+
+

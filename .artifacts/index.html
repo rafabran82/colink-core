@@ -1,50 +1,105 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>Local CI — 
-smoke-with-trend
-</title>
+<title>Local CI Summary</title>
 <style>
-body{font-family:Segoe UI,Arial,sans-serif;padding:24px;}
-.badge{margin-bottom:16px}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
-ul{line-height:1.6}
-span{color:#555;font-size:12px;margin-left:6px}
-h2{margin-top:0}
+ body{font-family:Segoe UI, sans-serif;margin:16px}
+ .row{display:flex;gap:10px;align-items:center}
+ .tz-table{margin-top:14px}
+ .badge{padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#f6f6f6}
 </style>
 </head>
 <body>
-<h2>Local CI — 
-smoke-with-trend
-</h2>
-<div class="badge"><span class="dot green"></span><b></b> —  passed; skipped ; failed ; time 0s</div>
-<h3>Artifacts</h3><ul>
-<li><a href=".gitkeep">.gitkeep</a></li>
-<li><a href="dataset.csv">dataset.csv</a> <span>(308 B)</span></li>
-<li><a href="index.html">index.html</a> <span>(2034 B)</span></li>
-<li><a href="pytest.txt">pytest.txt</a> <span>(81 B)</span></li>
-<li><a href="sample.events.ndjson">sample.events.ndjson</a> <span>(419 B)</span></li>
-<li><a href="sample.metrics.json">sample.metrics.json</a> <span>(141 B)</span></li>
-<li><a href="sim.events.ndjson">sim.events.ndjson</a> <span>(4483 B)</span></li>
-<li><a href="sim.metrics.json">sim.metrics.json</a> <span>(150 B)</span></li>
-<li><a href="sim.summary.csv">sim.summary.csv</a> <span>(1257 B)</span></li>
-<li><a href="SUMMARY.md">SUMMARY.md</a> <span>(277 B)</span></li>
-</ul>
-<h3>Plots</h3><ul>
-<li><a href="slow_by_module.png">slow_by_module.png</a> <span>(2542 B)</span></li>
-<li><a href="sparkline.png">sparkline.png</a> <span>(1201 B)</span></li>
-<li><a href="summary.png">summary.png</a> <span>(5282 B)</span></li>
-</ul>
-<h3>Metrics</h3><ul>
-<li><a href="ci_badge.json">ci_badge.json</a> <span>(7 B)</span></li>
-<li><a href="ci_summary.json">ci_summary.json</a> <span>(4777 B)</span></li>
-<li><a href="trend_stats.json">trend_stats.json</a> <span>(141 B)</span></li>
-</ul>
-<h3>Data</h3><ul>
-<li><a href=".gitkeep">.gitkeep</a></li>
-</ul>
-<hr/><h3>CI Trend History</h3><img src='ci/runs/runs_trend.png' style='max-width:920px;border:1px solid #ddd;border-radius:8px'/>
+  <p>Generated: 11/11/2025 13:43:24</p>
+
+  <div class="row">
+    <label><b>Timezone:</b></label>
+    <select id="tzSelect"><option value="">Local time (default)</option>
+<option value="Eastern">Eastern</option>
+<option value="Central">Central</option>
+<option value="Mountain">Mountain</option>
+<option value="Pacific">Pacific</option>
+<option value="UTC">UTC</option></select>
+    <button id="tzBtn" class="badge">TZ: Local time (default)</button>
+  </div>
+
+  <h2>Local CI Run Trend</h2>
+  <img id="ciChart" src="ci/runs/runs_trend_local.png" width="800"/>
+
+  <div id="tablesHost">
+    <div class='tz-table' data-tz='local' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 16)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+<tr><td>2025-11-11T11:27:30</td><td style='text-align:right'>51</td><td style='text-align:right'>0.13</td></tr>
+<tr><td>2025-11-11T12:42:37</td><td style='text-align:right'>11759</td><td style='text-align:right'>1237.011</td></tr>
+<tr><td>2025-11-11T12:48:01</td><td style='text-align:right'>11760</td><td style='text-align:right'>1237.012</td></tr>
+<tr><td>2025-11-11T12:50:32</td><td style='text-align:right'>11761</td><td style='text-align:right'>1237.012</td></tr>
+<tr><td>2025-11-11T12:54:52</td><td style='text-align:right'>11762</td><td style='text-align:right'>1237.012</td></tr>
+</table>
+</div>
+<div class='tz-table' data-tz='central' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+</table>
+</div>
+<div class='tz-table' data-tz='eastern' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+</table>
+</div>
+<div class='tz-table' data-tz='mountain' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+</table>
+</div>
+<div class='tz-table' data-tz='pacific' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+</table>
+</div>
+<div class='tz-table' data-tz='utc' style='display:none'><h3>Last 5 Runs <span style='font-size:12px;color:#555'>(TZ: Local, valid rows: 0)</span></h3>
+<table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;font-family:Segoe UI,sans-serif'>
+<tr><th>Timestamp</th><th>Files</th><th>Total MB</th></tr>
+</table>
+</div>
+  </div>
+
+  <div style="margin-top:10px;color:#888;font-size:12px"><div style='margin-top:10px;color:#888;font-size:12px'>Use rebuild_ci.cmd to refresh without adding a new run.</div></div>
+
+<script>
+(function(){
+  function getParam(name){
+    const u = new URL(window.location.href);
+    return u.searchParams.get(name) || "";
+  }
+  function showTable(tz){
+    document.querySelectorAll('.tz-table').forEach(div=>{
+      div.style.display = (div.getAttribute('data-tz') === tz) ? 'block' : 'none';
+    });
+  }
+  function applyTZ(tz){
+    const chart = document.getElementById('ciChart');
+    // compute image path from tz
+    const stem = 'ci/runs/runs_trend_';
+    chart.src = stem + (tz ? tz : 'local') + '.png';
+    showTable(tz || '');
+    const badge = document.getElementById('tzBtn');
+    badge.textContent = 'TZ: ' + (tz || 'Local time (default)');
+    const u = new URL(window.location.href);
+    if (tz) { u.searchParams.set('tz', tz); } else { u.searchParams.delete('tz'); }
+    history.replaceState(null, '', u.toString());
+  }
+
+  // init selection
+  const initial = getParam('tz');               // "", "Eastern", ...
+  const sel = document.getElementById('tzSelect');
+  sel.value = initial;
+  applyTZ(initial);
+
+  sel.addEventListener('change', ()=>applyTZ(sel.value));
+  document.getElementById('tzBtn').addEventListener('click', ()=>applyTZ(sel.value));
+})();
+</script>
 </body>
 </html>
-
