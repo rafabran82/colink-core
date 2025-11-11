@@ -34,9 +34,9 @@ $pytestExit  = 0
 $durationSec = 0.0
 $sw = [Diagnostics.Stopwatch]::StartNew()
 if (-not $NoTests) {
-  Write-Host "Running tests with $Python -m pytest -rA --durations=0 ..."
+  Write-Host "Running tests with $Python -m pytest -rA --durations=0 --junitxml .artifacts/ci/junit.xml ..."
   # Capture stdout+stderr in-process (works on Windows PowerShell + pwsh)
-  $out = & $Python -m pytest -rA --durations=0 2>&1
+  $out = & $Python -m pytest -rA --durations=0 --junitxml .artifacts/ci/junit.xml 2>&1
   $pytestExit = $LASTEXITCODE
   Set-Content -Path $pytestLogPath -Value ($out -join [Environment]::NewLine) -Encoding utf8
 } else {
@@ -45,67 +45,112 @@ if (-not $NoTests) {
 $sw.Stop()
 $durationSec = [Math]::Round($sw.Elapsed.TotalSeconds,2)
 
-# --- Parse pytest log with a small Python helper (robust)
+# --- Parse pytest reports (XML first, text fallback) with a small Python helper
 $pyParse = @"
-import sys, re, json, pathlib, datetime
-log_path = pathlib.Path(sys.argv[1])
-out_json = pathlib.Path(sys.argv[2])
-ndjson   = pathlib.Path(sys.argv[3])
-exitcode = int(sys.argv[4])
-text = log_path.read_text(encoding='utf-8') if log_path.exists() else ''
+import sys, re, json, pathlib, datetime, xml.etree.ElementTree as ET
+log_path   = pathlib.Path(sys.argv[1])
+out_json   = pathlib.Path(sys.argv[2])
+ndjson     = pathlib.Path(sys.argv[3])
+exitcode   = int(sys.argv[4])
+junit_path = pathlib.Path('.artifacts/ci/junit.xml')
 
-m = re.search(r"=+\s*(.+?)\s+in\s+([0-9]*\.?[0-9]+)s\s*=+", text)
-counts = {}
-tot = 0
+counts = {"passed": 0, "failed": 0, "skipped": 0, "errors": 0}
+tot = None
 dur_total = None
-if m:
+durations = []
+
+def parse_from_junit(p: pathlib.Path):
+    global counts, tot, dur_total, durations
+    if not p.exists():
+        return False
+    try:
+        tree = ET.parse(str(p))
+        root = tree.getroot()
+        # JUnit structure: <testsuite tests=".." failures=".." errors=".." skipped=".." time=".."> with <testcase time="..">
+        # pytest can nest <testsuite>, so accumulate
+        suites = root.findall(".//testsuite") or [root]
+        tests = failures = errors = skipped = 0
+        total_time = 0.0
+        for s in suites:
+            tests    += int(s.attrib.get("tests", 0))
+            failures += int(s.attrib.get("failures", 0))
+            errors   += int(s.attrib.get("errors", 0))
+            skipped  += int(s.attrib.get("skipped", 0))
+            try:
+                total_time += float(s.attrib.get("time", 0) or 0)
+            except Exception:
+                pass
+            for tc in s.findall(".//testcase"):
+                try:
+                    t = float(tc.attrib.get("time", 0) or 0)
+                except Exception:
+                    t = None
+                name = tc.attrib.get("classname","") + "::" + tc.attrib.get("name","")
+                durations.append({"name": name.strip(":") , "seconds": t})
+        counts = {
+            "passed": max(tests - failures - errors - skipped, 0),
+            "failed": failures + errors,
+            "skipped": skipped,
+            "errors": errors
+        }
+        tot = tests
+        dur_total = total_time if total_time > 0 else None
+        return True
+    except Exception:
+        return False
+
+def parse_from_text(p: pathlib.Path):
+    global counts, tot, dur_total
+    text = p.read_text(encoding="utf-8") if p.exists() else ""
+    m = re.search(r"=+\\s*(.+?)\\s+in\\s+([0-9]*\\.?[0-9]+)s\\s*=+", text)
+    if not m:
+        return False
     parts = m.group(1).split(",")
+    c = {}
+    T = 0
     for part in parts:
         part = part.strip()
-        mm = re.match(r"(\d+)\s+(\w+)", part)
+        mm = re.match(r"(\\d+)\\s+(\\w+)", part)
         if mm:
             n, label = int(mm.group(1)), mm.group(2).lower()
-            counts[label] = counts.get(label, 0) + n
-            tot += n
+            c[label] = c.get(label, 0) + n
+            T += n
+    counts["passed"]  = c.get("passed", 0)
+    counts["failed"]  = c.get("failed", 0) + c.get("errors", 0) + c.get("error", 0)
+    counts["skipped"] = c.get("skipped", 0) + c.get("xfailed", 0) + c.get("xpassed", 0)
+    tot = T or None
     try:
         dur_total = float(m.group(2))
     except Exception:
         dur_total = None
+    return True
 
-durations = []
-for sec, name in re.findall(r"^\s*([0-9]*\.?[0-9]+)s\s+\w+\s+(.+)$", text, flags=re.M):
-    try:
-        durations.append({"name": name.strip(), "seconds": float(sec)})
-    except Exception:
-        pass
-
-passed  = counts.get("passed", 0)
-failed  = counts.get("failed", 0) + counts.get("errors", 0) + counts.get("error", 0)
-skipped = counts.get("skipped", 0) + counts.get("xfailed", 0) + counts.get("xpassed", 0)
+ok = parse_from_junit(junit_path) or parse_from_text(log_path)
 
 result = {
     "exit_code": exitcode,
-    "tests_total": tot or None,
-    "passed": passed,
-    "failed": failed,
-    "skipped": skipped,
+    "tests_total": tot,
+    "passed": counts.get("passed",0),
+    "failed": counts.get("failed",0),
+    "skipped": counts.get("skipped",0),
     "time_total_sec": dur_total,
-    "durations": durations[:200]
+    "durations": [d for d in durations if d.get("seconds") is not None][:200]
 }
 out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
+ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00","Z")
 nd = {
-    "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00","Z"),
+    "ts": ts,
     "exit": exitcode,
     "tests_total": result["tests_total"],
-    "passed": passed,
-    "failed": failed,
-    "skipped": skipped,
+    "passed": result["passed"],
+    "failed": result["failed"],
+    "skipped": result["skipped"],
     "time_total_sec": result["time_total_sec"]
 }
 ndjson.parent.mkdir(parents=True, exist_ok=True)
 with ndjson.open("a", encoding="utf-8") as f:
-    f.write(json.dumps(nd, ensure_ascii=False) + "\n")
+    f.write(json.dumps(nd, ensure_ascii=False) + "\\n")
 "@
 $tmpPy = Join-Path $env:TEMP ("ci_parse_{0}.py" -f ([guid]::NewGuid()))
 Set-Content -Path $tmpPy -Value $pyParse -Encoding utf8
@@ -113,6 +158,7 @@ try {
   & $Python $tmpPy $pytestLogPath $summaryJsonPath $ndjsonPath $pytestExit | Out-Null
 } finally {
   Remove-Item $tmpPy -Force -ErrorAction SilentlyContinue
+}
 }
 
 # --- Plot (optional; pass=1 fail=0)
@@ -200,4 +246,5 @@ Write-Host "Local CI completed. Summary: $summaryJsonPath"
 Write-Host "Index: $indexHtml"
 if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
 exit $sum.exit_code
+
 
