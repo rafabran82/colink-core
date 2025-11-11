@@ -34,7 +34,10 @@ def main():
     fig, ax1 = plt.subplots(figsize=(6,3))
     ax1.plot(x, df["SizeMB"], marker="o", color="tab:blue", label="Total MB")
     ax1.set_xlabel("Run Timestamp")
-    ax1.set_ylabel("Total MB", color="tab:blue")`nax1.ticklabel_format(style="plain", axis="y")`nax1.get_yaxis().get_major_formatter().set_scientific(False)`nax1.yaxis.get_offset_text().set_visible(False)
+    ax1.set_ylabel("Total MB", color="tab:blue")
+    ax1.ticklabel_format(style="plain", axis="y")
+    ax1.get_yaxis().get_major_formatter().set_scientific(False)
+    ax1.yaxis.get_offset_text().set_visible(False)`nax1.ticklabel_format(style="plain", axis="y")`nax1.get_yaxis().get_major_formatter().set_scientific(False)`nax1.yaxis.get_offset_text().set_visible(False)
     ax1.tick_params(axis="y", labelcolor="tab:blue")
     ax1.ticklabel_format(style="plain", axis="y")  # force plain tick labels
     ax1.get_yaxis().get_major_formatter().set_scientific(False)
@@ -61,4 +64,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
