@@ -39,8 +39,7 @@ def main():
     fig.tight_layout()
 import numpy as np
 from matplotlib.ticker import FixedLocator
-    ax = plt.gca()
-
+ax = plt.gca()
     # Count current ticks (positions), fall back to length of line x-data if needed
     ticks = ax.get_xticks()
     m = len(ticks)
@@ -67,8 +66,7 @@ except Exception:
 try:
 import numpy as np
 from matplotlib.ticker import FixedLocator
-    ax = plt.gca()
-
+ax = plt.gca()
     # Count current ticks; if too few, fall back to x-data length
     ticks = ax.get_xticks()
     m = len(ticks)
@@ -97,6 +95,7 @@ except Exception:
 
 if __name__ == "__main__":
     main()
+
 
 
 
