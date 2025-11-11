@@ -162,3 +162,5 @@ pwsh -NoLogo -NoProfile -File .\run_ci.ps1 -ProjectHook "& .\scripts\smoke.ps1" 
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\EnableRepoHooks.ps1
+<!-- ARTIFACT_HOOKS_END -->
+
