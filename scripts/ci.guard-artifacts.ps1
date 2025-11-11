@@ -1,4 +1,5 @@
-﻿Param()
+﻿# --- newline helper (used in interpolated strings and regexes) ---
+$script:newline = [Environment]::NewLineParam()
 
 $ErrorActionPreference = "Stop"$allowed = @(
 ".artifacts/.gitkeep",
@@ -19,3 +20,4 @@ Write-Error ("Non-allowlisted tracked files under .artifacts/:n - " + ($bad -joi
 exit 1
 }
 Write-Host "Artifact guard OK."
+
