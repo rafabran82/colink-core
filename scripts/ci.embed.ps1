@@ -86,3 +86,27 @@ $html = @"
 
 Set-Content -Path $IndexPath -Value $html -Encoding utf8
 Write-Host "✅ Embedded TZ-enabled index into $IndexPath"
+# -- BEGIN SUMMARY PNG FOOTER (auto if present) --
+try {
+  $idxDir      = Split-Path -Parent $IndexPath
+  $summaryAbs  = Join-Path $idxDir "metrics\summary.png"
+  $summaryRel  = "metrics/summary.png"
+
+  if (Test-Path -LiteralPath $summaryAbs) {
+    $html = Get-Content -Raw -LiteralPath $IndexPath
+    $panel = @"
+<div style="margin-top:16px;padding-top:10px;border-top:1px solid #eee">
+  <div style="color:#666;font:12px/1.4 system-ui,sans-serif;margin-bottom:6px">
+    Aggregate across sim runs (Avg Total MB)
+  </div>
+  <img src="$summaryRel" alt="Summary across runs" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:8px"/>
+</div>
+"@
+    if ($html -notmatch '<!-- SUMMARY PNG PANEL INSERTED -->') {
+      $panelWrapped = "<!-- SUMMARY PNG PANEL INSERTED -->`r`n$panel`r`n"
+      $html = $html -replace '</body>', ($panelWrapped + '</body>')
+      Set-Content -LiteralPath $IndexPath -Value $html -Encoding utf8
+    }
+  }
+} catch {}
+# -- END SUMMARY PNG FOOTER --
