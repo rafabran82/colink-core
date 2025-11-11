@@ -45,4 +45,3 @@ __pycache__/
 !.artifacts/ci/pytest.txt
 !.artifacts/ci/trend_stats.json
 # === local-ci allowlist END ===
-

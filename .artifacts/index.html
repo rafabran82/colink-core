@@ -1,64 +1,34 @@
 <!doctype html>
-<html lang="en">
-<meta charset="utf-8"/>
-<title>Local CI Summary</title>
+<meta charset="utf-8">
+<title>Artifacts</title>
 <style>
-  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:2rem;line-height:1.5}
-  .chip{display:inline-block;padding:.25rem .6rem;border-radius:9999px;font-weight:600}
-  .ok{background:#e6ffed;border:1px solid #b7ebc6;color:#096c38}
-  .bad{background:#ffecec;border:1px solid #ffb3b3;color:#8a1f11}
-  code{background:#f5f5f5;padding:.15rem .35rem;border-radius:.25rem}
-  .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:960px}
-  img{max-width:560px;border:1px solid #ddd;border-radius:8px}
-  table{border-collapse:collapse}
-  th,td{padding:.35rem .6rem;border:1px solid #eee}
-  th{background:#fafafa;text-align:left}
-  td:last-child{white-space:nowrap}
+  body{font:16px system-ui,Segoe UI,Arial,sans-serif;margin:24px;line-height:1.45}
+  h1{font-size:32px;margin:0 0 8px}
+  .badge{margin:10px 0 16px;padding:8px 12px;background:#f6f8fa;border:1px solid #e5e7eb;border-radius:10px;display:inline-block}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
+  ul{margin:6px 0 18px 20px} li span{color:#6b7280;margin-left:6px}
+  h2{font-size:18px;margin:16px 0 6px}
 </style>
-<body>
-  <h1>Local CI Summary</h1>
-  <div>Status: <span class="chip bad">FAIL</span> <small>(gate: ≥ 0.05 s ⇒ exit 2)</small></div>
-  <div class="grid">
-    <div><strong>pytest exit:</strong> <code>0</code></div>
-    <div><strong>final exit:</strong> <code>2</code></div>
-    <div><strong>duration (wall):</strong> <code>7.55 s</code></div>
-    <div><strong>generated:</strong> <code>2025-11-11 10:59:30Z</code></div>
-    <div>
-      <a href="ci/ci_summary.json">ci/ci_summary.json</a> •
-      <a href="ci/pytest.txt">ci/pytest.txt</a> •
-      <a href="ci/junit.xml">ci/junit.xml</a> •
-      <a href="metrics/run.ndjson">metrics/run.ndjson</a>
-    </div>
-    <div><em>summary plot (if generated)</em><br/><img src="plots/summary.png" alt="summary plot"/></div>
-  </div>
-
-  <h3>Counts</h3>
-  <table>
-    <tr><th>total</th><th>passed</th><th>failed</th><th>skipped</th><th>time_total_sec</th></tr>
-    <tr><td>42</td><td>40</td><td>0</td><td>2</td><td>7.166</td></tr>
-  </table>
-
-  <h3>Top 10 slowest tests</h3>
-  <table>
-    <tr><th>test</th><th>seconds</th></tr>
-    <tr><td><code>tests.test_sim_json_headless::test_sim_json_schema_and_seed</code></td><td style='text-align:right'>0.799</td></tr>
-<tr><td><code>tests.test_sim_metrics_headless::test_metrics_and_metrics_only</code></td><td style='text-align:right'>0.617</td></tr>
-<tr><td><code>tests.test_run_artifacts::test_run_demo_emits_artifacts</code></td><td style='text-align:right'>0.468</td></tr>
-<tr><td><code>colink_core.sim.test_json_cli::test_sweep_json_smoke</code></td><td style='text-align:right'>0.422</td></tr>
-<tr><td><code>tests.test_sim_spread_headless::test_sim_spread_headless[COPX/COL]</code></td><td style='text-align:right'>0.394</td></tr>
-<tr><td><code>tests.test_sim_spread_headless::test_sim_spread_headless[XRP/COL]</code></td><td style='text-align:right'>0.363</td></tr>
-<tr><td><code>tests.test_sim_slippage_headless::test_sim_slippage_headless[XRP/COL]</code></td><td style='text-align:right'>0.333</td></tr>
-<tr><td><code>tests.test_sim_slippage_headless::test_sim_slippage_headless[COPX/COL]</code></td><td style='text-align:right'>0.332</td></tr>
-<tr><td><code>tests.test_sim_plot_headless::test_sim_plot_headless[XRP/COL]</code></td><td style='text-align:right'>0.331</td></tr>
-<tr><td><code>tests.test_sim_plot_headless::test_sim_plot_headless[COPX/COL]</code></td><td style='text-align:right'>0.326</td></tr>
-
-  </table>
-
-  <p><small>Max observed test time this run: <code>0.799 s</code>.</small></p>
-</body>
-</html>
-<!-- CI-BADGE -->
-<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;margin-top:8px">
-  <strong>Badge:</strong> pass — 42/42 passed,
-  skipped 0, failed 0 (time 0s)
-</div>
+<h1>Artifacts</h1>
+<div class="badge"><span class="dot" style="background:#6b7280"></span><strong></strong> — </div>
+<h2>CI files</h2><ul><li><a href="ci/ci_badge.json">ci_badge.json</a> <span>(7 B)</span></li>
+<li><a href="ci/ci_run.stderr.log">ci_run.stderr.log</a></li>
+<li><a href="ci/ci_run.stdout.log">ci_run.stdout.log</a></li>
+<li><a href="ci/ci_summary.csv">ci_summary.csv</a> <span>(68 B)</span></li>
+<li><a href="ci/ci_summary.json">ci_summary.json</a> <span>(5 KB)</span></li>
+<li><a href="ci/junit.xml">junit.xml</a> <span>(86 B)</span></li>
+<li><a href="ci/pytest.txt">pytest.txt</a> <span>(17 B)</span></li>
+<li><a href="ci/trend_stats.json">trend_stats.json</a> <span>(141 B)</span></li></ul>
+<h2>Plots</h2><ul><li><a href="plots/slow_by_module.png">slow_by_module.png</a> <span>(11 KB)</span></li>
+<li><a href="plots/sparkline.png">sparkline.png</a> <span>(24 KB)</span></li>
+<li><a href="plots/summary.png">summary.png</a> <span>(20 KB)</span></li></ul>
+<h2>Metrics</h2><ul><li><a href="metrics/run.ndjson">run.ndjson</a> <span>(24 B)</span></li></ul>
+<h2>Bundles</h2><ul><li><a href="bundles/run-20251111-054507.zip">run-20251111-054507.zip</a> <span>(10 KB)</span></li>
+<li><a href="bundles/run-20251111-054708.zip">run-20251111-054708.zip</a> <span>(10 KB)</span></li>
+<li><a href="bundles/run-20251111-055016.zip">run-20251111-055016.zip</a> <span>(12 KB)</span></li>
+<li><a href="bundles/run-20251111-055810.zip">run-20251111-055810.zip</a> <span>(13 KB)</span></li>
+<li><a href="bundles/run-20251111-055818.zip">run-20251111-055818.zip</a> <span>(13 KB)</span></li>
+<li><a href="bundles/run-20251111-055922.zip">run-20251111-055922.zip</a> <span>(13 KB)</span></li>
+<li><a href="bundles/run-20251111-055930.zip">run-20251111-055930.zip</a> <span>(13 KB)</span></li>
+<li><a href="bundles/run-20251111-083232.zip">run-20251111-083232.zip</a> <span>(4 KB)</span></li>
+<li><a href="bundles/run-20251111-083257.zip">run-20251111-083257.zip</a> <span>(4 KB)</span></li></ul>
