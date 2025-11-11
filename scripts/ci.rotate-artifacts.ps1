@@ -1,4 +1,4 @@
-﻿# --- CI artifact rotation & cleanup ---
+﻿# --- CI artifact rotation & cleanup (PS5+ safe) ---
 param (
     [string]$DataDir = ".artifacts\data",
     [int]$Keep = 100,
@@ -10,7 +10,8 @@ if (-not (Test-Path $DataDir)) {
     return
 }
 
-$dirs = Get-ChildItem -Path $DataDir -Directory | Sort-Object LastWriteTime -Descending
+# Always treat as array, even if only one directory
+$dirs = @(Get-ChildItem -Path $DataDir -Directory | Sort-Object LastWriteTime -Descending)
 $total = $dirs.Count
 
 if ($total -le $Keep) {
