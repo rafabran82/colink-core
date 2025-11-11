@@ -1,14 +1,64 @@
-﻿<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>COLINK CI Artifacts</title>
-  </head>
-  <body>
-    <h1>COLINK CI Artifacts</h1>
-    <p>This folder keeps a tiny index and summaries under version control, while heavy outputs stay ignored.</p>
-    <ul>
-      <li><a href="./ci/ci_summary.json">CI Summary (JSON)</a></li>
-    </ul>
-  </body>
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"/>
+<title>Local CI Summary</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:2rem;line-height:1.5}
+  .chip{display:inline-block;padding:.25rem .6rem;border-radius:9999px;font-weight:600}
+  .ok{background:#e6ffed;border:1px solid #b7ebc6;color:#096c38}
+  .bad{background:#ffecec;border:1px solid #ffb3b3;color:#8a1f11}
+  code{background:#f5f5f5;padding:.15rem .35rem;border-radius:.25rem}
+  .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:960px}
+  img{max-width:560px;border:1px solid #ddd;border-radius:8px}
+  table{border-collapse:collapse}
+  th,td{padding:.35rem .6rem;border:1px solid #eee}
+  th{background:#fafafa;text-align:left}
+  td:last-child{white-space:nowrap}
+</style>
+<body>
+  <h1>Local CI Summary</h1>
+  <div>Status: <span class="chip bad">FAIL</span> <small>(gate: ≥ 0.05 s ⇒ exit 2)</small></div>
+  <div class="grid">
+    <div><strong>pytest exit:</strong> <code>0</code></div>
+    <div><strong>final exit:</strong> <code>2</code></div>
+    <div><strong>duration (wall):</strong> <code>7.55 s</code></div>
+    <div><strong>generated:</strong> <code>2025-11-11 10:59:30Z</code></div>
+    <div>
+      <a href="ci/ci_summary.json">ci/ci_summary.json</a> •
+      <a href="ci/pytest.txt">ci/pytest.txt</a> •
+      <a href="ci/junit.xml">ci/junit.xml</a> •
+      <a href="metrics/run.ndjson">metrics/run.ndjson</a>
+    </div>
+    <div><em>summary plot (if generated)</em><br/><img src="plots/summary.png" alt="summary plot"/></div>
+  </div>
+
+  <h3>Counts</h3>
+  <table>
+    <tr><th>total</th><th>passed</th><th>failed</th><th>skipped</th><th>time_total_sec</th></tr>
+    <tr><td>42</td><td>40</td><td>0</td><td>2</td><td>7.166</td></tr>
+  </table>
+
+  <h3>Top 10 slowest tests</h3>
+  <table>
+    <tr><th>test</th><th>seconds</th></tr>
+    <tr><td><code>tests.test_sim_json_headless::test_sim_json_schema_and_seed</code></td><td style='text-align:right'>0.799</td></tr>
+<tr><td><code>tests.test_sim_metrics_headless::test_metrics_and_metrics_only</code></td><td style='text-align:right'>0.617</td></tr>
+<tr><td><code>tests.test_run_artifacts::test_run_demo_emits_artifacts</code></td><td style='text-align:right'>0.468</td></tr>
+<tr><td><code>colink_core.sim.test_json_cli::test_sweep_json_smoke</code></td><td style='text-align:right'>0.422</td></tr>
+<tr><td><code>tests.test_sim_spread_headless::test_sim_spread_headless[COPX/COL]</code></td><td style='text-align:right'>0.394</td></tr>
+<tr><td><code>tests.test_sim_spread_headless::test_sim_spread_headless[XRP/COL]</code></td><td style='text-align:right'>0.363</td></tr>
+<tr><td><code>tests.test_sim_slippage_headless::test_sim_slippage_headless[XRP/COL]</code></td><td style='text-align:right'>0.333</td></tr>
+<tr><td><code>tests.test_sim_slippage_headless::test_sim_slippage_headless[COPX/COL]</code></td><td style='text-align:right'>0.332</td></tr>
+<tr><td><code>tests.test_sim_plot_headless::test_sim_plot_headless[XRP/COL]</code></td><td style='text-align:right'>0.331</td></tr>
+<tr><td><code>tests.test_sim_plot_headless::test_sim_plot_headless[COPX/COL]</code></td><td style='text-align:right'>0.326</td></tr>
+
+  </table>
+
+  <p><small>Max observed test time this run: <code>0.799 s</code>.</small></p>
+</body>
 </html>
+<!-- CI-BADGE -->
+<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;margin-top:8px">
+  <strong>Badge:</strong> pass — 42/42 passed,
+  skipped 0, failed 0 (time 0s)
+</div>
