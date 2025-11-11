@@ -5,6 +5,21 @@ from pathlib import Path
 def iso_now():
     return datetime.now(timezone.utc).isoformat()
 
+def gen_latency_ms(i: int) -> float:
+    """
+    Small synthetic latency model:
+      - base ~ 150–180 ms
+      - gentle wave
+      - rare spikes
+    """
+    base = 165.0 + 8.0*math.sin(i/9.0)
+    noise = random.uniform(-4.0, 4.0)
+    # 3% chance of a small spike
+    spike = 0.0
+    if random.random() < 0.03:
+        spike = random.uniform(25.0, 60.0)
+    return max(0.0, base + noise + spike)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True, help="Output directory")
@@ -16,36 +31,52 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     # --- Generate tiny synthetic timeline ---
-    values = []
+    mb_values = []
+    lat_values = []
     ndjson_path = out / "events.ndjson"
     with ndjson_path.open("w", encoding="utf-8") as f:
         base = random.uniform(10, 20)
         for i in range(args.n):
-            # gentle trend + sine + noise (pretend “MB processed”)
-            val = base + 0.05*i + 2.0*math.sin(i/7.0) + random.uniform(-0.3, 0.3)
-            values.append(val)
+            # pretend “MB processed”
+            mb = base + 0.05*i + 2.0*math.sin(i/7.0) + random.uniform(-0.3, 0.3)
+            mb_values.append(mb)
+
+            # synthetic latency
+            lat = gen_latency_ms(i)
+            lat_values.append(lat)
+
             evt = {
                 "ts": iso_now(),
                 "seq": i,
-                "metric": "total_mb",
-                "value": round(val, 3)
+                "metrics": {
+                    "total_mb": round(mb, 3),
+                    "latency_ms": round(lat, 1)
+                }
             }
             f.write(json.dumps(evt) + "\n")
             time.sleep(args.dt)
 
     # --- Metrics summary ---
-    p95 = statistics.quantiles(values, n=20)[18] if len(values) >= 20 else max(values)
+    def p95(vs):
+        # statistics.quantiles requires enough samples; guard for short runs
+        if len(vs) >= 20:
+            return statistics.quantiles(vs, n=20)[18]
+        return max(vs) if vs else 0.0
+
     metrics = {
         "generated_at": iso_now(),
-        "samples": len(values),
-        "total_mb_min": round(min(values), 3),
-        "total_mb_avg": round(statistics.fmean(values), 3),
-        "total_mb_p95": round(p95, 3),
-        "total_mb_max": round(max(values), 3),
+        "samples": len(mb_values),
+        "total_mb_min": round(min(mb_values), 3),
+        "total_mb_avg": round(statistics.fmean(mb_values), 3),
+        "total_mb_p95": round(p95(mb_values), 3),
+        "total_mb_max": round(max(mb_values), 3),
+
+        # NEW latency rollups
+        "latency_ms_p50": round(statistics.median(lat_values), 1),
+        "latency_ms_p95": round(p95(lat_values), 1),
+        "latency_ms_max": round(max(lat_values), 1),
     }
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
-
-    # light breadcrumb for other tools
     (out / "_ok").write_text("ok", encoding="utf-8")
 
 if __name__ == "__main__":
