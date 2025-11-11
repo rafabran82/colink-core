@@ -1,0 +1,11 @@
+﻿{
+    "status":  "pass",
+    "color":  "green",
+    "tests_total":  42,
+    "passed":  40,
+    "failed":  0,
+    "skipped":  2,
+    "time_total_sec":  7.426
+}
+
+

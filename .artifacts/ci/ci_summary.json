@@ -1,5 +1,178 @@
-﻿{
-    "generated_at":  "2025-11-11T04:39:49",
-    "version":  1,
-    "note":  "Placeholder summary committed to repo; heavy artifacts remain ignored."
+{
+  "exit_code": 0,
+  "tests_total": 42,
+  "passed": 40,
+  "failed": 0,
+  "skipped": 2,
+  "time_total_sec": 7.426,
+  "durations": [
+    {
+      "name": "colink_core.sim.test_json_cli::test_quote_json_smoke",
+      "seconds": 0.328
+    },
+    {
+      "name": "colink_core.sim.test_json_cli::test_sweep_json_smoke",
+      "seconds": 0.354
+    },
+    {
+      "name": "colink_core.sim.test_json_shape::test_quote_keys_shape",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_amm::test_swap_x_for_y_increases_x_decreases_y_and_respects_fee",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_amm::test_swap_y_for_x_increases_y_decreases_x_and_respects_fee",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_amm::test_liquidity_add_and_remove_is_proportional",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_amm::test_price_monotonicity_basic",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_limits::test_limiter_size_and_dev_caps_and_breaker",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_risk_guard::test_min_out_guard_allows_small_slippage",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_risk_guard::test_size_aware_twap_guard_blocks_large_deviation",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_router::test_quote_and_exec_are_positive_and_reasonable",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_twap_price_utils::test_twap_warm_and_value_stable",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_twap_price_utils::test_bps_deviation_zero_when_equal",
+      "seconds": 0.0
+    },
+    {
+      "name": "colink_core.sim.tests.test_twap_price_utils::test_bps_deviation_positive_when_below_twap",
+      "seconds": 0.0
+    },
+    {
+      "name": "tests.test_api_sim::test_api_quote_ok",
+      "seconds": 0.01
+    },
+    {
+      "name": "tests.test_api_sim::test_api_sweep_ok",
+      "seconds": 0.004
+    },
+    {
+      "name": "tests.test_app_exists::test_app_exists",
+      "seconds": 0.003
+    },
+    {
+      "name": "tests.test_bridge_smoke::test_bridge_smoke",
+      "seconds": 0.162
+    },
+    {
+      "name": "tests.test_import::test_import_main",
+      "seconds": 0.002
+    },
+    {
+      "name": "tests.test_imports::test_imports",
+      "seconds": 0.001
+    },
+    {
+      "name": "tests.test_json_cli::test_help_is_ascii_and_clean",
+      "seconds": 0.327
+    },
+    {
+      "name": "tests.test_json_cli::test_quote_basic",
+      "seconds": 0.308
+    },
+    {
+      "name": "tests.test_json_cli::test_sweep_placeholder",
+      "seconds": 0.337
+    },
+    {
+      "name": "tests.test_kpi_thresholds::test_kpi_thresholds[path0]",
+      "seconds": 0.001
+    },
+    {
+      "name": "tests.test_kpi_thresholds::test_kpi_thresholds[path1]",
+      "seconds": 0.0
+    },
+    {
+      "name": "tests.test_packaging::test_package_only_colink_core",
+      "seconds": 0.013
+    },
+    {
+      "name": "tests.test_plot_smoke::test_sim_demo_plot",
+      "seconds": 0.309
+    },
+    {
+      "name": "tests.test_run_artifacts::test_run_demo_emits_artifacts",
+      "seconds": 0.51
+    },
+    {
+      "name": "tests.test_sim_csv_headless::test_csv_ingest_headless",
+      "seconds": 0.345
+    },
+    {
+      "name": "tests.test_sim_json_headless::test_sim_json_schema_and_seed",
+      "seconds": 0.81
+    },
+    {
+      "name": "tests.test_sim_metrics_headless::test_metrics_and_metrics_only",
+      "seconds": 0.598
+    },
+    {
+      "name": "tests.test_sim_min::test_sim_health",
+      "seconds": 0.002
+    },
+    {
+      "name": "tests.test_sim_min::test_sim_echo_ok",
+      "seconds": 0.002
+    },
+    {
+      "name": "tests.test_sim_min::test_sim_echo_bad_outdir",
+      "seconds": 0.002
+    },
+    {
+      "name": "tests.test_sim_plot_headless::test_sim_plot_headless[XRP/COL]",
+      "seconds": 0.322
+    },
+    {
+      "name": "tests.test_sim_plot_headless::test_sim_plot_headless[COPX/COL]",
+      "seconds": 0.331
+    },
+    {
+      "name": "tests.test_sim_slippage_headless::test_sim_slippage_headless[XRP/COL]",
+      "seconds": 0.32
+    },
+    {
+      "name": "tests.test_sim_slippage_headless::test_sim_slippage_headless[COPX/COL]",
+      "seconds": 0.328
+    },
+    {
+      "name": "tests.test_sim_spread_headless::test_sim_spread_headless[XRP/COL]",
+      "seconds": 0.337
+    },
+    {
+      "name": "tests.test_sim_spread_headless::test_sim_spread_headless[COPX/COL]",
+      "seconds": 0.328
+    },
+    {
+      "name": "tests.test_smoke::test_smoke",
+      "seconds": 0.0
+    },
+    {
+      "name": "tests.test_sweep_pngs::test_sweep_returns_pngs",
+      "seconds": 0.351
+    }
+  ]
 }
