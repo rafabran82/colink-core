@@ -3,20 +3,28 @@
     [string[]]$Include = @("*.py")
 )
 
-# --- Resolve working root robustly ---
+# --- Resolve Root (multi-strategy fallback) ---
 if (-not $Root -or $Root -eq "") {
     if ($PSScriptRoot) {
         $Root = $PSScriptRoot
     } elseif ($MyInvocation.PSCommandPath) {
         $Root = Split-Path -Parent $MyInvocation.PSCommandPath
+    } elseif ($MyInvocation.MyCommand.Definition) {
+        $Root = Split-Path -Parent $MyInvocation.MyCommand.Definition
     } else {
         try {
-            $Root = Split-Path -Parent $MyInvocation.MyCommand.Definition
+            $Root = (& git rev-parse --show-toplevel 2>$null)
         } catch {
-            $Root = "."
+            $Root = (Get-Location).Path
         }
     }
 }
+
+if (-not $Root -or $Root -eq "") {
+    $Root = (Get-Location).Path
+}
+
+Write-Host "🔍 Python guard scanning root: $Root" -ForegroundColor DarkGray
 
 function Invoke-PythonSyntaxGuard {
     param([string]$ScanRoot, [string[]]$Patterns)
