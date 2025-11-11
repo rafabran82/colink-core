@@ -34,9 +34,9 @@ $pytestExit  = 0
 $durationSec = 0.0
 $sw = [Diagnostics.Stopwatch]::StartNew()
 if (-not $NoTests) {
-  Write-Host "Running tests with $Python -m pytest -q -rA --durations=0 ..."
+  Write-Host "Running tests with $Python -m pytest -rA --durations=0 ..."
   # Capture stdout+stderr in-process (works on Windows PowerShell + pwsh)
-  $out = & $Python -m pytest -q -rA --durations=0 2>&1
+  $out = & $Python -m pytest -rA --durations=0 2>&1
   $pytestExit = $LASTEXITCODE
   Set-Content -Path $pytestLogPath -Value ($out -join [Environment]::NewLine) -Encoding utf8
 } else {
@@ -95,7 +95,7 @@ result = {
 out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
 nd = {
-    "ts": datetime.datetime.utcnow().isoformat(timespec="milliseconds") + "Z",
+    "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00","Z"),
     "exit": exitcode,
     "tests_total": result["tests_total"],
     "passed": passed,
@@ -200,3 +200,4 @@ Write-Host "Local CI completed. Summary: $summaryJsonPath"
 Write-Host "Index: $indexHtml"
 if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
 exit $sum.exit_code
+
