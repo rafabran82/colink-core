@@ -29,26 +29,16 @@ $indexHtml       = Join-Path $Out "index.html"
 # --- Ensure directories
 $null = New-Item -ItemType Directory -Force -Path $Out,$ciDir,$logsDir,$plotsDir,$metricsDir,$bundlesDir
 
-# --- Run pytest (optional)
+# --- Run pytest (portable capture)
 $pytestExit  = 0
 $durationSec = 0.0
 $sw = [Diagnostics.Stopwatch]::StartNew()
 if (-not $NoTests) {
   Write-Host "Running tests with $Python -m pytest -q -rA --durations=0 ..."
-  # Capture detailed report and tee to log file
-  $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = $Python
-  $psi.ArgumentList = @("-m","pytest","-q","-rA","--durations=0")
-  $psi.RedirectStandardOutput = $true
-  $psi.RedirectStandardError  = $true
-  $psi.UseShellExecute = $false
-  $p = [System.Diagnostics.Process]::Start($psi)
-  $stdout = $p.StandardOutput.ReadToEnd()
-  $stderr = $p.StandardError.ReadToEnd()
-  $p.WaitForExit()
-  $pytestExit = $p.ExitCode
-  # Write combined output to log file
-  Set-Content -Path $pytestLogPath -Value ($stdout + $stderr) -Encoding utf8
+  # Capture stdout+stderr in-process (works on Windows PowerShell + pwsh)
+  $out = & $Python -m pytest -q -rA --durations=0 2>&1
+  $pytestExit = $LASTEXITCODE
+  Set-Content -Path $pytestLogPath -Value ($out -join [Environment]::NewLine) -Encoding utf8
 } else {
   Write-Host "Skipping tests (--NoTests)."
 }
@@ -57,15 +47,14 @@ $durationSec = [Math]::Round($sw.Elapsed.TotalSeconds,2)
 
 # --- Parse pytest log with a small Python helper (robust)
 $pyParse = @"
-import sys, re, json, pathlib
+import sys, re, json, pathlib, datetime
 log_path = pathlib.Path(sys.argv[1])
 out_json = pathlib.Path(sys.argv[2])
 ndjson   = pathlib.Path(sys.argv[3])
 exitcode = int(sys.argv[4])
 text = log_path.read_text(encoding='utf-8') if log_path.exists() else ''
 
-# Totals line: "== 27 passed, 2 skipped in 7.33s =="
-m = re.search(r"=+\\s*(.+?)\\s+in\\s+([0-9]*\\.?[0-9]+)s\\s*=+", text)
+m = re.search(r"=+\s*(.+?)\s+in\s+([0-9]*\.?[0-9]+)s\s*=+", text)
 counts = {}
 tot = 0
 dur_total = None
@@ -73,7 +62,7 @@ if m:
     parts = m.group(1).split(",")
     for part in parts:
         part = part.strip()
-        mm = re.match(r"(\\d+)\\s+(\\w+)", part)
+        mm = re.match(r"(\d+)\s+(\w+)", part)
         if mm:
             n, label = int(mm.group(1)), mm.group(2).lower()
             counts[label] = counts.get(label, 0) + n
@@ -83,18 +72,17 @@ if m:
     except Exception:
         dur_total = None
 
-# Durations block lines (best-effort): "0.22s call tests/test_x.py::test_y"
 durations = []
-for sec, name in re.findall(r"^\\s*([0-9]*\\.?[0-9]+)s\\s+\\w+\\s+(.+)$", text, flags=re.M):
+for sec, name in re.findall(r"^\s*([0-9]*\.?[0-9]+)s\s+\w+\s+(.+)$", text, flags=re.M):
     try:
         durations.append({"name": name.strip(), "seconds": float(sec)})
     except Exception:
         pass
 
-# Summarize pass/fail-ish
-passed = counts.get("passed", 0)
-failed = counts.get("failed", 0) + counts.get("errors", 0) + counts.get("error", 0)
+passed  = counts.get("passed", 0)
+failed  = counts.get("failed", 0) + counts.get("errors", 0) + counts.get("error", 0)
 skipped = counts.get("skipped", 0) + counts.get("xfailed", 0) + counts.get("xpassed", 0)
+
 result = {
     "exit_code": exitcode,
     "tests_total": tot or None,
@@ -102,13 +90,12 @@ result = {
     "failed": failed,
     "skipped": skipped,
     "time_total_sec": dur_total,
-    "durations": durations[:200]  # cap
+    "durations": durations[:200]
 }
 out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
-# Append NDJSON line
 nd = {
-    "ts": __import__("datetime").datetime.utcnow().isoformat(timespec="milliseconds") + "Z",
+    "ts": datetime.datetime.utcnow().isoformat(timespec="milliseconds") + "Z",
     "exit": exitcode,
     "tests_total": result["tests_total"],
     "passed": passed,
@@ -118,7 +105,7 @@ nd = {
 }
 ndjson.parent.mkdir(parents=True, exist_ok=True)
 with ndjson.open("a", encoding="utf-8") as f:
-    f.write(json.dumps(nd, ensure_ascii=False) + "\\n")
+    f.write(json.dumps(nd, ensure_ascii=False) + "\n")
 "@
 $tmpPy = Join-Path $env:TEMP ("ci_parse_{0}.py" -f ([guid]::NewGuid()))
 Set-Content -Path $tmpPy -Value $pyParse -Encoding utf8
@@ -193,16 +180,15 @@ $html = @"
 Set-Content -Path $indexHtml -Value $html -Encoding utf8
 
 # --- Bundle snapshot (zip)
-$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$stamp  = Get-Date -Format "yyyyMMdd-HHmmss"
 $bundle = Join-Path $bundlesDir ("run-{0}.zip" -f $stamp)
 
-# Select key outputs (avoid zipping the bundles dir itself)
 $bundleInputs = @()
 $bundleInputs += $summaryJsonPath
-$bundleInputs += $pytestLogPath
-if (Test-Path $plotPath)    { $bundleInputs += $plotPath }
-if (Test-Path $indexHtml)   { $bundleInputs += $indexHtml }
-if (Test-Path $ndjsonPath)  { $bundleInputs += $ndjsonPath }
+if (Test-Path $pytestLogPath) { $bundleInputs += $pytestLogPath }
+if (Test-Path $plotPath)      { $bundleInputs += $plotPath }
+if (Test-Path $indexHtml)     { $bundleInputs += $indexHtml }
+if (Test-Path $ndjsonPath)    { $bundleInputs += $ndjsonPath }
 
 if (Test-Path $bundle) { Remove-Item $bundle -Force }
 if ($bundleInputs.Count -gt 0) {
