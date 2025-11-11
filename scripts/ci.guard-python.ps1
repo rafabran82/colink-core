@@ -1,21 +1,17 @@
-﻿# --- Python syntax guard (cross-version safe, callable as function) ---
+﻿param(
+    [string]$Root = (Split-Path -Parent $MyInvocation.MyCommand.Definition),
+    [string[]]$Include = @("*.py")
+)
+
 function Invoke-PythonSyntaxGuard {
-    param (
-        [string]$Root = "scripts",
-        [string[]]$Include = @("*.py")
-    )
-
-    $cmd = Get-Command python -ErrorAction SilentlyContinue
-    $py  = if ($null -ne $cmd) { $cmd.Source } else { $null }
-
-    if (-not $py) {
-        Write-Error "❌ Python not found in PATH. Please install Python 3.x."
-        return 1
+    param([string]$ScanRoot, [string[]]$Patterns)
+    $pyFiles = @()
+    foreach ($p in $Patterns) {
+        $pyFiles += Get-ChildItem -Path $ScanRoot -Filter $p -Recurse -ErrorAction SilentlyContinue
     }
 
-    $pyFiles = Get-ChildItem -Path $Root -Recurse -Include $Include -File -ErrorAction SilentlyContinue
-    if (-not $pyFiles) {
-        Write-Warning "⚠️ No Python files found under $Root"
+    if (-not $pyFiles -or $pyFiles.Count -eq 0) {
+        Write-Warning "⚠️ No Python files found under $ScanRoot"
         return 0
     }
 
@@ -35,3 +31,5 @@ function Invoke-PythonSyntaxGuard {
     Write-Host "✅ Python lint check passed for all scripts." -ForegroundColor Green
     return 0
 }
+
+Invoke-PythonSyntaxGuard -ScanRoot $Root -Patterns $Include
