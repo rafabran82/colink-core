@@ -1,19 +1,25 @@
 ﻿# ci.guard-artifacts.ps1
 # Fail the build if any *tracked* file exists under .artifacts that is not explicitly allowed.
-# This enforces that only placeholder/summary files are versioned; everything else should remain untracked/ignored.
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 param(
-  [string]$Repo = $(git rev-parse --show-toplevel),
+  [string]$Repo,                      # resolved after param if not provided
   [string]$ArtifactsRel = ".artifacts"
 )
+
+# Resolve $Repo only after parameters are bound (avoid $(...) in param defaults)
+if ([string]::IsNullOrWhiteSpace($Repo)) {
+  $Repo = (& git rev-parse --show-toplevel).Trim()
+}
+if ([string]::IsNullOrWhiteSpace($Repo)) {
+  throw "Unable to resolve repository root."
+}
 
 Set-Location -Path $Repo
 
 # Explicit allowlist of versioned files under .artifacts (tracked by Git).
-# If you add a new summary or placeholder file that should be committed, add it here too.
 $allowed = @(
   ".artifacts/.gitkeep",
   ".artifacts/index.html",
@@ -25,10 +31,9 @@ $allowed = @(
   ".artifacts/bundles/.gitkeep"
 )
 
-# Collect tracked files (not the ignored/untracked runtime outputs)
+# Gather tracked files beneath .artifacts (not runtime outputs)
 $tracked = (& git ls-files -z -- $ArtifactsRel) -split "`0" | Where-Object { $_ }
 
-# Nothing tracked: that's fine.
 if (-not $tracked -or $tracked.Count -eq 0) {
   Write-Host ("Guard OK. No files are tracked under {0}." -f $ArtifactsRel)
   exit 0
@@ -37,9 +42,7 @@ if (-not $tracked -or $tracked.Count -eq 0) {
 # Anything tracked but not in the allowlist is a violation.
 $unexpected = @()
 foreach ($p in $tracked) {
-  if (-not ($allowed -contains $p)) {
-    $unexpected += $p
-  }
+  if (-not ($allowed -contains $p)) { $unexpected += $p }
 }
 
 if ($unexpected.Count -gt 0) {
