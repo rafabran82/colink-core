@@ -213,8 +213,11 @@ plt.savefig(out)
 }
 
 # ----- index.html
-$passFail = if ($finalExit -eq 0) { "PASS" } else { "FAIL" }
-$gateNote = if ($FailIfSlowSec -gt 0) { "(gate: ≥ $FailIfSlowSec s ⇒ exit 2)" } else { "" }
+$passFail    = if ($finalExit -eq 0) { "PASS" } else { "FAIL" }
+$statusClass = if ($passFail -eq "PASS") { "ok" } else { "bad" }
+$gateNote    = if ($FailIfSlowSec -gt 0) { "(gate: ≥ $FailIfSlowSec s ⇒ exit 2)" } else { "" }
+$maxStr      = ("{0:N3}" -f [double]$maxSeconds)
+
 $html = @"
 <!doctype html>
 <html lang="en">
@@ -235,7 +238,7 @@ $html = @"
 </style>
 <body>
   <h1>Local CI Summary</h1>
-  <div>Status: <span class="chip ${passFail=='PASS' ? 'ok' : 'bad'}">$passFail</span> <small>$gateNote</small></div>
+  <div>Status: <span class="chip $statusClass">$passFail</span> <small>$gateNote</small></div>
   <div class="grid">
     <div><strong>pytest exit:</strong> <code>$($sum.exit_code)</code></div>
     <div><strong>final exit:</strong> <code>$finalExit</code></div>
@@ -262,10 +265,10 @@ $html = @"
     $slowRows
   </table>
 
-  <p><small>Max observed test time this run: <code>{0:N3}s</code>.</small></p>
+  <p><small>Max observed test time this run: <code>$maxStr s</code>.</small></p>
 </body>
 </html>
-"@ -f ([double]$maxSeconds)
+"@
 
 Set-Content -Path $indexHtml -Value $html -Encoding utf8
 
@@ -290,3 +293,4 @@ Write-Host "Index: $indexHtml"
 if (Test-Path $plotPath) { Write-Host "Plot: $plotPath" }
 
 exit $finalExit
+
