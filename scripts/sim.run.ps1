@@ -1,5 +1,5 @@
 ﻿# --- Python syntax guard (fast fail) ---
-. "scripts/ci.guard-python.ps1"
+. (Join-Path $PSScriptRoot "ci.guard-python.ps1")
 Invoke-PythonSyntaxGuard -Root "scripts" -Include @("*.py")
 Write-Host "✅ Python lint check passed for all scripts." -ForegroundColor Green
 # --- end guard ---
@@ -97,4 +97,5 @@ try {
 } catch {
   Write-Host ("⚠️ Skipped dashboard refresh: " + $_.Exception.Message)
 }
+
 
