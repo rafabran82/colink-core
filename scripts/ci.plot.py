@@ -1,6 +1,13 @@
 ﻿import pandas as pd, matplotlib.pyplot as plt, os, re
 
-RUNS = r".artifacts/ci/runs/runs_log.csv"
+RUNS_DEFAULT = r".artifacts/ci/runs/runs_log.csv"
+OUT  = r".artifacts/ci/runs/runs_trend.png"
+
+import argparse
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--log', default=RUNS_DEFAULT)
+args, _ = parser.parse_known_args()
+RUNS = args.log
 OUT  = r".artifacts/ci/runs/runs_trend.png"
 
 def looks_like_iso_ts(s: str) -> bool:
@@ -63,3 +70,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

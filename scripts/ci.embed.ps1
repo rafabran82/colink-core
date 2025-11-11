@@ -1,17 +1,22 @@
 ﻿param(
-  [string]$IndexPath = ".artifacts\index.html",
-  [string]$ChartRelPath = "ci/runs/runs_trend.png",
-  [string]$ExtraHtml = ""
+  [Parameter(Mandatory)][string]$IndexPath,
+  [Parameter(Mandatory)][string]$ChartRelPath,
+  [string]$ExtraHtml = "",
+  [string]$FooterHtml = ""
 )
 
-$ErrorActionPreference = "Stop"
+$now = Get-Date
 $html = @"
-<html><body style='font-family:Segoe UI,sans-serif'>
-<h2>Local CI Summary</h2>
-<p>Generated: $(Get-Date)</p>
-<img src="$ChartRelPath" width="600">
-$ExtraHtml
-</body></html>
+<html>
+  <body style='font-family:Segoe UI,sans-serif'>
+    <h1>Local CI Summary</h1>
+    <p>Generated: $now</p>
+    <h3>Local CI Run Trend</h3>
+    <img src="$ChartRelPath" width="600" />
+    <div style='margin-top:18px'>$ExtraHtml</div>
+    <div>$FooterHtml</div>
+  </body>
+</html>
 "@
 Set-Content -Path $IndexPath -Value $html -Encoding utf8
 Write-Host "✅ Embedded trend chart into $IndexPath"
