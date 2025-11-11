@@ -164,4 +164,42 @@ pwsh -NoLogo -NoProfile -File .\run_ci.ps1 -ProjectHook "& .\scripts\smoke.ps1" 
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\EnableRepoHooks.ps1
 <!-- ARTIFACT_HOOKS_END -->
 
+<!-- CI HOOKS BEGIN -->
+## CI hooks
 
+The repo uses a tiny guard to ensure only **allowed** files are tracked under \.artifacts/\.
+You can install a local **pre-commit** hook to catch this early:
+
+\\\powershell
+# one-time (Windows)
+\#!/usr/bin/env bash
+set -euo pipefail
+# list staged files under .artifacts
+bad=$(git diff --cached --name-only -- .artifacts/ \
+  | grep -vE '^\.artifacts/($|\.gitkeep$|index\.html$|ci/($|\.gitkeep$|ci_summary\.json$)|metrics/\.gitkeep$|plots/\.gitkeep$|data/\.gitkeep$|bundles/\.gitkeep$)' || true)
+if [ -n "$bad" ]; then
+  echo "ERROR: You staged non-allowlisted files in .artifacts/:"
+  echo "$bad" | sed 's/^/  - /'
+  echo "Only index.html, ci/ci_summary.json, and .gitkeep files are allowed."
+  exit 1
+fi = @'
+pwsh -NoProfile -File scripts/ci.guard-artifacts.ps1
+if (\0 -ne 0) { exit \0 }
+'@
+Set-Content -Path .git/hooks/pre-commit -Value \#!/usr/bin/env bash
+set -euo pipefail
+# list staged files under .artifacts
+bad=$(git diff --cached --name-only -- .artifacts/ \
+  | grep -vE '^\.artifacts/($|\.gitkeep$|index\.html$|ci/($|\.gitkeep$|ci_summary\.json$)|metrics/\.gitkeep$|plots/\.gitkeep$|data/\.gitkeep$|bundles/\.gitkeep$)' || true)
+if [ -n "$bad" ]; then
+  echo "ERROR: You staged non-allowlisted files in .artifacts/:"
+  echo "$bad" | sed 's/^/  - /'
+  echo "Only index.html, ci/ci_summary.json, and .gitkeep files are allowed."
+  exit 1
+fi -Encoding ascii
+\\\
+
+- Guard script: \scripts/ci.guard-artifacts.ps1\ (tracked-allowlist enforcement)
+- Optional: run your local CI script before pushing if you have one.
+
+<!-- CI HOOKS END -->
