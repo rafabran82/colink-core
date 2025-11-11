@@ -101,5 +101,59 @@
   document.getElementById('tzBtn').addEventListener('click', ()=>applyTZ(sel.value));
 })();
 </script>
+<!-- TZ SWITCH PATCH BEGIN -->
+<script>
+(function(){
+  function findTzSelect(){
+    return document.getElementById('tzSelect')
+        || document.querySelector('select[name="tz"]')
+        || document.querySelector('select');
+  }
+  function findChartImg(){
+    // pick the first <img> whose src looks like our trend image
+    const imgs = Array.from(document.querySelectorAll('img'));
+    return imgs.find(i => /ci\/runs\/runs_trend_/i.test(i.getAttribute('src')||i.src));
+  }
+  const tzMap = { local:'local', eastern:'Eastern', central:'Central', mountain:'Mountain', pacific:'Pacific', utc:'UTC' };
+
+  const sel  = findTzSelect();
+  const img  = findChartImg();
+  const label= document.getElementById('tzLabel');
+
+  function show(tz){
+    if (!img) return;
+    const suf = tzMap[tz] || 'local';
+    // update chart src
+    const base = 'ci/runs/runs_trend_' + suf + '.png';
+    img.setAttribute('src', base);
+
+    // toggle tables
+    document.querySelectorAll('.tz-table').forEach(d => {
+      d.style.display = (d.dataset.tz === tz) ? '' : 'none';
+    });
+
+    // update label + url param
+    if (label) label.textContent = 'TZ: ' + tz.toUpperCase();
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tz', tz);
+      history.replaceState(null, '', url);
+    } catch (_) {}
+  }
+
+  if (sel) {
+    // init from ?tz= if present
+    try {
+      const urlTz = new URL(window.location.href).searchParams.get('tz');
+      if (urlTz && tzMap[urlTz]) sel.value = urlTz;
+    } catch (_) {}
+
+    sel.addEventListener('change', e => show(e.target.value));
+    show(sel.value || 'local');
+  }
+})();
+</script>
+<!-- TZ SWITCH PATCH END -->
 </body>
 </html>
+
