@@ -1,14 +1,17 @@
 ﻿param(
   [string]$Note = "dev",
   [int]$KeepBundles = 10,
-  [int]$KeepSnaps   = 10
-)
-
-$ErrorActionPreference = "Stop"
+  [int]$KeepSnaps   = 10,
+  [switch]$NoOpen = $false
+)$ErrorActionPreference = "Stop"
 
 function Remove-OldFiles {
-  param(
-    [Parameter(Mandatory=$true)][string]$Dir,
+param(
+  [string]$Note = "dev",
+  [int]$KeepBundles = 10,
+  [int]$KeepSnaps   = 10,
+  [switch]$NoOpen = $false
+)][string]$Dir,
     [Parameter(Mandatory=$true)][string]$Filter,
     [int]$Keep = 10
   )
@@ -70,8 +73,12 @@ $badgeHtml = ('<div class="badge"><span class="dot green"></span><b>{0}</b> — 
   $badge.status, $badge.passed, $badge.skipped, $badge.failed, ([math]::Round($badge.time_sec,3)))
 
 function List-Section {
-  param([string]$Title,[string]$Dir,[string]$Filter="*")
-  if (!(Test-Path $Dir)) { return "" }
+param(
+  [string]$Note = "dev",
+  [int]$KeepBundles = 10,
+  [int]$KeepSnaps   = 10,
+  [switch]$NoOpen = $false
+)if (!(Test-Path $Dir)) { return "" }
   $files = Get-ChildItem -Path $Dir -Filter $Filter -File -ErrorAction SilentlyContinue
   if (!$files) { return "" }
   $lis = $files | ForEach-Object {
@@ -353,5 +360,18 @@ function Add-Line($name,$vals,$useAxisY2=$false) {
         [void]$s.Points.AddXY($labels[$i], ([double]$vals[$i]))
     }
     $chart.Series.Add($s) | Out-Null
+}
+
+# ===== Phase-98: Rotate old run JSONs/logs (keep 100) =====
+try {
+  $runDir = ".artifacts\ci\runs"
+  if (Test-Path $runDir) {
+    Get-ChildItem $runDir -File -Include "run-summary_*.json" |
+      Sort-Object LastWriteTime -Descending |
+      Select-Object -Skip 100 |
+      Remove-Item -Force -ErrorAction SilentlyContinue
+  }
+} catch {
+  Write-Warning "Rotation of old runs failed: $($_.Exception.Message)"
 }
 
