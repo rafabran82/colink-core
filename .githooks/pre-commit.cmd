@@ -1,5 +1,5 @@
 @echo off
-REM Launch PowerShell hook (prefer PowerShell 7 "pwsh", fallback to Windows PowerShell)
+REM Launch PowerShell hook (prefer pwsh, fallback to Windows PowerShell)
 where pwsh >NUL 2>&1
 IF %ERRORLEVEL%==0 (
   pwsh -NoProfile -ExecutionPolicy Bypass -File "%~dp0pre-commit.ps1"
