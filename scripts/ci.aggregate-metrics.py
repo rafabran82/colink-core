@@ -1,6 +1,5 @@
 ﻿import json, csv, pathlib
 
-# Resolve repo root (this script may run from "scripts/")
 repo_root = pathlib.Path(__file__).resolve().parents[1]
 data_root = repo_root / ".artifacts" / "data"
 metrics = []
@@ -16,13 +15,18 @@ for f in data_root.glob("*/metrics.json"):
 if not metrics:
     print(f"⚠️ No metrics found in {data_root}")
 else:
+    # Collect all unique keys for CSV headers
+    all_keys = set()
+    for m in metrics:
+        all_keys.update(m.keys())
+
     out_dir = repo_root / ".artifacts" / "metrics"
     out_dir.mkdir(parents=True, exist_ok=True)
     csv_path = out_dir / "summary.csv"
     json_path = out_dir / "summary.json"
 
     with open(csv_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=metrics[0].keys())
+        writer = csv.DictWriter(f, fieldnames=sorted(all_keys))
         writer.writeheader()
         writer.writerows(metrics)
 
