@@ -17,3 +17,20 @@ __pycache__/
 
 .venv/
 
+# --- CI artifacts (keep most ignored; allowlist summary + index + .gitkeep) ---
+/.artifacts/*
+!/ .artifacts/
+!/ .artifacts/.gitkeep
+!/ .artifacts/index.html
+!/ .artifacts/ci/
+!/ .artifacts/ci/.gitkeep
+!/ .artifacts/ci/ci_summary.json
+!/ .artifacts/metrics/
+!/ .artifacts/metrics/.gitkeep
+!/ .artifacts/plots/
+!/ .artifacts/plots/.gitkeep
+!/ .artifacts/data/
+!/ .artifacts/data/.gitkeep
+!/ .artifacts/bundles/
+!/ .artifacts/bundles/.gitkeep
+
