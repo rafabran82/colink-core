@@ -8,7 +8,14 @@
 
 # --- Helpers: field-safe escaping (HTML + attribute safe) ---
 function Escape-HTML {
-  param([string]$s)
+param(
+  [string]$IndexPath = ".artifacts\index.html",
+  [string]$SummaryJson = ".artifacts\metrics\summary.json",
+  [string]$DeltaJson = ".artifacts\metrics\delta.json",
+  [switch]$Quiet
+)
+function _say([string]$m){ if (-not $Quiet) { Write-Host $m } }
+function _warn([string]$m){ Write-Warning $m }
   if ($null -eq $s) { return "" }
   $s = $s -replace '&','&amp;'
   $s = $s -replace '<','&lt;'
@@ -141,3 +148,4 @@ if ($updated) {
 } else {
   if (-not $Quiet) { Write-Host "ℹ️ Metrics badge already up to date — no changes written." }
 }
+
