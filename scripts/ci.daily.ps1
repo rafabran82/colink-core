@@ -1,456 +1,108 @@
-﻿# --- Daily COLINK CI maintenance (robust paths) ---
-# Resolve scriptDir for both script execution and interactive runs
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} # removed orphan else {
-  $repo = (& git rev-parse --show-toplevel 2>$null)
-  if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
+﻿# COLINK Daily CI (clean single-flow)
+param([switch]$Quiet)
+
+$ErrorActionPreference = "Stop"
+
+function Info([string]$msg)  { if (-not $Quiet) { Write-Host $msg } }
+function Warn([string]$msg)  { Write-Warning $msg }
+function Ok([string]$msg)    { if (-not $Quiet) { Write-Host $msg -ForegroundColor Green } }
+
+# --- Paths ---
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$repoRoot  = Split-Path $scriptDir -Parent
+
+$artifactsDir = Join-Path $repoRoot ".artifacts"
+$runsDir      = Join-Path $artifactsDir "data"
+$indexPath    = Join-Path $artifactsDir "index.html"
+$metricsDir   = Join-Path $artifactsDir "metrics"
+$summaryJson  = Join-Path $metricsDir "summary.json"
+$summaryCsv   = Join-Path $metricsDir "summary.csv"
+$deltaJson    = Join-Path $metricsDir "delta.json"
+
+# --- Start banner ---
+Info "🌅 Starting daily COLINK CI maintenance..."
+
+# --- Rotate old runs (noop unless threshold exceeded) ---
+if (-not (Test-Path $runsDir)) { New-Item -ItemType Directory -Force -Path $runsDir | Out-Null }
+$keep = 100
+$allRuns = Get-ChildItem -Directory $runsDir -ErrorAction SilentlyContinue | Sort-Object Name
+$extra = [Math]::Max(0, ($allRuns.Count - $keep))
+if ($extra -gt 0) {
+  $allRuns | Select-Object -First $extra | Remove-Item -Recurse -Force
+  Ok "♻️ Rotated $extra old runs (keep=$keep)."
+} else {
+  Ok "✅ Nothing to rotate ($($allRuns.Count) runs, keep=$keep)."
 }
 
-Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
-
-# Rotate artifacts
-& (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
-
-# Sim run
-$repoRoot = Split-Path $scriptDir -Parent
-& (Join-Path $scriptDir "sim.run.ps1")
-
-# Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# Embed latest metrics panel into index.html
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-# --- Ensure summary.json exists & is non-empty (fallback from CSV) ---
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$summaryCsv  = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
-if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
-  if (Test-Path $summaryCsv) {
-    try {
-      $rows = Import-Csv $summaryCsv
-      if ($rows -and $rows.Count -gt 0) {
-        $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
-        Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-} # removed orphan else {
-        Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
-      }
-    } catch {
-      Write-Warning "Failed to rebuild summary.json from CSV: $(# --- Daily COLINK CI maintenance (robust paths) ---
-# Resolve scriptDir for both script execution and interactive runs
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} # removed orphan else {
-  $repo = (& git rev-parse --show-toplevel 2>$null)
-  if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
-}
-
-Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
-
-# Rotate artifacts
-& (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
-
-# Sim run
-$repoRoot = Split-Path $scriptDir -Parent
-& (Join-Path $scriptDir "sim.run.ps1")
-
-# Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# Embed latest metrics panel into index.html
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Open dashboard after maintenance ---
-$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
-if (Test-Path $indexPath) {
-    Start-Process $indexPath
-} # removed orphan else {
-    Write-Warning "Dashboard file not found at $indexPath"
-}
-
-# === METRICS-AGGREGATE BEGIN ===
-# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-.Exception.Message)"
-    }
-} # removed orphan else {
-    Write-Warning "summary.csv not found; cannot rebuild summary.json."
+# --- Python guard (compile syntax of any *.py under scripts) ---
+$pyRoot = Join-Path $repoRoot "scripts"
+$pyFiles = Get-ChildItem -Recurse -File -Path $pyRoot -Include *.py -ErrorAction SilentlyContinue
+if ($pyFiles.Count -gt 0) {
+  Info "🔍 Python guard scanning root: $pyRoot"
+  $errCount = 0
+  foreach ($f in $pyFiles) {
+    $out = & python -m py_compile $f.FullName 2>&1
+    if ($LASTEXITCODE -ne 0) { $errCount++ ; Write-Warning "⚠️ Syntax error in $($f.Name): $out" }
   }
-}
-# --- Ensure summary.json exists & is non-empty (fallback from CSV) ---
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$summaryCsv  = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
-if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
-  if (Test-Path $summaryCsv) {
-    try {
-      $rows = Import-Csv $summaryCsv
-      if ($rows -and $rows.Count -gt 0) {
-        $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
-        Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-} # removed orphan else {
-        Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
-      }
-    } catch {
-      Write-Warning "Failed to rebuild summary.json from CSV: $(# --- Daily COLINK CI maintenance (robust paths) ---
-# Resolve scriptDir for both script execution and interactive runs
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} # removed orphan else {
-  $repo = (& git rev-parse --show-toplevel 2>$null)
-  if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
+  if ($errCount -eq 0) { Ok "✅ Python lint check passed for all scripts." }
+} else {
+  Info "ℹ️  No Python files to lint under $pyRoot — skipping."
 }
 
-Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
+# --- Make a fresh output folder for the run ---
+$stamp      = Get-Date -Format "yyyyMMdd-HHmmss"
+$outDir     = Join-Path $runsDir $stamp
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+Ok "📂 Output folder: $outDir"
 
-# Rotate artifacts
-& (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
-
-# Sim run
-$repoRoot = Split-Path $scriptDir -Parent
-& (Join-Path $scriptDir "sim.run.ps1")
-
-# Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
+# --- Run the simulation (scripts\sim.run.py) ---
+$simPy = Join-Path $pyRoot "sim.run.py"
+if (Test-Path $simPy) {
+  Info "🐍 Executing Python simulation at: $simPy"
+  & python $simPy 2>&1
+  if ($LASTEXITCODE -ne 0) { throw "Simulation failed (exit $LASTEXITCODE)" }
+} else {
+  Warn "Simulation entry not found: $simPy"
 }
 
-# Embed latest metrics panel into index.html
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Open dashboard after maintenance ---
-$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
-if (Test-Path $indexPath) {
-    Start-Process $indexPath
-} # removed orphan else {
-    Write-Warning "Dashboard file not found at $indexPath"
+# --- Minimal validation that metrics.json exists if the sim created it ---
+$runMetrics = Join-Path $outDir "metrics.json"
+if (Test-Path $runMetrics) {
+  Ok "✅ Metrics written: $runMetrics"
+} else {
+  Warn "metrics.json not found in $outDir (sim may be a no-op for this run)."
 }
 
-# === METRICS-AGGREGATE BEGIN ===
-# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-.Exception.Message)"
-    }
-} # removed orphan else {
-    Write-Warning "summary.csv not found; cannot rebuild summary.json."
+# --- Rebuild dashboard if helper exists (should NOT open browser) ---
+$rebuildCmd = Join-Path $repoRoot "rebuild_ci.cmd"
+if (Test-Path $rebuildCmd) {
+  Info "🔄 Refreshing dashboard..."
+  & $rebuildCmd 2>&1 | ForEach-Object {
+    # silence any 'echo Write-Host ...' lines that legacy scripts might print
+    if ($_ -notmatch 'Write-Host') { $_ }
   }
-
-# --- Open dashboard after maintenance ---
-$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
-if (Test-Path $indexPath) {
-    Start-Process $indexPath
-} # removed orphan else {
-    Write-Warning "Dashboard file not found at $indexPath"
+  Ok "✅ Dashboard refreshed via rebuild_ci.cmd."
+} else {
+  Warn "rebuild_ci.cmd not found — skipping dashboard rebuild."
 }
 
-# === METRICS-AGGREGATE BEGIN ===
-# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-# --- Ensure summary.json exists & is non-empty (fallback from CSV) ---
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$summaryCsv  = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
-if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
-  if (Test-Path $summaryCsv) {
-    try {
-      $rows = Import-Csv $summaryCsv
-      if ($rows -and $rows.Count -gt 0) {
-        $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
-        Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-} # removed orphan else {
-        Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
-      }
-    } catch {
-      Write-Warning "Failed to rebuild summary.json from CSV: $(# --- Daily COLINK CI maintenance (robust paths) ---
-# Resolve scriptDir for both script execution and interactive runs
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} # removed orphan else {
-  $repo = (& git rev-parse --show-toplevel 2>$null)
-  if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
-}
-
-Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
-
-# Rotate artifacts
-& (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
-
-# Sim run
-$repoRoot = Split-Path $scriptDir -Parent
-& (Join-Path $scriptDir "sim.run.ps1")
-
-# Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# Embed latest metrics panel into index.html
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Open dashboard after maintenance ---
-$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
-if (Test-Path $indexPath) {
-    Start-Process $indexPath
-} # removed orphan else {
-    Write-Warning "Dashboard file not found at $indexPath"
-}
-
-# === METRICS-AGGREGATE BEGIN ===
-# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-.Exception.Message)"
-    }
-} # removed orphan else {
-    Write-Warning "summary.csv not found; cannot rebuild summary.json."
-  }
-}
-# --- Ensure summary.json exists & is non-empty (fallback from CSV) ---
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$summaryCsv  = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
-if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
-  if (Test-Path $summaryCsv) {
-    try {
-      $rows = Import-Csv $summaryCsv
-      if ($rows -and $rows.Count -gt 0) {
-        $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
-        Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-} # removed orphan else {
-        Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
-      }
-    } catch {
-      Write-Warning "Failed to rebuild summary.json from CSV: $(# --- Daily COLINK CI maintenance (robust paths) ---
-# Resolve scriptDir for both script execution and interactive runs
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} # removed orphan else {
-  $repo = (& git rev-parse --show-toplevel 2>$null)
-  if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
-}
-
-Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
-
-# Rotate artifacts
-& (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
-
-# Sim run
-$repoRoot = Split-Path $scriptDir -Parent
-& (Join-Path $scriptDir "sim.run.ps1")
-
-# Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# Embed latest metrics panel into index.html
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Open dashboard after maintenance ---
-$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
-if (Test-Path $indexPath) {
-    Start-Process $indexPath
-} # removed orphan else {
-    Write-Warning "Dashboard file not found at $indexPath"
-}
-
-# === METRICS-AGGREGATE BEGIN ===
-# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
-python (Join-Path $scriptDir "ci.aggregate-metrics.py")
-python (Join-Path $scriptDir "ci.delta-badge.py")
-
-# Wait until summary.json exists and is non-empty before embedding
-$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-for ($i = 0; $i -lt 5; $i++) {
-  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
-  Start-Sleep -Seconds 1
-}
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-# --- Embed latest metrics panel into index.html (absolute paths)
-$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
-$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
-$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-.Exception.Message)"
-    }
-} # removed orphan else {
-    Write-Warning "summary.csv not found; cannot rebuild summary.json."
-  }
-
-# --- Open dashboard once (absolute path from repo root) ---
-$repoRoot = Split-Path $PSScriptRoot -Parent
-$index    = Join-Path $repoRoot ".artifacts\index.html"
-if (Test-Path $index) {
-  Start-Process $index
-} # removed orphan else {
-  Write-Warning "Dashboard not found: $index"
-}
-
-# --- Open dashboard once (absolute path from repo root) ---
-$repoRoot = Split-Path $PSScriptRoot -Parent
-} # removed orphan else {
-  Write-Warning "Dashboard not found: $index"
-}
-
-# --- Embed field-safe metrics badge (once) ---
-
-if (Test-Path $embedPath) {
-  & $embedPath -Quiet
-} # removed orphan else {
-  Write-Warning "Embed script not found: $embedPath"
-}
-# --- Open dashboard (absolute path, once) ---
-$repoRoot = Split-Path $PSScriptRoot -Parent
-} # removed orphan else {
-  Write-Warning "Dashboard not found: $index"
-}
-
+# --- Metrics summary/delta are produced by your build; just report if present ---
+if (Test-Path $summaryJson) { Ok "✅ Metrics summary present: $summaryJson" }
+if (Test-Path $summaryCsv)  { Ok "✅ Metrics summary CSV present: $summaryCsv" }
+if (Test-Path $deltaJson)   { Ok "✅ Delta summary present:   $deltaJson" }
 
 # --- Embed field-safe metrics badge (centralized) ---
-$embedPath = Join-Path $PSScriptRoot "ci.embed-latest.ps1"
+$embedPath = Join-Path $scriptDir "ci.embed-latest.ps1"
 if (Test-Path $embedPath) {
-  & $embedPath -Quiet
-} # removed orphan else {
-  Write-Warning "Embed script not found: $embedPath"
+  & $embedPath -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson -Quiet
+} else {
+  Warn "Embed script not found: $embedPath"
 }
+
 # --- Open dashboard once (absolute path from repo root) ---
-$repoRoot = Split-Path $PSScriptRoot -Parent
-
-  Write-Host "🌐 Dashboard opened: $index"
-} # removed orphan else {
-  Write-Warning "Dashboard not found: $index"
-
+if (Test-Path $indexPath) {
+  Start-Process $indexPath
+  Write-Host "🌐 Dashboard opened: $indexPath"
+} else {
+  Warn "Dashboard not found: $indexPath"
+}
