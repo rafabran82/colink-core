@@ -1,4 +1,6 @@
-﻿def _encode_currency_code(code: str) -> str:
+﻿from xrpl.utils.xrp_conversions import xrp_to_drops
+from decimal import Decimal
+def _encode_currency_code(code: str) -> str:
     """
     XRPL currency rules:
       - If 3-letter uppercase (and not XRP), keep as-is.
@@ -165,4 +167,6 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
         issuer=iss,
         value=val
     )
+
+
 
