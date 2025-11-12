@@ -170,3 +170,31 @@ if (Test-Path $index) {
 
 
 
+
+Start-Process ".artifacts\\index.html"
+
+
+Start-Process ".artifacts\\index.html"
+
+# --- Final: Open dashboard robustly (single owner) ---
+try {
+  $repoRoot = Split-Path $PSScriptRoot -Parent
+  $indexRel = ".artifacts\index.html"
+  $index    = Join-Path $repoRoot $indexRel
+  $abs      = (Resolve-Path $index -ErrorAction SilentlyContinue)?.Path
+
+  if ($abs -and (Test-Path $abs)) {
+    try {
+      # Preferred: open with default associated app (browser)
+      Start-Process -FilePath $abs -Verb Open
+    } catch {
+      # Fallback: Explorer will open the HTML file too
+      Start-Process explorer.exe $abs
+    }
+    Write-Host "🌐 Dashboard opened (robust): $abs"
+  } else {
+    Write-Warning "Dashboard not found at: $index"
+  }
+} catch {
+  Write-Warning "Failed to open dashboard: $($_.Exception.Message)"
+}
