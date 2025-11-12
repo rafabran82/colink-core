@@ -446,3 +446,6 @@ Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded
 
 & "$PSScriptRoot\ci.embed-latest.ps1" -Quiet
 
+
+Start-Process ".artifacts\index.html"
+
