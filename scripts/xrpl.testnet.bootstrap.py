@@ -102,7 +102,7 @@
         txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                                           "note": "created by runtime safeguard"}))
     _append_tx_note(txlog_path, "skeleton finished")
-    return 0
+    # Final safeguard to ensure tx_log.ndjson exists`r`n    txlog_path = out_dir / "tx_log.ndjson"`r`n    if not txlog_path.exists():`r`n        import json, time`r`n        txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "note": "final safeguard created"}, indent=2))`r`n    return 0
 def _write_json(path_obj, obj):
     import json
     path_obj.write_text(json.dumps(obj, indent=2))
@@ -112,6 +112,7 @@ def _append_tx_note(txlog_path, note):
     with txlog_path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                              "note": str(note)}) + "\n")
+
 
 
 
