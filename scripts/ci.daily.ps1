@@ -392,3 +392,10 @@ try {
 # disabled duplicate open
 
 
+
+Start-Process ".artifacts\\index.html"
+
+
+Start-Process ".artifacts\\index.html"
+
+
