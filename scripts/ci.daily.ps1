@@ -129,7 +129,7 @@ if (Test-Path $indexPath) {
 try {
   $self = Get-Content $MyInvocation.MyCommand.Definition -Raw
   $rxEmb = '(?mi)^\s*\$embedPath\s*=\s*Join-Path\s+\$PSScriptRoot\s+"ci\.embed-latest\.ps1"[\s\S]*?^\s*&\s*\$embedPath\s+-Quiet\s*$'
-  $rxOpen = '(?mi)^\s*if\s*\(Test-Path\s*\$indexPath\)\s*\{\s*Start-Process\s*\$indexPath[\s\S]*?Write-Host\s*"\x{1F310}\s*Dashboard opened:.*?$'
+  $rxOpen = '(?mi)^\s*if\s*\(Test-Path\s*\$indexPath\)\s*\{\s*Start-Process\s*\$indexPath[\s\S]*?Write-Host\s*"Dashboard opened:.*?$'
   $e = ([regex]::Matches($self, $rxEmb)).Count
   $o = ([regex]::Matches($self, $rxOpen)).Count
   if ($e -eq 1 -and $o -eq 1) {
@@ -140,3 +140,4 @@ try {
 } catch {
   Write-Warning ("Integrity guard failed: {0}" -f $_.Exception.Message)
 }
+
