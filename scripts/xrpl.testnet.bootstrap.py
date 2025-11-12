@@ -168,26 +168,49 @@ def leg_to_amount(leg):
         issuer=iss,
         value=val
     )
-
 if __name__ == "__main__":
-    import os, sys, json, time
+    import sys, json, time
     from pathlib import Path
+
     print("bootstrap: entry (__main__)")
 
-    # locate output folder
+    # Locate output folder (default ".")
     out_dir = Path(".")
     if "--out" in sys.argv:
         try:
-            out_dir = Path(sys.argv[sys.argv.index("--out")+1])
+            out_dir = Path(sys.argv[sys.argv.index("--out") + 1])
         except Exception:
             pass
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    def _invoke_entry():
+        """
+        Try common entry functions in order. If a candidate needs args and we
+        have parse_args(), call it and pass the result.
+        """
+        candidates = ["main", "bootstrap_main", "run", "cli"]
+        for name in candidates:
+            fn = globals().get(name)
+            if callable(fn):
+                # Try no-arg call first
+                try:
+                    return fn()
+                except TypeError:
+                    # Try with parse_args() if available
+                    pa = globals().get("parse_args")
+                    if callable(pa):
+                        try:
+                            return fn(pa())
+                        except Exception:
+                            pass
+                    # If still TypeError, re-raise
+                    raise
+        raise RuntimeError("no entry function found")
+
     exit_code = 0
     try:
-        # call your real program
-        main()
-        print("bootstrap: main() completed")
+        _invoke_entry()
+        print("bootstrap: entry function completed")
     except SystemExit as se:
         exit_code = int(getattr(se, "code", 1) or 0)
         print(f"bootstrap: SystemExit({exit_code})")
@@ -197,7 +220,7 @@ if __name__ == "__main__":
         print(f"bootstrap: ERROR: {e}")
         traceback.print_exc()
 
-    # always write a tiny meta to signal a run
+    # Always write a tiny meta so CI can detect a run
     try:
         meta_path = out_dir / "bootstrap_meta.json"
         meta = {
@@ -220,4 +243,3 @@ if __name__ == "__main__":
 
     print(f"bootstrap: exit (code={exit_code})")
     sys.exit(exit_code)
-
