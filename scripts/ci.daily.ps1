@@ -59,7 +59,12 @@ Ok "📂 Output folder: $outDir"
 $simPy = Join-Path $pyRoot "sim.run.py"
 if (Test-Path $simPy) {
   Info "🐍 Executing Python simulation at: $simPy"
-  & python $simPy 2>&1
+  # Build args: required --out, optional --n/--dt via env overrides
+  $simArgs = @('--out', $outDir)
+  if ($env:COLINK_SIM_N -and ($env:COLINK_SIM_N -as [int]))    { $simArgs += @('--n',  $env:COLINK_SIM_N) }
+  if ($env:COLINK_SIM_DT -and ($env:COLINK_SIM_DT -as [double])){ $simArgs += @('--dt', $env:COLINK_SIM_DT) }
+
+  & python $simPy @simArgs 2>&1
   if ($LASTEXITCODE -ne 0) { throw "Simulation failed (exit $LASTEXITCODE)" }
 } else {
   Warn "Simulation entry not found: $simPy"
@@ -106,3 +111,4 @@ if (Test-Path $indexPath) {
 } else {
   Warn "Dashboard not found: $indexPath"
 }
+
