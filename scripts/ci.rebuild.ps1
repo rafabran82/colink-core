@@ -44,3 +44,4 @@ foreach ($t in $tz) {
 Write-Host "✅ Rebuilt charts & index: $idx"
 Start-Process $idx
 
+
