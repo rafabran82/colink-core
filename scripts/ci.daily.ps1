@@ -30,8 +30,14 @@ for ($i = 0; $i -lt 5; $i++) {
 }
 
 # Embed latest metrics panel into index.html
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath  (Join-Path $repoRoot ".artifacts\index.html") -SummaryJson (Join-Path $repoRoot ".artifacts\metrics\summary.json") -DeltaJson   (Join-Path $repoRoot ".artifacts\metrics\delta.json")Write-Host "✅ Daily CI maintenance complete." -ForegroundColor Green
+# --- Embed latest metrics panel into index.html (absolute paths)
+$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
+$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
+$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
+& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
+
+Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
@@ -58,13 +64,12 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") `
-    -IndexPath  $indexPath `
-    -SummaryJson $summaryJson `
-    -DeltaJson   $deltaJson
+# --- Embed latest metrics panel into index.html (absolute paths)
+$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
+$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
+$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-Write-Host "✅ Embedded latest metrics into $indexPath"# === METRICS-AGGREGATE END ===
+& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
-
-
+Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
