@@ -132,3 +132,9 @@ def _append_tx_note(txlog_path, note):
 
 
 
+
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(main())
+
