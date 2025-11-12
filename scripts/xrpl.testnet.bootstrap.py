@@ -19,6 +19,11 @@
 
 
     out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
+        # tx_log path
+        txlog_path = out_dir / "tx_log.ndjson"
+        if not txlog_path.exists():
+            txlog_path.write_text("")
+        _append_tx_note(txlog_path, "skeleton finished")
     # ensure tx_log.ndjson exists before append
 
     if not txlog_path.exists():
@@ -99,13 +104,6 @@
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
 
-    # Explicit safeguard to ensure tx_log.ndjson is created
-
-    if not txlog_path.exists():
-        import json, time
-        txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                                          "note": "created by runtime safeguard"}))
-
     return 0
 def _write_json(path_obj, obj):
     import json
@@ -137,5 +135,6 @@ def _append_tx_note(txlog_path, note):
 if __name__ == '__main__':
     import sys
     sys.exit(main())
+
 
 
