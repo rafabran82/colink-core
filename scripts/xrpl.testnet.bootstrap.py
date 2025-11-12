@@ -74,7 +74,7 @@ def account_seq(client: JsonRpcClient, address: str) -> int:
 def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
     return TrustSet(
         limit_amount=IssuedCurrencyAmount(
-            currency=Currency.from_currency_code(currency),
+            currency=currency,
             issuer=issuer_addr,
             value=limit,
         )
@@ -82,7 +82,7 @@ def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
 
 def ic_amount(issuer_addr: str, currency: str, value: str) -> IssuedCurrencyAmount:
     return IssuedCurrencyAmount(
-        currency=Currency.from_currency_code(currency),
+        currency=currency,
         issuer=issuer_addr,
         value=value,
     )
@@ -298,4 +298,5 @@ def _write_summary(out_dir: str, network: str, lines):
 if __name__ == "__main__":
     # keep original CLI, then call main()
     main()
+
 
