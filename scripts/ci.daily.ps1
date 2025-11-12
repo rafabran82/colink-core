@@ -454,9 +454,25 @@ if (Test-Path $index) {
   Write-Warning "Dashboard not found: $index"
 }
 
-
-& "`$PSScriptRoot\ci.embed-latest.ps1" -Quiet
 # --- Open dashboard once (absolute path from repo root) ---
+$repoRoot = Split-Path $PSScriptRoot -Parent
+$index    = Join-Path $repoRoot ".artifacts\index.html"
+if (Test-Path $index) {
+  Start-Process $index
+  Write-Host "🌐 Dashboard opened: $index"
+} else {
+  Write-Warning "Dashboard not found: $index"
+}
+
+
+# --- Embed field-safe metrics badge (once) ---
+$embedPath = Join-Path $PSScriptRoot "ci.embed-latest.ps1"
+if (Test-Path $embedPath) {
+  & $embedPath -Quiet
+} else {
+  Write-Warning "Embed script not found: $embedPath"
+}
+# --- Open dashboard (absolute path, once) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
 if (Test-Path $index) {
