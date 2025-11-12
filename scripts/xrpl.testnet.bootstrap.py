@@ -70,10 +70,12 @@ def main(argv: list[str] | None = None) -> int:
         ("trustlines.json", []),
         ("offers.json", []),
     ]
-for name, default in base_files:
+
+    for name, default in base_files:
         pth = out_dir / name
         if not pth.exists():
             _write_json(pth, default)
+
     # --- XRPL Testnet client + wallet generation ---
     from xrpl.clients import JsonRpcClient
     from xrpl.wallet import Wallet
@@ -99,7 +101,9 @@ for name, default in base_files:
         _append_tx_note(txlog_path, "created LP wallet")
 
     _write_json(out_dir / "wallets.json", wallets)
-# Plan / Result / Meta / Human summary
+
+    # Plan / Result / Meta / Human summary
+
     plan_path = out_dir / f"bootstrap_plan_{args.network}.json"
     result_path = out_dir / f"bootstrap_result_{args.network}.json"
     meta_path = out_dir / "bootstrap_meta.json"
@@ -185,6 +189,7 @@ for name, default in base_files:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
