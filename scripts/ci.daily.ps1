@@ -43,7 +43,7 @@ $simPy = "scripts/sim.run.py"
 Write-Host "🐍 Executing Python simulation via $simPy ..."
 try {
     # Run with safe defaults to always succeed
-    $simOut = & python $simPy --out .artifacts/data/demo --demo 2>&1
+    $simOut = & python $simPy --out .artifacts/data/demo/metrics_ci.json --demo 2>&1
     if ($LASTEXITCODE -ne 0 -or ($simOut -match "Traceback|Error|Exception")) {
         Write-Warning "Simulation produced warnings or non-zero exit; see output below:"
         Write-Host $simOut
@@ -96,7 +96,7 @@ Write-Host "📂 Output folder: $outDir"
 $simPy = "scripts/sim.run.py"
 Write-Host "🐍 Executing Python simulation via $simPy ..."
 try {
-    $simOut = & python $simPy --out .artifacts/data/demo --demo 2>&1
+    $simOut = & python $simPy --out .artifacts/data/demo/metrics_ci.json --demo 2>&1
     if ($LASTEXITCODE -ne 0 -or ($simOut -match "Traceback|Error|Exception")) {
         Write-Warning "Simulation produced warnings or non-zero exit; see output below:"
         Write-Host $simOut
@@ -164,6 +164,7 @@ if (Test-Path $index) {
 } else {
     Write-Warning "❌ index.html not found."
 }
+
 
 
 
