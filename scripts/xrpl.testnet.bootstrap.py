@@ -104,7 +104,18 @@
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
 
-    return 0
+            # --- tx_log handling (clean version) ---
+        txlog_path = out_dir / "tx_log.ndjson"
+
+        # Create file if missing
+        if not txlog_path.exists():
+            txlog_path.write_text("")
+
+        # Append a runtime note
+        _append_tx_note(txlog_path, "skeleton finished")
+
+        return 0
+
 def _write_json(path_obj, obj):
     import json
     path_obj.write_text(json.dumps(obj, indent=2))
@@ -135,6 +146,7 @@ def _append_tx_note(txlog_path, note):
 if __name__ == '__main__':
     import sys
     sys.exit(main())
+
 
 
 
