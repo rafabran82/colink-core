@@ -298,3 +298,4 @@ def _write_summary(out_dir: str, network: str, lines):
 if __name__ == "__main__":
     # keep original CLI, then call main()
     main()
+
