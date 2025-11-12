@@ -1,65 +1,107 @@
 ﻿param(
-  [string]$IndexPath,
-  [string]$SummaryJson
+  [Parameter(Mandatory=$true)] [string]$IndexPath,
+  [Parameter(Mandatory=$true)] [string]$SummaryJson,
+  [string]$DeltaJson = ""
 )
 
-if ($PSScriptRoot) {
-  $scriptDir = $PSScriptRoot
-} elseif ($PSCommandPath) {
-  $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
-  $scriptDir = Join-Path (Get-Location).Path "scripts"
-}
-$repoRoot = Split-Path $scriptDir -Parent
-
-if (-not $IndexPath)   { $IndexPath   = Join-Path $repoRoot ".artifacts\index.html" }
-if (-not $SummaryJson) { $SummaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json" }
-
-if (-not (Test-Path $SummaryJson)) {
-  Write-Warning "No summary.json found at $SummaryJson — skipping embed."
-  exit 0
+function Read-Json($p) {
+  if (-not (Test-Path $p)) { return $null }
+  try { return Get-Content $p -Raw | ConvertFrom-Json -Depth 4 } catch { return $null }
 }
 
 try {
-  $data = Get-Content $SummaryJson -Raw | ConvertFrom-Json
+  $summary = Read-Json $SummaryJson
 } catch {
   Write-Warning "Failed to read ${SummaryJson}: $($_.Exception.Message)"
   exit 0
 }
 
-if (-not $data -or $data.Count -eq 0) {
-  Write-Warning "Empty summary.json — skipping embed."
-  exit 0
+if (-not $summary) { Write-Warning "No summary data"; exit 0 }
+
+# Normalize rows
+if ($summary.PSObject.Properties.Name -contains "rows") { $rows = $summary.rows } else { $rows = $summary }
+if (-not $rows -or $rows.Count -lt 1) { Write-Warning "No rows in summary"; exit 0 }
+
+$cur = $rows[-1]
+$ts  = $cur.ts
+if (-not $ts) { $ts = $cur.timestamp }
+
+# Try to read deltas if available
+$delta = $null
+if ($DeltaJson -and (Test-Path $DeltaJson)) {
+  $delta = Read-Json $DeltaJson
 }
 
-$latest = $data[-1]
-$keys = @("run_id","timestamp_utc","events_count","errors_count","success_rate","latency_ms_p50","latency_ms_p95","latency_ms_max")
-$rows = foreach ($k in $keys) {
-  if ($latest.PSObject.Properties.Name -contains $k) {
-    "<tr><td style='padding:4px 8px;color:#bbb;'>$k</td><td style='padding:4px 8px;color:#fff;'>$($latest.$k)</td></tr>"
+# Build Latest metrics HTML
+$latestLines = @()
+foreach ($kv in $cur.PSObject.Properties) {
+  $k = $kv.Name; $v = $kv.Value
+  if ($k -in @("ts","timestamp")) { continue }
+  $latestLines += "<div class='metric'><span class='k'>$k</span><span class='v'>$v</span></div>"
+}
+
+$deltaHtml = ""
+if ($delta -and $delta.items -and $delta.items.Count -gt 0) {
+  $badges = @()
+  foreach ($it in $delta.items) {
+    $arrow = if ($it.improved) { "↑" } else { "↓" }
+    $dot   = if ($it.improved) { "🟢" } else { "🔴" }
+    $curr  = "$($it.current)$($it.unit)"
+    $prev  = "$($it.previous)$($it.unit)"
+    $chg   = if ($it.delta -ge 0) { "+$($it.delta)$($it.unit)" } else { "$($it.delta)$($it.unit)" }
+    $badges += "<div class='badge'>$dot <b>$($it.label)</b> $arrow <span class='chg'>$chg</span> <span class='prev'>(prev $prev)</span></div>"
   }
-}
-
-$snippet = @"
-<div style='margin:14px 0;padding:10px;border:1px solid #333;border-radius:10px;background:#1a1a1a'>
-  <div style='color:#00D4FF;font-weight:600;margin-bottom:6px;'>Latest Run Metrics</div>
-  <table style='border-collapse:collapse;font-family:ui-sans-serif,system-ui,Segoe UI; font-size:12px;'>
-    $(($rows -join "`n"))
-  </table>
+  $joined = ($badges -join "`n")
+  $deltaHtml = @"
+<div class='delta-wrap'>
+  <div class='delta-title'>Δ Since previous run</div>
+  <div class='delta-badges'>
+    $joined
+  </div>
 </div>
 "@
-
-$marker = "<!-- CI-TREND-CHARTS-BEGIN -->"
-if (Test-Path $IndexPath) {
-  $html = Get-Content $IndexPath -Raw
-  if ($html -match [regex]::Escape($marker)) {
-    $html = $html -replace [regex]::Escape($marker), ($snippet + "`n" + $marker)
-  } else {
-    $html = $snippet + "`n" + $html
-  }
-  Set-Content -Path $IndexPath -Value $html -Encoding utf8
-  Write-Host "✅ Embedded latest metrics into $IndexPath"
-} else {
-  Write-Warning "Index not found at $IndexPath — skipping embed."
 }
 
+$block = @"
+<!-- LATEST_METRICS BEGIN -->
+<div class='latest-panel'>
+  <div class='latest-title'>Latest Run Metrics</div>
+  <div class='latest-ts'>timestamp: $ts</div>
+  <div class='latest-body'>
+    $($latestLines -join "`n")
+  </div>
+  $deltaHtml
+</div>
+<style>
+.latest-panel {font-family: system-ui,Segoe UI,Arial; max-width: 380px; border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin:12px 0;}
+.latest-title {font-weight:700; margin-bottom:2px;}
+.latest-ts {color:#6b7280; font-size:12px; margin-bottom:8px;}
+.metric {display:flex; justify-content:space-between; font-size:13px; padding:2px 0; border-bottom:1px dashed #f0f0f0;}
+.metric .k {color:#374151}
+.metric .v {color:#111827}
+.delta-wrap{margin-top:8px; padding-top:6px; border-top:1px solid #e5e7eb;}
+.delta-title{font-weight:600; font-size:13px; margin-bottom:6px;}
+.delta-badges{display:flex; flex-direction:column; gap:4px;}
+.badge{font-size:13px;}
+.badge .chg{margin:0 6px;}
+.badge .prev{color:#6b7280; font-size:12px;}
+</style>
+<!-- LATEST_METRICS END -->
+"@
+
+# Inject into index.html (replace existing block if present)
+$html = Get-Content $IndexPath -Raw
+$pattern = '(?s)<!-- LATEST_METRICS BEGIN -->.*?<!-- LATEST_METRICS END -->'
+if ($html -match $pattern) {
+  $html = [regex]::Replace($html, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $block })
+} else {
+  # insert after <body> if possible
+  if ($html -match '<body[^>]*>') {
+    $html = $html -replace '(<body[^>]*>)', "`$1`r`n$block`r`n"
+  } else {
+    $html = $block + "`r`n" + $html
+  }
+}
+
+Set-Content $IndexPath -Encoding utf8 -Value $html
+Write-Host "✅ Embedded latest metrics into $IndexPath"

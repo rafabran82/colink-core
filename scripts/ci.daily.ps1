@@ -20,6 +20,7 @@ $repoRoot = Split-Path $scriptDir -Parent
 
 # Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
 python (Join-Path $scriptDir "ci.aggregate-metrics.py")
+python (Join-Path $scriptDir "ci.delta-badge.py")
 
 # Wait until summary.json exists and is non-empty before embedding
 $summary = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\metrics\summary.json"
@@ -45,6 +46,7 @@ if (Test-Path $indexPath) {
 # === METRICS-AGGREGATE BEGIN ===
 # --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
 python (Join-Path $scriptDir "ci.aggregate-metrics.py")
+python (Join-Path $scriptDir "ci.delta-badge.py")
 
 # Wait until summary.json exists and is non-empty before embedding
 $summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
@@ -58,4 +60,5 @@ for ($i = 0; $i -lt 5; $i++) {
     -IndexPath  (Join-Path $repoRoot ".artifacts\index.html") `
     -SummaryJson $summary
 # === METRICS-AGGREGATE END ===
+
 
