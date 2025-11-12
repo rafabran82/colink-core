@@ -428,9 +428,6 @@ if (Test-Path $index) {
 
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$index    = Join-Path $repoRoot ".artifacts\index.html"
-if (Test-Path $index) {
-  Start-Process $index
 
 } else {
   Write-Warning "Dashboard not found: $index"
@@ -445,9 +442,6 @@ if (Test-Path $embedPath) {
 }
 # --- Open dashboard (absolute path, once) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$index    = Join-Path $repoRoot ".artifacts\index.html"
-if (Test-Path $index) {
-  Start-Process $index
 
 } else {
   Write-Warning "Dashboard not found: $index"
@@ -463,9 +457,7 @@ if (Test-Path $embedPath) {
 }
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
-$index    = Join-Path $repoRoot ".artifacts\index.html"
-if (Test-Path $index) {
-  Start-Process $index
+
   Write-Host "🌐 Dashboard opened: $index"
 } else {
   Write-Warning "Dashboard not found: $index"
@@ -474,3 +466,4 @@ if (Test-Path $index) {
 
 }
 }
+
