@@ -70,12 +70,36 @@ def main(argv: list[str] | None = None) -> int:
         ("trustlines.json", []),
         ("offers.json", []),
     ]
-    for name, default in base_files:
+for name, default in base_files:
         pth = out_dir / name
         if not pth.exists():
             _write_json(pth, default)
+    # --- XRPL Testnet client + wallet generation ---
+    from xrpl.clients import JsonRpcClient
+    from xrpl.wallet import Wallet
 
-    # Plan / Result / Meta / Human summary
+    client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
+
+    # Load existing wallets.json
+    wallets = json.loads((out_dir / "wallets.json").read_text())
+
+    if wallets.get("issuer") is None:
+        issuer_wallet = Wallet.create()
+        wallets["issuer"] = issuer_wallet.to_dict()
+        _append_tx_note(txlog_path, "created issuer wallet")
+
+    if wallets.get("user") is None:
+        user_wallet = Wallet.create()
+        wallets["user"] = user_wallet.to_dict()
+        _append_tx_note(txlog_path, "created user wallet")
+
+    if wallets.get("lp") is None:
+        lp_wallet = Wallet.create()
+        wallets["lp"] = lp_wallet.to_dict()
+        _append_tx_note(txlog_path, "created LP wallet")
+
+    _write_json(out_dir / "wallets.json", wallets)
+# Plan / Result / Meta / Human summary
     plan_path = out_dir / f"bootstrap_plan_{args.network}.json"
     result_path = out_dir / f"bootstrap_result_{args.network}.json"
     meta_path = out_dir / "bootstrap_meta.json"
@@ -161,5 +185,6 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
