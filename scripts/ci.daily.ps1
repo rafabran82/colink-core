@@ -96,7 +96,7 @@ Write-Host "📂 Output folder: $outDir"
 $simPy = "scripts/sim.run.py"
 Write-Host "🐍 Executing Python simulation via $simPy ..."
 try {
-    $simOut = & python $simPy 2>&1
+    $simOut = & python $simPy --demo 2>&1
     if ($LASTEXITCODE -ne 0 -or ($simOut -match "Traceback|Error|Exception")) {
         Write-Warning "Simulation produced warnings or non-zero exit; see output below:"
         Write-Host $simOut
@@ -111,7 +111,7 @@ catch {
 
 # --- Refresh dashboard ---
 Write-Host "🔄 Refreshing dashboard..."
-& scripts/rebuild_ci.cmd
+& $PSScriptRoot\\ci.fix-open.ps1
 Write-Host "✅ Dashboard refreshed via rebuild_ci.cmd."
 
 # --- Verify metrics ---
@@ -142,7 +142,7 @@ Write-Host "🔄 Refreshing dashboard..."
 & "$PSScriptRoot\ci.fix-open.ps1"
 Write-Host "✅ Dashboard refreshed via ci.fix-open.ps1."
 Write-Host "🔄 Refreshing dashboard..."
-& scripts/rebuild_ci.cmd
+& $PSScriptRoot\\ci.fix-open.ps1
 Write-Host "✅ Dashboard refreshed via rebuild_ci.cmd."
 
 # --- Verify metrics ---
@@ -164,4 +164,6 @@ if (Test-Path $index) {
 } else {
     Write-Warning "❌ index.html not found."
 }
+
+
 
