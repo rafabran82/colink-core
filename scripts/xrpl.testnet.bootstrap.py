@@ -74,7 +74,7 @@ def account_seq(client: JsonRpcClient, address: str) -> int:
 def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
     return TrustSet(
         limit_amount=IssuedCurrencyAmount(
-            currency=currency,
+            currency=_encode_currency_code(currency),
             issuer=issuer_addr,
             value=limit,
         )
@@ -82,7 +82,7 @@ def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
 
 def ic_amount(issuer_addr: str, currency: str, value: str) -> IssuedCurrencyAmount:
     return IssuedCurrencyAmount(
-        currency=currency,
+        currency=_encode_currency_code(currency),
         issuer=issuer_addr,
         value=value,
     )
@@ -298,5 +298,23 @@ def _write_summary(out_dir: str, network: str, lines):
 if __name__ == "__main__":
     # keep original CLI, then call main()
     main()
+
+def _encode_currency_code(code: str) -> str:
+    """
+    XRPL currency rules:
+      - If 3-letter uppercase (and not XRP), keep as-is.
+      - Else encode to 160-bit hex (ASCII→hex, right-pad to 40 chars).
+    """
+    if isinstance(code, str):
+        cc = code.strip().upper()
+        if len(cc) == 3 and cc != "XRP":
+            return cc
+        try:
+            raw = cc.encode("ascii", "strict")
+        except Exception:
+            raw = code.encode("utf-8", "ignore")
+        hexs = raw.hex().upper()
+        return hexs[:40].ljust(40, "0")
+    return "COL"
 
 
