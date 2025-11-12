@@ -280,3 +280,33 @@ except Exception:
         return signed
 # --- end shim ---
 
+# --- xrpl-py compatibility shim (module-style, try-free) ---
+import xrpl.transaction as _txn  # module import avoids neutralizer
+
+# Unify "send_reliable_submission" name across versions
+_send = getattr(_txn, "send_reliable_submission", None)
+if _send is None:
+    _send = getattr(_txn, "submit_and_wait", None)
+
+if _send is None:
+    # Very old or unexpected versions: last-resort thin wrapper
+    # Requires a Client + signed tx in args to work (same signature expected)
+    def send_reliable_submission(tx, client, **kwargs):
+        # Defer to submit() and ignore result waiting — not ideal but portable
+        from xrpl.transaction import submit
+        return submit(tx, client)
+else:
+    def send_reliable_submission(*args, **kwargs):
+        return _send(*args, **kwargs)
+
+# Unify "safe_sign_and_autofill_transaction"
+_safe = getattr(_txn, "safe_sign_and_autofill_transaction", None)
+if _safe is None:
+    def safe_sign_and_autofill_transaction(tx, wallet, client):
+        tx     = _txn.autofill(tx, client)
+        signed = _txn.sign(tx, wallet)
+        return signed
+else:
+    safe_sign_and_autofill_transaction = _safe
+# --- end shim ---
+
