@@ -15,6 +15,7 @@
     logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO), format="%(message)s")
 print('>>> DEBUG: running file:', __file__)
     logging.info("bootstrap(skeleton): network=%s execute=%s out=%s", args.network, args.execute, args.out)
+    print('>>> DEBUG: running file:', __file__)
 print('>>> DEBUG: running file:', __file__)
 
     out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
@@ -126,6 +127,7 @@ def _append_tx_note(txlog_path, note):
 
 print(">>> DEBUG: running file:", __file__)
 print('>>> DEBUG: running file:', __file__)
+
 
 
 
