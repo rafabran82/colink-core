@@ -19,10 +19,10 @@ from xrpl.models.transactions import TrustSet, Payment, OfferCreate
 from xrpl.models.requests import AccountInfo
 try:
     # Common in many 1.x versions
-    from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
+# (neutralized) from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
 except Exception:  # ImportError or re-exports moved
     # Fallback used by newer/other layouts
-    from xrpl.helpers import safe_sign_and_autofill_transaction, send_reliable_submission
+# (neutralized) from xrpl.helpers import safe_sign_and_autofill_transaction, send_reliable_submission
 from xrpl.models.amounts import IssuedCurrencyAmount
 from xrpl.models.currencies import Currency
 from xrpl.utils import xrp_to_drops
@@ -255,5 +255,6 @@ def main():
     print(f"OK: wrote bootstrap summary → {res_txt}")
     if not args.execute:
         print("NOTE: Dry-run only. Re-run with --execute to submit transactions.")
+
 
 
