@@ -138,212 +138,31 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
     """
     out = []
     for i, o in enumerate(offers, 1):
-        def leg_to_amount(leg: Dict[str, Any]):
-            if leg["type"] == "xrp":
-                # value is in XRP, convert to drops
-                return xrp_to_drops(leg["value"])
-# neutralized: else
-                iss = issuer_addr if leg.get("issuer") in (None, "", "auto") else leg["issuer"]
-                return ic_amount(iss, leg["currency"], str(leg["value"]))
-
-        tx = OfferCreate(
-            account=lp.classic_address,
-            taker_gets=leg_to_amount(o["taker_gets"]),
-            taker_pays=leg_to_amount(o["taker_pays"]),
-        )
-        out.append(send_tx(client, tx, lp, execute))
-    return out
-
-def main():
-    print("bootstrap: starting (testnet bootstrap)")
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--network", default="testnet")
-    ap.add_argument("--out", default=".artifacts/data/bootstrap")
-    ap.add_argument("--execute", action="store_true", help="Actually submit transactions")
-    ap.add_argument("--verbose", action="store_true")
-    args = ap.parse_args()
-
-    client = get_client(args.network)
-    if args.verbose: print(f"xrpl-py version: {xrpl_version}")
-    ensure_dir(args.out)
-
-    # Plan: COPX + COL; issue 1000 to user, 5000 to LP
-    plan = BootstrapPlan(
-        network=args.network,
-        out_dir=args.out,
-        currencies=["COPX", "COL"],
-        issue_amount_user="1000",
-        issue_amount_lp="5000",
-        lp_offers=[
-            # LP sells 100 COPX for 10.5 XRP
-            {"taker_gets": {"type":"ic","currency":"COPX","value":"100","issuer":"auto"},
-             "taker_pays": {"type":"xrp","value":"10.5"}},
-            # LP buys 50 COL paying 5.25 XRP
-            {"taker_gets": {"type":"xrp","value":"5.25"},
-             "taker_pays": {"type":"ic","currency":"COL","value":"50","issuer":"auto"}},
-        ],
-    )
-
-    # Wallets
-    issuer = faucet_wallet(client, "issuer")
-    user   = faucet_wallet(client, "user")
-    lp     = faucet_wallet(client, "lp")
-
-    issuer_addr = issuer.classic_address
-    user_addr   = user.classic_address
-    lp_addr     = lp.classic_address
-
-    if args.verbose:
-        print("Wallets:")
-        print("  issuer:", issuer_addr)
-        print("  user  :", user_addr)
-        print("  lp    :", lp_addr)
-
-    results = {
-        "network": args.network,
-        "execute": bool(args.execute),
-        "issuer": {"address": issuer_addr, "seed": issuer.seed},
-        "user":   {"address": user_addr,   "seed": user.seed},
-        "lp":     {"address": lp_addr,     "seed": lp.seed},
-        "trustlines": [],
-        "issuance": [],
-        "offers": [],
-    }
-
-    # 1) Trust lines (user + lp) for each currency
-    for cur in plan.currencies:
-        # user TL
-        tl_user = trustline_tx(lp_addr, issuer_addr, cur, "1000000000")
-        results["trustlines"].append(send_tx(client, tl_user, user, args.execute))
-        # lp TL
-        tl_lp = trustline_tx(user_addr, issuer_addr, cur, "1000000000")
-        results["trustlines"].append(send_tx(client, tl_lp, lp, args.execute))
-        if args.execute:
-            wait(2.0)
-
-    # 2) Issuance (issuer -> user / lp)
-    for cur in plan.currencies:
-        # to user
-        p_user = Payment(
-            account=issuer_addr,
-            destination=user_addr,
-            amount=ic_amount(issuer_addr, cur, plan.issue_amount_user)
-        )
-        results["issuance"].append(send_tx(client, p_user, issuer, args.execute))
-        # to lp
-        p_lp = Payment(
-            account=issuer_addr,
-            destination=lp_addr,
-            amount=ic_amount(issuer_addr, cur, plan.issue_amount_lp)
-        )
-        results["issuance"].append(send_tx(client, p_lp, issuer, args.execute))
-        if args.execute:
-            wait(2.0)
-
-    # 3) Seed offers from LP
-    results["offers"] = seed_offers(
-        client=client,
-        issuer=issuer,
-        lp=lp,
-        issuer_addr=issuer_addr,
-        execute=args.execute,
-        offers=plan.lp_offers,
-    )
-
-    # Write artifacts
-    res_json = os.path.join(args.out, f"bootstrap_result_{args.network}.json")
-    write_json(res_json, results)
-
-    lines = []
-    lines.append(f"Network : {args.network}")
-    lines.append(f"Execute : {args.execute}")
-    lines.append(f"Issuer  : {issuer_addr}")
-    lines.append(f"User    : {user_addr}")
-    lines.append(f"LP      : {lp_addr}")
-    lines.append("")
-    lines.append("Trustlines created for: " + ", ".join(plan.currencies))
-    lines.append(f"Issued to user: {plan.issue_amount_user} of each ({', '.join(plan.currencies)})")
-    lines.append(f"Issued to LP  : {plan.issue_amount_lp} of each ({', '.join(plan.currencies)})")
-    lines.append(f"Offers placed : {len(plan.lp_offers)} (LP)")
-    summary = "\n".join(lines)
-
-    res_txt = os.path.join(args.out, f"bootstrap_summary_{args.network}.txt")
-    write_text(res_txt, summary)
-
-    print(f"OK: wrote bootstrap result → {res_json}")
-    print(f"OK: wrote bootstrap summary → {res_txt}")
-    if not args.execute:
-        print("NOTE: Dry-run only. Re-run with --execute to submit transactions.")
-
-# --- xrpl-py compatibility shim (covers multiple versions) ---
-# neutralized: try
-    import xrpl.transaction as _txn  # module import avoids neutralizer
-    safe_sign_and_autofill_transaction = _txn.safe_sign_and_autofill_transaction
-    send_reliable_submission = _txn.send_reliable_submission
-# neutralized: except
-    import xrpl.transaction as _txn
-    # Build our own signer/autofill and alias submit-and-wait when needed
-# neutralized: try
-# neutralized: except
-# --- end shim ---
-
-# --- xrpl-py compatibility shim (module-style, try-free) ---
-import xrpl.transaction as _txn  # module import avoids neutralizer
-
-# Unify "send_reliable_submission" name across versions
-_send = getattr(_txn, "send_reliable_submission", None)
-if _send is None:
-    _send = getattr(_txn, "submit_and_wait", None)
-
-if _send is None:
-    # Very old or unexpected versions: last-resort thin wrapper
-    # Requires a Client + signed tx in args to work (same signature expected)
-# neutralized: else
-# Unify "safe_sign_and_autofill_transaction"
-# neutralized: else
-    safe_sign_and_autofill_transaction = _safe
-# --- end shim ---
-
-
-
-def _write_summary(out_dir: str, network: str, lines):
-    path = os.path.join(out_dir, f"bootstrap_summary_{network}.txt")
-    with open(path, "w", encoding="utf-8") as f:
-        for ln in lines:
-            f.write(ln.rstrip() + "\n")
-
-if __name__ == "__main__":
-    # keep original CLI, then call main()
-    main()
-
-def _encode_currency_code(code: str) -> str:
+        def leg_to_amount(leg):
     """
-    XRPL currency rules:
-      - If 3-letter uppercase (and not XRP), keep as-is.
-      - Else encode to 160-bit hex (ASCII→hex, right-pad to 40 chars).
+    Convert a leg dict into an XRPL Amount:
+      - XRP legs: accept numeric/str, coerce to Decimal → xrp_to_drops → str
+      - IOU legs: IssuedCurrencyAmount with encoded currency
+    Expected keys:
+      XRP: {"type":"XRP","value": <xrp amount as str/num>}
+      IOU: {"type":"IOU","currency": "...", "issuer": "...", "value": <str/num>}
     """
-    if isinstance(code, str):
-        cc = code.strip().upper()
-        if len(cc) == 3 and cc != "XRP":
-            return cc
+    kind = (leg.get("type") or "").upper()
+    if kind == "XRP":
+        v = leg.get("value", 0)
+        # coerce to Decimal for xrp_to_drops
         try:
-            raw = cc.encode("ascii", "strict")
+            dv = v if isinstance(v, Decimal) else Decimal(str(v))
         except Exception:
-            raw = code.encode("utf-8", "ignore")
-        hexs = raw.hex().upper()
-        return hexs[:40].ljust(40, "0")
-    return "COL"
-
-
-
-
-
-
-
-
-
-
-
-
-
+            dv = Decimal(0)
+        return str(xrp_to_drops(dv))
+    # IOU
+    cur = leg.get("currency", "")
+    iss = leg.get("issuer", "")
+    val = str(leg.get("value", "0"))
+    return IssuedCurrencyAmount(
+        currency=_encode_currency_code(cur),
+        issuer=iss,
+        value=val
+    )
 
