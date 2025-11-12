@@ -168,6 +168,13 @@ def leg_to_amount(leg):
         issuer=iss,
         value=val
     )
+def main(*_args, **_kwargs):
+    """
+    Temporary stub to satisfy __main__ entry.
+    TODO: wire this to actual bootstrap flow (parse_args -> run plan/execute).
+    """
+    print("bootstrap: main() stub — no-op (temporary)")
+    return 0
 if __name__ == "__main__":
     import sys, json, time
     from pathlib import Path
@@ -243,3 +250,4 @@ if __name__ == "__main__":
 
     print(f"bootstrap: exit (code={exit_code})")
     sys.exit(exit_code)
+
