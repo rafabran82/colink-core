@@ -451,5 +451,5 @@ Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded
 
 
 
-& "\ci.embed-latest.ps1" -Quiet
+& "$PSScriptRoot\ci.embed-latest.ps1" -Quiet
 
