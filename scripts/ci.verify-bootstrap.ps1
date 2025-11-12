@@ -86,3 +86,4 @@ $presentKeys = ($sum.present.GetEnumerator() | Where-Object { $_.Value } | ForEa
   "OK: $($sum.ok)"
 ) | Set-Content -Path $human -Encoding utf8
 Write-Host "• Wrote: $human"
+
