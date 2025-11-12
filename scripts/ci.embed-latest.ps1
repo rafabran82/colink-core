@@ -1,4 +1,8 @@
-﻿param(
+﻿function _nz([object]$s) {
+  if ($null -eq $s) { return "" }
+  return [string]$s
+}
+param(
   [string]$IndexPath    = ".artifacts\index.html",
   [string]$SummaryJson  = ".artifacts\metrics\summary.json",
   [string]$SummaryCsv   = ".artifacts\metrics\summary.csv",
@@ -148,5 +152,6 @@ if ($updated) {
 } else {
   if (-not $Quiet) { Write-Host "ℹ️ Metrics badge already up to date — no changes written." }
 }
+
 
 
