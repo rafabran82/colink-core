@@ -24,6 +24,7 @@ def _append_tx_note(txlog_path: Path, note: str) -> None:
     ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     entry = {"ts": ts, "note": str(note)}
     with txlog_path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(entry) + "\n")
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
@@ -223,6 +224,7 @@ _write_json(out_dir / "wallets.json", wallets)
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
