@@ -1,0 +1,9 @@
+name: TEMP valid placeholder
+on:
+  workflow_dispatch: {}
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo "placeholder OK"

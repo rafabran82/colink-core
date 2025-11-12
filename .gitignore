@@ -51,3 +51,12 @@ __pycache__/
 # Local-CI backups
 scripts/Local-CI.backup_*.ps1
 scripts/*.bak
+# Local artifacts & snapshots
+.artifacts/
+.local_snapshots/
+
+# Oversized backups / temp
+scripts/*.bak*
+*.zip
+*.7z
+*.rar

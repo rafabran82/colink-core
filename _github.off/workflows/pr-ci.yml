@@ -1,0 +1,81 @@
+﻿name: PR CI
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+
+jobs:
+  build-test-package:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      ALLOW_PYTEST_NO_TESTS: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: Windows-pip-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            Windows-pip-
+
+      - name: Phase-10 Bootstrap
+        run: .\scripts\ci\Phase-10-Bootstrap.ps1
+
+      - name: Phase-20 Build & Test
+        run: |
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-20-BuildAndTest.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Caller observed exit code: $code"
+          if ($code -ne 0) { exit $code }
+
+      - name: Phase-25 Emit samples (optional)
+        continue-on-error: true
+        run: |
+          $global:LASTEXITCODE = 0
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          & pwsh -NoLogo -NoProfile -File "scripts/ci/Phase-25-EmitSamples.ps1"
+          $code = $LASTEXITCODE
+          Write-Host "Phase-25 observed exit code: $code (ignored if nonzero)"
+          exit 0
+
+      - name: Make index.html
+        run: |
+          New-Item -ItemType Directory -Force -Path .artifacts | Out-Null
+          @"
+<!doctype html><meta charset='utf-8'><title>Artifacts</title>
+<h1>Artifacts</h1>
+<ul>
+  <li><a href='sample.png'>sample.png</a></li>
+  <li><a href='sample.json'>sample.json</a></li>
+</ul>
+"@ | Set-Content .artifacts\index.html -Encoding utf8
+
+      - name: List .artifacts
+        run: |
+          if (Test-Path .artifacts) { Get-ChildItem -Recurse .artifacts | Format-List FullName,Length }
+
+      - name: Upload .artifacts folder (browsable index)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-ci-artifacts
+          path: ./.artifacts
+          if-no-files-found: ignore

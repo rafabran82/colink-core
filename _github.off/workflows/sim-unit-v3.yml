@@ -1,0 +1,19 @@
+name: sim-unit-v3 (dispatch check)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print context
+        shell: pwsh
+        run: |
+          Write-Host "Repo: $env:GITHUB_REPOSITORY"
+          Write-Host "Ref:  $env:GITHUB_REF"
+          Write-Host "SHA:  $env:GITHUB_SHA"
+      - name: Done
+        shell: pwsh
+        run: echo "sim-unit-v3(dispatch) OK"

@@ -1,0 +1,14 @@
+name: Manual CI (probe)
+on:
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "Why you're running this"
+        required: false
+        default: "probe"
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Manual dispatch works. note='${{ github.event.inputs.note }}'"

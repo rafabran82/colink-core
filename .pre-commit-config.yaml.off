@@ -1,0 +1,40 @@
+﻿repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.5.0
+    hooks:
+      - id: yesqa
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.1
+    hooks:
+      - id: pyupgrade
+        args: ["--py38-plus"]
+
+  # ---------- Local raw-bytes BOM/CRLF checks ----------
+  - repo: local
+    hooks:
+      - id: check-bom-crlf-workflows
+        name: Check BOM/CRLF in workflow YAMLs
+        entry: pwsh -NoLogo -NoProfile -File .tools/check-bom.ps1 --path .github/workflows/**/*.y*ml --fail
+        language: system
+        pass_filenames: false
+        files: ^\.github/workflows/.*\.(yml|yaml)$
+
+      - id: check-bom-crlf-all
+        name: Check BOM/CRLF (repo-wide, raw bytes)
+        entry: pwsh -NoLogo -NoProfile -File .tools/check-bom.ps1 --path . --fail
+        language: system
+        always_run: true
+        pass_filenames: false
+exclude: ^(\.artifacts/|\.venv/|\.ruff_cache/|\.pytest_cache/|build/|dist/|__pycache__/|.*\.(?:png|jpe?g|gif|bmp|tiff?|webp|ico|mp4|mov|avi|mkv|webm|mp3|wav|flac|ogg|pdf|zip|7z|gz|tar|tgz|bz2|xz|exe|dll|so|dylib|bin|pyc|pyo|pyd|db|sqlite3?|lock)|.*\.bak\d*)$
