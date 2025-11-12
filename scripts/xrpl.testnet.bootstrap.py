@@ -17,10 +17,11 @@ from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet, generate_faucet_wallet
 from xrpl.models.transactions import TrustSet, Payment, OfferCreate
 from xrpl.models.requests import AccountInfo
+from xrpl_compat import safe_sign_and_autofill_transaction, send_reliable_submission
 # neutralized: try
     # Common in many 1.x versions
 # (neutralized) from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
-except Exception:  # ImportError or re-exports moved
+# neutralized: except
     # Fallback used by newer/other layouts
 # (neutralized) from xrpl.helpers import safe_sign_and_autofill_transaction, send_reliable_submission
 from xrpl.models.amounts import IssuedCurrencyAmount
@@ -309,6 +310,7 @@ if _safe is None:
 # neutralized: else
     safe_sign_and_autofill_transaction = _safe
 # --- end shim ---
+
 
 
 
