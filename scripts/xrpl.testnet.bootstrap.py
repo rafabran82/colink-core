@@ -140,6 +140,7 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
     """
     out = []
     for i, o in enumerate(offers, 1):
+        pass
 def leg_to_amount(leg):
     """
     Convert a leg dict into an XRPL Amount:
