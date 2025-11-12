@@ -174,6 +174,104 @@ def main(argv=None):
       - Parse args (--network/--out/--execute/--verbose)
       - Ensure artifacts exist
       - Write plan + result skeletons
+      - Ensure tx_log.ndjson has at least one header line
+      - Return 0 (no XRPL side-effects yet)
+    """
+    import sys, json, time, logging, traceback
+    from pathlib import Path
+    import argparse
+
+    argv = list(sys.argv[1:] if argv is None else argv)
+
+    p = argparse.ArgumentParser(prog="xrpl.testnet.bootstrap")
+    p.add_argument("--network", default="testnet", choices=["testnet","devnet","amm-devnet","mainnet"])
+    p.add_argument("--out", default=".artifacts/data/bootstrap")
+    p.add_argument("--execute", action="store_true")
+    p.add_argument("--verbose", action="store_true")
+    args = p.parse_args(argv)
+
+    logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO), format="%(message)s")
+    logging.info("bootstrap(skeleton): network=%s execute=%s out=%s", args.network, args.execute, args.out)
+
+    out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
+    wallets_path  = out_dir / "wallets.json"
+    tls_path      = out_dir / "trustlines.json"
+    offers_path   = out_dir / "offers.json"
+    txlog_path    = out_dir / "tx_log.ndjson"
+    meta_path     = out_dir / "bootstrap_meta.json"
+    plan_path     = out_dir / f"bootstrap_plan_{args.network}.json"
+    result_path   = out_dir / f"bootstrap_result_{args.network}.json"
+    human_path    = out_dir / f"bootstrap_summary_{args.network}.txt"
+
+    try:
+        # Ensure base files exist
+        if not wallets_path.exists(): wallets_path.write_text(json.dumps({"issuer": None,"user": None,"lp": None}, indent=2))
+        if not tls_path.exists():     tls_path.write_text(json.dumps([], indent=2))
+        if not offers_path.exists():  offers_path.write_text(json.dumps([], indent=2))
+        if not txlog_path.exists():   txlog_path.write_text("")
+        if txlog_path.stat().st_size == 0:
+            with txlog_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                                     "note": "bootstrap skeleton started"}) + "\n")
+
+        # Plan (write once)
+        if not plan_path.exists():
+            plan = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "network": args.network, "steps": ["ensure-files","write-plan","write-result"],
+                    "execute": bool(args.execute)}
+            plan_path.write_text(json.dumps(plan, indent=2))
+
+        # Result (merge if present)
+        result = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                  "network": args.network, "executed": False,
+                  "notes": ["skeleton run; no XRPL side-effects yet"]}
+        if result_path.exists():
+            try:
+                prev = json.loads(result_path.read_text())
+                if isinstance(prev, dict): prev.update(result); result = prev
+            except Exception: pass
+        result_path.write_text(json.dumps(result, indent=2))
+
+        # Meta (mark last run)
+        meta = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "note": "skeleton main completed", "exit_code": 0}
+        if meta_path.exists():
+            try:
+                prev = json.loads(meta_path.read_text())
+                if isinstance(prev, dict): prev.update(meta); meta = prev
+            except Exception: pass
+        meta_path.write_text(json.dumps(meta, indent=2))
+
+        # Human summary
+        names = ["wallets.json","trustlines.json","offers.json","tx_log.ndjson","bootstrap_meta.json",
+                 f"bootstrap_plan_{args.network}.json", f"bootstrap_result_{args.network}.json",
+                 f"bootstrap_summary_{args.network}.txt"]
+        present = [n for n in names if (out_dir / n).exists()]
+        try:
+            with txlog_path.open("r", encoding="utf-8") as fh:
+                tx_lines = sum(1 for line in fh if line.strip())
+        except Exception:
+            tx_lines = 0
+
+        human = ["COLINK XRPL Testnet Bootstrap — summary",
+                 f"UTC: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
+                 f"Folder: {args.out}",
+                 "Present: " + ", ".join(present),
+                 f"tx_log lines: {tx_lines}",
+                 "OK: True"]
+        human_path.write_text("\n".join(human), encoding="utf-8")
+
+        logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
+        return 0
+    except SystemExit as se:
+        logging.error("bootstrap(skeleton): SystemExit(%s)", getattr(se, "code", 1)); raise
+    except Exception:
+        logging.error("bootstrap(skeleton): ERROR"); traceback.print_exc(); return 1
+    """
+    Skeleton bootstrap entry:
+      - Parse args (--network/--out/--execute/--verbose)
+      - Ensure artifacts exist
+      - Write plan + result skeletons
       - Append a header line to tx_log.ndjson if empty
       - Return 0 (no XRPL side-effects yet)
     """
@@ -296,4 +394,5 @@ def main(argv=None):
         logging.error("bootstrap(skeleton): ERROR")
         traceback.print_exc()
         return 1
+
 
