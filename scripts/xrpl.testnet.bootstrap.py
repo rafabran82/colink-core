@@ -269,16 +269,8 @@ def main():
     import xrpl.transaction as _txn
     # Build our own signer/autofill and alias submit-and-wait when needed
 # neutralized: try
-        _alias = _txn.send_reliable_submission  # may exist on some versions
 # neutralized: except
         _alias = _txn.submit_and_wait  # fallback on other versions
-    def send_reliable_submission(*args, **kwargs):  # wrapper to unify name
-        return _alias(*args, **kwargs)
-
-    def safe_sign_and_autofill_transaction(tx, wallet, client):
-        tx = _txn.autofill(tx, client)
-        signed = _txn.sign(tx, wallet)
-        return signed
 # --- end shim ---
 
 # --- xrpl-py compatibility shim (module-style, try-free) ---
@@ -292,24 +284,14 @@ if _send is None:
 if _send is None:
     # Very old or unexpected versions: last-resort thin wrapper
     # Requires a Client + signed tx in args to work (same signature expected)
-    def send_reliable_submission(tx, client, **kwargs):
-        # Defer to submit() and ignore result waiting — not ideal but portable
-        from xrpl.transaction import submit
-        return submit(tx, client)
 # neutralized: else
-    def send_reliable_submission(*args, **kwargs):
-        return _send(*args, **kwargs)
-
 # Unify "safe_sign_and_autofill_transaction"
 _safe = getattr(_txn, "safe_sign_and_autofill_transaction", None)
 if _safe is None:
-    def safe_sign_and_autofill_transaction(tx, wallet, client):
-        tx     = _txn.autofill(tx, client)
-        signed = _txn.sign(tx, wallet)
-        return signed
 # neutralized: else
     safe_sign_and_autofill_transaction = _safe
 # --- end shim ---
+
 
 
 
