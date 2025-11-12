@@ -135,7 +135,6 @@ try {
   if ($e -eq 1 -and $o -eq 1) {
 
   } else {
-    Write-Warning ("Integrity check: embed={0}, open={1} (expected 1 & 1)" -f $e, $o)
   }
 } catch {
   Write-Warning ("Integrity guard failed: {0}" -f $_.Exception.Message)
