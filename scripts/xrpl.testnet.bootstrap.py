@@ -32,6 +32,7 @@
         )
 
     # --- txlog safeguard END ---
+
         # tx_log path
         txlog_path = out_dir / "tx_log.ndjson"
         if not txlog_path.exists():
@@ -41,7 +42,7 @@
 
     if not txlog_path.exists():
         txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                                          "note": "created by skeleton safeguard"}, indent=2))
+                                        "note": "created by skeleton safeguard"}, indent=2))
 
     # Ensure base JSONs
     for nm, default in [
@@ -58,7 +59,7 @@
     if not txlog_path.exists() or txlog_path.stat().st_size == 0:
         with txlog_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                                 "note": "bootstrap skeleton started"}) + "\\n")
+                                "note": "bootstrap skeleton started"}) + "\\n")
 
     # Plan / Result / Meta / Human summary
     plan_path   = out_dir / f"bootstrap_plan_{args.network}.json"
@@ -74,9 +75,9 @@
         plan_path.write_text(json.dumps(plan, indent=2))
 
     result = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-              "network": args.network,
-              "executed": False,
-              "notes": ["skeleton run; no XRPL side-effects yet"]}
+            "network": args.network,
+            "executed": False,
+            "notes": ["skeleton run; no XRPL side-effects yet"]}
     try:
         prev = json.loads(result_path.read_text()) if result_path.exists() else None
         if isinstance(prev, dict):
@@ -98,8 +99,8 @@
 
     # Human summary
     names = ["wallets.json","trustlines.json","offers.json","tx_log.ndjson","bootstrap_meta.json",
-             f"bootstrap_plan_{args.network}.json", f"bootstrap_result_{args.network}.json",
-             f"bootstrap_summary_{args.network}.txt"]
+            f"bootstrap_plan_{args.network}.json", f"bootstrap_result_{args.network}.json",
+            f"bootstrap_summary_{args.network}.txt"]
     present = [n for n in names if (out_dir / n).exists()]
     try:
         with txlog_path.open("r", encoding="utf-8") as fh:
@@ -108,14 +109,15 @@
         tx_lines = 0
 
     human = ["COLINK XRPL Testnet Bootstrap — summary",
-             f"UTC: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
-             f"Folder: {args.out}",
-             "Present: " + ", ".join(present),
-             f"tx_log lines: {tx_lines}",
-             "OK: True"]
+            f"UTC: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
+            f"Folder: {args.out}",
+            "Present: " + ", ".join(present),
+            f"tx_log lines: {tx_lines}",
+            "OK: True"]
     human_path.write_text("\\n".join(human), encoding="utf-8")
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
+
 
             # --- tx_log handling (clean version) ---
         txlog_path = out_dir / "tx_log.ndjson"
@@ -148,7 +150,7 @@ def _append_tx_note(txlog_path, note):
     import json, time
     with txlog_path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                             "note": str(note)}) + "\n")
+                            "note": str(note)}) + "\n")
 
 
 
