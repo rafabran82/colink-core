@@ -17,11 +17,17 @@ from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet, generate_faucet_wallet
 from xrpl.models.transactions import TrustSet, Payment, OfferCreate
 from xrpl.models.requests import AccountInfo
-from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
+try:
+    # Common in many 1.x versions
+    from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
+except Exception:  # ImportError or re-exports moved
+    # Fallback used by newer/other layouts
+    from xrpl.helpers import safe_sign_and_autofill_transaction, send_reliable_submission
 from xrpl.models.amounts import IssuedCurrencyAmount
 from xrpl.models.currencies import Currency
 from xrpl.utils import xrp_to_drops
-
+import xrpl
+xrpl_version = getattr(xrpl, "__version__", "unknown")
 TESTNET_JSONRPC = "https://s.altnet.rippletest.net:51234"
 
 @dataclass
@@ -137,6 +143,7 @@ def main():
     args = ap.parse_args()
 
     client = get_client(args.network)
+    if args.verbose: print(f"xrpl-py version: {xrpl_version}")
     ensure_dir(args.out)
 
     # Plan: COPX + COL; issue 1000 to user, 5000 to LP
@@ -248,3 +255,4 @@ def main():
     print(f"OK: wrote bootstrap summary → {res_txt}")
     if not args.execute:
         print("NOTE: Dry-run only. Re-run with --execute to submit transactions.")
+
