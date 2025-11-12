@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
 """
-XRPL Testnet Bootstrap — Modules 1–3
+XRPL Testnet Bootstrap — Modules 1–4
 """
 
 import sys
@@ -27,29 +27,57 @@ def _append_tx_note(path: Path, note: str) -> None:
         fh.write(json.dumps(entry) + "\n")
 
 
+def _ensure_wallets(out_dir: Path, txlog_path: Path):
+    wallets_path = out_dir / "wallets.json"
+    wallets = json.loads(wallets_path.read_text(encoding="utf-8"))
+
+    def _create(name):
+        w = Wallet.create()
+        wallets[name] = {
+            "address": w.classic_address,
+            "seed": w.seed,
+            "public": w.public_key,
+            "private": w.private_key,
+        }
+        _append_tx_note(txlog_path, f"created wallet: {name}")
+
+    if wallets.get("issuer") is None:
+        _create("issuer")
+
+    if wallets.get("user") is None:
+        _create("user")
+
+    if wallets.get("lp") is None:
+        _create("lp")
+
+    _write_json(wallets_path, wallets)
+    return wallets
+
+
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
 
-    # args: --network testnet --out dir --execute --verbose (we’ll parse in later modules)
     out_dir = Path(".artifacts/data/bootstrap")
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Ensure tx log exists
     txlog_path = out_dir / "tx_log.ndjson"
     if not txlog_path.exists():
         txlog_path.write_text("", encoding="utf-8")
         _append_tx_note(txlog_path, "bootstrap init")
 
-    wallets_path = out_dir / "wallets.json"
-    if not wallets_path.exists():
-        _write_json(wallets_path, {"issuer": None, "user": None, "lp": None})
+    # Ensure base files
+    if not (out_dir / "wallets.json").exists():
+        _write_json(out_dir / "wallets.json", {"issuer": None, "user": None, "lp": None})
 
-    trust_path = out_dir / "trustlines.json"
-    if not trust_path.exists():
-        _write_json(trust_path, [])
+    if not (out_dir / "trustlines.json").exists():
+        _write_json(out_dir / "trustlines.json", [])
 
-    offers_path = out_dir / "offers.json"
-    if not offers_path.exists():
-        _write_json(offers_path, [])
+    if not (out_dir / "offers.json").exists():
+        _write_json(out_dir / "offers.json", [])
+
+    # --- MODULE 4: generate wallets ---
+    wallets = _ensure_wallets(out_dir, txlog_path)
 
     return 0
 
