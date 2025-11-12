@@ -60,7 +60,11 @@ Write-Host "• Appended: $RunsCsv → $csvLine"
 
 # Human text summary (beside artifacts)
 $human = Join-Path $BootstrapDir "bootstrap_summary_testnet.txt"
-$presentKeys = ($sum.present.PSObject.Properties | Where-Object { [CmdletBinding()]
+$presentNames = @()
+foreach ($prop in $sum.present.PSObject.Properties) {
+  if ($prop.Value) { $presentNames += $prop.Name }
+}
+$presentKeys = ($presentNames -join ", ")
 param(
   [string]$BootstrapDir = ".artifacts/data/bootstrap",
   [string]$SummaryJson  = ".artifacts/ci/bootstrap.summary.json",
@@ -122,7 +126,11 @@ Write-Host "• Appended: $RunsCsv → $csvLine"
 
 # Human text summary (beside artifacts)
 $human = Join-Path $BootstrapDir "bootstrap_summary_testnet.txt"
-$presentKeys = ($sum.present.GetEnumerator() | Where-Object { $_.Value } | ForEach-Object { $_.Key }) -join ", "
+$presentNames = @()
+foreach ($prop in $sum.present.PSObject.Properties) {
+  if ($prop.Value) { $presentNames += $prop.Name }
+}
+$presentKeys = ($presentNames -join ", ")
 @(
   "COLINK XRPL Testnet Bootstrap — summary",
   "UTC: $($sum.ts)",
@@ -194,7 +202,11 @@ Write-Host "• Appended: $RunsCsv → $csvLine"
 
 # Human text summary (beside artifacts)
 $human = Join-Path $BootstrapDir "bootstrap_summary_testnet.txt"
-$presentKeys = ($sum.present.GetEnumerator() | Where-Object { $_.Value } | ForEach-Object { $_.Key }) -join ", "
+$presentNames = @()
+foreach ($prop in $sum.present.PSObject.Properties) {
+  if ($prop.Value) { $presentNames += $prop.Name }
+}
+$presentKeys = ($presentNames -join ", ")
 @(
   "COLINK XRPL Testnet Bootstrap — summary",
   "UTC: $($sum.ts)",
@@ -214,4 +226,5 @@ Write-Host "• Wrote: $human"
   "OK: $($sum.ok)"
 ) | Set-Content -Path $human -Encoding utf8
 Write-Host "• Wrote: $human"
+
 
