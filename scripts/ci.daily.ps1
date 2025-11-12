@@ -128,7 +128,7 @@ foreach ($m in $metrics) {
 # --- Open dashboard once ---
 $index = ".artifacts\\index.html"
 if (Test-Path $index) {
-    Write-Host "🌐 Dashboard opened: $index"
+
     Start-Process explorer.exe "/select,$index"
 } else {
     Write-Warning "❌ index.html not found."
@@ -159,22 +159,13 @@ foreach ($m in $metrics) {
 # --- Open dashboard once ---
 $index = ".artifacts\\index.html"
 if (Test-Path $index) {
-    Write-Host "🌐 Dashboard opened: $index"
+
     Start-Process explorer.exe "/select,$index"
 } else {
     Write-Warning "❌ index.html not found."
 }
-
-
-
-
-
-
-
-Start-Process ".artifacts\\index.html"
-
-
-Start-Process ".artifacts\\index.html"
+# disabled duplicate open
+# disabled duplicate open
 
 # --- Final: Open dashboard robustly (single owner) ---
 try {
@@ -331,7 +322,7 @@ foreach ($m in $metrics) {
 # --- Open dashboard once ---
 $index = ".artifacts\\index.html"
 if (Test-Path $index) {
-    Write-Host "🌐 Dashboard opened: $index"
+
     Start-Process explorer.exe "/select,$index"
 } else {
     Write-Warning "❌ index.html not found."
@@ -362,22 +353,13 @@ foreach ($m in $metrics) {
 # --- Open dashboard once ---
 $index = ".artifacts\\index.html"
 if (Test-Path $index) {
-    Write-Host "🌐 Dashboard opened: $index"
+
     Start-Process explorer.exe "/select,$index"
 } else {
     Write-Warning "❌ index.html not found."
 }
-
-
-
-
-
-
-
-Start-Process ".artifacts\\index.html"
-
-
-Start-Process ".artifacts\\index.html"
+# disabled duplicate open
+# disabled duplicate open
 
 # --- Final: Open dashboard robustly (single owner) ---
 try {
@@ -406,6 +388,7 @@ try {
 }
 .Exception.Message)"
 }
-
+# disabled duplicate open
+# disabled duplicate open
 
 
