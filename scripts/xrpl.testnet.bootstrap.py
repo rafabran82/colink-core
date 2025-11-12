@@ -100,8 +100,8 @@ def main(argv: list[str] | None = None) -> int:
     _write_json(out_dir / "wallets.json", wallets)
 
     # --- XRPL Trustline Setup (COPX) ---
-    from xrpl.models.transactions import TrustSet
-    from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
+from xrpl.models.transactions import TrustSet\n    from xrpl_compat import safe_sign_and_autofill_transaction, send_reliable_submission
+
 
     issuer_addr = wallets["issuer"]["address"]
     limit_value = "1000000"
@@ -224,6 +224,7 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
