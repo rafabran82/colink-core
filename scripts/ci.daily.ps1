@@ -394,8 +394,18 @@ try {
 # (disabled) inline open
 # (disabled) inline open
 # (disabled) inline open
-
-& .\rebuild_ci.cmd
+# --- Single refresh (inline) ---
+if (Test-Path 'scripts\ci.embed-latest.ps1') {
+  & 'scripts\ci.embed-latest.ps1'
+  if (\0 -eq 0) {
+    Write-Host "✅ Embedded TZ-enabled index into .artifacts\index.html"
+  } else {
+    Write-Warning "Embed script returned non-zero exit."
+  }
+} else {
+  Write-Warning "scripts\ci.embed-latest.ps1 not found — skipping embed step."
+}
+# --- End single refresh ---
 # --- Single, final dashboard open (sole owner) ---
 $index = ".artifacts\index.html"
 $abs = $null
@@ -406,6 +416,13 @@ if ($abs) {
 } else {
   Write-Warning "Dashboard not found: $index"
 }
+
+
+Start-Process ".artifacts\\index.html"
+
+
+Start-Process ".artifacts\\index.html"
+
 
 
 Start-Process ".artifacts\\index.html"
