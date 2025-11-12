@@ -1,3 +1,14 @@
+﻿@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
 @echo off
 @echo off
 @echo off
@@ -14,4 +25,5 @@ if exist "scripts\ci.rebuild.ps1" (
 )
 popd
 endlocal
+
 
