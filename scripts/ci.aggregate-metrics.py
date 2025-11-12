@@ -11,7 +11,7 @@ JSON_PATH   = METR / "summary.json"
 NDJSON_PATH = METR / "summary.ndjson"
 
 def utc_now():
-    return datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def load_metrics_from_runs():
     rows = []
@@ -114,3 +114,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
