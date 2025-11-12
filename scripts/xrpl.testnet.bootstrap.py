@@ -60,6 +60,10 @@ def main(argv: list[str] | None = None) -> int:
     if not txlog_path.exists():
         _append_tx_note(txlog_path, "bootstrap skeleton started")
 
+        # Safeguard: ensure wallets.json exists
+    wallets_path = out_dir / "wallets.json"
+    if not wallets_path.exists():
+        _write_json(wallets_path, {"issuer": None, "user": None, "lp": None"})
     # Ensure base JSON files exist
     base_files = [
         ("wallets.json", {"issuer": None, "user": None, "lp": None}),
@@ -157,3 +161,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
