@@ -31,3 +31,12 @@ for ($i = 0; $i -lt 5; $i++) {
 & (Join-Path $scriptDir "ci.embed-latest.ps1")
 
 Write-Host "✅ Daily CI maintenance complete." -ForegroundColor Green
+
+# --- Open dashboard after maintenance ---
+$indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
+if (Test-Path $indexPath) {
+    Start-Process $indexPath
+    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+} else {
+    Write-Warning "Dashboard file not found at $indexPath"
+}
