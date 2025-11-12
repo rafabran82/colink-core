@@ -140,33 +140,31 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
     """
     out = []
     for i, o in enumerate(offers, 1):
-        def leg_to_amount(leg):
+def leg_to_amount(leg):
     """
     Convert a leg dict into an XRPL Amount:
-      - XRP legs: accept numeric/str, coerce to Decimal → xrp_to_drops → str
+      - XRP legs: coerce value to Decimal, then xrp_to_drops → str
       - IOU legs: IssuedCurrencyAmount with encoded currency
     Expected keys:
       XRP: {"type":"XRP","value": <xrp amount as str/num>}
       IOU: {"type":"IOU","currency": "...", "issuer": "...", "value": <str/num>}
     """
-    kind = (leg.get("type") or "").upper()
+    kind = (str(leg.get("type", "")).upper())
     if kind == "XRP":
         v = leg.get("value", 0)
-        # coerce to Decimal for xrp_to_drops
         try:
             dv = v if isinstance(v, Decimal) else Decimal(str(v))
         except Exception:
             dv = Decimal(0)
         return str(xrp_to_drops(dv))
-    # IOU
-    cur = leg.get("currency", "")
-    iss = leg.get("issuer", "")
+
+    # IOU leg
+    cur = str(leg.get("currency", ""))
+    iss = str(leg.get("issuer", ""))
     val = str(leg.get("value", "0"))
     return IssuedCurrencyAmount(
         currency=_encode_currency_code(cur),
         issuer=iss,
         value=val
     )
-
-
 
