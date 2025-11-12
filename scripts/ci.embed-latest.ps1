@@ -1,25 +1,25 @@
 ﻿function _nz([object]$s) {
   if ($null -eq $s) { return "" }
-  return [string]$s
+  return $s
 }
 param(
-  [string]$IndexPath    = ".artifacts\index.html",
-  [string]$SummaryJson  = ".artifacts\metrics\summary.json",
-  [string]$SummaryCsv   = ".artifacts\metrics\summary.csv",
-  [string]$RunsLogCsv   = ".artifacts\ci\runs\runs_log.csv",
+  $IndexPath = ".artifacts\index.html",
+  $SummaryJson = ".artifacts\metrics\summary.json",
+  $SummaryCsv = ".artifacts\metrics\summary.csv",
+  $RunsLogCsv = ".artifacts\ci\runs\runs_log.csv",
   [switch]$Quiet
 )
 
 # --- Helpers: field-safe escaping (HTML + attribute safe) ---
 function Escape-HTML {
 param(
-  [string]$IndexPath = ".artifacts\index.html",
-  [string]$SummaryJson = ".artifacts\metrics\summary.json",
-  [string]$DeltaJson = ".artifacts\metrics\delta.json",
+  $IndexPath = ".artifacts\index.html",
+  $SummaryJson = ".artifacts\metrics\summary.json",
+  $DeltaJson = ".artifacts\metrics\delta.json",
   [switch]$Quiet
 )
-function _say([string]$m){ if (-not $Quiet) { Write-Host $m } }
-function _warn([string]$m){ Write-Warning $m }
+function _say($m){ if (-not $Quiet) { Write-Host $m } }
+function _warn($m){ Write-Warning $m }
   if ($null -eq $s) { return "" }
   $s = $s -replace '&','&amp;'
   $s = $s -replace '<','&lt;'
@@ -98,8 +98,8 @@ $kvSpans = @()
 foreach ($k in $props.Keys) {
   $v = $props[$k]
   if ($null -eq $v) { continue }
-  $vk = Escape-HTML ([string]$k)
-  $vv = Escape-HTML ([string]$v)
+  $vk = Escape-HTML ($k)
+  $vv = Escape-HTML ($v)
   $kvSpans += "<span class='kv' style='padding:.15rem .45rem;border-radius:.6rem;background:#f8fafc;border:1px solid #e5e7eb'><b>$vk</b>: $vv</span>"
 }
 
@@ -152,6 +152,7 @@ if ($updated) {
 } else {
   if (-not $Quiet) { Write-Host "ℹ️ Metrics badge already up to date — no changes written." }
 }
+
 
 
 
