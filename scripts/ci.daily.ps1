@@ -390,12 +390,19 @@ try {
 }
 # disabled duplicate open
 # disabled duplicate open
-
-
-
-Start-Process ".artifacts\\index.html"
-
-
-Start-Process ".artifacts\\index.html"
-
+# (disabled) inline open
+# (disabled) inline open
+# (disabled) inline open
+# (disabled) inline open
+& scripts/rebuild_ci.cmd
+# --- Single, final dashboard open (sole owner) ---
+$index = ".artifacts\index.html"
+$abs = $null
+try { $abs = (Resolve-Path -LiteralPath $index -ErrorAction Stop).Path } catch {}
+if ($abs) {
+  Start-Process $abs
+  Write-Host "🌐 Dashboard opened (single owner): $abs"
+} else {
+  Write-Warning "Dashboard not found: $index"
+}
 
