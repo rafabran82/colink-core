@@ -17,7 +17,7 @@ from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet, generate_faucet_wallet
 from xrpl.models.transactions import TrustSet, Payment, OfferCreate
 from xrpl.models.requests import AccountInfo
-try:
+# neutralized: try
     # Common in many 1.x versions
 # (neutralized) from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
 except Exception:  # ImportError or re-exports moved
@@ -96,7 +96,7 @@ def send_tx(client: JsonRpcClient, tx, wallet: Wallet, execute: bool) -> Dict[st
             "tx_json": signed.to_xrpl(),
         }
     # Execute: reliable submission
-    try:
+# neutralized: try
         result = send_reliable_submission(signed, client).result
         return {
             "mode": "execute",
@@ -104,7 +104,7 @@ def send_tx(client: JsonRpcClient, tx, wallet: Wallet, execute: bool) -> Dict[st
             "tx_json": result.get("tx_json"),
             "validated": result.get("validated"),
         }
-    except Exception as e:
+# neutralized: except
         return {"mode": "execute", "error": str(e)}
 
 def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: str, execute: bool, offers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -122,7 +122,7 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
             if leg["type"] == "xrp":
                 # value is in XRP, convert to drops
                 return xrp_to_drops(leg["value"])
-            else:
+# neutralized: else
                 iss = issuer_addr if leg.get("issuer") in (None, "", "auto") else leg["issuer"]
                 return ic_amount(iss, leg["currency"], str(leg["value"]))
 
@@ -260,16 +260,16 @@ def main():
 
 
 # --- xrpl-py compatibility shim (covers multiple versions) ---
-try:
+# neutralized: try
     import xrpl.transaction as _txn  # module import avoids neutralizer
     safe_sign_and_autofill_transaction = _txn.safe_sign_and_autofill_transaction
     send_reliable_submission = _txn.send_reliable_submission
-except Exception:
+# neutralized: except
     import xrpl.transaction as _txn
     # Build our own signer/autofill and alias submit-and-wait when needed
-    try:
+# neutralized: try
         _alias = _txn.send_reliable_submission  # may exist on some versions
-    except Exception:
+# neutralized: except
         _alias = _txn.submit_and_wait  # fallback on other versions
     def send_reliable_submission(*args, **kwargs):  # wrapper to unify name
         return _alias(*args, **kwargs)
@@ -295,7 +295,7 @@ if _send is None:
         # Defer to submit() and ignore result waiting — not ideal but portable
         from xrpl.transaction import submit
         return submit(tx, client)
-else:
+# neutralized: else
     def send_reliable_submission(*args, **kwargs):
         return _send(*args, **kwargs)
 
@@ -306,7 +306,8 @@ if _safe is None:
         tx     = _txn.autofill(tx, client)
         signed = _txn.sign(tx, wallet)
         return signed
-else:
+# neutralized: else
     safe_sign_and_autofill_transaction = _safe
 # --- end shim ---
+
 
