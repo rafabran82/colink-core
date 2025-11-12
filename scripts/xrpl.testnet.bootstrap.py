@@ -13,7 +13,9 @@
     args = p.parse_args(argv)
 
     logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO), format="%(message)s")
+print('>>> DEBUG: running file:', __file__)
     logging.info("bootstrap(skeleton): network=%s execute=%s out=%s", args.network, args.execute, args.out)
+print('>>> DEBUG: running file:', __file__)
 
     out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
     # ensure tx_log.ndjson exists before append
@@ -95,6 +97,7 @@
     human_path.write_text("\\n".join(human), encoding="utf-8")
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
+print('>>> DEBUG: running file:', __file__)
     # Explicit safeguard to ensure tx_log.ndjson is created
     txlog_path = out_dir / "tx_log.ndjson"
     if not txlog_path.exists():
@@ -119,7 +122,9 @@ def _append_tx_note(txlog_path, note):
 
 
 
-`r`nprint(">>> DEBUG: running file:", __file__)
+
 
 print(">>> DEBUG: running file:", __file__)
+print('>>> DEBUG: running file:', __file__)
+
 
