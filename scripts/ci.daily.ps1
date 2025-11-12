@@ -85,13 +85,11 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
@@ -117,9 +115,6 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-
-Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
 .Exception.Message)"
     }
@@ -178,13 +173,11 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
@@ -211,22 +204,17 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
-
 .Exception.Message)"
     }
   } else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
-}& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
-Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
@@ -303,13 +291,11 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
@@ -335,9 +321,6 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
-
-
-Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
 .Exception.Message)"
     }
@@ -396,13 +379,11 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-    Write-Host "🌐 Dashboard opened: $indexPath" -ForegroundColor Cyan
+
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
@@ -429,27 +410,18 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-
-Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
-
 .Exception.Message)"
     }
   } else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
-}& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
-
-Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
-
-
-
 
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
 if (Test-Path $index) {
   Start-Process $index
-  Write-Host "🌐 Dashboard opened: $index"
+
 } else {
   Write-Warning "Dashboard not found: $index"
 }
@@ -459,20 +431,37 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
 if (Test-Path $index) {
   Start-Process $index
-  Write-Host "🌐 Dashboard opened: $index"
+
 } else {
   Write-Warning "Dashboard not found: $index"
 }
-
 
 # --- Embed field-safe metrics badge (once) ---
-$embedPath = Join-Path $PSScriptRoot "ci.embed-latest.ps1"
+
 if (Test-Path $embedPath) {
   & $embedPath -Quiet
 } else {
   Write-Warning "Embed script not found: $embedPath"
 }
 # --- Open dashboard (absolute path, once) ---
+$repoRoot = Split-Path $PSScriptRoot -Parent
+$index    = Join-Path $repoRoot ".artifacts\index.html"
+if (Test-Path $index) {
+  Start-Process $index
+
+} else {
+  Write-Warning "Dashboard not found: $index"
+}
+
+
+# --- Embed field-safe metrics badge (centralized) ---
+$embedPath = Join-Path $PSScriptRoot "ci.embed-latest.ps1"
+if (Test-Path $embedPath) {
+  & $embedPath -Quiet
+} else {
+  Write-Warning "Embed script not found: $embedPath"
+}
+# --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
 if (Test-Path $index) {
