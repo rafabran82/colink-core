@@ -4,7 +4,7 @@ if ($PSScriptRoot) {
   $scriptDir = $PSScriptRoot
 } elseif ($PSCommandPath) {
   $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
+} # removed orphan else {
   $repo = (& git rev-parse --show-toplevel 2>$null)
   if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
 }
@@ -44,7 +44,7 @@ if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
       if ($rows -and $rows.Count -gt 0) {
         $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
         Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-      } else {
+} # removed orphan else {
         Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
       }
     } catch {
@@ -54,7 +54,7 @@ if ($PSScriptRoot) {
   $scriptDir = $PSScriptRoot
 } elseif ($PSCommandPath) {
   $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
+} # removed orphan else {
   $repo = (& git rev-parse --show-toplevel 2>$null)
   if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
 }
@@ -89,8 +89,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-
-} else {
+} # removed orphan else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
 
@@ -118,7 +117,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
 .Exception.Message)"
     }
-  } else {
+} # removed orphan else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
 }
@@ -132,7 +131,7 @@ if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
       if ($rows -and $rows.Count -gt 0) {
         $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
         Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-      } else {
+} # removed orphan else {
         Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
       }
     } catch {
@@ -142,7 +141,7 @@ if ($PSScriptRoot) {
   $scriptDir = $PSScriptRoot
 } elseif ($PSCommandPath) {
   $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
+} # removed orphan else {
   $repo = (& git rev-parse --show-toplevel 2>$null)
   if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
 }
@@ -177,8 +176,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-
-} else {
+} # removed orphan else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
 
@@ -206,7 +204,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
 .Exception.Message)"
     }
-  } else {
+} # removed orphan else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
 
@@ -214,8 +212,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-
-} else {
+} # removed orphan else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
 
@@ -250,7 +247,7 @@ if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
       if ($rows -and $rows.Count -gt 0) {
         $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
         Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-      } else {
+} # removed orphan else {
         Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
       }
     } catch {
@@ -260,7 +257,7 @@ if ($PSScriptRoot) {
   $scriptDir = $PSScriptRoot
 } elseif ($PSCommandPath) {
   $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
+} # removed orphan else {
   $repo = (& git rev-parse --show-toplevel 2>$null)
   if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
 }
@@ -295,8 +292,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-
-} else {
+} # removed orphan else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
 
@@ -324,7 +320,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
 .Exception.Message)"
     }
-  } else {
+} # removed orphan else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
 }
@@ -338,7 +334,7 @@ if (-not (Test-Path $summaryJson) -or ((Get-Item $summaryJson).Length -lt 10)) {
       if ($rows -and $rows.Count -gt 0) {
         $rows | ConvertTo-Json -Depth 4 | Set-Content -Path $summaryJson -Encoding utf8
         Write-Host "🧩 Rebuilt summary.json from CSV ($($rows.Count) rows)."
-      } else {
+} # removed orphan else {
         Write-Warning "summary.csv has no rows; cannot rebuild summary.json."
       }
     } catch {
@@ -348,7 +344,7 @@ if ($PSScriptRoot) {
   $scriptDir = $PSScriptRoot
 } elseif ($PSCommandPath) {
   $scriptDir = Split-Path -Parent $PSCommandPath
-} else {
+} # removed orphan else {
   $repo = (& git rev-parse --show-toplevel 2>$null)
   if ($repo) { $scriptDir = Join-Path $repo "scripts" } else { $scriptDir = Join-Path (Get-Location).Path "scripts" }
 }
@@ -383,8 +379,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 $indexPath = Join-Path (Split-Path $scriptDir -Parent) ".artifacts\index.html"
 if (Test-Path $indexPath) {
     Start-Process $indexPath
-
-} else {
+} # removed orphan else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
 
@@ -412,7 +407,7 @@ $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
 .Exception.Message)"
     }
-  } else {
+} # removed orphan else {
     Write-Warning "summary.csv not found; cannot rebuild summary.json."
   }
 
@@ -421,15 +416,13 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
 if (Test-Path $index) {
   Start-Process $index
-
-} else {
+} # removed orphan else {
   Write-Warning "Dashboard not found: $index"
 }
 
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
-
-} else {
+} # removed orphan else {
   Write-Warning "Dashboard not found: $index"
 }
 
@@ -437,13 +430,12 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 
 if (Test-Path $embedPath) {
   & $embedPath -Quiet
-} else {
+} # removed orphan else {
   Write-Warning "Embed script not found: $embedPath"
 }
 # --- Open dashboard (absolute path, once) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
-
-} else {
+} # removed orphan else {
   Write-Warning "Dashboard not found: $index"
 }
 
@@ -452,18 +444,13 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $embedPath = Join-Path $PSScriptRoot "ci.embed-latest.ps1"
 if (Test-Path $embedPath) {
   & $embedPath -Quiet
-} else {
+} # removed orphan else {
   Write-Warning "Embed script not found: $embedPath"
 }
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
 
   Write-Host "🌐 Dashboard opened: $index"
-} else {
+} # removed orphan else {
   Write-Warning "Dashboard not found: $index"
-}
-
-
-}
-}
 
