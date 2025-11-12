@@ -89,7 +89,7 @@ def account_seq(client: JsonRpcClient, address: str) -> int:
     resp = client.request(req).result
     return resp["account_data"]["Sequence"]
 
-def trustline_tx(user_addr, issuer_addr: str, currency: str, limit: str) -> TrustSet:
+def trustline_tx(account_addr: str, issuer_addr: str, currency: str, limit: str):
     return TrustSet(
         account=account_addr,
         limit_amount=IssuedCurrencyAmount(
