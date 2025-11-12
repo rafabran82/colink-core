@@ -34,7 +34,7 @@ function Invoke-PythonSyntaxGuard {
     }
 
     if (-not $pyFiles -or $pyFiles.Count -eq 0) {
-        Write-Warning "⚠️ No Python files found under $ScanRoot"
+        Write-Host "ℹ️  No Python files to lint under $Root — skipping."
         return 0
     }
 
@@ -56,3 +56,4 @@ function Invoke-PythonSyntaxGuard {
 }
 
 Invoke-PythonSyntaxGuard -ScanRoot $Root -Patterns $Include
+
