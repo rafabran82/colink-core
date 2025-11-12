@@ -1,55 +1,250 @@
 ﻿#!/usr/bin/env python3
 """
-Phase 4: XRPL Testnet bootstrap (DRY-RUN SCAFFOLD)
-- No network calls yet; just args + plan output.
-- Next commit wires xrpl-py behind --execute.
-"""
-import argparse, os, json, time, pathlib
+XRPL Testnet Bootstrap
+- Dry-run by default. Use --execute to submit transactions.
+- Creates issuer/user/lp wallets, trust lines for COPX and COL,
+  issues tokens to user/lp, and seeds light DEX offers.
 
-def load_env():
-    env = {}
-    p = pathlib.Path(".env")
-    if p.exists():
-        for line in p.read_text(encoding="utf-8").splitlines():
-            line=line.strip()
-            if not line or line.startswith("#") or "=" not in line: 
-                continue
-            k,v = line.split("=",1)
-            env[k.strip()] = v.strip()
-    return env
+Outputs:
+  <out>/bootstrap_result_<network>.json
+  <out>/bootstrap_summary_<network>.txt
+"""
+import argparse, json, os, time
+from dataclasses import asdict, dataclass
+from typing import Dict, Any, List, Optional
+
+from xrpl.clients import JsonRpcClient
+from xrpl.wallet import Wallet, generate_faucet_wallet
+from xrpl.models.transactions import TrustSet, Payment, OfferCreate
+from xrpl.models.requests import AccountInfo
+from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
+from xrpl.models.amounts import IssuedCurrencyAmount
+from xrpl.models.currencies import Currency
+from xrpl.utils import xrp_to_drops
+
+TESTNET_JSONRPC = "https://s.altnet.rippletest.net:51234"
+
+@dataclass
+class BootstrapPlan:
+    network: str
+    out_dir: str
+    currencies: List[str]           # ["COPX","COL"]
+    issue_amount_user: str          # "1000"
+    issue_amount_lp: str            # "5000"
+    lp_offers: List[Dict[str, Any]] # simple seeded offers
+
+def ensure_dir(p: str) -> None:
+    os.makedirs(p, exist_ok=True)
+
+def write_json(path: str, obj: Any) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2)
+
+def write_text(path: str, text: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+
+def wait(s: float) -> None:
+    time.sleep(s)
+
+def pretty(obj: Any) -> str:
+    return json.dumps(obj, indent=2)
+
+def get_client(network: str) -> JsonRpcClient:
+    # You can expand with mainnet/devnet mapping later if needed
+    return JsonRpcClient(TESTNET_JSONRPC)
+
+def faucet_wallet(client: JsonRpcClient, tag: str) -> Wallet:
+    # Faucet handles funding & activation on testnet
+    w = generate_faucet_wallet(client, debug=False)
+    return w
+
+def account_seq(client: JsonRpcClient, address: str) -> int:
+    req = AccountInfo(account=address, ledger_index="validated", strict=True)
+    resp = client.request(req).result
+    return resp["account_data"]["Sequence"]
+
+def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
+    return TrustSet(
+        limit_amount=IssuedCurrencyAmount(
+            currency=Currency.from_currency_code(currency),
+            issuer=issuer_addr,
+            value=limit,
+        )
+    )
+
+def ic_amount(issuer_addr: str, currency: str, value: str) -> IssuedCurrencyAmount:
+    return IssuedCurrencyAmount(
+        currency=Currency.from_currency_code(currency),
+        issuer=issuer_addr,
+        value=value,
+    )
+
+def send_tx(client: JsonRpcClient, tx, wallet: Wallet, execute: bool) -> Dict[str, Any]:
+    """Sign, autofill, and optionally submit. Always returns a structured result."""
+    signed = safe_sign_and_autofill_transaction(tx, client, wallet)
+    if not execute:
+        # Dry-run: do not submit—return the prepared blob
+        return {
+            "mode": "dry-run",
+            "tx_json": signed.to_xrpl(),
+        }
+    # Execute: reliable submission
+    try:
+        result = send_reliable_submission(signed, client).result
+        return {
+            "mode": "execute",
+            "engine_result": result.get("engine_result"),
+            "tx_json": result.get("tx_json"),
+            "validated": result.get("validated"),
+        }
+    except Exception as e:
+        return {"mode": "execute", "error": str(e)}
+
+def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: str, execute: bool, offers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    offers items:
+      {
+        "taker_gets": {"type":"ic"|"xrp", "currency":"COPX","value":"100","issuer":"<auto>"},
+        "taker_pays": {"type":"xrp"|"ic", "value":"10.5","currency":"", "issuer":"<auto>"}
+      }
+    Note: If "issuer" is "auto" for IC legs, we fill with issuer_addr.
+    """
+    out = []
+    for i, o in enumerate(offers, 1):
+        def leg_to_amount(leg: Dict[str, Any]):
+            if leg["type"] == "xrp":
+                # value is in XRP, convert to drops
+                return xrp_to_drops(leg["value"])
+            else:
+                iss = issuer_addr if leg.get("issuer") in (None, "", "auto") else leg["issuer"]
+                return ic_amount(iss, leg["currency"], str(leg["value"]))
+
+        tx = OfferCreate(
+            account=lp.classic_address,
+            taker_gets=leg_to_amount(o["taker_gets"]),
+            taker_pays=leg_to_amount(o["taker_pays"]),
+        )
+        out.append(send_tx(client, tx, lp, execute))
+    return out
 
 def main():
-    ap = argparse.ArgumentParser(description="XRPL Testnet bootstrap (dry-run)")
-    ap.add_argument("--network", default=os.getenv("XRPL_NETWORK","testnet"), choices=["testnet","devnet"])
-    ap.add_argument("--out", default=".artifacts/data/bootstrap", help="Output folder")
-    ap.add_argument("--token-code", default=os.getenv("XRPL_TOKEN_CODE","COL"))
-    ap.add_argument("--execute", action="store_true", help="(future) perform real xrpl ops")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--network", default="testnet")
+    ap.add_argument("--out", default=".artifacts/data/bootstrap")
+    ap.add_argument("--execute", action="store_true", help="Actually submit transactions")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
-    out = pathlib.Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
+    client = get_client(args.network)
+    ensure_dir(args.out)
 
-    env = load_env()
-    run = {
-        "ts": int(time.time()),
+    # Plan: COPX + COL; issue 1000 to user, 5000 to LP
+    plan = BootstrapPlan(
+        network=args.network,
+        out_dir=args.out,
+        currencies=["COPX", "COL"],
+        issue_amount_user="1000",
+        issue_amount_lp="5000",
+        lp_offers=[
+            # LP sells 100 COPX for 10.5 XRP
+            {"taker_gets": {"type":"ic","currency":"COPX","value":"100","issuer":"auto"},
+             "taker_pays": {"type":"xrp","value":"10.5"}},
+            # LP buys 50 COL paying 5.25 XRP
+            {"taker_gets": {"type":"xrp","value":"5.25"},
+             "taker_pays": {"type":"ic","currency":"COL","value":"50","issuer":"auto"}},
+        ],
+    )
+
+    # Wallets
+    issuer = faucet_wallet(client, "issuer")
+    user   = faucet_wallet(client, "user")
+    lp     = faucet_wallet(client, "lp")
+
+    issuer_addr = issuer.classic_address
+    user_addr   = user.classic_address
+    lp_addr     = lp.classic_address
+
+    if args.verbose:
+        print("Wallets:")
+        print("  issuer:", issuer_addr)
+        print("  user  :", user_addr)
+        print("  lp    :", lp_addr)
+
+    results = {
         "network": args.network,
-        "token_code": args.token_code,
-        "execute": args.execute,
-        "env_keys": sorted([k for k in env.keys() if k.startswith("XRPL_")]),
-        "plan": [
-            "Create/derive issuer, LP, and user wallets (seed if provided; else generate)",
-            "Fund wallets via faucet (testnet/devnet)",
-            "Set trustlines (user↔issuer, LP↔issuer) for token",
-            "Issue token from issuer",
-            "Seed basic DEX offers for COL/XRP"
-        ]
+        "execute": bool(args.execute),
+        "issuer": {"address": issuer_addr, "seed": issuer.seed},
+        "user":   {"address": user_addr,   "seed": user.seed},
+        "lp":     {"address": lp_addr,     "seed": lp.seed},
+        "trustlines": [],
+        "issuance": [],
+        "offers": [],
     }
 
-    plan_path = out / f"bootstrap_plan_{args.network}.json"
-    plan_path.write_text(json.dumps(run, indent=2), encoding="utf-8")
-    print(f"OK: wrote bootstrap plan → {plan_path}")
-    print("NOTE: --execute is ignored in this scaffold. Next step wires xrpl-py calls.")
+    # 1) Trust lines (user + lp) for each currency
+    for cur in plan.currencies:
+        # user TL
+        tl_user = trustline_tx(issuer_addr, cur, "1000000000")
+        tl_user.account = user_addr
+        results["trustlines"].append(send_tx(client, tl_user, user, args.execute))
+        # lp TL
+        tl_lp = trustline_tx(issuer_addr, cur, "1000000000")
+        tl_lp.account = lp_addr
+        results["trustlines"].append(send_tx(client, tl_lp, lp, args.execute))
+        if args.execute:
+            wait(2.0)
 
-if __name__ == "__main__":
-    main()
+    # 2) Issuance (issuer -> user / lp)
+    for cur in plan.currencies:
+        # to user
+        p_user = Payment(
+            account=issuer_addr,
+            destination=user_addr,
+            amount=ic_amount(issuer_addr, cur, plan.issue_amount_user)
+        )
+        results["issuance"].append(send_tx(client, p_user, issuer, args.execute))
+        # to lp
+        p_lp = Payment(
+            account=issuer_addr,
+            destination=lp_addr,
+            amount=ic_amount(issuer_addr, cur, plan.issue_amount_lp)
+        )
+        results["issuance"].append(send_tx(client, p_lp, issuer, args.execute))
+        if args.execute:
+            wait(2.0)
+
+    # 3) Seed offers from LP
+    results["offers"] = seed_offers(
+        client=client,
+        issuer=issuer,
+        lp=lp,
+        issuer_addr=issuer_addr,
+        execute=args.execute,
+        offers=plan.lp_offers,
+    )
+
+    # Write artifacts
+    res_json = os.path.join(args.out, f"bootstrap_result_{args.network}.json")
+    write_json(res_json, results)
+
+    lines = []
+    lines.append(f"Network : {args.network}")
+    lines.append(f"Execute : {args.execute}")
+    lines.append(f"Issuer  : {issuer_addr}")
+    lines.append(f"User    : {user_addr}")
+    lines.append(f"LP      : {lp_addr}")
+    lines.append("")
+    lines.append("Trustlines created for: " + ", ".join(plan.currencies))
+    lines.append(f"Issued to user: {plan.issue_amount_user} of each ({', '.join(plan.currencies)})")
+    lines.append(f"Issued to LP  : {plan.issue_amount_lp} of each ({', '.join(plan.currencies)})")
+    lines.append(f"Offers placed : {len(plan.lp_offers)} (LP)")
+    summary = "\n".join(lines)
+
+    res_txt = os.path.join(args.out, f"bootstrap_summary_{args.network}.txt")
+    write_text(res_txt, summary)
+
+    print(f"OK: wrote bootstrap result → {res_json}")
+    print(f"OK: wrote bootstrap summary → {res_txt}")
+    if not args.execute:
+        print("NOTE: Dry-run only. Re-run with --execute to submit transactions.")
