@@ -1,4 +1,22 @@
-﻿#!/usr/bin/env python3
+﻿def _encode_currency_code(code: str) -> str:
+    """
+    XRPL currency rules:
+      - If 3-letter uppercase (and not XRP), keep as-is.
+      - Else encode to 160-bit hex (ASCII→hex, right-pad to 40 chars).
+    """
+    if isinstance(code, str):
+        cc = code.strip().upper()
+        if len(cc) == 3 and cc != "XRP":
+            return cc
+        try:
+            raw = cc.encode("ascii", "strict")
+        except Exception:
+            raw = code.encode("utf-8", "ignore")
+        hexs = raw.hex().upper()
+        return hexs[:40].ljust(40, "0")
+    return "COL"
+
+#!/usr/bin/env python3
 """
 XRPL Testnet Bootstrap
 - Dry-run by default. Use --execute to submit transactions.
@@ -316,5 +334,6 @@ def _encode_currency_code(code: str) -> str:
         hexs = raw.hex().upper()
         return hexs[:40].ljust(40, "0")
     return "COL"
+
 
 
