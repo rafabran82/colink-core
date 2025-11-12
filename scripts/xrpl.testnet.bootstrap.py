@@ -169,3 +169,55 @@ def leg_to_amount(leg):
         value=val
     )
 
+if __name__ == "__main__":
+    import os, sys, json, time
+    from pathlib import Path
+    print("bootstrap: entry (__main__)")
+
+    # locate output folder
+    out_dir = Path(".")
+    if "--out" in sys.argv:
+        try:
+            out_dir = Path(sys.argv[sys.argv.index("--out")+1])
+        except Exception:
+            pass
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    exit_code = 0
+    try:
+        # call your real program
+        main()
+        print("bootstrap: main() completed")
+    except SystemExit as se:
+        exit_code = int(getattr(se, "code", 1) or 0)
+        print(f"bootstrap: SystemExit({exit_code})")
+    except Exception as e:
+        exit_code = 1
+        import traceback
+        print(f"bootstrap: ERROR: {e}")
+        traceback.print_exc()
+
+    # always write a tiny meta to signal a run
+    try:
+        meta_path = out_dir / "bootstrap_meta.json"
+        meta = {
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
+            "note": "entry finally",
+            "exit_code": exit_code
+        }
+        try:
+            if meta_path.exists():
+                prev = json.loads(meta_path.read_text())
+                if isinstance(prev, dict):
+                    prev.update(meta)
+                    meta = prev
+        except Exception:
+            pass
+        meta_path.write_text(json.dumps(meta, indent=2))
+        print(f"bootstrap: wrote {meta_path}")
+    except Exception as e:
+        print(f"bootstrap: failed to write meta: {e}")
+
+    print(f"bootstrap: exit (code={exit_code})")
+    sys.exit(exit_code)
+
