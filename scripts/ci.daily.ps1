@@ -59,16 +59,21 @@ Ok "📂 Output folder: $outDir"
 $simPy = Join-Path $pyRoot "sim.run.py"
 if (Test-Path $simPy) {
   Info "🐍 Executing Python simulation at: $simPy"
-  # Build args: required --out, plus defaults (env overrides)
-  [int]    $DefaultN  = 50
-  [double] $DefaultDT = 0.1
-
+  # Build args: always pass --out; include --n/--dt only if sim.run.py defines them
   $simArgs = @('--out', $outDir)
 
-  $n  = if ($env:COLINK_SIM_N  -and ($env:COLINK_SIM_N  -as [int]))    { [int]$env:COLINK_SIM_N  } else { $DefaultN  }
-  $dt = if ($env:COLINK_SIM_DT -and ($env:COLINK_SIM_DT -as [double])) { [double]$env:COLINK_SIM_DT } else { $DefaultDT }
+  $simTxt = Get-Content $simPy -Raw
+  $hasN  = ($simTxt -match '(?m)--n(\b|[^a-zA-Z0-9_])'  -or $simTxt -match "add_argument\(\s*['""]--n['""]")
+  $hasDT = ($simTxt -match '(?m)--dt(\b|[^a-zA-Z0-9_])' -or $simTxt -match "add_argument\(\s*['""]--dt['""]")
 
-  $simArgs += @('--n', $n, '--dt', $dt)
+  if ($hasN) {
+    $n = if ($env:COLINK_SIM_N -and ($env:COLINK_SIM_N -as [int])) { [int]$env:COLINK_SIM_N } else { 50 }
+    $simArgs += @('--n', $n)
+  }
+  if ($hasDT) {
+    $dt = if ($env:COLINK_SIM_DT -and ($env:COLINK_SIM_DT -as [double])) { [double]$env:COLINK_SIM_DT } else { 0.1 }
+    $simArgs += @('--dt', $dt)
+  }
 
   & python $simPy @simArgs 2>&1
   if ($LASTEXITCODE -ne 0) { throw "Simulation failed (exit $LASTEXITCODE)" }
@@ -134,4 +139,5 @@ try {
 } catch {
   Write-Warning "Integrity guard failed: $($_.Exception.Message)"
 }
+
 
