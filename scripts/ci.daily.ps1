@@ -54,10 +54,17 @@ for ($i = 0; $i -lt 5; $i++) {
 }
 
 # --- Embed latest metrics panel into index.html (absolute paths)
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath  (Join-Path $repoRoot ".artifacts\index.html") -SummaryJson (Join-Path $repoRoot ".artifacts\metrics\summary.json") -DeltaJson   (Join-Path $repoRoot ".artifacts\metrics\delta.json")`
-    -IndexPath  (Join-Path $repoRoot ".artifacts\index.html") `
-    -SummaryJson $summary
-# === METRICS-AGGREGATE END ===
+$indexPath   = Join-Path $repoRoot ".artifacts\index.html"
+$summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
+$deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
+
+& (Join-Path $scriptDir "ci.embed-latest.ps1") `
+    -IndexPath  $indexPath `
+    -SummaryJson $summaryJson `
+    -DeltaJson   $deltaJson
+
+Write-Host "✅ Embedded latest metrics into $indexPath"# === METRICS-AGGREGATE END ===
+
 
 
 
