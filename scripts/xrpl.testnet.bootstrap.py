@@ -16,6 +16,11 @@
     logging.info("bootstrap(skeleton): network=%s execute=%s out=%s", args.network, args.execute, args.out)
 
     out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
+    # ensure tx_log.ndjson exists before append
+    txlog_path = Path(out_dir) / "tx_log.ndjson"
+    if not txlog_path.exists():
+        txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                                          "note": "created by skeleton safeguard"}, indent=2))
 
     # Ensure base JSONs
     for nm, default in [
@@ -101,4 +106,5 @@ def _append_tx_note(txlog_path, note):
     with txlog_path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                              "note": str(note)}) + "\n")
+
 
