@@ -24,7 +24,8 @@ def _append_tx_note(txlog_path: Path, note: str) -> None:
     ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     entry = {"ts": ts, "note": str(note)}
     with txlog_path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(entry) + "\n")
+        fh.write(json.dumps(entry) + "
+")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -215,7 +216,8 @@ _write_json(out_dir / "wallets.json", wallets)
         f"tx_log lines: {tx_lines}",
         "OK: True",
     ]
-    human_path.write_text("\n".join(human_lines), encoding="utf-8")
+    human_path.write_text("
+".join(human_lines), encoding="utf-8")
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
     _append_tx_note(txlog_path, "skeleton finished")
@@ -225,6 +227,7 @@ _write_json(out_dir / "wallets.json", wallets)
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
