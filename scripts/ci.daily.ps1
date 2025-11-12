@@ -1,70 +1,44 @@
-﻿# COLINK Daily CI — clean single-flow (robust sim launcher)
-param([switch]$Quiet)
-$ErrorActionPreference = "Stop"
+﻿# --- COLINK Daily CI Task ---
+Write-Host "🌅 Starting daily COLINK CI maintenance..."
 
-function Info([string]$m){ if (-not $Quiet) { Write-Host $m } }
-function Ok([string]$m){ if (-not $Quiet) { Write-Host $m -ForegroundColor Green } }
-function Warn([string]$m){ Write-Warning $m }
-
-# --- Paths
-$scriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$repoRoot    = Split-Path $scriptDir -Parent
-$artifacts   = Join-Path $repoRoot ".artifacts"
-$runsDir     = Join-Path $artifacts "data"
-$indexPath   = Join-Path $artifacts "index.html"
-$metricsDir  = Join-Path $artifacts "metrics"
-$summaryJson = Join-Path $metricsDir "summary.json"
-$summaryCsv  = Join-Path $metricsDir "summary.csv"
-$deltaJson   = Join-Path $metricsDir "delta.json"
-
-# --- Start
-Info "🌅 Starting daily COLINK CI maintenance..."
-
-# --- Rotate runs (keep=100)
-New-Item -ItemType Directory -Force -Path $runsDir | Out-Null
+# --- Rotate old runs ---
 $keep = 100
-$all  = Get-ChildItem -Directory $runsDir -ErrorAction SilentlyContinue | Sort-Object Name
-$extra = [math]::Max(0, $all.Count - $keep)
-if ($extra -gt 0) { $all | Select-Object -First $extra | Remove-Item -Recurse -Force ; Ok "♻️ Rotated $extra old runs (keep=$keep)." }
-else { Ok "✅ Nothing to rotate ($($all.Count) runs, keep=$keep)." }
-
-# --- Python guard (compile *.py under scripts)
-$pyRoot = Join-Path $repoRoot "scripts"
-$pyFiles = Get-ChildItem -Recurse -File -Path $pyRoot -Include *.py -ErrorAction SilentlyContinue
-if ($pyFiles.Count -gt 0) {
-  Info "🔍 Python guard scanning root: $pyRoot"
-  $errs = 0
-  foreach ($f in $pyFiles) {
-    $out = & python -m py_compile $f.FullName 2>&1
-    if ($LASTEXITCODE -ne 0) { $errs++ ; Write-Warning ("⚠️ Syntax error in {0}: {1}" -f $f.Name, $out) }
-  }
-  if ($errs -eq 0) { Ok "✅ Python lint check passed for all scripts." }
+$runsDir = ".artifacts\\ci\\runs"
+if (Test-Path $runsDir) {
+    $runs = Get-ChildItem $runsDir -Filter "run-summary_*.json" | Sort-Object LastWriteTime -Descending
+    if ($runs.Count -gt $keep) {
+        $remove = $runs[$keep..($runs.Count - 1)]
+        $remove | Remove-Item -Force
+        Write-Host "♻️  Rotated $($remove.Count) old run logs (keep=$keep)"
+    } else {
+        Write-Host "✅ Nothing to rotate ($($runs.Count) runs, keep=$keep)."
+    }
 } else {
-  Info ("ℹ️  No Python files to lint under {0} — skipping." -f $pyRoot)
+    Write-Host "ℹ️  Runs directory not found; skipping rotation."
 }
 
-# --- New run dir
-$stamp  = Get-Date -Format "yyyyMMdd-HHmmss"
-$outDir = Join-Path $runsDir $stamp
+# --- Python lint check ---
+Write-Host "🔍 Python guard scanning root: $PWD\\scripts"
+$errors = 0
+Get-ChildItem -Path scripts -Filter *.py -Recurse | ForEach-Object {
+    $out = & python -m py_compile $_.FullName 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "⚠️ Syntax error in $($_.Name): $out"
+        $errors++
+    }
+}
+if ($errors -eq 0) {
+    Write-Host "✅ Python lint check passed for all scripts."
+} else {
+    throw "❌ Python lint failed ($errors files)"
+}
+
+# --- Output folder setup ---
+$outDir = ".artifacts\\data\\$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-Ok ("📂 Output folder: {0}" -f $outDir)
+Write-Host "📂 Output folder: $outDir"
 
-# --- Run simulation (robust launcher)
-$simPy = Join-Path $pyRoot "sim.run.py"
-if (Test-Path $simPy) {
-  Info ("🐍 Executing Python simulation at: {0}" -f $simPy)
-
-  # Always pass --out; try a few forms so we work with most CLIs
-  $attempts = @(
-    @{ label = 'array-args'; args = @('--out', $outDir) },
-    @{ label = 'assign-out'; args = @("--out=$outDir") },
-    @{ label = 'quoted-out'; args = @('--out', "$outDir") }
-  )
-
-  $runOk = $false
-  foreach ($a in $attempts) {
-    try {
-      Write-Host ("# --- Simplified COLINK simulation runner (single safe attempt) ---
+# --- Simplified simulation runner (single safe attempt) ---
 $simPy = "scripts/sim.run.py"
 Write-Host "🐍 Executing Python simulation via $simPy ..."
 try {
@@ -75,170 +49,33 @@ try {
     } else {
         Write-Host "✅ Python simulation executed cleanly."
     }
-} catch {
-    Write-Warning "Simulation failed to execute: $(# COLINK Daily CI — clean single-flow (robust sim launcher)
-param([switch]$Quiet)
-$ErrorActionPreference = "Stop"
+}
+catch {
+    Write-Warning "Simulation failed to execute: $($_.Exception.Message)"
+}
+# --- End simulation block ---
 
-function Info([string]$m){ if (-not $Quiet) { Write-Host $m } }
-function Ok([string]$m){ if (-not $Quiet) { Write-Host $m -ForegroundColor Green } }
-function Warn([string]$m){ Write-Warning $m }
+# --- Refresh dashboard ---
+Write-Host "🔄 Refreshing dashboard..."
+& scripts/rebuild_ci.cmd
+Write-Host "✅ Dashboard refreshed via rebuild_ci.cmd."
 
-# --- Paths
-$scriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$repoRoot    = Split-Path $scriptDir -Parent
-$artifacts   = Join-Path $repoRoot ".artifacts"
-$runsDir     = Join-Path $artifacts "data"
-$indexPath   = Join-Path $artifacts "index.html"
-$metricsDir  = Join-Path $artifacts "metrics"
-$summaryJson = Join-Path $metricsDir "summary.json"
-$summaryCsv  = Join-Path $metricsDir "summary.csv"
-$deltaJson   = Join-Path $metricsDir "delta.json"
+# --- Verify metrics ---
+$metrics = @(
+    ".artifacts\\metrics\\summary.json",
+    ".artifacts\\metrics\\summary.csv",
+    ".artifacts\\metrics\\delta.json"
+)
+foreach ($m in $metrics) {
+    if (Test-Path $m) { Write-Host "✅ $(Split-Path $m -Leaf) present: $m" }
+    else { Write-Warning "❌ Missing $m" }
+}
 
-# --- Start
-Info "🌅 Starting daily COLINK CI maintenance..."
-
-# --- Rotate runs (keep=100)
-New-Item -ItemType Directory -Force -Path $runsDir | Out-Null
-$keep = 100
-$all  = Get-ChildItem -Directory $runsDir -ErrorAction SilentlyContinue | Sort-Object Name
-$extra = [math]::Max(0, $all.Count - $keep)
-if ($extra -gt 0) { $all | Select-Object -First $extra | Remove-Item -Recurse -Force ; Ok "♻️ Rotated $extra old runs (keep=$keep)." }
-else { Ok "✅ Nothing to rotate ($($all.Count) runs, keep=$keep)." }
-
-# --- Python guard (compile *.py under scripts)
-$pyRoot = Join-Path $repoRoot "scripts"
-$pyFiles = Get-ChildItem -Recurse -File -Path $pyRoot -Include *.py -ErrorAction SilentlyContinue
-if ($pyFiles.Count -gt 0) {
-  Info "🔍 Python guard scanning root: $pyRoot"
-  $errs = 0
-  foreach ($f in $pyFiles) {
-    $out = & python -m py_compile $f.FullName 2>&1
-    if ($LASTEXITCODE -ne 0) { $errs++ ; Write-Warning ("⚠️ Syntax error in {0}: {1}" -f $f.Name, $out) }
-  }
-  if ($errs -eq 0) { Ok "✅ Python lint check passed for all scripts." }
+# --- Open dashboard once ---
+$index = ".artifacts\\index.html"
+if (Test-Path $index) {
+    Write-Host "🌐 Dashboard opened: $index"
+    Start-Process explorer.exe "/select,$index"
 } else {
-  Info ("ℹ️  No Python files to lint under {0} — skipping." -f $pyRoot)
+    Write-Warning "❌ index.html not found."
 }
-
-# --- New run dir
-$stamp  = Get-Date -Format "yyyyMMdd-HHmmss"
-$outDir = Join-Path $runsDir $stamp
-New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-Ok ("📂 Output folder: {0}" -f $outDir)
-
-# --- Run simulation (robust launcher)
-$simPy = Join-Path $pyRoot "sim.run.py"
-if (Test-Path $simPy) {
-  Info ("🐍 Executing Python simulation at: {0}" -f $simPy)
-
-  # Always pass --out; try a few forms so we work with most CLIs
-  $attempts = @(
-    @{ label = 'array-args'; args = @('--out', $outDir) },
-    @{ label = 'assign-out'; args = @("--out=$outDir") },
-    @{ label = 'quoted-out'; args = @('--out', "$outDir") }
-  )
-
-  $runOk = $false
-  foreach ($a in $attempts) {
-    try {
-      Write-Host ("# --- Simulation block placeholder --- via rebuild_ci.cmd."
-} else {
-  Warn "rebuild_ci.cmd not found — skipping dashboard rebuild."
-}
-
-# --- Report summaries (if produced)
-if (Test-Path $summaryJson) { Ok ("✅ Metrics summary JSON present: {0}" -f $summaryJson) }
-if (Test-Path $summaryCsv)  { Ok ("✅ Metrics summary CSV present:  {0}" -f $summaryCsv) }
-if (Test-Path $deltaJson)   { Ok ("✅ Delta summary present:       {0}" -f $deltaJson) }
-
-# --- Embed metrics badge (centralized; Quiet)
-$embedPath = Join-Path $scriptDir "ci.embed-latest.ps1"
-if (Test-Path $embedPath) {
-  & $embedPath -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson -Quiet
-} else {
-  Warn ("Embed script not found: {0}" -f $embedPath)
-}
-
-# --- Open dashboard once
-if (Test-Path $indexPath) {
-  Start-Process explorer.exe "/select,$IndexPath"
-  Write-Host ("🌐 Dashboard opened: {0}" -f $indexPath)
-} else {
-  Warn ("Dashboard not found: {0}" -f $indexPath)
-}
-
-# --- Integrity guard: ensure exactly ONE embed + ONE open block are present in this file
-try {
-  $self = Get-Content $MyInvocation.MyCommand.Definition -Raw
-  $rxEmb = '(?mi)^\s*\$embedPath\s*=\s*Join-Path\s+\$PSScriptRoot\s+"ci\.embed-latest\.ps1"[\s\S]*?^\s*&\s*\$embedPath\s+-Quiet\s*$'
-  $rxOpen = '(?mi)^\s*if\s*\(Test-Path\s*\$indexPath\)\s*\{\s*Start-Process\s*\$indexPath[\s\S]*?Write-Host\s*"Dashboard opened:.*?$'
-  $e = ([regex]::Matches($self, $rxEmb)).Count
-  $o = ([regex]::Matches($self, $rxOpen)).Count
-  if ($e -eq 1 -and $o -eq 1) {
-
-  } else {
-  }
-} catch {
-  Write-Warning ("Integrity guard failed: {0}" -f $_.Exception.Message)
-}
-
-
-
-
-
-
-.Exception.Message)"
-}
-# --- End simulation block --- via rebuild_ci.cmd."
-} else {
-  Warn "rebuild_ci.cmd not found — skipping dashboard rebuild."
-}
-
-# --- Report summaries (if produced)
-if (Test-Path $summaryJson) { Ok ("✅ Metrics summary JSON present: {0}" -f $summaryJson) }
-if (Test-Path $summaryCsv)  { Ok ("✅ Metrics summary CSV present:  {0}" -f $summaryCsv) }
-if (Test-Path $deltaJson)   { Ok ("✅ Delta summary present:       {0}" -f $deltaJson) }
-
-# --- Embed metrics badge (centralized; Quiet)
-$embedPath = Join-Path $scriptDir "ci.embed-latest.ps1"
-if (Test-Path $embedPath) {
-  & $embedPath -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson -Quiet
-} else {
-  Warn ("Embed script not found: {0}" -f $embedPath)
-}
-
-# --- Open dashboard once
-if (Test-Path $indexPath) {
-  Start-Process explorer.exe "/select,$IndexPath"
-  Write-Host ("🌐 Dashboard opened: {0}" -f $indexPath)
-} else {
-  Warn ("Dashboard not found: {0}" -f $indexPath)
-}
-
-# --- Integrity guard: ensure exactly ONE embed + ONE open block are present in this file
-try {
-  $self = Get-Content $MyInvocation.MyCommand.Definition -Raw
-  $rxEmb = '(?mi)^\s*\$embedPath\s*=\s*Join-Path\s+\$PSScriptRoot\s+"ci\.embed-latest\.ps1"[\s\S]*?^\s*&\s*\$embedPath\s+-Quiet\s*$'
-  $rxOpen = '(?mi)^\s*if\s*\(Test-Path\s*\$indexPath\)\s*\{\s*Start-Process\s*\$indexPath[\s\S]*?Write-Host\s*"Dashboard opened:.*?$'
-  $e = ([regex]::Matches($self, $rxEmb)).Count
-  $o = ([regex]::Matches($self, $rxOpen)).Count
-  if ($e -eq 1 -and $o -eq 1) {
-
-  } else {
-  }
-} catch {
-  Write-Warning ("Integrity guard failed: {0}" -f $_.Exception.Message)
-}
-
-
-
-
-
-
-
-
-
-
-
-
