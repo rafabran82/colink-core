@@ -82,5 +82,46 @@ def main(argv=None):
     return 0
 
 
-if __name__ == "__main__":
+def _selftest():
+    """
+    Minimal sanity test for each bootstrap module.
+    Runs after each module commit.
+    Prints either OK or ERROR with details.
+    """
+    out_dir = Path(".artifacts/data/bootstrap")
+    problems = []
+
+    # Check base directory
+    if not out_dir.exists():
+        problems.append("bootstrap directory missing")
+
+    # Check tx_log
+    txlog = out_dir / "tx_log.ndjson"
+    if not txlog.exists():
+        problems.append("tx_log.ndjson missing")
+
+    # Check wallets.json structure
+    wallets_path = out_dir / "wallets.json"
+    if not wallets_path.exists():
+        problems.append("wallets.json missing")
+    else:
+        try:
+            wallets = json.loads(wallets_path.read_text())
+            for key in ["issuer", "user", "lp"]:
+                if key not in wallets:
+                    problems.append(f"wallet entry missing: {key}")
+        except Exception as e:
+            problems.append(f"wallets.json invalid: {str(e)}")
+
+    if problems:
+        print("❌ MODULE TEST FAILED")
+        for p in problems:
+            print("   - " + p)
+        return 1
+
+    print("✅ MODULE TEST OK")
+    return 0
+
+if __name__ == '__main__':
     sys.exit(main())
+
