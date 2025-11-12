@@ -270,7 +270,6 @@ def main():
     # Build our own signer/autofill and alias submit-and-wait when needed
 # neutralized: try
 # neutralized: except
-        _alias = _txn.submit_and_wait  # fallback on other versions
 # --- end shim ---
 
 # --- xrpl-py compatibility shim (module-style, try-free) ---
@@ -291,6 +290,7 @@ if _safe is None:
 # neutralized: else
     safe_sign_and_autofill_transaction = _safe
 # --- end shim ---
+
 
 
 
