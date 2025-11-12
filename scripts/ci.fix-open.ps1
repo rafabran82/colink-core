@@ -1,8 +1,4 @@
 ﻿$openLine = 'Start-Process ".artifacts\\index.html"'
-param(
-  [string]$Daily = "scripts\ci.daily.ps1"
-)
-
 Write-Host "🔎 Deduping dashboard openers..."
 
 # Patterns that open the dashboard
@@ -61,6 +57,7 @@ if ($d -match [regex]::Escape($embedLine)) {
 
 Set-Content -Path $Daily -Encoding utf8 -Value $d
 Write-Host "✅ ci.daily.ps1 now owns the single dashboard open."
+
 
 
 
