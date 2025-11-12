@@ -6,20 +6,44 @@
   [switch]$Quiet
 )
 
-# ------- helpers -------
+# -------- helpers --------
 function _nz([object]$s) { if ($null -eq $s) { return "" } [string]$s }
+
 function _abs([string]$p) {
   if ([string]::IsNullOrWhiteSpace($p)) { return $p }
   if ([IO.Path]::IsPathRooted($p)) { return $p }
   $repo = Split-Path $PSScriptRoot -Parent
-  return (Join-Path $repo $p)
+  Join-Path $repo $p
 }
+
+function Get-Field {
+  param(
+    [Parameter(Mandatory)]$Obj,
+    [string[]]$Names
+  )
+  if ($null -eq $Obj) { return $null }
+  # If it’s an array, use the first row
+  if ($Obj -is [System.Collections.IEnumerable] -and -not ($Obj -is [string])) {
+    $Obj = ($Obj | Select-Object -First 1)
+  }
+  foreach ($n in $Names) {
+    $matches = $Obj.PSObject.Properties.Match($n, 'IgnoreCase')
+    if ($matches.Count -gt 0) {
+      $actual = $matches[0].Name
+      return $Obj.$actual
+    }
+  }
+  return $null
+}
+
+# -------- normalize paths --------
 $IndexPath   = _abs $IndexPath
 $SummaryJson = _abs $SummaryJson
 $SummaryCsv  = _abs $SummaryCsv
 $DeltaJson   = _abs $DeltaJson
+$RunsLogCsv  = _abs ".artifacts\ci\runs\runs_log.csv"
 
-# ------- load summary (JSON -> CSV fallback) -------
+# -------- load summary (JSON → CSV → runs_log.csv) --------
 $summary = $null
 if (Test-Path $SummaryJson) {
   try { $summary = Get-Content $SummaryJson -Raw | ConvertFrom-Json } catch { }
@@ -27,16 +51,26 @@ if (Test-Path $SummaryJson) {
 if (-not $summary -and (Test-Path $SummaryCsv)) {
   try {
     $rows = Import-Csv $SummaryCsv
-    if ($rows -and $rows.Count -ge 1) { $summary = $rows[0] }
+    if ($rows) { $summary = $rows | Select-Object -Last 1 }
+  } catch { }
+}
+if (-not $summary -and (Test-Path $RunsLogCsv)) {
+  try {
+    $summary = Import-Csv $RunsLogCsv | Select-Object -Last 1
   } catch { }
 }
 
-# Compose safe fields
-$files = _nz ($summary.Files)
-$total = _nz ($summary.TotalMB)
-$stamp = _nz ($summary.RunTimestamp)
+# -------- extract fields robustly --------
+$files = Get-Field -Obj $summary -Names @('Files','file_count','Count','NumFiles')
+$total = Get-Field -Obj $summary -Names @('TotalMB','total_mb','Total','MB','SizeMB')
+$stamp = Get-Field -Obj $summary -Names @('RunTimestamp','timestamp','RunTime','Generated','Time')
 
-# ------- build field-safe badge -------
+# final fallback to empty strings (field-safe)
+$files = _nz $files
+$total = _nz $total
+$stamp = _nz $stamp
+
+# -------- build badge --------
 $begin = '<!-- METRICS BADGE BEGIN -->'
 $end   = '<!-- METRICS BADGE END -->'
 $badge = @"
@@ -48,13 +82,13 @@ $badge = @"
 </div>
 "@
 
-# ------- embed into index.html between markers -------
+# -------- embed into index.html --------
 if (-not (Test-Path $IndexPath)) {
   if (-not $Quiet) { Write-Warning "Index not found: $IndexPath" }
   exit 0
 }
-$html = Get-Content $IndexPath -Raw
 
+$html = Get-Content $IndexPath -Raw
 if ($html -match [regex]::Escape($begin) -and $html -match [regex]::Escape($end)) {
   $pattern = [regex]::Escape($begin) + '.*?' + [regex]::Escape($end)
   $html = [regex]::Replace($html, $pattern, { param($m) "$begin`r`n$badge`r`n$end" }, 'Singleline')
