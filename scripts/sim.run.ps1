@@ -4,7 +4,7 @@ Set-Location $PSScriptRoot
 
 # --- 1. Pre-run: Python syntax guard ---
 . (Join-Path $PSScriptRoot "ci.guard-python.ps1")
-Invoke-PythonSyntaxGuard -Root "scripts" -Include @("*.py")
+Invoke-PythonSyntaxGuard -Root (Split-Path $PSScriptRoot -Parent) -Include @("*.py") -Exclude @("\\.venv\\","\\.artifacts\\","\\_github\.off\\")
 
 # --- 2. Prepare output directory ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
@@ -52,4 +52,5 @@ else {
 Write-Host "🔄 Refreshing dashboard..."
 cmd /c (Join-Path $repoRoot "rebuild_ci.cmd")
 Write-Host "✅ Dashboard refreshed via rebuild_ci.cmd." -ForegroundColor Green
+
 
