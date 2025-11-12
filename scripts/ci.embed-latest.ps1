@@ -1,107 +1,81 @@
 ﻿param(
   [Parameter(Mandatory=$true)] [string]$IndexPath,
   [Parameter(Mandatory=$true)] [string]$SummaryJson,
-  [string]$DeltaJson = ""
+  [string]$DeltaJson = $(Join-Path (Split-Path $PSScriptRoot -Parent) ".artifacts\metrics\delta.json")
 )
 
-function Read-Json($p) {
-  if (-not (Test-Path $p)) { return $null }
-  try { return Get-Content $p -Raw | ConvertFrom-Json -Depth 4 } catch { return $null }
-}
+function Get-LatestSummaryRow {
+  param([string]$JsonPath, [string]$CsvPath)
 
-try {
-  $summary = Read-Json $SummaryJson
-} catch {
-  Write-Warning "Failed to read ${SummaryJson}: $($_.Exception.Message)"
-  exit 0
-}
-
-if (-not $summary) { Write-Warning "No summary data"; exit 0 }
-
-# Normalize rows
-if ($summary.PSObject.Properties.Name -contains "rows") { $rows = $summary.rows } else { $rows = $summary }
-if (-not $rows -or $rows.Count -lt 1) { Write-Warning "No rows in summary"; exit 0 }
-
-$cur = $rows[-1]
-$ts  = $cur.ts
-if (-not $ts) { $ts = $cur.timestamp }
-
-# Try to read deltas if available
-$delta = $null
-if ($DeltaJson -and (Test-Path $DeltaJson)) {
-  $delta = Read-Json $DeltaJson
-}
-
-# Build Latest metrics HTML
-$latestLines = @()
-foreach ($kv in $cur.PSObject.Properties) {
-  $k = $kv.Name; $v = $kv.Value
-  if ($k -in @("ts","timestamp")) { continue }
-  $latestLines += "<div class='metric'><span class='k'>$k</span><span class='v'>$v</span></div>"
-}
-
-$deltaHtml = ""
-if ($delta -and $delta.items -and $delta.items.Count -gt 0) {
-  $badges = @()
-  foreach ($it in $delta.items) {
-    $arrow = if ($it.improved) { "↑" } else { "↓" }
-    $dot   = if ($it.improved) { "🟢" } else { "🔴" }
-    $curr  = "$($it.current)$($it.unit)"
-    $prev  = "$($it.previous)$($it.unit)"
-    $chg   = if ($it.delta -ge 0) { "+$($it.delta)$($it.unit)" } else { "$($it.delta)$($it.unit)" }
-    $badges += "<div class='badge'>$dot <b>$($it.label)</b> $arrow <span class='chg'>$chg</span> <span class='prev'>(prev $prev)</span></div>"
+  # Try JSON first (if exists & non-trivial)
+  if (Test-Path $JsonPath -ErrorAction SilentlyContinue) {
+    $len = (Get-Item $JsonPath).Length
+    if ($len -gt 10) {
+      try {
+        $data = Get-Content $JsonPath -Raw | ConvertFrom-Json -ErrorAction Stop
+        if ($data -is [System.Array]) {
+          if ($data.Count -gt 0) { return $data[-1] }
+        } elseif ($data) { return $data }
+      } catch {
+        Write-Verbose "JSON parse failed: $($_.Exception.Message)"
+      }
+    }
   }
-  $joined = ($badges -join "`n")
-  $deltaHtml = @"
-<div class='delta-wrap'>
-  <div class='delta-title'>Δ Since previous run</div>
-  <div class='delta-badges'>
-    $joined
-  </div>
-</div>
-"@
+
+  # Fallback: CSV
+  if (Test-Path $CsvPath -ErrorAction SilentlyContinue) {
+    try {
+      $rows = Import-Csv $CsvPath
+      if ($rows -and $rows.Count -gt 0) { return $rows[-1] }
+    } catch {
+      Write-Verbose "CSV import failed: $($_.Exception.Message)"
+    }
+  }
+
+  return $null
 }
 
-$block = @"
-<!-- LATEST_METRICS BEGIN -->
-<div class='latest-panel'>
-  <div class='latest-title'>Latest Run Metrics</div>
-  <div class='latest-ts'>timestamp: $ts</div>
-  <div class='latest-body'>
-    $($latestLines -join "`n")
-  </div>
-  $deltaHtml
-</div>
-<style>
-.latest-panel {font-family: system-ui,Segoe UI,Arial; max-width: 380px; border:1px solid #e5e7eb; border-radius:12px; padding:12px; margin:12px 0;}
-.latest-title {font-weight:700; margin-bottom:2px;}
-.latest-ts {color:#6b7280; font-size:12px; margin-bottom:8px;}
-.metric {display:flex; justify-content:space-between; font-size:13px; padding:2px 0; border-bottom:1px dashed #f0f0f0;}
-.metric .k {color:#374151}
-.metric .v {color:#111827}
-.delta-wrap{margin-top:8px; padding-top:6px; border-top:1px solid #e5e7eb;}
-.delta-title{font-weight:600; font-size:13px; margin-bottom:6px;}
-.delta-badges{display:flex; flex-direction:column; gap:4px;}
-.badge{font-size:13px;}
-.badge .chg{margin:0 6px;}
-.badge .prev{color:#6b7280; font-size:12px;}
-</style>
-<!-- LATEST_METRICS END -->
-"@
+# Resolve repo root and CSV path
+$repoRoot   = Split-Path $PSScriptRoot -Parent
+$summaryCsv = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
 
-# Inject into index.html (replace existing block if present)
-$html = Get-Content $IndexPath -Raw
-$pattern = '(?s)<!-- LATEST_METRICS BEGIN -->.*?<!-- LATEST_METRICS END -->'
-if ($html -match $pattern) {
-  $html = [regex]::Replace($html, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $block })
+# Load the latest summary row (with CSV fallback)
+$row = Get-LatestSummaryRow -JsonPath $SummaryJson -CsvPath $summaryCsv
+if (-not $row) {
+  Write-Host "ℹ️  No summary data available after JSON+CSV fallback — leaving dashboard unchanged."
+  return
+}
+
+# Build a small badge (defensively handle missing keys)
+$runId   = $row.run_id    | ForEach-Object { $_ }
+$ts      = $row.ts        | ForEach-Object { $_ }
+$steps   = $row.steps     | ForEach-Object { $_ }
+$success = $row.success   | ForEach-Object { $_ }
+$uptime  = $row.uptime_ms | ForEach-Object { $_ }
+
+$parts = @()
+if ($runId)   { $parts += "Run: $runId" }
+if ($ts)      { $parts += "TS: $ts" }
+if ($steps)   { $parts += "Steps: $steps" }
+if ($success) { $parts += "OK: $success" }
+if ($uptime)  { $parts += "Uptime(ms): $uptime" }
+if ($parts.Count -eq 0) { $parts = @("Latest metrics updated") }
+
+$badge = "<div id=""latest-metrics"" style=""font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin:6px 0;"">
+  <strong>Latest Run Metrics:</strong> <span>" + [string]::Join(" · ", $parts) + "</span>
+</div>"
+
+# Replace or insert between markers in index.html
+$begin = '<!-- METRICS-BEGIN -->'
+$end   = '<!-- METRICS-END -->'
+$html  = Get-Content $IndexPath -Raw
+
+if ($html -match [regex]::Escape($begin) -and $html -match [regex]::Escape($end)) {
+  $pattern = [regex]::Escape($begin) + '.*?' + [regex]::Escape($end)
+  $html = [regex]::Replace($html, $pattern, { param($m) "$begin`r`n$badge`r`n$end" }, 'Singleline')
 } else {
-  # insert after <body> if possible
-  if ($html -match '<body[^>]*>') {
-    $html = $html -replace '(<body[^>]*>)', "`$1`r`n$block`r`n"
-  } else {
-    $html = $block + "`r`n" + $html
-  }
+  $html += "`r`n$begin`r`n$badge`r`n$end"
 }
 
-Set-Content $IndexPath -Encoding utf8 -Value $html
+Set-Content -Path $IndexPath -Encoding utf8 -Value $html
 Write-Host "✅ Embedded latest metrics into $IndexPath"
