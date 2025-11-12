@@ -89,8 +89,9 @@ def account_seq(client: JsonRpcClient, address: str) -> int:
     resp = client.request(req).result
     return resp["account_data"]["Sequence"]
 
-def trustline_tx(issuer_addr: str, currency: str, limit: str) -> TrustSet:
+def trustline_tx(user_addr, issuer_addr: str, currency: str, limit: str) -> TrustSet:
     return TrustSet(
+        account=account_addr,
         limit_amount=IssuedCurrencyAmount(
             currency=_encode_currency_code(currency),
             issuer=issuer_addr,
@@ -212,7 +213,7 @@ def main():
     # 1) Trust lines (user + lp) for each currency
     for cur in plan.currencies:
         # user TL
-        tl_user = trustline_tx(issuer_addr, cur, "1000000000")
+        tl_user = trustline_tx(lp_addr, issuer_addr, cur, "1000000000")
         tl_user.account = user_addr
         results["trustlines"].append(send_tx(client, tl_user, user, args.execute))
         # lp TL
@@ -334,6 +335,8 @@ def _encode_currency_code(code: str) -> str:
         hexs = raw.hex().upper()
         return hexs[:40].ljust(40, "0")
     return "COL"
+
+
 
 
 
