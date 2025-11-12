@@ -23,7 +23,7 @@ if (-not (Test-Path $SummaryJson)) {
 try {
   $data = Get-Content $SummaryJson -Raw | ConvertFrom-Json
 } catch {
-  Write-Warning "Failed to read $SummaryJson: $($_.Exception.Message)"
+  Write-Warning "Failed to read ${SummaryJson}: $($_.Exception.Message)"
   exit 0
 }
 
@@ -62,3 +62,4 @@ if (Test-Path $IndexPath) {
 } else {
   Write-Warning "Index not found at $IndexPath — skipping embed."
 }
+
