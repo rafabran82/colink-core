@@ -18,7 +18,20 @@
 
 
 
-    out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
+    out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)    # --- txlog safeguard START ---
+    from pathlib import Path
+    import json, time
+
+    txlog_path = Path(out_dir) / "tx_log.ndjson"
+    if not txlog_path.exists():
+        txlog_path.write_text(
+            json.dumps({
+                "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "note": "created by skeleton safeguard"
+            }, indent=2)
+        )
+
+    # --- txlog safeguard END ---
         # tx_log path
         txlog_path = out_dir / "tx_log.ndjson"
         if not txlog_path.exists():
@@ -157,6 +170,7 @@ def _append_tx_note(txlog_path, note):
 if __name__ == '__main__':
     import sys
     sys.exit(main())
+
 
 
 
