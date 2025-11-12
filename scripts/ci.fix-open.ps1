@@ -43,7 +43,11 @@ $d = [regex]::Replace($d, $psOpenRx, '')
 
 # Insert single open before the EOF (or after our embed call if present)
 $embedLine = '& "`$PSScriptRoot\ci.embed-latest.ps1" -Quiet'
-$openLine  = 'Start-Process ".artifacts\index.html"'
+if (-not (Get-Variable -Name "DashboardOpened" -Scope Global -ErrorAction SilentlyContinue)) {
+    $Global:DashboardOpened = $true
+    Start-Process ".artifacts\index.html"
+    Write-Host "🌐 Dashboard opened (single instance)."
+}
 
 if ($d -match [regex]::Escape($embedLine)) {
   # Place right after embed line (clean separation)
@@ -56,4 +60,5 @@ if ($d -match [regex]::Escape($embedLine)) {
 
 Set-Content -Path $Daily -Encoding utf8 -Value $d
 Write-Host "✅ ci.daily.ps1 now owns the single dashboard open."
+
 
