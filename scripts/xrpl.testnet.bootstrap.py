@@ -174,7 +174,7 @@ def main(argv=None):
       - Parse args (--network/--out/--execute/--verbose)
       - Ensure artifacts exist
       - Write plan + result skeletons
-      - Append a header line to tx_log.ndjson
+      - Append a header line to tx_log.ndjson if empty
       - Return 0 (no XRPL side-effects yet)
     """
     import sys, json, time, logging, traceback
@@ -196,7 +196,6 @@ def main(argv=None):
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Ensure files exist; do not overwrite non-empty ones
     wallets_path  = out_dir / "wallets.json"
     tls_path      = out_dir / "trustlines.json"
     offers_path   = out_dir / "offers.json"
@@ -207,6 +206,7 @@ def main(argv=None):
     human_path    = out_dir / f"bootstrap_summary_{args.network}.txt"
 
     try:
+        # Ensure base files exist (create if missing)
         if not wallets_path.exists():
             wallets_path.write_text(json.dumps({"issuer": None, "user": None, "lp": None}, indent=2))
         if not tls_path.exists():
@@ -214,14 +214,13 @@ def main(argv=None):
         if not offers_path.exists():
             offers_path.write_text(json.dumps([], indent=2))
         if not txlog_path.exists():
-            txlog_path.write_text("")  # create empty
-        # append a header line if empty (so verifier sees >=1 line when execute is used)
+            txlog_path.write_text("")
         if txlog_path.stat().st_size == 0:
             with txlog_path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                                      "note": "bootstrap skeleton started"}) + "\n")
 
-        # Write a simple plan if missing
+        # Plan (write once)
         if not plan_path.exists():
             plan = {
                 "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -231,14 +230,13 @@ def main(argv=None):
             }
             plan_path.write_text(json.dumps(plan, indent=2))
 
-        # Result skeleton (idempotent update)
+        # Result (merge if present)
         result = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "network": args.network,
             "executed": False,
             "notes": ["skeleton run; no XRPL side-effects yet"]
         }
-        # Merge if already exists
         if result_path.exists():
             try:
                 prev = json.loads(result_path.read_text())
@@ -249,7 +247,7 @@ def main(argv=None):
                 pass
         result_path.write_text(json.dumps(result, indent=2))
 
-        # meta file: mark last run
+        # Meta (mark last run)
         meta = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "note": "skeleton main completed",
@@ -265,23 +263,26 @@ def main(argv=None):
                 pass
         meta_path.write_text(json.dumps(meta, indent=2))
 
-        # human summary
-        present_keys = []
-        for pth in [wallets_path, tls_path, offers_path, txlog_path, meta_path, plan_path, result_path, human_path]:
-            # we’ll compute presence after writing human_path
-            pass
+        # Human summary (presence + count)
         present = []
         for name in ["wallets.json","trustlines.json","offers.json","tx_log.ndjson","bootstrap_meta.json",
                      f"bootstrap_plan_{args.network}.json", f"bootstrap_result_{args.network}.json",
                      f"bootstrap_summary_{args.network}.txt"]:
             if (out_dir / name).exists():
                 present.append(name)
+        tx_lines = 0
+        try:
+            with txlog_path.open("r", encoding="utf-8") as fh:
+                tx_lines = sum(1 for line in fh if line.strip())
+        except Exception:
+            tx_lines = 0
+
         human = [
             "COLINK XRPL Testnet Bootstrap — summary",
             f"UTC: {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}",
             f"Folder: {args.out}",
             "Present: " + ", ".join(present),
-            f"tx_log lines: {sum(1 for _ in open(txlog_path, 'r', encoding='utf-8') if _.strip())}",
+            f"tx_log lines: {tx_lines}",
             "OK: True",
         ]
         human_path.write_text("\n".join(human), encoding="utf-8")
@@ -294,8 +295,7 @@ def main(argv=None):
     except Exception:
         logging.error("bootstrap(skeleton): ERROR")
         traceback.print_exc()
-        return 1
-    def _invoke_entry():
+        return 1    def _invoke_entry():
         """
         Try common entry functions in order. If a candidate needs args and we
         have parse_args(), call it and pass the result.
@@ -355,5 +355,6 @@ def main(argv=None):
 
     print(f"bootstrap: exit (code={exit_code})")
     sys.exit(exit_code)
+
 
 
