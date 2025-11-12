@@ -24,8 +24,9 @@ def main():
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-    print(f"✅ Metrics written to {path}")
+    print(f"OK: Metrics written to {path}")
     return 0
 
 if __name__ == "__main__":
     main()
+
