@@ -450,3 +450,6 @@ Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
 
+
+& "\ci.embed-latest.ps1" -Quiet
+
