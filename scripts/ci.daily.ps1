@@ -384,8 +384,11 @@ try {
   $repoRoot = Split-Path $PSScriptRoot -Parent
   $indexRel = ".artifacts\index.html"
   $index    = Join-Path $repoRoot $indexRel
-  $abs      = (Resolve-Path $index -ErrorAction SilentlyContinue)?.Path
-
+  $abs = $null
+  try {
+    $rp  = Resolve-Path -LiteralPath $index -ErrorAction Stop
+    $abs = $rp.Path
+  } catch { }
   if ($abs -and (Test-Path $abs)) {
     try {
       # Preferred: open with default associated app (browser)
@@ -403,5 +406,6 @@ try {
 }
 .Exception.Message)"
 }
+
 
 
