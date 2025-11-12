@@ -119,7 +119,7 @@ if (Test-Path $embedPath) {
 
 # --- Open dashboard once
 if (Test-Path $indexPath) {
-  Start-Process $indexPath
+  Start-Process explorer.exe "/select,$index"
   Write-Host ("🌐 Dashboard opened: {0}" -f $indexPath)
 } else {
   Warn ("Dashboard not found: {0}" -f $indexPath)
