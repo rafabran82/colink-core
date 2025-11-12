@@ -394,7 +394,8 @@ try {
 # (disabled) inline open
 # (disabled) inline open
 # (disabled) inline open
-& scripts/rebuild_ci.cmd
+
+& .\rebuild_ci.cmd
 # --- Single, final dashboard open (sole owner) ---
 $index = ".artifacts\index.html"
 $abs = $null
@@ -405,4 +406,11 @@ if ($abs) {
 } else {
   Write-Warning "Dashboard not found: $index"
 }
+
+
+Start-Process ".artifacts\\index.html"
+
+
+Start-Process ".artifacts\\index.html"
+
 
