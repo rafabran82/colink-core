@@ -91,3 +91,12 @@
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
     return 0
+def _write_json(path_obj, obj):
+    import json
+    path_obj.write_text(json.dumps(obj, indent=2))
+
+def _append_tx_note(txlog_path, note):
+    import json, time
+    with txlog_path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                             "note": str(note)}) + "\n")
