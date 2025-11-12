@@ -15,6 +15,7 @@ Write-Host "🌅 Starting daily COLINK CI maintenance..." -ForegroundColor Cyan
 & (Join-Path $scriptDir "ci.rotate-artifacts.ps1") -Keep 100
 
 # Sim run
+$repoRoot = Split-Path $scriptDir -Parent
 & (Join-Path $scriptDir "sim.run.ps1")
 
 # Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
@@ -40,3 +41,21 @@ if (Test-Path $indexPath) {
 } else {
     Write-Warning "Dashboard file not found at $indexPath"
 }
+
+# === METRICS-AGGREGATE BEGIN ===
+# --- Aggregate metrics across runs (JSON -> CSV/JSON/NDJSON)
+python (Join-Path $scriptDir "ci.aggregate-metrics.py")
+
+# Wait until summary.json exists and is non-empty before embedding
+$summary = Join-Path $repoRoot ".artifacts\metrics\summary.json"
+for ($i = 0; $i -lt 5; $i++) {
+  if ((Test-Path $summary) -and ((Get-Item $summary).Length -gt 50)) { break }
+  Start-Sleep -Seconds 1
+}
+
+# --- Embed latest metrics panel into index.html (absolute paths)
+& (Join-Path $scriptDir "ci.embed-latest.ps1") `
+    -IndexPath  (Join-Path $repoRoot ".artifacts\index.html") `
+    -SummaryJson $summary
+# === METRICS-AGGREGATE END ===
+

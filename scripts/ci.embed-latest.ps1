@@ -1,17 +1,29 @@
 ﻿param(
-  [string]$IndexPath = ".artifacts\index.html",
-  [string]$SummaryJson = ".artifacts\metrics\summary.json"
+  [string]$IndexPath,
+  [string]$SummaryJson
 )
 
+if ($PSScriptRoot) {
+  $scriptDir = $PSScriptRoot
+} elseif ($PSCommandPath) {
+  $scriptDir = Split-Path -Parent $PSCommandPath
+} else {
+  $scriptDir = Join-Path (Get-Location).Path "scripts"
+}
+$repoRoot = Split-Path $scriptDir -Parent
+
+if (-not $IndexPath)   { $IndexPath   = Join-Path $repoRoot ".artifacts\index.html" }
+if (-not $SummaryJson) { $SummaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json" }
+
 if (-not (Test-Path $SummaryJson)) {
-  Write-Warning "No summary.json found — skipping embed."
+  Write-Warning "No summary.json found at $SummaryJson — skipping embed."
   exit 0
 }
 
 try {
   $data = Get-Content $SummaryJson -Raw | ConvertFrom-Json
 } catch {
-  Write-Warning "Failed to read summary.json: $($_.Exception.Message)"
+  Write-Warning "Failed to read $SummaryJson: $($_.Exception.Message)"
   exit 0
 }
 
