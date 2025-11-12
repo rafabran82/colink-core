@@ -149,3 +149,4 @@ if ($updated) {
   if (-not $Quiet) { Write-Host "ℹ️ Metrics badge already up to date — no changes written." }
 }
 
+
