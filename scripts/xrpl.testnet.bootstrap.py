@@ -13,14 +13,14 @@
     args = p.parse_args(argv)
 
     logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO), format="%(message)s")
-    print('>>> DEBUG: running file:', __file__)
+
     logging.info("bootstrap(skeleton): network=%s execute=%s out=%s", args.network, args.execute, args.out)
-    print('>>> DEBUG: running file:', __file__)
-    print('>>> DEBUG: running file:', __file__)
+
+
 
     out_dir = Path(args.out); out_dir.mkdir(parents=True, exist_ok=True)
     # ensure tx_log.ndjson exists before append
-    txlog_path = Path(out_dir) / "tx_log.ndjson"
+
     if not txlog_path.exists():
         txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                                           "note": "created by skeleton safeguard"}, indent=2))
@@ -36,7 +36,7 @@
             pth.write_text(json.dumps(default, indent=2))
 
     # tx log header line (if empty)
-    txlog_path = out_dir / "tx_log.ndjson"
+
     if not txlog_path.exists() or txlog_path.stat().st_size == 0:
         with txlog_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -98,15 +98,15 @@
     human_path.write_text("\\n".join(human), encoding="utf-8")
 
     logging.info("bootstrap(skeleton): wrote artifacts into %s", str(out_dir))
-    print('>>> DEBUG: running file:', __file__)
+
     # Explicit safeguard to ensure tx_log.ndjson is created
-    txlog_path = out_dir / "tx_log.ndjson"
+
     if not txlog_path.exists():
         import json, time
         txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                                           "note": "created by runtime safeguard"}))
-    _append_tx_note(txlog_path, "skeleton finished")
-    # Final safeguard to ensure tx_log.ndjson exists`r`n    txlog_path = out_dir / "tx_log.ndjson"`r`n    if not txlog_path.exists():`r`n        import json, time`r`n        txlog_path.write_text(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "note": "final safeguard created"}, indent=2))`r`n    return 0
+
+    return 0
 def _write_json(path_obj, obj):
     import json
     path_obj.write_text(json.dumps(obj, indent=2))
@@ -126,7 +126,7 @@ def _append_tx_note(txlog_path, note):
 
 
     print(">>> DEBUG: running file:", __file__)
-    print('>>> DEBUG: running file:', __file__)
+
 
 
 
@@ -137,4 +137,5 @@ def _append_tx_note(txlog_path, note):
 if __name__ == '__main__':
     import sys
     sys.exit(main())
+
 
