@@ -59,10 +59,16 @@ Ok "📂 Output folder: $outDir"
 $simPy = Join-Path $pyRoot "sim.run.py"
 if (Test-Path $simPy) {
   Info "🐍 Executing Python simulation at: $simPy"
-  # Build args: required --out, optional --n/--dt via env overrides
+  # Build args: required --out, plus defaults (env overrides)
+  [int]    $DefaultN  = 50
+  [double] $DefaultDT = 0.1
+
   $simArgs = @('--out', $outDir)
-  if ($env:COLINK_SIM_N -and ($env:COLINK_SIM_N -as [int]))    { $simArgs += @('--n',  $env:COLINK_SIM_N) }
-  if ($env:COLINK_SIM_DT -and ($env:COLINK_SIM_DT -as [double])){ $simArgs += @('--dt', $env:COLINK_SIM_DT) }
+
+  $n  = if ($env:COLINK_SIM_N  -and ($env:COLINK_SIM_N  -as [int]))    { [int]$env:COLINK_SIM_N  } else { $DefaultN  }
+  $dt = if ($env:COLINK_SIM_DT -and ($env:COLINK_SIM_DT -as [double])) { [double]$env:COLINK_SIM_DT } else { $DefaultDT }
+
+  $simArgs += @('--n', $n, '--dt', $dt)
 
   & python $simPy @simArgs 2>&1
   if ($LASTEXITCODE -ne 0) { throw "Simulation failed (exit $LASTEXITCODE)" }
@@ -110,5 +116,22 @@ if (Test-Path $indexPath) {
   Write-Host "🌐 Dashboard opened: $indexPath"
 } else {
   Warn "Dashboard not found: $indexPath"
+}
+
+
+# --- Integrity guard: single embed/open blocks ---
+try {
+  $self = Get-Content $MyInvocation.MyCommand.Definition -Raw
+  $rxEmb = '(?mi)^\s*\$embedPath\s*=\s*Join-Path\s+\$PSScriptRoot\s+"ci\.embed-latest\.ps1"[\s\S]*?^\s*&\s*\$embedPath\s+-Quiet\s*$'
+  $rxOpen = '(?mi)^\s*\$index\s*=\s*Join-Path\s+\$repoRoot\s+"\.artifacts\\index\.html"[\s\S]*?^\s*Start-Process\s+\$index\s*$'
+  $e = ([regex]::Matches($self,$rxEmb)).Count
+  $o = ([regex]::Matches($self,$rxOpen)).Count
+  if ($e -eq 1 -and $o -eq 1) {
+    Write-Host "✅ Integrity: 1 embed block, 1 open block"
+  } else {
+    Write-Warning "Integrity check: embed=$e, open=$o (should both be 1)."
+  }
+} catch {
+  Write-Warning "Integrity guard failed: $($_.Exception.Message)"
 }
 
