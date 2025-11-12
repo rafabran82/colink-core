@@ -98,9 +98,45 @@ def main(argv: list[str] | None = None) -> int:
         lp_wallet = Wallet.create()
         wallets["lp"] = { "address": lp_wallet.classic_address, "seed": lp_wallet.seed, "public": lp_wallet.public_key, "private": lp_wallet.private_key }
         _append_tx_note(txlog_path, "created LP wallet")
+_write_json(out_dir / "wallets.json", wallets)
 
-    _write_json(out_dir / "wallets.json", wallets)
+    # --- XRPL Trustline Setup (COPX) ---
+    from xrpl.models.transactions import TrustSet
+    from xrpl.transaction import safe_sign_and_autofill_transaction, send_reliable_submission
 
+    issuer_addr = wallets["issuer"]["address"]
+    limit_value = "1000000"
+
+    # Helper: detect if trustline exists
+    def _has_trustline(client, account, issuer, currency):
+        from xrpl.models.requests import AccountLines
+        resp = client.request(AccountLines(account=account))
+        if "lines" not in resp.result:
+            return False
+        for line in resp.result["lines"]:
+            if line.get("currency") == currency and line.get("account") == issuer:
+                return True
+        return False
+
+    # Trustlines to create: user + lp
+    trust_targets = [
+        (wallets["user"], "user"),
+        (wallets["lp"], "lp"),
+    ]
+
+    for w, label in trust_targets:
+        if not _has_trustline(client, w["address"], issuer_addr, "COPX"):
+            tx = TrustSet(
+                account=w["address"],
+                limit_amount={
+                    "currency": "COPX",
+                    "issuer": issuer_addr,
+                    "value": limit_value,
+                },
+            )
+            signed = safe_sign_and_autofill_transaction(tx, Wallet(seed=w["seed"]), client)
+            result = send_reliable_submission(signed, client)
+            _append_tx_note(txlog_path, f"created trustline for {label}: COPX {limit_value}")
     # Plan / Result / Meta / Human summary
 
 
@@ -189,6 +225,7 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
