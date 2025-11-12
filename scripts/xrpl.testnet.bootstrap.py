@@ -257,9 +257,6 @@ def main():
     if not args.execute:
         print("NOTE: Dry-run only. Re-run with --execute to submit transactions.")
 
-
-
-
 # --- xrpl-py compatibility shim (covers multiple versions) ---
 # neutralized: try
     import xrpl.transaction as _txn  # module import avoids neutralizer
@@ -285,15 +282,8 @@ if _send is None:
     # Requires a Client + signed tx in args to work (same signature expected)
 # neutralized: else
 # Unify "safe_sign_and_autofill_transaction"
-_safe = getattr(_txn, "safe_sign_and_autofill_transaction", None)
-if _safe is None:
 # neutralized: else
     safe_sign_and_autofill_transaction = _safe
 # --- end shim ---
-
-
-
-
-
 
 
