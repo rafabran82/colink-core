@@ -136,6 +136,7 @@ def seed_offers(client: JsonRpcClient, issuer: Wallet, lp: Wallet, issuer_addr: 
     return out
 
 def main():
+    print("bootstrap: starting (testnet bootstrap)")
     ap = argparse.ArgumentParser()
     ap.add_argument("--network", default="testnet")
     ap.add_argument("--out", default=".artifacts/data/bootstrap")
@@ -287,3 +288,13 @@ if _send is None:
 # --- end shim ---
 
 
+
+def _write_summary(out_dir: str, network: str, lines):
+    path = os.path.join(out_dir, f"bootstrap_summary_{network}.txt")
+    with open(path, "w", encoding="utf-8") as f:
+        for ln in lines:
+            f.write(ln.rstrip() + "\n")
+
+if __name__ == "__main__":
+    # keep original CLI, then call main()
+    main()
