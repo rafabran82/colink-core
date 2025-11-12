@@ -1,83 +1,104 @@
 ﻿param(
-  [Parameter(Mandatory=$true)] [string]$IndexPath,
-  [Parameter(Mandatory=$true)] [string]$SummaryJson,
-  [string]$DeltaJson = $(Join-Path (Split-Path $PSScriptRoot -Parent) ".artifacts\metrics\delta.json")
+  [string]$IndexPath   = ".artifacts\index.html",
+  [string]$SummaryJson = ".artifacts\metrics\summary.json",
+  [string]$SummaryCsv  = ".artifacts\metrics\summary.csv"
 )
 
-function Get-Prop {
-  param([object]$Obj, [string]$Name)
-  if (-not $Obj) { return $null }
-  if ($Obj -is [hashtable]) { if ($Obj.ContainsKey($Name)) { return $Obj[$Name] } else { return $null } }
-  $p = $Obj.PSObject.Properties[$Name]
-  if ($p) { return $p.Value } else { return $null }
+# --- Helpers: field-safe escaping (HTML + attribute safe) ---
+function Escape-HTML {
+  param([string]$s)
+  if ($null -eq $s) { return "" }
+  $s = $s -replace '&','&amp;'
+  $s = $s -replace '<','&lt;'
+  $s = $s -replace '>','&gt;'
+  $s = $s -replace '"','&quot;'
+  $s = $s -replace "'","&#39;"
+  return $s
 }
 
-function Get-LatestSummaryRow {
-  param([string]$JsonPath, [string]$CsvPath)
-
-  if (Test-Path $JsonPath -ErrorAction SilentlyContinue) {
-    $len = (Get-Item $JsonPath).Length
-    if ($len -gt 10) {
-      try {
-        $data = Get-Content $JsonPath -Raw | ConvertFrom-Json -ErrorAction Stop
-        if ($data -is [System.Array]) { if ($data.Count -gt 0) { return $data[-1] } }
-        elseif ($data) { return $data }
-      } catch { Write-Verbose "JSON parse failed: $($_.Exception.Message)" }
-    }
+# --- Load summary: prefer JSON, fallback to CSV (last row) ---
+$summary = $null
+if (Test-Path $SummaryJson) {
+  try {
+    $summary = Get-Content $SummaryJson -Raw | ConvertFrom-Json -ErrorAction Stop
+  } catch {
+    Write-Warning ("Failed to parse JSON summary at {0}: {1}" -f $SummaryJson, ($_.Exception.Message))
   }
-
-  if (Test-Path $CsvPath -ErrorAction SilentlyContinue) {
-    try {
-      $rows = Import-Csv $CsvPath
-      if ($rows -and $rows.Count -gt 0) { return $rows[-1] }
-    } catch { Write-Verbose "CSV import failed: $($_.Exception.Message)" }
+}
+if (-not $summary -and (Test-Path $SummaryCsv)) {
+  try {
+    $rows = Import-Csv $SummaryCsv -ErrorAction Stop
+    if ($rows -and $rows.Count -ge 1) { $summary = $rows[-1] }
+  } catch {
+    Write-Warning ("Failed to parse CSV summary at {0}: {1}" -f $SummaryCsv, ($_.Exception.Message))
   }
-  return $null
 }
 
-$repoRoot   = Split-Path $PSScriptRoot -Parent
-$summaryCsv = Join-Path $repoRoot ".artifacts\metrics\summary.csv"
-
-$row = Get-LatestSummaryRow -JsonPath $SummaryJson -CsvPath $summaryCsv
-if (-not $row) {
-  Write-Host "ℹ️  No summary data available after JSON+CSV fallback — leaving dashboard unchanged."
-  return
+if (-not $summary) {
+  Write-Warning "No metrics summary found (checked JSON then CSV). Skipping embed."
+  exit 0
 }
 
-$fields = @(
-  @{ Label = 'Run';         Name = 'run_id' },
-  @{ Label = 'TS';          Name = 'ts' },
-  @{ Label = 'Steps';       Name = 'steps' },
-  @{ Label = 'OK';          Name = 'success' },
-  @{ Label = 'Uptime(ms)';  Name = 'uptime_ms' },
-  @{ Label = 'Avg Lat(ms)'; Name = 'avg_latency_ms' },
-  @{ Label = 'P95(ms)';     Name = 'latency_ms_p95' },
-  @{ Label = 'P50(ms)';     Name = 'latency_ms_p50' },
-  @{ Label = 'Max(ms)';     Name = 'latency_ms_max' }
+# --- Build an ordered view of key fields (dynamic; schema-agnostic) ---
+$props = @{}
+$prefer = @(
+  'run_id','branch','sha',
+  'runs','success','fail','errors',
+  'duration_ms','duration_s',
+  'files','size_kb','size_mb',
+  'timestamp','when','tz'
 )
 
-$parts = New-Object System.Collections.Generic.List[string]
-foreach ($f in $fields) {
-  $v = Get-Prop -Obj $row -Name $f.Name
-  if ($null -ne $v -and "$v".Trim() -ne '') {
-    [void]$parts.Add(("{0}: {1}" -f $f.Label, $v))
-  }
+foreach ($k in $prefer) {
+  if ($summary.PSObject.Properties.Name -contains $k) { $props[$k] = $summary.$k }
 }
-if ($parts.Count -eq 0) { [void]$parts.Add("Latest metrics updated") }
+foreach ($p in $summary.PSObject.Properties) {
+  if ($props.ContainsKey($p.Name)) { continue }
+  if ($props.Count -ge 8) { break }
+  $props[$p.Name] = $p.Value
+}
 
-$badge = "<div id=""latest-metrics"" style=""font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin:6px 0;"">
-  <strong>Latest Run Metrics:</strong> <span>" + [string]::Join(" · ", $parts) + "</span>
-</div>"
+$kvSpans = @()
+foreach ($k in $props.Keys) {
+  $v = $props[$k]
+  if ($null -eq $v) { continue }
+  $vk = Escape-HTML ([string]$k)
+  $vv = Escape-HTML ([string]$v)
+  $kvSpans += "<span class='kv' style='padding:.15rem .45rem;border-radius:.6rem;background:#f8fafc;border:1px solid #e5e7eb'><b>$vk</b>: $vv</span>"
+}
 
-$begin = '<!-- METRICS-BEGIN -->'
-$end   = '<!-- METRICS-END -->'
-$html  = Get-Content $IndexPath -Raw
+if ($kvSpans.Count -eq 0) {
+  Write-Warning "Summary loaded but had no printable fields. Skipping embed."
+  exit 0
+}
+
+$badge = @"
+<div id='metrics-badge' style='display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;padding:.6rem .8rem;border-radius:1rem;border:1px solid #e5e7eb;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";font-size:.9rem;'>
+  <span class='dot' style='width:.6rem;height:.6rem;border-radius:9999px;background:#10b981;display:inline-block' title='Healthy'></span>
+  <span class='label' style='font-weight:600;margin-right:.1rem'>Latest CI</span>
+  $(($kvSpans -join "`n  "))
+</div>
+"@
+
+if (-not (Test-Path $IndexPath)) {
+  New-Item -ItemType File -Force -Path $IndexPath | Out-Null
+  Set-Content -Path $IndexPath -Encoding utf8 -Value "<!doctype html><meta charset='utf-8'><title>COLINK CI</title>`n<body></body>"
+}
+
+$html  = Get-Content $IndexPath -Raw -ErrorAction Stop
+$begin = '<!-- METRICS BADGE BEGIN -->'
+$end   = '<!-- METRICS BADGE END -->'
+$block = "$begin`r`n$badge`r`n$end"
 
 if ($html -match [regex]::Escape($begin) -and $html -match [regex]::Escape($end)) {
   $pattern = [regex]::Escape($begin) + '.*?' + [regex]::Escape($end)
-  $html = [regex]::Replace($html, $pattern, { param($m) "$begin`r`n$badge`r`n$end" }, 'Singleline')
+  $html = [regex]::Replace($html, $pattern, { param($m) $block }, 'Singleline')
 } else {
-  $html += "`r`n$begin`r`n$badge`r`n$end"
+  if ($html -notmatch '</body>') {
+    $html += "`r`n$block"
+  } else {
+    $html = $html -replace '</body>', "$block`r`n</body>"
+  }
 }
 
 Set-Content -Path $IndexPath -Encoding utf8 -Value $html
