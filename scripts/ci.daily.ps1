@@ -444,10 +444,18 @@ Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded
 
 
 
-& "$PSScriptRoot\ci.embed-latest.ps1" -Quiet
+# --- Open dashboard once (absolute path from repo root) ---
+$repoRoot = Split-Path $PSScriptRoot -Parent
+$index    = Join-Path $repoRoot ".artifacts\index.html"
+if (Test-Path $index) {
+  Start-Process $index
+  Write-Host "🌐 Dashboard opened: $index"
+} else {
+  Write-Warning "Dashboard not found: $index"
+}
 
 
-
+& "`$PSScriptRoot\ci.embed-latest.ps1" -Quiet
 # --- Open dashboard once (absolute path from repo root) ---
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $index    = Join-Path $repoRoot ".artifacts\index.html"
