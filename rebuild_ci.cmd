@@ -1,4 +1,5 @@
 @echo off
+@echo off
 setlocal
 pushd %~dp0
 REM Only call the PS rebuild if it exists; otherwise exit 0 quietly

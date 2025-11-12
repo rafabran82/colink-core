@@ -85,7 +85,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
@@ -119,7 +118,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
@@ -180,7 +178,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
@@ -214,7 +211,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
@@ -307,7 +303,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
@@ -341,7 +336,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
@@ -402,7 +396,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"
 # --- Open dashboard after maintenance ---
@@ -436,7 +429,6 @@ $indexPath   = Join-Path $repoRoot ".artifacts\index.html"
 $summaryJson = Join-Path $repoRoot ".artifacts\metrics\summary.json"
 $deltaJson   = Join-Path $repoRoot ".artifacts\metrics\delta.json"
 
-& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
 
@@ -448,6 +440,7 @@ Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded
 }& (Join-Path $scriptDir "ci.embed-latest.ps1") -IndexPath $indexPath -SummaryJson $summaryJson -DeltaJson $deltaJson
 
 Write-Host "✅ Embedded latest metrics into $indexPath"Write-Host "✅ Embedded latest metrics into $indexPath"
+
 
 
 

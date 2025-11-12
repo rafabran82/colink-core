@@ -1,4 +1,5 @@
 @echo off
+@echo off
 REM Launch PowerShell hook (prefer pwsh, fallback to Windows PowerShell)
 where pwsh >NUL 2>&1
 IF %ERRORLEVEL%==0 (
