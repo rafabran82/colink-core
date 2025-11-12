@@ -97,7 +97,7 @@ def main(argv: list[str] | None = None) -> int:
         lp_wallet = Wallet.create()
         wallets["lp"] = { "address": lp_wallet.classic_address, "seed": lp_wallet.seed, "public": lp_wallet.public_key, "private": lp_wallet.private_key }
         _append_tx_note(txlog_path, "created LP wallet")
-_write_json(out_dir / "wallets.json", wallets)
+    _write_json(out_dir / "wallets.json", wallets)
 
     # --- XRPL Trustline Setup (COPX) ---
     from xrpl.models.transactions import TrustSet
@@ -224,6 +224,7 @@ _write_json(out_dir / "wallets.json", wallets)
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
