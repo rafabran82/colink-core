@@ -119,4 +119,5 @@ def _append_tx_note(txlog_path, note):
 
 
 
+`r`nprint(">>> DEBUG: running file:", __file__)
 
