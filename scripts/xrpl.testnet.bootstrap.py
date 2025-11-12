@@ -86,17 +86,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if wallets.get("issuer") is None:
         issuer_wallet = Wallet.create()
-        wallets["issuer"] = issuer_wallet.to_dict()
+        wallets["issuer"] = { "address": issuer_wallet.classic_address, "seed": issuer_wallet.seed, "public": issuer_wallet.public_key, "private": issuer_wallet.private_key }
         _append_tx_note(txlog_path, "created issuer wallet")
 
     if wallets.get("user") is None:
         user_wallet = Wallet.create()
-        wallets["user"] = user_wallet.to_dict()
+        wallets["user"] = { "address": user_wallet.classic_address, "seed": user_wallet.seed, "public": user_wallet.public_key, "private": user_wallet.private_key }
         _append_tx_note(txlog_path, "created user wallet")
 
     if wallets.get("lp") is None:
         lp_wallet = Wallet.create()
-        wallets["lp"] = lp_wallet.to_dict()
+        wallets["lp"] = { "address": lp_wallet.classic_address, "seed": lp_wallet.seed, "public": lp_wallet.public_key, "private": lp_wallet.private_key }
         _append_tx_note(txlog_path, "created LP wallet")
 
     _write_json(out_dir / "wallets.json", wallets)
@@ -189,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
