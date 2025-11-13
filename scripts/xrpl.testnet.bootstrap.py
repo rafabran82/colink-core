@@ -97,7 +97,6 @@ def main():
         issuer = wallets["issuer"]["address"]
         limit_value = "1000000"
 
-         -------------------------------------------------------
 
 # --- # --- FUNDING MODULE START ---
 
