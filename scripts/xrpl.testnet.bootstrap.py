@@ -129,8 +129,8 @@ def fund_if_needed(label, w):
 
 # --- # --- FUNDING MODULE END ---
 def ensure_trustline(wallet_record, label):
-            w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
-            tx = TrustSet(
+    w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
+    tx = TrustSet(
                 account=w.classic_address,
                 limit_amount={
                     "currency": "COPX",
@@ -138,12 +138,12 @@ def ensure_trustline(wallet_record, label):
                     "value": limit_value,
                 },
             )
-            signed = safe_sign_and_autofill_transaction(tx, w, client)
-            send_reliable_submission(signed, client)
-            _append_tx_note(txlog_path, f"created trustline for {label}")
+    signed = safe_sign_and_autofill_transaction(tx, w, client)
+    send_reliable_submission(signed, client)
+    _append_tx_note(txlog_path, f"created trustline for {label}")
 
-        ensure_trustline(wallets["user"], "user")
-        ensure_trustline(wallets["lp"], "lp")
+    ensure_trustline(wallets["user"], "user")
+    ensure_trustline(wallets["lp"], "lp")
 
         _write_json(out_dir / "trustlines.json", ["user", "lp"])
         _append_tx_note(txlog_path, "trustlines finished")
@@ -153,5 +153,6 @@ def ensure_trustline(wallet_record, label):
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
