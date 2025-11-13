@@ -99,7 +99,7 @@ def main():
 
          -------------------------------------------------------
 
-# --- FUNDING MODULE START -----------------------------------------------------
+# --- # --- FUNDING MODULE START ---
 
 import time
 import httpx
@@ -128,7 +128,7 @@ def fund_if_needed(label, w):
     print(f"[fund] faucet OK → waiting 5 seconds...")
     time.sleep(5)
 
-# --- FUNDING MODULE END -------------------------------------------------------
+# --- # --- FUNDING MODULE END ---
 def ensure_trustline(wallet_record, label):
             w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
             tx = TrustSet(
