@@ -163,7 +163,7 @@ def create_trustline(
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, wallet)
-    result = reliable_submission(signed, client)
+    result = submit_and_wait(signed, client)
     # Try to extract a hash; fall back if not present
     result_dict = getattr(result, "result", {})
     tx_json = result_dict.get("tx_json", {})
@@ -360,6 +360,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
