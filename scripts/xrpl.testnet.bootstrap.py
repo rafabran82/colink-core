@@ -17,7 +17,7 @@ from pathlib import Path
 from xrpl.clients import JsonRpcClient
 from xrpl.models.transactions import TrustSet
 from xrpl.wallet import Wallet
-from xrpl.transaction import sign, autofill, reliable_submission
+from xrpl.transaction import sign, autofill, send_reliable_submission
 from xrpl.models.requests import AccountInfo, AccountLines
 
 # -----------------------------------
@@ -72,7 +72,7 @@ def create_trustline(client, wallet: Wallet, issuer: str):
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, wallet)
-    result = reliable_submission(signed, client)
+    result = send_reliable_submission(signed, client)
 
     print(f"[trustline] OK: {result}")
 
@@ -181,4 +181,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
