@@ -145,7 +145,7 @@ def ensure_trustline(wallet_record, label):
     ensure_trustline(wallets["user"], "user")
     ensure_trustline(wallets["lp"], "lp")
 
-        _write_json(out_dir / "trustlines.json", ["user", "lp"])
+    _write_json(out_dir / "trustlines.json", ["user", "lp"])
         _append_tx_note(txlog_path, "trustlines finished")
 
     _append_tx_note(txlog_path, "bootstrap finished")
@@ -153,6 +153,7 @@ def ensure_trustline(wallet_record, label):
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
