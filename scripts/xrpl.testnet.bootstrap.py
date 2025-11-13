@@ -102,7 +102,7 @@ def main():
         limit_value = "1000000"
 
         def ensure_trustline(wallet_record, label):
-            w = Wallet(seed=wallet_record["seed"])
+            w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
             tx = TrustSet(
                 account=w.classic_address,
                 limit_amount={
@@ -127,5 +127,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
