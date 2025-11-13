@@ -34,7 +34,7 @@ from xrpl.transaction import autofill, sign, reliable_submission
 from xrpl.wallet import Wallet
 
 # 160-bit HEX currency code for COPX (ASCII "COPX" + padding)
-COPX_HEX = "434f505800000000000000000000000000000000"
+COPX_HEX = "CPX"
 
 
 # -----------------------------------
@@ -360,4 +360,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
