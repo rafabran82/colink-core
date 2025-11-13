@@ -24,17 +24,36 @@ import json
 import os
 import sys
 import time
+from decimal import Decimal
 from pathlib import Path
 
 import httpx
 from xrpl.clients import JsonRpcClient
-from xrpl.models.requests import AccountInfo, AccountLines
-from xrpl.models.transactions import TrustSet
+from xrpl.models.requests import AccountInfo, AccountLines, BookOffers
+from xrpl.models.transactions import TrustSet, Payment, OfferCreate
+from xrpl.models.amounts import IssuedCurrencyAmount
 from xrpl.transaction import autofill, sign, submit_and_wait
 from xrpl.wallet import Wallet
 
 # 160-bit HEX currency code for COPX (ASCII "COPX" + padding)
 COPX_HEX = "CPX"
+
+# --- COL token + COPX<->COL pool config ------------------------------
+
+# Human-readable COL token code (standard 3–4 char issuer token)
+COL_CODE = "COL"
+
+# Initial COL distribution (issued by issuer to LP + user)
+COL_LP_ISSUE_AMOUNT = "500000"   # 500k COL for liquidity provider
+COL_USER_ISSUE_AMOUNT = "10000"   # small COL balance for user testing
+
+# LP pool seeding for the COPX<->COL DEX offers
+# Idea: 1 COL ~ 10 COPX (arbitrary test rate for simulations)
+COPX_LP_SELL_AMOUNT = "100000"    # LP sells 100k COPX for COL
+COL_LP_BUY_AMOUNT   = "10000"     # ... wants 10k COL in return
+
+COL_LP_SELL_AMOUNT  = "10000"     # LP sells 10k COL for COPX
+COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
 
 
 # -----------------------------------
@@ -124,6 +143,135 @@ def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr:
 
 
 # -----------------------------------
+# COL issuance helpers
+def issue_col_to_wallet(
+    client: JsonRpcClient,
+    issuer_wallet: Wallet,
+    dest_wallet: Wallet,
+    amount: str,
+    verbose: bool = False,
+) -> str:
+    """
+    Send COL_CODE issued by issuer_wallet to dest_wallet.
+
+    Creates an IOU Payment from the issuer to the destination using
+    IssuedCurrencyAmount. Assumes the destination already has a COL trustline.
+    """
+    tx = Payment(
+        account=issuer_wallet.classic_address,
+        destination=dest_wallet.classic_address,
+        amount=IssuedCurrencyAmount(
+            currency=COL_CODE,
+            issuer=issuer_wallet.classic_address,
+            value=amount,
+        ),
+    )
+    if verbose:
+        print(f"[col-issue] {amount} {COL_CODE} -> {dest_wallet.classic_address}")
+
+    tx_prepared = autofill(tx, client)
+    signed = sign(tx_prepared, issuer_wallet)
+    try:
+        result = submit_and_wait(signed, client)
+    except Exception as e:
+        if verbose:
+            print(f"[col-issue] ERROR during COL issue: {e}")
+        return ""
+
+    tx_result = (getattr(result, "result", None) or result)
+    tx_hash = None
+    if isinstance(tx_result, dict):
+        tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
+
+    if verbose:
+        print(f"[col-issue] submitted, hash={tx_hash or "N/A"}")
+
+    return tx_hash or ""
+
+
+def issue_copx_to_wallet(
+    client: JsonRpcClient,
+    issuer_wallet: Wallet,
+    dest_wallet: Wallet,
+    amount: str,
+    verbose: bool = False,
+) -> str:
+    """
+    Send COPX (COPX_HEX) issued by issuer_wallet to dest_wallet.
+
+    Assumes the destination already has a COPX trustline to the issuer.
+    """
+    tx = Payment(
+        account=issuer_wallet.classic_address,
+        destination=dest_wallet.classic_address,
+        amount=IssuedCurrencyAmount(
+            currency=COPX_HEX,
+            issuer=issuer_wallet.classic_address,
+            value=amount,
+        ),
+    )
+    if verbose:
+        print(f"[copx-issue] {amount} COPX -> {dest_wallet.classic_address}")
+
+    tx_prepared = autofill(tx, client)
+    signed = sign(tx_prepared, issuer_wallet)
+    try:
+        result = submit_and_wait(signed, client)
+    except Exception as e:
+        if verbose:
+            print(f"[copx-issue] ERROR during COPX issue: {e}")
+        return ""
+
+    tx_result = (getattr(result, "result", None) or result)
+    tx_hash = None
+    if isinstance(tx_result, dict):
+        tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
+
+    if verbose:
+        print(f"[copx-issue] submitted, hash={tx_hash}")
+
+    return tx_hash or ""
+
+def create_copx_col_offer(
+    client: JsonRpcClient,
+    lp_wallet: Wallet,
+    taker_gets: IssuedCurrencyAmount,
+    taker_pays: IssuedCurrencyAmount,
+    verbose: bool = False,
+) -> str:
+    """
+    Generic helper to create a COPX<->COL IOU offer from the LP wallet.
+
+    taker_gets: the amount the LP is offering to sell.
+    taker_pays: the amount the LP wants in return.
+    """
+    tx = OfferCreate(
+        account=lp_wallet.classic_address,
+        taker_gets=taker_gets,
+        taker_pays=taker_pays,
+    )
+    if verbose:
+        print(f"[dex-offer] submitting offer from {lp_wallet.classic_address}")
+
+    tx_prepared = autofill(tx, client)
+    signed = sign(tx_prepared, lp_wallet)
+    try:
+        result = submit_and_wait(signed, client)
+    except Exception as e:
+        if verbose:
+            print(f"[col-issue] ERROR during COL issue: {e}")
+        return ""
+
+    tx_result = (getattr(result, "result", None) or result)
+    tx_hash = None
+    if isinstance(tx_result, dict):
+        tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
+
+    if verbose:
+        print(f"[dex-offer] submitted, hash={tx_hash}")
+
+    return tx_hash or ""
+
 # Trustline helpers
 # -----------------------------------
 def has_trustline(client: JsonRpcClient, acct: str, issuer: str, currency_hex: str = COPX_HEX) -> bool:
@@ -163,7 +311,12 @@ def create_trustline(
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, wallet)
-    result = submit_and_wait(signed, client)
+    try:
+        result = submit_and_wait(signed, client)
+    except Exception as e:
+        if verbose:
+            print(f"[col-issue] ERROR during COL issue: {e}")
+        return ""
     # Try to extract a hash; fall back if not present
     result_dict = getattr(result, "result", {})
     tx_json = result_dict.get("tx_json", {})
@@ -171,6 +324,31 @@ def create_trustline(
     if verbose:
         print(f"[trustline] submitted, hash={tx_hash or 'N/A'}")
     return tx_hash
+
+
+# COL trustline helper (thin wrapper around create_trustline)
+def create_col_trustline(
+    client: JsonRpcClient,
+    wallet: Wallet,
+    issuer: str,
+    limit_value: str = "1000000",
+    verbose: bool = False,
+) -> str:
+    """
+    Create (or ensure) a COL trustline from the given wallet to the issuer.
+
+    This uses the existing generic create_trustline helper but passes COL_CODE
+    as the currency. Keeping this as a thin wrapper makes it easier to evolve
+    COL-specific behavior later without touching the COPX path.
+    """
+    return create_trustline(
+        client=client,
+        wallet=wallet,
+        issuer=issuer,
+        currency_hex=COL_CODE,
+        limit_value=limit_value,
+        verbose=verbose,
+    )
 
 
 # -----------------------------------
@@ -319,13 +497,234 @@ def main() -> int:
     issuer_addr = issuer_rec["address"]
 
     # Trustlines: user and lp to issuer for COPX_HEX
-    user_hash = create_trustline(client, user_w, issuer_addr, currency_hex=COPX_HEX, verbose=args.verbose)
-    append_tx_note(txlog_path, "trustline created (user -> issuer COPX_HEX)", tx_hash=user_hash or None)
+    user_hash = create_trustline(
+        client,
+        user_w,
+        issuer_addr,
+        currency_hex=COPX_HEX,
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        "trustline created (user -> issuer COPX_HEX)",
+        tx_hash=user_hash or None,
+    )
 
-    lp_hash = create_trustline(client, lp_w, issuer_addr, currency_hex=COPX_HEX, verbose=args.verbose)
-    append_tx_note(txlog_path, "trustline created (lp -> issuer COPX_HEX)", tx_hash=lp_hash or None)
+    lp_hash = create_trustline(
+        client,
+        lp_w,
+        issuer_addr,
+        currency_hex=COPX_HEX,
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        "trustline created (lp -> issuer COPX_HEX)",
+        tx_hash=lp_hash or None,
+    )
+
+    # Additional COL trustlines: user and lp to issuer for COL_CODE
+    col_user_hash = create_col_trustline(
+        client=client,
+        wallet=user_w,
+        issuer=issuer_addr,
+        limit_value="1000000",
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        "trustline created (user -> issuer COL_CODE)",
+        tx_hash=col_user_hash or None,
+    )
+
+    col_lp_hash = create_col_trustline(
+        client=client,
+        wallet=lp_w,
+        issuer=issuer_addr,
+        limit_value="1000000",
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        "trustline created (lp -> issuer COL_CODE)",
+        tx_hash=col_lp_hash or None,
+    )
+
+    # COL issuance: issuer -> user and lp
+    col_user_issue_hash = issue_col_to_wallet(
+        client=client,
+        issuer_wallet=issuer_w,
+        dest_wallet=user_w,
+        amount=COL_USER_ISSUE_AMOUNT,
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        f"COL issued to user ({COL_USER_ISSUE_AMOUNT})",
+        tx_hash=col_user_issue_hash or None,
+    )
+
+    col_lp_issue_hash = issue_col_to_wallet(
+        client=client,
+        issuer_wallet=issuer_w,
+        dest_wallet=lp_w,
+        amount=COL_LP_ISSUE_AMOUNT,
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        f"COL issued to lp ({COL_LP_ISSUE_AMOUNT})",
+        tx_hash=col_lp_issue_hash or None,
+    )
+
+    # COPX issuance: issuer -> lp (for second side of pool)
+    copx_lp_issue_hash = issue_copx_to_wallet(
+        client=client,
+        issuer_wallet=issuer_w,
+        dest_wallet=lp_w,
+        amount="100000",
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        "COPX issued to lp (100000)",
+        tx_hash=copx_lp_issue_hash or None,
+    )
+
+    # Seed COPX<->COL DEX: LP sells COL for COPX at ~10:1
+    dex_col_sells_hash = create_copx_col_offer(
+        client=client,
+        lp_wallet=lp_w,
+        taker_gets=IssuedCurrencyAmount(
+            currency=COL_CODE,
+            issuer=issuer_addr,
+            value=COL_LP_SELL_AMOUNT,
+        ),
+        taker_pays=IssuedCurrencyAmount(
+            currency=COPX_HEX,
+            issuer=issuer_addr,
+            value=COPX_LP_BUY_AMOUNT,
+        ),
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        f"DEX offer created (LP sells {COL_LP_SELL_AMOUNT} COL for {COPX_LP_BUY_AMOUNT} COPX)",
+        tx_hash=dex_col_sells_hash or None,
+    )
+
+    # Seed COPX<->COL DEX: LP sells COPX for COL at ~10:1
+    dex_copx_sells_hash = create_copx_col_offer(
+        client=client,
+        lp_wallet=lp_w,
+        taker_gets=IssuedCurrencyAmount(
+            currency=COPX_HEX,
+            issuer=issuer_addr,
+            value=COPX_LP_SELL_AMOUNT,
+        ),
+        taker_pays=IssuedCurrencyAmount(
+            currency=COL_CODE,
+            issuer=issuer_addr,
+            value=COL_LP_BUY_AMOUNT,
+        ),
+        verbose=args.verbose,
+    )
+    append_tx_note(
+        txlog_path,
+        f"DEX offer created (LP sells {COPX_LP_SELL_AMOUNT} COPX for {COL_LP_BUY_AMOUNT} COL)",
+        tx_hash=dex_copx_sells_hash or None,
+    )
 
     write_json(out_dir / "trustlines.json", {"currency_hex": COPX_HEX, "accounts": ["user", "lp"]})
+
+    # Optional: snapshot COPX<->COL orderbook after seeding LP offers
+    orderbook = inspect_copx_col_orderbook(
+        client=client,
+        issuer_addr=issuer_addr,
+        verbose=args.verbose,
+    )
+    write_json(out_dir / "orderbook_copx_col.json", orderbook)
+    append_tx_note(txlog_path, "orderbook snapshot captured (COPX<->COL)")
+
+    # Derive offer count for bridge state snapshot
+    offers = []
+    if isinstance(orderbook, dict):
+        offers = orderbook.get("offers", []) or []
+
+    # Simulate a small COL->COPX bridge payment (user self-payment)
+    bridge_hash = simulate_col_to_copx_payment(
+        client=client,
+        user_wallet=user_w,
+        issuer_addr=issuer_addr,
+        amount_copx="1000",
+        max_col_spend="2000",
+        verbose=args.verbose,
+    )
+    bridge_status = "ok" if bridge_hash else "error_or_no_path"
+    append_tx_note(
+        txlog_path,
+        "bridge payment simulated (COL->COPX, user self-payment, 1000 COPX)",
+        tx_hash=bridge_hash or None,
+    )
+
+    bridge_state = {
+        "network": args.network,
+        "issuer": issuer_addr,
+        "user": user_rec["address"],
+        "lp": lp_rec["address"],
+        "copx_hex": COPX_HEX,
+        "col_code": COL_CODE,
+        "orderbook_offers": len(offers),
+        "bridge_status": bridge_status,
+        "bridge_tx_hash": bridge_hash or None,
+    }
+    write_json(out_dir / "bridge_state.json", bridge_state)
+    append_tx_note(txlog_path, "bridge state snapshot written")
+
+    # Snapshot COPX/COL balances (user + LP) for simulation
+    def _snapshot_addr(addr: str) -> dict:
+        info = client.request(
+            AccountInfo(
+                account=addr,
+                ledger_index="validated",
+                strict=True,
+            )
+        ).result
+        xrp_drops = (info.get("account_data") or {}).get("Balance")
+        xrp = None
+        if xrp_drops is not None:
+            try:
+                xrp = str(Decimal(xrp_drops) / Decimal("1000000"))
+            except Exception:
+                xrp = xrp_drops
+
+        lines_resp = client.request(AccountLines(account=addr)).result
+        lines = lines_resp.get("lines", [])
+        ious = []
+        for line in lines:
+            if line.get("account") == issuer_addr and line.get("currency") in (COPX_HEX, COL_CODE):
+                ious.append(
+                    {
+                        "currency": line.get("currency"),
+                        "balance": line.get("balance"),
+                        "limit": line.get("limit"),
+                    }
+                )
+        return {"xrp": xrp, "ious": ious}
+
+    balances = {
+        "issuer": {"address": issuer_addr},
+        "user": {
+            "address": user_rec["address"],
+            **_snapshot_addr(user_rec["address"]),
+        },
+        "lp": {
+            "address": lp_rec["address"],
+            **_snapshot_addr(lp_rec["address"]),
+        },
+    }
+    write_json(out_dir / "balances_copx_col.json", balances)
+    append_tx_note(txlog_path, "balances snapshot written (COPX/COL user+lp)")
 
     # Final result + human summary
     result = {
@@ -351,6 +750,11 @@ def main() -> int:
         "",
         f"User trustline tx: {user_hash or 'N/A'}",
         f"LP trustline tx:   {lp_hash or 'N/A'}",
+        "",
+        "Artifacts:",
+        " - orderbook: orderbook_copx_col.json",
+        " - bridge state: bridge_state.json",
+        " - balances: balances_copx_col.json",
     ]
     human_path.write_text("\n".join(summary_lines), encoding="utf-8")
 
@@ -358,8 +762,101 @@ def main() -> int:
     return 0
 
 
+def inspect_copx_col_orderbook(
+    client: JsonRpcClient,
+    issuer_addr: str,
+    verbose: bool = False,
+) -> dict:
+    """
+    Inspect the COPX<->COL orderbook (COPX -> COL side) for this issuer.
+    Returns the raw result dict from the BookOffers request.
+    """
+    req = BookOffers(
+        taker_gets={
+            "currency": COPX_HEX,
+            "issuer": issuer_addr,
+        },
+        taker_pays={
+            "currency": COL_CODE,
+            "issuer": issuer_addr,
+        },
+        limit=20,
+    )
+    resp = client.request(req)
+    result = getattr(resp, "result", None) or resp
+    offers = []
+    if isinstance(result, dict):
+        offers = result.get("offers", [])
+    if verbose:
+        print(f"[orderbook] COPX->COL offers: {len(offers)}")
+    return result if isinstance(result, dict) else {"offers": offers}
+
+
+def simulate_col_to_copx_payment(
+    client: JsonRpcClient,
+    user_wallet: Wallet,
+    issuer_addr: str,
+    amount_copx: str = "1000",
+    max_col_spend: str = "200",
+    verbose: bool = False,
+) -> str:
+    """
+    Simulate a COL -> COPX bridge payment:
+    - Source: user_wallet (pays in COL_CODE).
+    - Destination: user_wallet (self-payment, receives COPX_HEX).
+    - amount_copx: how much COPX the destination should receive.
+    - max_col_spend: max COL the user is willing to spend.
+    """
+    tx = Payment(
+        account=user_wallet.classic_address,
+        destination=user_wallet.classic_address,
+        amount=IssuedCurrencyAmount(
+            currency=COPX_HEX,
+            issuer=issuer_addr,
+            value=amount_copx,
+        ),
+        send_max=IssuedCurrencyAmount(
+            currency=COL_CODE,
+            issuer=issuer_addr,
+            value=max_col_spend,
+        ),
+    )
+    if verbose:
+        print(
+            "[bridge] user "
+            f"{user_wallet.classic_address} pays up to {max_col_spend} {COL_CODE} "
+            f"to deliver {amount_copx} {COPX_HEX} to {issuer_addr}"
+        )
+
+    tx_prepared = autofill(tx, client)
+    signed = sign(tx_prepared, user_wallet)
+    try:
+        result = submit_and_wait(signed, client)
+    except Exception as e:
+        if verbose:
+            print(f"[bridge] ERROR during COL->COPX payment: {e}")
+        return ""
+
+    tx_result = (getattr(result, "result", None) or result)
+    tx_hash = None
+    if isinstance(tx_result, dict):
+        tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
+
+    if verbose:
+        print(f"[bridge] submitted COL->COPX payment, hash={tx_hash}")
+
+    return tx_hash or ""
+
+
 if __name__ == "__main__":
     sys.exit(main())
+
+
+
+
+
+
+
 
 
 
