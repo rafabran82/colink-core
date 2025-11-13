@@ -30,7 +30,7 @@ import httpx
 from xrpl.clients import JsonRpcClient
 from xrpl.models.requests import AccountInfo, AccountLines
 from xrpl.models.transactions import TrustSet
-from xrpl.transaction import autofill, sign, reliable_submission
+from xrpl.transaction import autofill, sign, submit_and_wait
 from xrpl.wallet import Wallet
 
 # 160-bit HEX currency code for COPX (ASCII "COPX" + padding)
@@ -360,5 +360,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
