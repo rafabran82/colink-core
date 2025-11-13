@@ -12,7 +12,6 @@ from xrpl.wallet import Wallet
 
 from xrpl_compat import safe_sign_and_autofill_transaction, send_reliable_submission
 
-
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--network", default="testnet", help="Network: testnet or devnet")
@@ -22,10 +21,8 @@ def parse_args():
     p.add_argument("--verbose", action="store_true", help="Verbose output")
     return p.parse_args()
 
-
 def _write_json(path_obj: Path, obj):
     path_obj.write_text(json.dumps(obj, indent=2))
-
 
 def _append_tx_note(txlog_path: Path, note: str):
     txlog_path.parent.mkdir(parents=True, exist_ok=True)
@@ -33,7 +30,6 @@ def _append_tx_note(txlog_path: Path, note: str):
     entry = {"ts": ts, "note": note}
     with txlog_path.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(entry) + "\n")
-
 
 def main():
     args = parse_args()
@@ -101,22 +97,21 @@ def main():
         issuer = wallets["issuer"]["address"]
         limit_value = "1000000"
 
-        # --- FUNDING MODULE START -----------------------------------------------------
+         -------------------------------------------------------
+
+# --- FUNDING MODULE START -----------------------------------------------------
 
 import time
+import httpx
 
 def fund_if_needed(label, w):
     print(f"[fund] checking {label} ({w['address']})")
-    url = "https://faucet.altnet.rippletest.net/accounts"
+    faucet_url = "https://faucet.altnet.rippletest.net/accounts"
 
-    # Check if account exists
+    # Check if account already exists
     try:
         from xrpl.models.requests import AccountInfo
-        req = AccountInfo(
-            account=w["address"],
-            ledger_index="current",
-            strict=True
-        )
+        req = AccountInfo(account=w["address"], ledger_index="current", strict=True)
         resp = client.request(req)
         if resp.is_successful():
             print(f"[fund] {label} already exists on-ledger")
@@ -125,8 +120,7 @@ def fund_if_needed(label, w):
         pass
 
     print(f"[fund] requesting faucet for {label}...")
-    import httpx
-    r = httpx.post(url, json={"destination": w["address"]})
+    r = httpx.post(faucet_url, json={"destination": w["address"]})
     if r.status_code != 200:
         print(f"[fund] faucet ERROR for {label}: {r.text}")
         return
@@ -135,7 +129,6 @@ def fund_if_needed(label, w):
     time.sleep(5)
 
 # --- FUNDING MODULE END -------------------------------------------------------
-
 def ensure_trustline(wallet_record, label):
             w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
             tx = TrustSet(
@@ -159,11 +152,7 @@ def ensure_trustline(wallet_record, label):
     _append_tx_note(txlog_path, "bootstrap finished")
     return 0
 
-
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
 
 
