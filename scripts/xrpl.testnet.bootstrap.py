@@ -1,160 +1,183 @@
 ﻿#!/usr/bin/env python3
-import argparse
-import json
-import logging
+"""
+XRPL Testnet Bootstrap - Simple Stable Edition (Phase 4 MVP)
+- Creates issuer, user, lp wallets
+- Funds them via Testnet faucet
+- Creates COPX trustlines
+- Outputs artifacts into --out directory
+"""
+
 import sys
+import json
 import time
+import argparse
+import httpx
 from pathlib import Path
 
 from xrpl.clients import JsonRpcClient
-from xrpl.models.requests import AccountInfo
+from xrpl.models.transactions import TrustSet
 from xrpl.wallet import Wallet
+from xrpl.transaction import sign, autofill, reliable_submission
+from xrpl.models.requests import AccountInfo, AccountLines
 
-from xrpl_compat import safe_sign_and_autofill_transaction, send_reliable_submission
+# -----------------------------------
+# Utility: read/write JSON with no BS
+# -----------------------------------
+def write_json(path: Path, obj):
+    path.write_text(json.dumps(obj, indent=2))
 
-def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument("--network", default="testnet", help="Network: testnet or devnet")
-    p.add_argument("--out", required=True, help="Directory to write bootstrap artifacts")
-    p.add_argument("--execute", action="store_true", help="Actually submit transactions")
-    p.add_argument("--trustlines-only", action="store_true", help="Only trustline step")
-    p.add_argument("--verbose", action="store_true", help="Verbose output")
-    return p.parse_args()
 
-def _write_json(path_obj: Path, obj):
-    path_obj.write_text(json.dumps(obj, indent=2))
+# --------------------------
+# Faucet funding for Testnet
+# --------------------------
+def fund_wallet(addr: str):
+    faucet = "https://faucet.altnet.rippletest.net/accounts"
+    print(f"[fund] requesting funds for: {addr}")
 
-def _append_tx_note(txlog_path: Path, note: str):
-    txlog_path.parent.mkdir(parents=True, exist_ok=True)
-    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    entry = {"ts": ts, "note": note}
-    with txlog_path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(entry) + "\n")
+    r = httpx.post(faucet, json={"destination": addr}, timeout=20)
+    if r.status_code != 200:
+        raise RuntimeError(f"Faucet error: {r.text}")
 
+    print(f"[fund] funded OK: {addr}")
+
+
+# --------------------------
+# Trustline check helper
+# --------------------------
+def has_trustline(client, acct, issuer, currency="COPX"):
+    req = AccountLines(account=acct)
+    resp = client.request(req).result
+    if "lines" not in resp:
+        return False
+    for line in resp["lines"]:
+        if line.get("currency") == currency and line.get("account") == issuer:
+            return True
+    return False
+
+
+# --------------------------
+# Create trustline for wallet
+# --------------------------
+def create_trustline(client, wallet: Wallet, issuer: str):
+    tx = TrustSet(
+        account=wallet.classic_address,
+        limit_amount={
+            "currency": "COPX",
+            "issuer": issuer,
+            "value": "1000000",
+        },
+    )
+
+    print(f"[trustline] creating for {wallet.classic_address}")
+
+    tx_prepared = autofill(tx, client)
+    signed = sign(tx_prepared, wallet)
+    result = reliable_submission(signed, client)
+
+    print(f"[trustline] OK: {result}")
+
+
+# --------------------------
+# Main bootstrap flow
+# --------------------------
 def main():
-    args = parse_args()
-
-    logging.basicConfig(level=logging.INFO if args.verbose else logging.WARNING)
-
-    endpoint = "https://s.altnet.rippletest.net:51234"
-    client = JsonRpcClient(endpoint)
+    p = argparse.ArgumentParser()
+    p.add_argument("--network", required=True, help="testnet or devnet")
+    p.add_argument("--out", required=True, help="output directory")
+    p.add_argument("--execute", action="store_true")
+    p.add_argument("--verbose", action="store_true")
+    args = p.parse_args()
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    txlog_path = out_dir / "tx_log.ndjson"
-    if not txlog_path.exists():
-        _append_tx_note(txlog_path, "bootstrap started")
+    # connect client
+    url = "https://s.altnet.rippletest.net:51234"
+    client = JsonRpcClient(url)
 
+    # Load or create wallets.json
     wallets_path = out_dir / "wallets.json"
     if wallets_path.exists():
         wallets = json.loads(wallets_path.read_text())
     else:
         wallets = {"issuer": None, "user": None, "lp": None}
 
-    # --- Create wallets ---
-    if wallets["issuer"] is None:
-        w = Wallet.create()
-        wallets["issuer"] = {
-            "address": w.classic_address,
-            "seed": w.seed,
-            "public": w.public_key,
-            "private": w.private_key,
-        }
-        _append_tx_note(txlog_path, "created issuer wallet")
+    # Create wallets if missing
+    changed = False
+    for label in ["issuer", "user", "lp"]:
+        if wallets[label] is None:
+            w = Wallet.create()
+            wallets[label] = {
+                "address": w.classic_address,
+                "seed": w.seed,
+                "public": w.public_key,
+                "private": w.private_key,
+            }
+            changed = True
+            print(f"[wallet] created {label}: {w.classic_address}")
 
-    if wallets["user"] is None:
-        w = Wallet.create()
-        wallets["user"] = {
-            "address": w.classic_address,
-            "seed": w.seed,
-            "public": w.public_key,
-            "private": w.private_key,
-        }
-        _append_tx_note(txlog_path, "created user wallet")
+    if changed:
+        write_json(wallets_path, wallets)
 
-    if wallets["lp"] is None:
-        w = Wallet.create()
-        wallets["lp"] = {
-            "address": w.classic_address,
-            "seed": w.seed,
-            "public": w.public_key,
-            "private": w.private_key,
-        }
-        _append_tx_note(txlog_path, "created LP wallet")
+    # Real wallet objects reconstructed
+    issuer_w = Wallet(
+        seed=wallets["issuer"]["seed"],
+        public_key=wallets["issuer"]["public"],
+        private_key=wallets["issuer"]["private"],
+    )
+    user_w = Wallet(
+        seed=wallets["user"]["seed"],
+        public_key=wallets["user"]["public"],
+        private_key=wallets["user"]["private"],
+    )
+    lp_w = Wallet(
+        seed=wallets["lp"]["seed"],
+        public_key=wallets["lp"]["public"],
+        private_key=wallets["lp"]["private"],
+    )
 
-    _write_json(wallets_path, wallets)
-
-    # If only creating wallets, exit here.
-    if args.trustlines_only:
-        _append_tx_note(txlog_path, "trustlines-only mode ended")
-        return 0
-
-    # --- Trustlines ---
+    # -----------------------------
+    # FUNDING (testnet faucet)
+    # -----------------------------
     if args.execute:
-        from xrpl.models.transactions import TrustSet
+        for w in [issuer_w, user_w, lp_w]:
+            try:
+                # check if exists
+                info = client.request(AccountInfo(account=w.classic_address))
+                if "account_data" in info.result:
+                    print(f"[fund] exists: {w.classic_address}")
+                    continue
+            except Exception:
+                pass
 
-        issuer = wallets["issuer"]["address"]
-        limit_value = "1000000"
+            # faucet fund
+            fund_wallet(w.classic_address)
+            time.sleep(3)
 
+    # -----------------------------
+    # TRUSTLINES
+    # -----------------------------
+    trust_path = out_dir / "trustlines.json"
+    trustlines = []
 
-# --- # --- FUNDING MODULE START ---
+    if args.execute:
+        issuer_addr = issuer_w.classic_address
 
-import time
-import httpx
+        # user trustline
+        if not has_trustline(client, user_w.classic_address, issuer_addr):
+            create_trustline(client, user_w, issuer_addr)
+            trustlines.append("user")
 
-def fund_if_needed(label, w):
-    print(f"[fund] checking {label} ({w['address']})")
-    faucet_url = "https://faucet.altnet.rippletest.net/accounts"
+        # lp trustline
+        if not has_trustline(client, lp_w.classic_address, issuer_addr):
+            create_trustline(client, lp_w, issuer_addr)
+            trustlines.append("lp")
 
-    # Check if account already exists
-    try:
-        from xrpl.models.requests import AccountInfo
-        req = AccountInfo(account=w["address"], ledger_index="current", strict=True)
-        resp = client.request(req)
-        if resp.is_successful():
-            print(f"[fund] {label} already exists on-ledger")
-            return
-    except Exception:
-        pass
+        write_json(trust_path, trustlines)
 
-    print(f"[fund] requesting faucet for {label}...")
-    r = httpx.post(faucet_url, json={"destination": w["address"]})
-    if r.status_code != 200:
-        print(f"[fund] faucet ERROR for {label}: {r.text}")
-        return
-
-    print(f"[fund] faucet OK → waiting 5 seconds...")
-    time.sleep(5)
-
-# --- # --- FUNDING MODULE END ---
-def ensure_trustline(wallet_record, label):
-    w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
-    tx = TrustSet(
-                account=w.classic_address,
-                limit_amount={
-                    "currency": "COPX",
-                    "issuer": issuer,
-                    "value": limit_value,
-                },
-            )
-    signed = safe_sign_and_autofill_transaction(tx, w, client)
-    send_reliable_submission(signed, client)
-    _append_tx_note(txlog_path, f"created trustline for {label}")
-
-    ensure_trustline(wallets["user"], "user")
-    ensure_trustline(wallets["lp"], "lp")
-
-    _write_json(out_dir / "trustlines.json", ["user", "lp"])
-        _append_tx_note(txlog_path, "trustlines finished")
-
-    _append_tx_note(txlog_path, "bootstrap finished")
+    print("[bootstrap] finished OK")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
-
-
