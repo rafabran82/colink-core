@@ -90,7 +90,7 @@ def main():
     _write_json(wallets_path, wallets)
 
     # If only creating wallets, exit here.
-    if args.trustlines-only:
+    if args.trustlines_only:
         _append_tx_note(txlog_path, "trustlines-only mode ended")
         return 0
 
@@ -127,3 +127,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
