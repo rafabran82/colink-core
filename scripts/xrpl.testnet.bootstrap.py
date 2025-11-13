@@ -44,7 +44,7 @@ def fund_wallet(addr: str):
 # --------------------------
 # Trustline check helper
 # --------------------------
-def has_trustline(client, acct, issuer, currency="COPX"):
+def has_trustline(client, acct, issuer, currency="434F505800000000000000000000000000000000"):
     req = AccountLines(account=acct)
     resp = client.request(req).result
     if "lines" not in resp:
@@ -62,7 +62,7 @@ def create_trustline(client, wallet: Wallet, issuer: str):
     tx = TrustSet(
         account=wallet.classic_address,
         limit_amount={
-            "currency": "COPX",
+            "currency": "434F505800000000000000000000000000000000",
             "issuer": issuer,
             "value": "1000000",
         },
@@ -181,3 +181,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
