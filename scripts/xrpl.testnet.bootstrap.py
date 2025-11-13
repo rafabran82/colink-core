@@ -101,7 +101,42 @@ def main():
         issuer = wallets["issuer"]["address"]
         limit_value = "1000000"
 
-        def ensure_trustline(wallet_record, label):
+        # --- FUNDING MODULE START -----------------------------------------------------
+
+import time
+
+def fund_if_needed(label, w):
+    print(f"[fund] checking {label} ({w['address']})")
+    url = "https://faucet.altnet.rippletest.net/accounts"
+
+    # Check if account exists
+    try:
+        from xrpl.models.requests import AccountInfo
+        req = AccountInfo(
+            account=w["address"],
+            ledger_index="current",
+            strict=True
+        )
+        resp = client.request(req)
+        if resp.is_successful():
+            print(f"[fund] {label} already exists on-ledger")
+            return
+    except Exception:
+        pass
+
+    print(f"[fund] requesting faucet for {label}...")
+    import httpx
+    r = httpx.post(url, json={"destination": w["address"]})
+    if r.status_code != 200:
+        print(f"[fund] faucet ERROR for {label}: {r.text}")
+        return
+
+    print(f"[fund] faucet OK → waiting 5 seconds...")
+    time.sleep(5)
+
+# --- FUNDING MODULE END -------------------------------------------------------
+
+def ensure_trustline(wallet_record, label):
             w = Wallet(seed=wallet_record["seed"], public_key=wallet_record["public"], private_key=wallet_record["private"])
             tx = TrustSet(
                 account=w.classic_address,
@@ -127,6 +162,7 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
