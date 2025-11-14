@@ -1,11 +1,13 @@
 ﻿import React, { useEffect, useState } from "react";
 import "./App.css";
+
 import PoolCard from "./components/PoolCard";
 import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
 
+// Correct imports:
 import { fetchPools } from "./api/pools";
-import { fetchSwapLogs, fetchSimMeta } from "./api/pools";
+import { fetchSimMeta, fetchSwapLogs } from "./api";   // <-- FIXED
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -15,6 +17,7 @@ function App() {
   });
 
   const isDark = theme === "dark";
+
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
   const [meta, setMeta] = useState(null);
@@ -31,7 +34,6 @@ function App() {
     else document.body.classList.remove("dark");
   }, [theme]);
 
-  // Load dashboard data
   useEffect(() => {
     let cancelled = false;
 
@@ -40,13 +42,13 @@ function App() {
         const [m, p, s] = await Promise.all([
           fetchSimMeta(),
           fetchPools(),
-          fetchSwapLogs(),
+          fetchSwapLogs()
         ]);
 
         if (!cancelled) {
           setMeta(m);
-          setPools(p);
-          setLogs(s);
+          setPools(p || []);
+          setLogs(s || []);
           setLoading(false);
         }
       } catch (err) {
@@ -59,19 +61,21 @@ function App() {
     return () => { cancelled = true; };
   }, []);
 
+  function toggleTheme() {
+    setTheme(prev => (prev === "light" ? "dark" : "light"));
+  }
+
   return (
     <div style={{ padding: "24px", minHeight: "100vh" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "16px",
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "16px"
+      }}>
         <SimMetaBar meta={meta} />
         <button
-          onClick={() => setTheme((prev) => (prev === "light" ? "dark" : "light"))}
+          onClick={toggleTheme}
           style={{
             padding: "6px 12px",
             borderRadius: "999px",
@@ -80,8 +84,7 @@ function App() {
             color: isDark ? "#f5f5f5" : "#222",
             cursor: "pointer",
             fontSize: "0.85rem",
-          }}
-        >
+          }}>
           {isDark ? "☀ Light mode" : "🌙 Dark mode"}
         </button>
       </div>
@@ -90,9 +93,9 @@ function App() {
 
       <section style={{ marginTop: "16px" }}>
         <h2>Pool State</h2>
-        {loading && pools.length === 0 && <p>Loading pool state…</p>}
-        {pools.length > 0 && pools.map((pool, i) => (
-          <PoolCard key={i} pool={pool} />
+        {loading && pools.length === 0 && <p>Loading pools…</p>}
+        {pools.map((p, i) => (
+          <PoolCard key={i} pool={p} />
         ))}
       </section>
 
@@ -106,4 +109,3 @@ function App() {
 }
 
 export default App;
-
