@@ -3,7 +3,7 @@ from colink_core.api.ws import ws_router
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import routers from top-level routes/ folder
-from routes import (
+from colink_core.api.routes import (
     sim,
     status,
     orderbook,
@@ -42,4 +42,5 @@ app.include_router(trade.router, prefix="/api")
 app.include_router(paper_admin.router, prefix="/api")
 app.include_router(paper_portfolio.router, prefix="/api")
 app.include_router(debug.router, prefix="/api")
+
 
