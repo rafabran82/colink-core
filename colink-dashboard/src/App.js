@@ -3,43 +3,32 @@ import "./App.css";
 import PoolCard from "./components/PoolCard";
 import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
+
 import { fetchPools } from "./api/pools";
 import { fetchSwapLogs, fetchSimMeta } from "./api";
 
 function App() {
-  // Theme with localStorage persistence
   const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") {
-      return "light";
-    }
+    if (typeof window === "undefined") return "light";
     const saved = window.localStorage.getItem("colink-theme");
-    if (saved === "dark" || saved === "light") {
-      return saved;
-    }
-    return "light";
+    return saved === "dark" || saved === "light" ? saved : "light";
   });
 
   const isDark = theme === "dark";
-
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Persist theme
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem("colink-theme", theme);
     }
   }, [theme]);
 
-  // Apply class to body for CSS theme
   useEffect(() => {
-    if (theme === "dark") {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
+    if (theme === "dark") document.body.classList.add("dark");
+    else document.body.classList.remove("dark");
   }, [theme]);
 
   // Load dashboard data
@@ -48,7 +37,7 @@ function App() {
 
     async function load() {
       try {
-        const [m, ps, s] = await Promise.all([
+        const [m, p, s] = await Promise.all([
           fetchSimMeta(),
           fetchPools(),
           fetchSwapLogs(),
@@ -56,7 +45,7 @@ function App() {
 
         if (!cancelled) {
           setMeta(m);
-          setPools(ps);
+          setPools(p);
           setLogs(s);
           setLoading(false);
         }
@@ -67,23 +56,11 @@ function App() {
     }
 
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  function toggleTheme() {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }
-
   return (
-    <div
-      style={{
-        padding: "24px",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Top bar: theme toggle + meta */}
+    <div style={{ padding: "24px", minHeight: "100vh" }}>
       <div
         style={{
           display: "flex",
@@ -93,9 +70,8 @@ function App() {
         }}
       >
         <SimMetaBar meta={meta} />
-
         <button
-          onClick={toggleTheme}
+          onClick={() => setTheme((prev) => (prev === "light" ? "dark" : "light"))}
           style={{
             padding: "6px 12px",
             borderRadius: "999px",
@@ -112,17 +88,14 @@ function App() {
 
       <h1>COLINK Dashboard</h1>
 
-      {/* Pool State Section */}
       <section style={{ marginTop: "16px" }}>
         <h2>Pool State</h2>
-        {loading && pools.length === 0 && <p>Loading pools…</p>}
-
-        {pools.map((pool, idx) => (
-          <PoolCard key={idx} pool={pool} />
+        {loading && pools.length === 0 && <p>Loading pool state…</p>}
+        {pools.length > 0 && pools.map((pool, i) => (
+          <PoolCard key={i} pool={pool} />
         ))}
       </section>
 
-      {/* Swap Logs Section */}
       <section style={{ marginTop: "24px" }}>
         <h2>Swap Logs</h2>
         {loading && logs.length === 0 && <p>Loading swap logs…</p>}
