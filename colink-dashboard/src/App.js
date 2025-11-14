@@ -1,17 +1,15 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import "./App.css";
+
+import { fetchPools } from "./api/pools";
+import { fetchSimMeta, fetchSwapLogs } from "./api";
 
 import PoolCard from "./components/PoolCard";
 import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
 
-// Correct imports:
-import { fetchPools } from "./api/pools";
-import { fetchSimMeta, fetchSwapLogs } from "./api";   // <-- FIXED
-
 function App() {
   const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") return "light";
     const saved = window.localStorage.getItem("colink-theme");
     return saved === "dark" || saved === "light" ? saved : "light";
   });
@@ -24,12 +22,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("colink-theme", theme);
-    }
-  }, [theme]);
-
-  useEffect(() => {
+    window.localStorage.setItem("colink-theme", theme);
     if (theme === "dark") document.body.classList.add("dark");
     else document.body.classList.remove("dark");
   }, [theme]);
@@ -39,16 +32,16 @@ function App() {
 
     async function load() {
       try {
-        const [m, p, s] = await Promise.all([
-          fetchSimMeta(),
+        const [poolList, swapLogs, simMeta] = await Promise.all([
           fetchPools(),
-          fetchSwapLogs()
+          fetchSwapLogs(),
+          fetchSimMeta(),
         ]);
 
         if (!cancelled) {
-          setMeta(m);
-          setPools(p || []);
-          setLogs(s || []);
+          setPools(poolList || []);
+          setLogs(swapLogs || []);
+          setMeta(simMeta || null);
           setLoading(false);
         }
       } catch (err) {
@@ -62,18 +55,21 @@ function App() {
   }, []);
 
   function toggleTheme() {
-    setTheme(prev => (prev === "light" ? "dark" : "light"));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }
 
   return (
     <div style={{ padding: "24px", minHeight: "100vh" }}>
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "16px"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "16px",
+        }}
+      >
         <SimMetaBar meta={meta} />
+
         <button
           onClick={toggleTheme}
           style={{
@@ -84,7 +80,8 @@ function App() {
             color: isDark ? "#f5f5f5" : "#222",
             cursor: "pointer",
             fontSize: "0.85rem",
-          }}>
+          }}
+        >
           {isDark ? "☀ Light mode" : "🌙 Dark mode"}
         </button>
       </div>
@@ -93,10 +90,15 @@ function App() {
 
       <section style={{ marginTop: "16px" }}>
         <h2>Pool State</h2>
-        {loading && pools.length === 0 && <p>Loading pools…</p>}
-        {pools.map((p, i) => (
-          <PoolCard key={i} pool={p} />
-        ))}
+
+        {loading && pools.length === 0 && <p>Loading pool state…</p>}
+
+        {(!loading && pools.length === 0) && (
+          <p>No pool data available.</p>
+        )}
+
+        {pools.length > 0 &&
+          pools.map((pool, i) => <PoolCard key={i} pool={pool} />)}
       </section>
 
       <section style={{ marginTop: "24px" }}>
