@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 from .xrpl_snapshot import load_bootstrap_snapshot
+from .amm import AMMPool, MetricsEngine, NDJSONLogger
 import argparse
 import json
 import math
@@ -47,6 +48,35 @@ def _demo_series(n: int = 240) -> list[tuple[int, float]]:
         y = baseline + val
         ts_ms = int((t0 + i * 0.05) * 1000)  # 20 Hz-ish
         series.append((ts_ms, y))
+    return series
+def _amm_series_demo(
+    n: int = 240,
+    fee_rate: float = 0.003,
+) -> list[tuple[int, float]]:
+    """
+    AMM-backed demo series.
+
+    Uses a simple COPX/COL pool and repeatedly applies swaps to
+    generate a time series of prices suitable for plotting.
+    """
+    pool = AMMPool("COPX", "COL", 1000.0, 7000.0, fee_rate)
+    series: list[tuple[int, float]] = []
+
+    t0 = time.time()
+    ts = t0
+
+    for i in range(n):
+        # Alternate directions for a bit of natural volatility
+        if i % 2 == 0:
+            pool.swap_a_to_b(50.0)
+        else:
+            pool.swap_b_to_a(30.0)
+
+        ts_ms = int(ts * 1000)
+        price = pool.price_a_to_b
+        series.append((ts_ms, price))
+        ts += 0.05  # ~20 Hz-ish
+
     return series
 
 def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
@@ -206,5 +236,7 @@ print("DEBUG: calling run_sim")
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
 
 
