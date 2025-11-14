@@ -7,7 +7,13 @@ def get_sim_meta():
     return {
         "timestamp": "2025-01-01T00:00:00Z",
         "engine": "demo",
-        "status": "ok"
+        "status": "ok",
+        "amm_demo": {
+            "prefix": ".artifacts/ci/amm_demo",
+            "png": ".artifacts/ci/amm_demo.png",
+            "ndjson": ".artifacts/ci/amm_demo.ndjson",
+            "json": ".artifacts/ci/amm_demo.json"
+        }
     }
 
 @router.get("/pools/state")
@@ -23,3 +29,4 @@ def get_swap_logs():
         {"pair": "COPX/COL", "amount_in": 1000, "amount_out": 7800, "timestamp": "2025-01-01T00:00:00Z"},
         {"pair": "COL/XRP", "amount_in": 15000, "amount_out": 270, "timestamp": "2025-01-01T00:05:00Z"}
     ]
+
