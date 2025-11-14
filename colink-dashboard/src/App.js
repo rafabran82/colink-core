@@ -32,14 +32,14 @@ function App() {
 
     async function load() {
       try {
-        const [poolList, swapLogs, simMeta] = await Promise.all([
+        console.log("🔵 fetchPools() starting"); const [poolList, swapLogs, simMeta] = await Promise.all([
           fetchPools(),
           fetchSwapLogs(),
           fetchSimMeta(),
         ]);
 
         if (!cancelled) {
-          setPools(poolList || []);
+          console.log("🟢 fetched pools:", poolList); setPools(poolList || []);
           setLogs(swapLogs || []);
           setMeta(simMeta || null);
           setLoading(false);
@@ -111,3 +111,4 @@ function App() {
 }
 
 export default App;
+
