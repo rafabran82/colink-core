@@ -1,43 +1,25 @@
 ﻿from fastapi import APIRouter
-from datetime import datetime
 
 router = APIRouter()
 
-# Temporary in-memory responses until sim/bridge wiring is complete
-
 @router.get("/sim/meta")
-async def get_sim_meta():
+def get_sim_meta():
     return {
-        "timestamp": datetime.utcnow().isoformat(),
-        "run_id": "local-dev",
-        "params": {
-            "note": "placeholder response from backend"
-        }
+        "timestamp": "2025-01-01T00:00:00Z",
+        "engine": "demo",
+        "status": "ok"
     }
 
-
 @router.get("/pools/state")
-async def get_pools_state():
+def get_pools_state():
     return [
-        {
-            "name": "COL/XRP",
-            "volume": 0,
-            "liquidity": 0
-        },
-        {
-            "name": "COPX/COL",
-            "volume": 0,
-            "liquidity": 0
-        }
+        {"pair": "COPX/COL", "reserve1": 1000, "reserve2": 7800},
+        {"pair": "COL/XRP", "reserve1": 15000, "reserve2": 270}
     ]
 
-
 @router.get("/swaps/recent")
-async def get_swaps_recent():
+def get_swap_logs():
     return [
-        {
-            "pair": "COL/XRP",
-            "amount": 0,
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        {"pair": "COPX/COL", "amount_in": 1000, "amount_out": 7800, "timestamp": "2025-01-01T00:00:00Z"},
+        {"pair": "COL/XRP", "amount_in": 15000, "amount_out": 270, "timestamp": "2025-01-01T00:05:00Z"}
     ]

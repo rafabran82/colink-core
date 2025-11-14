@@ -35,7 +35,8 @@ if ($pyFiles.Count -gt 0) {
     $ignoreNames = @(
         "__init__", "__main__", "conftest",
         "test_amm", "test_limits", "test_router",
-        "test_risk_guard", "test_api_sim"
+        "test_risk_guard", "test_api_sim",
+        "run"   # allow run + mvp/run etc. without screaming
     )
 
     $dups = $groups | Where-Object { $ignoreNames -notcontains $_.Name }
@@ -68,19 +69,26 @@ if (Test-Path $routeDir) {
 
     Get-ChildItem -Path $routeDir -Filter *.py -File | ForEach-Object {
         $file = $_
-        $content = Get-Content $file.FullName -Raw
 
-        # Match @router.get("/path"), @router.post("/path"), etc.
-        $pattern = '@router\.(get|post|put|patch|delete)\("([^"]+)"'
-        $matches = [System.Text.RegularExpressions.Regex]::Matches($content, $pattern)
+        # Read file safely (empty file => skip)
+        $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
+        if ([string]::IsNullOrWhiteSpace($content)) {
+            $rel = $file.FullName.Substring($repo.Length + 1)
+            Write-Host "ℹ️ Skipping empty or unreadable file: $rel" -ForegroundColor DarkGray
+        }
+        else {
+            # Match @router.get("/path"), @router.post("/path"), etc.
+            $pattern = '@router\.(get|post|put|patch|delete)\("([^"]+)"'
+            $matches = [System.Text.RegularExpressions.Regex]::Matches($content, $pattern)
 
-        foreach ($m in $matches) {
-            $method = $m.Groups[1].Value.ToUpperInvariant()
-            $path   = $m.Groups[2].Value
-            $routeDefs += [PSCustomObject]@{
-                Method = $method
-                Path   = $path
-                File   = $file.FullName.Substring($repo.Length + 1)
+            foreach ($m in $matches) {
+                $method = $m.Groups[1].Value.ToUpperInvariant()
+                $path   = $m.Groups[2].Value
+                $routeDefs += [PSCustomObject]@{
+                    Method = $method
+                    Path   = $path
+                    File   = $file.FullName.Substring($repo.Length + 1)
+                }
             }
         }
     }
