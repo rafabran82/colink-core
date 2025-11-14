@@ -1,14 +1,19 @@
 ﻿import React from "react";
 
 function PoolCard({ pool }) {
+  const bg = "var(--card-bg)";
+  const border = "var(--card-border)";
+  const muted = "var(--text-muted)";
+
   return (
     <div
       style={{
         marginTop: "8px",
         padding: "12px 16px",
-        border: "1px solid #dddddd",
+        border: `1px solid ${border}`,
         borderRadius: "8px",
         maxWidth: "420px",
+        backgroundColor: bg,
       }}
     >
       <div
@@ -19,7 +24,7 @@ function PoolCard({ pool }) {
         }}
       >
         <strong>{pool.label}</strong>
-        <span style={{ fontSize: "0.85rem", color: "#555" }}>
+        <span style={{ fontSize: "0.85rem", color: muted }}>
           Fee: {(pool.feeBps / 100).toFixed(2)}%
         </span>
       </div>
@@ -59,7 +64,7 @@ function PoolCard({ pool }) {
         <span>{pool.lpTokenSupply.toLocaleString()}</span>
       </div>
 
-      <div style={{ marginTop: "6px", fontSize: "0.8rem", color: "#777" }}>
+      <div style={{ marginTop: "6px", fontSize: "0.8rem", color: muted }}>
         Updated:{" "}
         {new Date(pool.lastUpdated).toLocaleTimeString(undefined, {
           hour: "2-digit",
