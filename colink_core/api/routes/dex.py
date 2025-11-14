@@ -13,7 +13,7 @@ class OfferBody(BaseModel):
     xrp: str
 
 
-@router.post("/offer")
+# DUPLICATE_DISABLED: @router.post("/offer")
 def post_offer(body: OfferBody):
     try:
         if not settings.TRADER_SEED or not settings.ISSUER_ADDRESS:
@@ -33,7 +33,7 @@ def post_offer(body: OfferBody):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/offers")
+# DUPLICATE_DISABLED: @router.get("/offers")
 def get_offers():
     try:
         if not settings.TRADER_SEED:
@@ -44,7 +44,7 @@ def get_offers():
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.delete("/offers/{seq}")
+# DUPLICATE_DISABLED: @router.delete("/offers/{seq}")
 def delete_offer(seq: int):
     try:
         if not settings.TRADER_SEED:
@@ -55,7 +55,7 @@ def delete_offer(seq: int):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/orderbook")
+# DUPLICATE_DISABLED: @router.get("/orderbook")
 def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
     try:
         if not settings.ISSUER_ADDRESS:
@@ -64,4 +64,5 @@ def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
         return orderbook_snapshot(c, settings.ISSUER_ADDRESS, settings.COL_CODE, limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+
 
