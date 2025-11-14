@@ -24,6 +24,7 @@ function App() {
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
   const [meta, setMeta] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Persist theme
@@ -123,6 +124,17 @@ function App() {
       </div>
 
       <h1>COLINK Dashboard</h1>
+      {lastUpdated && (
+        <p
+          style={{
+            marginTop: "4px",
+            fontSize: "0.8rem",
+            opacity: 0.7,
+          }}
+        >
+          Data as of {lastUpdated.toLocaleString()}
+        </p>
+      )}
 
       {/* Pool State Section */}
       <section style={{ marginTop: "16px" }}>
@@ -175,4 +187,5 @@ function App() {
 }
 
 export default App;
+
 
