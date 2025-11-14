@@ -1,41 +1,59 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+
 import { fetchSimMeta } from "./api/meta";
 import { fetchPools } from "./api/pools";
 import { fetchSwapLogs } from "./api/logs";
 
-// ---------------------------------------
-//  Helper: Compute newest timestamp
-// ---------------------------------------
+/* ---------------------------------------------
+   computeLatestTimestamp
+---------------------------------------------- */
 function computeLatestTimestamp(simMeta, pools, swaps) {
   const ts = [];
 
   if (simMeta?.lastUpdated) ts.push(new Date(simMeta.lastUpdated));
 
   if (Array.isArray(pools)) {
-    pools.forEach(p => {
+    pools.forEach((p) => {
       if (p.lastUpdated) ts.push(new Date(p.lastUpdated));
     });
   }
 
   if (Array.isArray(swaps)) {
-    swaps.forEach(s => {
+    swaps.forEach((s) => {
       const t = s.timestamp || s.executed_at;
       if (t) ts.push(new Date(t));
     });
   }
 
   if (ts.length === 0) return "N/A";
-
   const latest = ts.reduce((a, b) => (a > b ? a : b));
   return latest.toLocaleString();
 }
 
-// ---------------------------------------
-//  Main Component
-// ---------------------------------------
+/* ---------------------------------------------
+   markFlashes
+---------------------------------------------- */
+function markFlashes(oldArr, newArr, keyFn) {
+  const oldMap = Object.fromEntries((oldArr || []).map((o) => [keyFn(o), o]));
+
+  return (newArr || []).map((n) => {
+    const key = keyFn(n);
+    const old = oldMap[key];
+
+    if (!old) return { ...n, __flash: true };
+    if (JSON.stringify(old) !== JSON.stringify(n))
+      return { ...n, __flash: true };
+
+    return { ...n, __flash: false };
+  });
+}
+
+/* ---------------------------------------------
+   App
+---------------------------------------------- */
 function App() {
-  const [meta, setMeta] = useState({});
+  const [simMeta, setSimMeta] = useState({});
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
 
@@ -51,15 +69,13 @@ function App() {
         fetchSwapLogs(),
       ]);
 
-      setMeta(m || {});
-      setPools(p || []);
-      setLogs(l || []);
+      setSimMeta(m || {});
+      setPools((prev) => markFlashes(prev, p || [], (x) => x.label));
+      setLogs((prev) => markFlashes(prev, l || [], (x) => x.id));
     } catch (err) {
       console.error("Dashboard loadAll failed", err);
     }
   }
-
-  const globalTimestamp = computeLatestTimestamp(meta, pools, logs);
 
   return (
     <div
@@ -72,16 +88,22 @@ function App() {
       }}
     >
       <h1 className="app-title">COLINK Dashboard</h1>
-      <div className="global-status">Data as of: {globalTimestamp}</div>
 
-      {/* --- POOL STATE --- */}
+      {/* Global Status Line */}
+      <div className="global-status" style={{ marginBottom: "1rem" }}>
+        Data as of: {computeLatestTimestamp(simMeta, pools, logs)}
+      </div>
+
+      {/* Pool State */}
       <h2>Pool State</h2>
+
       {pools.length === 0 ? (
         <p>No pool data available.</p>
       ) : (
         pools.map((pool, idx) => (
           <div
             key={idx}
+            className={pool.__flash ? "flash" : ""}
             style={{
               border: "1px solid #333",
               borderRadius: "8px",
@@ -114,11 +136,19 @@ function App() {
         ))
       )}
 
-      {/* --- SWAP LOGS --- */}
+      {/* Swap Logs */}
       <h2>Swap Logs</h2>
+
       {logs.length === 0 ? (
-        <div style={{ padding: "1rem", background: "#111", borderRadius: "8px" }}>
+        <div
+          style={{
+            padding: "1rem",
+            background: "#111",
+            borderRadius: "8px",
+          }}
+        >
           <b>No swap logs yet</b>
+          <p>Run a simulation or on-ledger test swap to see recent activity.</p>
         </div>
       ) : (
         <table
@@ -143,7 +173,13 @@ function App() {
           </thead>
           <tbody>
             {logs.map((log, idx) => (
-              <tr key={idx} style={{ borderTop: "1px solid #333" }}>
+              <tr
+                key={idx}
+                className={log.__flash ? "flash" : ""}
+                style={{
+                  borderTop: "1px solid #333",
+                }}
+              >
                 <td>{log.id}</td>
                 <td>{log.pool}</td>
                 <td>{log.fromAsset}</td>
