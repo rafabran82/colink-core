@@ -1,17 +1,22 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useEffect, useState } from "react";
 import "./App.css";
-
-import { fetchPools } from "./api/pools";
-import { fetchSimMeta, fetchSwapLogs } from "./api";
-
 import PoolCard from "./components/PoolCard";
 import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
+import { fetchSimMeta, fetchSwapLogs } from "./api";
+import { fetchPools } from "./api/pools";
 
 function App() {
+  // Theme with localStorage persistence
   const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
     const saved = window.localStorage.getItem("colink-theme");
-    return saved === "dark" || saved === "light" ? saved : "light";
+    if (saved === "dark" || saved === "light") {
+      return saved;
+    }
+    return "light";
   });
 
   const isDark = theme === "dark";
@@ -21,45 +26,76 @@ function App() {
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Persist theme
   useEffect(() => {
-    window.localStorage.setItem("colink-theme", theme);
-    if (theme === "dark") document.body.classList.add("dark");
-    else document.body.classList.remove("dark");
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("colink-theme", theme);
+    }
   }, [theme]);
 
+  // Apply class to body for CSS theme (handled in index.css / App.css)
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (isDark) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [isDark]);
+
+  // Load dashboard data
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
-        console.log("🔵 fetchPools() starting"); const [poolList, swapLogs, simMeta] = await Promise.all([
+        console.log("fetchPools() starting");
+        const [poolList, swapLogs, simMeta] = await Promise.all([
           fetchPools(),
           fetchSwapLogs(),
           fetchSimMeta(),
         ]);
+        console.log("fetched pools:", poolList);
 
-        if (!cancelled) {
-          console.log("🟢 fetched pools:", poolList); setPools(poolList || []);
-          setLogs(swapLogs || []);
-          setMeta(simMeta || null);
-          setLoading(false);
+        if (cancelled) {
+          return;
         }
+
+        setPools(Array.isArray(poolList) ? poolList : []);
+        setLogs(Array.isArray(swapLogs) ? swapLogs : []);
+        setMeta(simMeta || null);
       } catch (err) {
         console.error("Dashboard load failed", err);
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setPools([]);
+          setLogs([]);
+          setMeta(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     load();
-    return (<div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>) => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function toggleTheme() {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }
 
-  return (<div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-    <div style={{ padding: "24px", minHeight: "100vh" }}>
+  return (
+    <div
+      style={{
+        padding: "24px",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Top bar: theme toggle + meta */}
       <div
         style={{
           display: "flex",
@@ -88,26 +124,30 @@ function App() {
 
       <h1>COLINK Dashboard</h1>
 
+      {/* Pool State Section */}
       <section style={{ marginTop: "16px" }}>
-                <h2>Pool State</h2>
+        <h2>Pool State</h2>
 
-        {/* Loading indicator */}
         {loading && pools.length === 0 && <p>Loading pool state…</p>}
 
-        {/* No pools */}
         {!loading && pools.length === 0 && (
           <p>No pool data available.</p>
         )}
 
-        {/* Render all pools */}
-        {!loading && pools.length > 0 && pools.map((p, i) => (
-          <PoolCard key={i} pool={p} />
-        ))}
+        {pools.length > 0 &&
+          pools.map((pool, i) => <PoolCard key={i} pool={pool} />)}
       </section>
 
+      {/* Swap Logs Section */}
       <section style={{ marginTop: "24px" }}>
         <h2>Swap Logs</h2>
+
         {loading && logs.length === 0 && <p>Loading swap logs…</p>}
+
+        {!loading && logs.length === 0 && (
+          <p>No swap logs yet.</p>
+        )}
+
         {logs.length > 0 && <SwapLogsTable logs={logs} />}
       </section>
     </div>
@@ -115,8 +155,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
