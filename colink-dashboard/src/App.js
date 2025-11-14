@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { fetchSimMeta } from "./api/meta";
 import { fetchPools } from "./api/pools";
@@ -92,11 +92,11 @@ function App() {
           >
             <h3>{pool.label}</h3>
             <p>
-              <b>Base:</b> {pool.baseSymbol} — Liquidity:{" "}
+              <b>Base:</b> {pool.baseSymbol} Ã¢â‚¬â€ Liquidity:{" "}
               {pool.baseLiquidity.toLocaleString()}
             </p>
             <p>
-              <b>Quote:</b> {pool.quoteSymbol} — Liquidity:{" "}
+              <b>Quote:</b> {pool.quoteSymbol} Ã¢â‚¬â€ Liquidity:{" "}
               {pool.quoteLiquidity.toLocaleString()}
             </p>
             <p>
