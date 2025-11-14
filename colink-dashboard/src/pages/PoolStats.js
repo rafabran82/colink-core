@@ -1,7 +1,8 @@
 ﻿import React, { useEffect, useState } from "react";
 import "../App.css";
 import SimMetaBar from "../components/SimMetaBar";
-import PoolCard from "../components/PoolCard";
+import PoolCard from '../components/PoolCard';
+import PoolStatsTable from '../components/PoolStatsTable';
 import { fetchPoolState, fetchSimMeta } from "../api";
 
 function PoolStatsPage() {
@@ -68,3 +69,4 @@ function PoolStatsPage() {
 }
 
 export default PoolStatsPage;
+
