@@ -66,3 +66,4 @@ def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
+
