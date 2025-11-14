@@ -1,4 +1,87 @@
-/* Modal Overlay */
+/* ============================
+   Global App Layout
+============================= */
+.App {
+  font-family: Arial, Helvetica, sans-serif;
+  background: black;
+  color: white;
+  min-height: 100vh;
+  padding: 2rem 3rem;
+}
+
+.app-title {
+  font-size: 2.4rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.global-status {
+  color: #999;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+/* ============================
+   Panels & Cards
+============================= */
+.card {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h3 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ============================
+   Table Styling
+============================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #111;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+thead th {
+  background: #1a1a1a;
+  padding: 0.75rem;
+  border-bottom: 1px solid #333;
+  text-align: left;
+  color: #ddd;
+}
+
+tbody td {
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid #222;
+  font-size: 0.95rem;
+}
+
+tbody tr:hover {
+  background: #191919;
+  cursor: pointer;
+}
+
+/* Flash animation */
+.flash {
+  animation: flashAnim 1s ease-in-out;
+}
+
+@keyframes flashAnim {
+  0% { background: #003300; }
+  50% { background: #001100; }
+  100% { background: transparent; }
+}
+
+/* ============================
+   Modal
+============================= */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -12,27 +95,26 @@
   z-index: 5000;
 }
 
-/* Modal Content */
 .modal-content {
   background: #111;
   padding: 2rem;
   border-radius: 12px;
-  max-width: 60%;
+  max-width: 55%;
   max-height: 80%;
   overflow-y: auto;
   border: 1px solid #444;
   color: white;
 }
 
-/* Close Button */
 .modal-close-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
+  margin-top: 1.25rem;
+  padding: 0.5rem 1.2rem;
   border: 1px solid #444;
   background: #222;
   color: white;
   cursor: pointer;
   border-radius: 6px;
+  transition: 0.15s;
 }
 
 .modal-close-btn:hover {

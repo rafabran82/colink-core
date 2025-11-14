@@ -6,35 +6,25 @@ import { fetchPools } from "./api/pools";
 import { fetchSwapLogs } from "./api/logs";
 import SwapDetailsModal from "./components/SwapDetailsModal";
 
-/* ---------------------------------------------
-   computeLatestTimestamp
----------------------------------------------- */
 function computeLatestTimestamp(simMeta, pools, swaps) {
   const ts = [];
 
   if (simMeta?.lastUpdated) ts.push(new Date(simMeta.lastUpdated));
 
-  if (Array.isArray(pools)) {
-    pools.forEach((p) => {
-      if (p.lastUpdated) ts.push(new Date(p.lastUpdated));
-    });
-  }
+  if (Array.isArray(pools))
+    pools.forEach((p) => p.lastUpdated && ts.push(new Date(p.lastUpdated)));
 
-  if (Array.isArray(swaps)) {
+  if (Array.isArray(swaps))
     swaps.forEach((s) => {
       const t = s.timestamp || s.executed_at;
       if (t) ts.push(new Date(t));
     });
-  }
 
   if (ts.length === 0) return "N/A";
   const latest = ts.reduce((a, b) => (a > b ? a : b));
   return latest.toLocaleString();
 }
 
-/* ---------------------------------------------
-   markFlashes
----------------------------------------------- */
 function markFlashes(oldArr, newArr, keyFn) {
   const oldMap = Object.fromEntries((oldArr || []).map((o) => [keyFn(o), o]));
 
@@ -50,15 +40,13 @@ function markFlashes(oldArr, newArr, keyFn) {
   });
 }
 
-/* ---------------------------------------------
-   App Component
----------------------------------------------- */
 function App() {
   const [simMeta, setSimMeta] = useState({});
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
 
   const [selectedSwap, setSelectedSwap] = useState(null);
+
   const openSwapDetails = (swap) => setSelectedSwap(swap);
   const closeSwapDetails = () => setSelectedSwap(null);
 
@@ -83,94 +71,85 @@ function App() {
   }
 
   return (
-    <div
-      className="App"
-      style={{
-        background: "black",
-        color: "white",
-        minHeight: "100vh",
-        padding: "2rem",
-      }}
-    >
+    <div className="App">
       <h1 className="app-title">COLINK Dashboard</h1>
 
-      <div className="global-status" style={{ marginBottom: "1rem" }}>
+      <div className="global-status">
         Data as of: {computeLatestTimestamp(simMeta, pools, logs)}
       </div>
 
-      {/* Pool State */}
-      <h2>Pool State</h2>
+      {/* ------------ POOLS ------------- */}
+      <section>
+        <h2>Pool State</h2>
 
-      {pools.length === 0 ? (
-        <p>No pool data available.</p>
-      ) : (
-        pools.map((pool, idx) => (
-          <div
-            key={idx}
-            className={pool.__flash ? "flash" : ""}
-            style={{
-              border: "1px solid #333",
-              borderRadius: "8px",
-              padding: "1rem",
-              marginBottom: "1rem",
-              background: "#111",
-            }}
-          >
-            <h3>{pool.label}</h3>
-            <p><b>Base:</b> {pool.baseSymbol} — Liquidity: {pool.baseLiquidity.toLocaleString()}</p>
-            <p><b>Quote:</b> {pool.quoteSymbol} — Liquidity: {pool.quoteLiquidity.toLocaleString()}</p>
-            <p><b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}</p>
-            <p><b>Fee:</b> {pool.feeBps} bps</p>
-            <p><small>Updated: {new Date(pool.lastUpdated).toLocaleString()}</small></p>
+        {pools.length === 0 ? (
+          <p>No pools available.</p>
+        ) : (
+          pools.map((pool) => (
+            <div key={pool.label} className={`card ${pool.__flash ? "flash" : ""}`}>
+              <h3>{pool.label}</h3>
+
+              <p><b>Base:</b> {pool.baseSymbol} — {pool.baseLiquidity.toLocaleString()}</p>
+              <p><b>Quote:</b> {pool.quoteSymbol} — {pool.quoteLiquidity.toLocaleString()}</p>
+              <p><b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}</p>
+              <p><b>Fee:</b> {pool.feeBps} bps</p>
+
+              <p>
+                <small>
+                  Updated: {new Date(pool.lastUpdated).toLocaleString()}
+                </small>
+              </p>
+            </div>
+          ))
+        )}
+      </section>
+
+      {/* ------------ SWAP LOGS ------------- */}
+      <section style={{ marginTop: "2rem" }}>
+        <h2>Swap Logs</h2>
+
+        {logs.length === 0 ? (
+          <div className="card">
+            <b>No swap logs yet</b>
+            <p>Run a simulation to generate activity.</p>
           </div>
-        ))
-      )}
-
-      {/* Swap Logs */}
-      <h2>Swap Logs</h2>
-
-      {logs.length === 0 ? (
-        <div style={{ padding: "1rem", background: "#111", borderRadius: "8px" }}>
-          <b>No swap logs yet</b>
-          <p>Run a simulation or on-ledger test swap to see recent activity.</p>
-        </div>
-      ) : (
-        <table style={{ width: "100%", marginTop: "1rem", background: "#111", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Pool</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Amount In</th>
-              <th>Amount Out</th>
-              <th>Status</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log, idx) => (
-              <tr
-                key={idx}
-                onClick={() => openSwapDetails(log)}
-                className={log.__flash ? "flash" : ""}
-                style={{ borderTop: "1px solid #333", cursor: "pointer" }}
-              >
-                <td>{log.id}</td>
-                <td>{log.pool}</td>
-                <td>{log.fromAsset}</td>
-                <td>{log.toAsset}</td>
-                <td>{log.amountIn}</td>
-                <td>{log.amountOut}</td>
-                <td>{log.status}</td>
-                <td>{new Date(log.timestamp).toLocaleString()}</td>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Pool</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount In</th>
+                <th>Amount Out</th>
+                <th>Status</th>
+                <th>Time</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
 
-      {/* Modal */}
+            <tbody>
+              {logs.map((log, idx) => (
+                <tr
+                  key={idx}
+                  onClick={() => openSwapDetails(log)}
+                  className={log.__flash ? "flash" : ""}
+                >
+                  <td>{log.id}</td>
+                  <td>{log.pool}</td>
+                  <td>{log.fromAsset}</td>
+                  <td>{log.toAsset}</td>
+                  <td>{log.amountIn}</td>
+                  <td>{log.amountOut}</td>
+                  <td>{log.status}</td>
+                  <td>{new Date(log.timestamp).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
       {selectedSwap && (
         <SwapDetailsModal swap={selectedSwap} onClose={closeSwapDetails} />
       )}

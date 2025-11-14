@@ -5,10 +5,7 @@ export default function SwapDetailsModal({ swap, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Swap Details</h2>
 
         <pre
@@ -23,10 +20,7 @@ export default function SwapDetailsModal({ swap, onClose }) {
 {JSON.stringify(swap, null, 2)}
         </pre>
 
-        <button
-          className="modal-close-btn"
-          onClick={onClose}
-        >
+        <button className="modal-close-btn" onClick={onClose}>
           Close
         </button>
       </div>
