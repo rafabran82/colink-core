@@ -1,58 +1,63 @@
 ﻿import React, { useEffect, useState } from "react";
-import PoolCard from "../components/PoolCard";
-import PoolStatsTable from "../components/PoolStatsTable";
-import { fetchPools, fetchSimMeta } from "../api/pools";
+import { fetchPools } from "../api/pools";
 
-function PoolStatsPage() {
+function PoolStats() {
   const [pools, setPools] = useState([]);
-  const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
-
     async function load() {
       try {
-        const [m, p] = await Promise.all([
-          fetchSimMeta(),
-          fetchPools(),
-        ]);
-
-        if (!cancelled) {
-          setMeta(m);
-          setPools(p);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error("PoolStatsPage load failed", err);
-        if (!cancelled) setLoading(false);
+        const list = await fetchPools();
+        setPools(list);
+      } finally {
+        setLoading(false);
       }
     }
-
     load();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
+  if (loading) {
+    return <p style={{ padding: "20px" }}>Loading pool stats…</p>;
+  }
+
+  if (!loading && pools.length === 0) {
+    return <p style={{ padding: "20px" }}>No pools available.</p>;
+  }
+
   return (
-    <div style={{ padding: "24px" }}>
+    <div style={{ padding: "20px" }}>
       <h1>Pool Statistics</h1>
 
-      {loading && pools.length === 0 && <p>Loading pools…</p>}
+      {pools.map((p, i) => {
+        const updated = new Date(p.lastUpdated).toLocaleString();
 
-      {/* Overview table */}
-      {pools.length > 0 && <PoolStatsTable pools={pools} />}
+        return (
+          <div
+            key={i}
+            style={{
+              marginTop: "22px",
+              padding: "18px",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid #666",
+              borderRadius: "8px",
+            }}
+          >
+            <h2>{p.label}</h2>
 
-      {/* Each individual pool card */}
-      <div style={{ marginTop: "24px" }}>
-        {pools.map((p, i) => (
-          <PoolCard key={i} pool={p} />
-        ))}
-      </div>
+            <p><strong>Base:</strong> {p.baseSymbol} — Liquidity: {p.baseLiquidity.toLocaleString()}</p>
+            <p><strong>Quote:</strong> {p.quoteSymbol} — Liquidity: {p.quoteLiquidity.toLocaleString()}</p>
+            <p><strong>LP Supply:</strong> {p.lpTokenSupply.toLocaleString()}</p>
+            <p><strong>Fee:</strong> {p.feeBps} bps</p>
+
+            <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+              Updated: {updated}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export default PoolStatsPage;
-
+export default PoolStats;
