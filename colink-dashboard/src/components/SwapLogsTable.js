@@ -28,9 +28,9 @@ function SwapLogsTable({ logs }) {
 
       <tbody>
         {logs.map((log) => (
-          <tr key={log.id} style={{ borderBottom: "1px solid #eee" }}>
+          <tr key={log.id} style={{ borderBottom: "1px solid #555" }}>
             <td>{log.id}</td>
-            <td>{new Date(log.timestamp).toLocaleString()}</td>
+            <td>{new Date(log.timestamp).toLocaleString()} style={{ opacity: 0.65 }}</td>
             <td>{log.pool}</td>
             <td>{log.fromAsset}</td>
             <td>{log.toAsset}</td>
@@ -45,3 +45,4 @@ function SwapLogsTable({ logs }) {
 }
 
 export default SwapLogsTable;
+
