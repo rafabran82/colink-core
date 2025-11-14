@@ -145,7 +145,27 @@ function App() {
         {loading && logs.length === 0 && <p>Loading swap logs…</p>}
 
         {!loading && logs.length === 0 && (
-          <p>No swap logs yet.</p>
+          (
+  <div
+    style={{
+      marginTop: "12px",
+      padding: "16px 20px",
+      maxWidth: "420px",
+      borderRadius: "12px",
+      border: "1px solid #444",
+      backgroundColor: isDark ? "#111" : "#fafafa",
+      color: isDark ? "#ddd" : "#333",
+      fontSize: "0.9rem",
+    }}
+  >
+    <strong style={{ display: "block", marginBottom: "4px" }}>
+      No swap logs yet
+    </strong>
+    <span style={{ opacity: 0.8 }}>
+      Run a simulation or on-ledger test swap to see recent activity here.
+    </span>
+  </div>
+)
         )}
 
         {logs.length > 0 && <SwapLogsTable logs={logs} />}
@@ -155,3 +175,4 @@ function App() {
 }
 
 export default App;
+
