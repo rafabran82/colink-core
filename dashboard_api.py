@@ -166,3 +166,4 @@ def get_pools_state() -> List[PoolState]:
 @app.get("/api/swaps/recent", response_model=List[SwapLogEntry])
 def get_recent_swaps() -> List[SwapLogEntry]:
     return _mock_swaps()
+
