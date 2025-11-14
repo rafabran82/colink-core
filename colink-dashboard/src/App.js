@@ -3,7 +3,8 @@ import "./App.css";
 import PoolCard from "./components/PoolCard";
 import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
-import { fetchPoolState, fetchSwapLogs, fetchSimMeta } from "./api";
+import { fetchPools } from "./api/pools";
+import { fetchSwapLogs, fetchSimMeta } from "./api";
 
 function App() {
   // Theme with localStorage persistence
@@ -20,7 +21,7 @@ function App() {
 
   const isDark = theme === "dark";
 
-  const [pool, setPool] = useState(null);
+  const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,15 +48,15 @@ function App() {
 
     async function load() {
       try {
-        const [m, p, s] = await Promise.all([
+        const [m, ps, s] = await Promise.all([
           fetchSimMeta(),
-          fetchPoolState(),
+          fetchPools(),
           fetchSwapLogs(),
         ]);
 
         if (!cancelled) {
           setMeta(m);
-          setPool(p);
+          setPools(ps);
           setLogs(s);
           setLoading(false);
         }
@@ -114,8 +115,11 @@ function App() {
       {/* Pool State Section */}
       <section style={{ marginTop: "16px" }}>
         <h2>Pool State</h2>
-        {loading && !pool && <p>Loading pool state…</p>}
-        {pool && <PoolCard pool={pool} />}
+        {loading && pools.length === 0 && <p>Loading pools…</p>}
+
+        {pools.map((pool, idx) => (
+          <PoolCard key={idx} pool={pool} />
+        ))}
       </section>
 
       {/* Swap Logs Section */}
