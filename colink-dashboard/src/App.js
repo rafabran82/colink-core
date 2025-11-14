@@ -89,16 +89,20 @@ function App() {
       <h1>COLINK Dashboard</h1>
 
       <section style={{ marginTop: "16px" }}>
-        <h2>Pool State</h2>
+                <h2>Pool State</h2>
 
+        {/* Loading indicator */}
         {loading && pools.length === 0 && <p>Loading pool state…</p>}
 
-        {(!loading && pools.length === 0) && (
+        {/* No pools */}
+        {!loading && pools.length === 0 && (
           <p>No pool data available.</p>
         )}
 
-        {pools.length > 0 &&
-          pools.map((pool, i) => <PoolCard key={i} pool={pool} />)}
+        {/* Render all pools */}
+        {!loading && pools.length > 0 && pools.map((p, i) => (
+          <PoolCard key={i} pool={p} />
+        ))}
       </section>
 
       <section style={{ marginTop: "24px" }}>
@@ -111,5 +115,6 @@ function App() {
 }
 
 export default App;
+
 
 
