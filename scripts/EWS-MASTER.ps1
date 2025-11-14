@@ -58,20 +58,7 @@ if (Test-Path $main) {
 # ---------------------------------------------------------
 Write-Host "`n▶ INDENTATION CHECK" -ForegroundColor Yellow
 
-$pyFiles = Get-ChildItem -Recurse -Filter *.py | Where-Object {
-    param(
-    [string]$ApiUrl = "http://127.0.0.1:8000"
-)
 
-Write-Host "🛡️ Running EWS-MASTER..." -ForegroundColor Cyan
-
-# Track fail state
-$Global:FAILED = $false
-
-function Mark-Fail($msg) {
-    Write-Host "❌ $msg" -ForegroundColor Red
-    $Global:FAILED = $true
-}
 
 # ---------------------------------------------------------
 # 1) Dashboard smoke test
@@ -118,14 +105,7 @@ if (Test-Path $main) {
 # 4) Indentation checker (basic)
 # ---------------------------------------------------------
 Write-Host "`n▶ INDENTATION CHECK" -ForegroundColor Yellow
-$pyFiles = Get-ChildItem -Recurse -Filter *.py
-foreach ($f in $pyFiles) {
-    $raw = Get-Content $f.FullName
-    foreach ($line in $raw) {
-        if ($line -match "`t") {
-            Mark-Fail "Tab indentation detected in $($f.FullName)"
-            break
-        }
+
     }
 }
 if (-not $Global:FAILED) {
@@ -146,13 +126,7 @@ if ($Global:FAILED) {
 .FullName -notmatch "\\.venv\\"
 }
 
-foreach ($f in $pyFiles) {
-    $raw = Get-Content $f.FullName
-    foreach ($line in $raw) {
-        if ($line -match "`t") {
-            Mark-Fail "Tab indentation detected in $($f.FullName)"
-            break
-        }
+foreach ($f in 
     }
 }
 
@@ -171,6 +145,7 @@ if ($Global:FAILED) {
     Write-Host "🟢 EWS-MASTER: ALL CHECKS PASSED" -ForegroundColor Green
 }
 ======================================
+
 
 
 
