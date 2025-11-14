@@ -126,3 +126,11 @@ tbody tr:hover {
   100% { transform: scale(1); opacity: 1; }
 }
 
+.flash {
+  animation: flashRow 1s ease-out;
+}
+
+@keyframes flashRow {
+  0% { background: #1a3; }
+  100% { background: transparent; }
+}

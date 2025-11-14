@@ -5,17 +5,16 @@ import { fetchSimMeta } from "./api/meta";
 import { fetchPools } from "./api/pools";
 import { fetchSwapLogs } from "./api/logs";
 import SwapDetailsModal from "./components/SwapDetailsModal";
+import { connectWS } from "./api/ws";
 
 function computeLatestTimestamp(meta, pools, swaps) {
   const ts = [];
 
   if (meta?.lastUpdated) ts.push(new Date(meta.lastUpdated));
-
   if (Array.isArray(pools))
-    pools.forEach((p) => p.lastUpdated && ts.push(new Date(p.lastUpdated)));
-
+    pools.forEach(p => p.lastUpdated && ts.push(new Date(p.lastUpdated)));
   if (Array.isArray(swaps))
-    swaps.forEach((s) => {
+    swaps.forEach(s => {
       const t = s.timestamp || s.executed_at;
       if (t) ts.push(new Date(t));
     });
@@ -43,26 +42,22 @@ function App() {
         fetchPools(),
         fetchSwapLogs(),
       ]);
-
       setSimMeta(m || {});
       setPools(p || []);
       setLogs(l || []);
-
       setLastRefresh(Date.now());
-      if (!silent) console.log("🔄 Dashboard updated:", new Date().toLocaleTimeString());
+      if (!silent) console.log("🔄 Dashboard updated");
     } catch (err) {
       console.error("Dashboard loadAll failed", err);
     }
   }
 
-  // Auto-refresh every 5 seconds
   useEffect(() => {
     loadAll(true);
     const id = setInterval(() => loadAll(true), 5000);
     return () => clearInterval(id);
   }, []);
 
-  // Update "seconds ago" counter
   useEffect(() => {
     const id = setInterval(() => {
       setSecondsAgo(Math.floor((Date.now() - lastRefresh) / 1000));
@@ -70,17 +65,38 @@ function App() {
     return () => clearInterval(id);
   }, [lastRefresh]);
 
+  // === WebSocket real-time updates ===
+  useEffect(() => {
+    connectWS((msg) => {
+      if (msg.type === "swap") {
+        const clone = [...logs];
+        msg.data.__flash = true;
+        clone.unshift(msg.data);
+        setLogs(clone);
+        setLastRefresh(Date.now());
+      }
+
+      if (msg.type === "pool_update") {
+        const updated = pools.map(p =>
+          p.label === msg.data.label ? { ...p, ...msg.data, __flash: true } : p
+        );
+        setPools(updated);
+        setLastRefresh(Date.now());
+      }
+
+      if (msg.type === "meta") {
+        setSimMeta({ ...simMeta, ...msg.data });
+        setLastRefresh(Date.now());
+      }
+    });
+  }, [logs, pools, simMeta]);
+
   return (
     <div className="App">
       <h1 className="app-title">COLINK Dashboard</h1>
 
-      {/* LIVE section */}
       <div className="global-status" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <span>
-          Data as of: {computeLatestTimestamp(simMeta, pools, logs) || "N/A"}
-        </span>
-
-        {/* Live green dot */}
+        <span>Data as of: {computeLatestTimestamp(simMeta, pools, logs) || "N/A"}</span>
         <span
           style={{
             width: "10px",
@@ -92,53 +108,36 @@ function App() {
             animation: "pulseLive 1.5s infinite"
           }}
         ></span>
-
-        {/* Timer */}
-        <span style={{ color: "#777", fontSize: "0.9rem" }}>
-          (updated {secondsAgo}s ago)
-        </span>
-
-        {/* Manual refresh */}
-        <button
-          onClick={() => loadAll(false)}
-          style={{
-            padding: "0.3rem 0.8rem",
-            background: "#222",
-            border: "1px solid #444",
-            color: "white",
-            borderRadius: "6px",
-            cursor: "pointer"
-          }}
-        >
-          Refresh
-        </button>
+        <span style={{ color: "#777" }}>(updated {secondsAgo}s ago)</span>
+        <button onClick={() => loadAll(false)}>Refresh</button>
       </div>
 
-      {/* Pools */}
+      {/* POOLS */}
       <section>
         <h2>Pool State</h2>
-
         {pools.length === 0 ? (
           <p>No pools available.</p>
         ) : (
-          pools.map((pool) => (
-            <div key={pool.label} className="card">
+          pools.map(pool => (
+            <div
+              key={pool.label}
+              className={`card ${pool.__flash ? "flash" : ""}`}
+              onAnimationEnd={() => { pool.__flash = false }}
+            >
               <h3>{pool.label}</h3>
-
               <p><b>Base:</b> {pool.baseSymbol} — {pool.baseLiquidity.toLocaleString()}</p>
               <p><b>Quote:</b> {pool.quoteSymbol} — {pool.quoteLiquidity.toLocaleString()}</p>
               <p><b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}</p>
               <p><b>Fee:</b> {pool.feeBps} bps</p>
-              <small>Updated: {new Date(pool.lastUpdated).toLocaleString()}</small>
+              <small>{new Date(pool.lastUpdated).toLocaleString()}</small>
             </div>
           ))
         )}
       </section>
 
-      {/* Swap Logs */}
+      {/* LOGS */}
       <section style={{ marginTop: "2rem" }}>
         <h2>Swap Logs</h2>
-
         {logs.length === 0 ? (
           <div className="card">
             <b>No swap logs yet</b>
@@ -160,7 +159,11 @@ function App() {
             </thead>
             <tbody>
               {logs.map((log, idx) => (
-                <tr key={idx} onClick={() => openSwapDetails(log)}>
+                <tr
+                  key={idx}
+                  className={log.__flash ? "flash" : ""}
+                  onClick={() => openSwapDetails(log)}
+                >
                   <td>{log.id}</td>
                   <td>{log.pool}</td>
                   <td>{log.fromAsset}</td>
@@ -177,7 +180,7 @@ function App() {
       </section>
 
       {selectedSwap && (
-        <SwapDetailsModal swap={selectedSwap} onClose={() => setSelectedSwap(null)} />
+        <SwapDetailsModal swap={selectedSwap} onClose={closeSwapDetails} />
       )}
     </div>
   );
