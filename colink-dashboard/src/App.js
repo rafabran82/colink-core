@@ -51,14 +51,14 @@ function App() {
     }
 
     load();
-    return () => { cancelled = true; };
+    return (<div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>) => { cancelled = true; };
   }, []);
 
   function toggleTheme() {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }
 
-  return (
+  return (<div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
     <div style={{ padding: "24px", minHeight: "100vh" }}>
       <div
         style={{
@@ -115,6 +115,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
