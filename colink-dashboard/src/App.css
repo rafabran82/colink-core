@@ -134,3 +134,26 @@ tbody tr:hover {
   0% { background: #1a3; }
   100% { background: transparent; }
 }
+.chart-card {
+  background: #111;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #222;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  background: #00ff44;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00ff44;
+  animation: livePulse 1.5s infinite;
+}
+
+@keyframes livePulse {
+  0% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.4; transform: scale(0.8); }
+}

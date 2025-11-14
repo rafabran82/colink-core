@@ -5,11 +5,12 @@ import { fetchSimMeta } from "./api/meta";
 import { fetchPools } from "./api/pools";
 import { fetchSwapLogs } from "./api/logs";
 import SwapDetailsModal from "./components/SwapDetailsModal";
+import PoolChart from "./components/PoolChart";
+import SwapVolumeChart from "./components/SwapVolumeChart";
 import { connectWS } from "./api/ws";
 
 function computeLatestTimestamp(meta, pools, swaps) {
   const ts = [];
-
   if (meta?.lastUpdated) ts.push(new Date(meta.lastUpdated));
   if (Array.isArray(pools))
     pools.forEach(p => p.lastUpdated && ts.push(new Date(p.lastUpdated)));
@@ -18,7 +19,6 @@ function computeLatestTimestamp(meta, pools, swaps) {
       const t = s.timestamp || s.executed_at;
       if (t) ts.push(new Date(t));
     });
-
   if (ts.length === 0) return null;
   return ts.reduce((a, b) => (a > b ? a : b)).toLocaleString();
 }
@@ -32,8 +32,37 @@ function App() {
   const [lastRefresh, setLastRefresh] = useState(Date.now());
   const [secondsAgo, setSecondsAgo] = useState(0);
 
+  // === Chart histories ===
+  const [poolHistory, setPoolHistory] = useState({});
+  const [swapVolume, setSwapVolume] = useState([]);
+
   const openSwapDetails = (swap) => setSelectedSwap(swap);
   const closeSwapDetails = () => setSelectedSwap(null);
+
+  // Add a history point for each pool on update
+  const recordPools = (poolsList) => {
+    const now = Date.now();
+    const updated = { ...poolHistory };
+    poolsList.forEach(p => {
+      if (!updated[p.label]) updated[p.label] = [];
+      updated[p.label].push({
+        t: now,
+        base: p.baseLiquidity || 0,
+        quote: p.quoteLiquidity || 0
+      });
+      updated[p.label] = updated[p.label].slice(-80);
+    });
+    setPoolHistory(updated);
+  };
+
+  // Add swap volume point
+  const recordSwap = (swap) => {
+    const now = Date.now();
+    const amount = parseFloat(swap.amountIn || 0);
+    const updated = [...swapVolume];
+    updated.push({ t: now, vol: amount });
+    setSwapVolume(updated.slice(-50));
+  };
 
   async function loadAll(silent = false) {
     try {
@@ -45,8 +74,11 @@ function App() {
       setSimMeta(m || {});
       setPools(p || []);
       setLogs(l || []);
+
+      recordPools(p || []);
+      l.forEach(recordSwap);
+
       setLastRefresh(Date.now());
-      if (!silent) console.log("🔄 Dashboard updated");
     } catch (err) {
       console.error("Dashboard loadAll failed", err);
     }
@@ -65,119 +97,96 @@ function App() {
     return () => clearInterval(id);
   }, [lastRefresh]);
 
-  // === WebSocket real-time updates ===
+  // === WebSocket ===
   useEffect(() => {
     connectWS((msg) => {
       if (msg.type === "swap") {
-        const clone = [...logs];
         msg.data.__flash = true;
-        clone.unshift(msg.data);
-        setLogs(clone);
+        setLogs(prev => {
+          const updated = [msg.data, ...prev];
+          return updated;
+        });
+        recordSwap(msg.data);
         setLastRefresh(Date.now());
       }
 
       if (msg.type === "pool_update") {
-        const updated = pools.map(p =>
-          p.label === msg.data.label ? { ...p, ...msg.data, __flash: true } : p
-        );
-        setPools(updated);
+        setPools(prev => {
+          const updated = prev.map(p =>
+            p.label === msg.data.label
+              ? { ...p, ...msg.data, __flash: true }
+              : p
+          );
+          recordPools(updated);
+          return updated;
+        });
         setLastRefresh(Date.now());
       }
 
       if (msg.type === "meta") {
-        setSimMeta({ ...simMeta, ...msg.data });
+        setSimMeta(prev => ({ ...prev, ...msg.data }));
         setLastRefresh(Date.now());
       }
     });
-  }, [logs, pools, simMeta]);
+  }, []);
 
   return (
     <div className="App">
       <h1 className="app-title">COLINK Dashboard</h1>
 
-      <div className="global-status" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <span>Data as of: {computeLatestTimestamp(simMeta, pools, logs) || "N/A"}</span>
-        <span
-          style={{
-            width: "10px",
-            height: "10px",
-            background: "#00ff44",
-            borderRadius: "50%",
-            display: "inline-block",
-            boxShadow: "0 0 8px #00ff44",
-            animation: "pulseLive 1.5s infinite"
-          }}
-        ></span>
-        <span style={{ color: "#777" }}>(updated {secondsAgo}s ago)</span>
-        <button onClick={() => loadAll(false)}>Refresh</button>
+      <div className="global-status">
+        Data as of: {computeLatestTimestamp(simMeta, pools, logs) || "N/A"}
+        <span className="live-dot"></span>
+        <span style={{ color: "#888" }}>({secondsAgo}s ago)</span>
       </div>
 
-      {/* POOLS */}
-      <section>
-        <h2>Pool State</h2>
-        {pools.length === 0 ? (
-          <p>No pools available.</p>
-        ) : (
-          pools.map(pool => (
-            <div
-              key={pool.label}
-              className={`card ${pool.__flash ? "flash" : ""}`}
-              onAnimationEnd={() => { pool.__flash = false }}
-            >
-              <h3>{pool.label}</h3>
-              <p><b>Base:</b> {pool.baseSymbol} — {pool.baseLiquidity.toLocaleString()}</p>
-              <p><b>Quote:</b> {pool.quoteSymbol} — {pool.quoteLiquidity.toLocaleString()}</p>
-              <p><b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}</p>
-              <p><b>Fee:</b> {pool.feeBps} bps</p>
-              <small>{new Date(pool.lastUpdated).toLocaleString()}</small>
-            </div>
-          ))
-        )}
-      </section>
+      {/* Pool charts */}
+      <h2>Liquidity Charts</h2>
+      {Object.keys(poolHistory).map(label => (
+        <div key={label} className="chart-card">
+          <PoolChart label={label} data={poolHistory[label]} />
+        </div>
+      ))}
 
-      {/* LOGS */}
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Swap Logs</h2>
-        {logs.length === 0 ? (
-          <div className="card">
-            <b>No swap logs yet</b>
-            <p>Run a simulation to generate activity.</p>
-          </div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Pool</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Amount In</th>
-                <th>Amount Out</th>
-                <th>Status</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((log, idx) => (
-                <tr
-                  key={idx}
-                  className={log.__flash ? "flash" : ""}
-                  onClick={() => openSwapDetails(log)}
-                >
-                  <td>{log.id}</td>
-                  <td>{log.pool}</td>
-                  <td>{log.fromAsset}</td>
-                  <td>{log.toAsset}</td>
-                  <td>{log.amountIn}</td>
-                  <td>{log.amountOut}</td>
-                  <td>{log.status}</td>
-                  <td>{new Date(log.timestamp).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+      {/* Swap volume */}
+      <h2>Swap Volume</h2>
+      <div className="chart-card">
+        <SwapVolumeChart data={swapVolume} />
+      </div>
+
+      {/* Pools */}
+      <h2>Pool State</h2>
+      {pools.map(pool => (
+        <div
+          key={pool.label}
+          className={`card ${pool.__flash ? "flash" : ""}`}
+        >
+          <h3>{pool.label}</h3>
+          <p><b>Base:</b> {pool.baseSymbol} — {pool.baseLiquidity}</p>
+          <p><b>Quote:</b> {pool.quoteSymbol} — {pool.quoteLiquidity}</p>
+          <p><b>LP Supply:</b> {pool.lpTokenSupply}</p>
+        </div>
+      ))}
+
+      {/* Logs */}
+      <h2>Swap Logs</h2>
+      <table>
+        <tbody>
+          {logs.map((log, idx) => (
+            <tr
+              key={idx}
+              className={log.__flash ? "flash" : ""}
+              onClick={() => setSelectedSwap(log)}
+            >
+              <td>{log.id}</td>
+              <td>{log.pool}</td>
+              <td>{log.amountIn}</td>
+              <td>{log.amountOut}</td>
+              <td>{new Date(log.timestamp).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       {selectedSwap && (
         <SwapDetailsModal swap={selectedSwap} onClose={closeSwapDetails} />
