@@ -1,77 +1,49 @@
 ﻿import React from "react";
+import "./PoolCard.css";
 
-function PoolCard({ pool }) {
-  const bg = "var(--card-bg)";
-  const border = "var(--card-border)";
-  const muted = "var(--text-muted)";
+function PoolCard({ pools }) {
+  if (!pools || pools.length === 0) {
+    return <p>No pool data available.</p>;
+  }
 
   return (
-    <div
-      style={{
-        marginTop: "8px",
-        padding: "12px 16px",
-        border: `1px solid ${border}`,
-        borderRadius: "8px",
-        maxWidth: "420px",
-        backgroundColor: bg,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "8px",
-        }}
-      >
-        <strong>{pool.label}</strong>
-        <span style={{ fontSize: "0.85rem", color: muted }}>
-          Fee: {(pool.feeBps / 100).toFixed(2)}%
-        </span>
-      </div>
+    <div style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "16px"
+    }}>
+      {pools.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            border: "1px solid #444",
+            padding: "16px",
+            borderRadius: "12px",
+            minWidth: "280px",
+            backgroundColor: "var(--card-bg)",
+            color: "var(--text-primary)",
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>{p.label}</h3>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "0.95rem",
-        }}
-      >
-        <span>{pool.baseSymbol} reserve</span>
-        <span>{pool.baseLiquidity.toLocaleString()}</span>
-      </div>
+          <p><strong>Base:</strong> {p.baseSymbol}</p>
+          <p><strong>Quote:</strong> {p.quoteSymbol}</p>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "0.95rem",
-          marginTop: "4px",
-        }}
-      >
-        <span>{pool.quoteSymbol} reserve</span>
-        <span>{pool.quoteLiquidity.toLocaleString()}</span>
-      </div>
+          <p><strong>Base Liquidity:</strong> {p.baseLiquidity.toLocaleString()}</p>
+          <p><strong>Quote Liquidity:</strong> {p.quoteLiquidity.toLocaleString()}</p>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "0.95rem",
-          marginTop: "4px",
-        }}
-      >
-        <span>LP supply</span>
-        <span>{pool.lpTokenSupply.toLocaleString()}</span>
-      </div>
+          <p><strong>LP Supply:</strong> {p.lpTokenSupply.toLocaleString()}</p>
+          <p><strong>Fee:</strong> {p.feeBps} bps</p>
 
-      <div style={{ marginTop: "6px", fontSize: "0.8rem", color: muted }}>
-        Updated:{" "}
-        {new Date(pool.lastUpdated).toLocaleTimeString(undefined, {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })}
-      </div>
+          {"syntheticPrice" in p && (
+            <p><strong>Synthetic Price:</strong> {p.syntheticPrice.toFixed(6)}</p>
+          )}
+
+          <p style={{ fontSize: "0.75rem", opacity: 0.7 }}>
+            Updated {p.lastUpdated}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
