@@ -162,8 +162,8 @@ function App() {
           className={`card ${pool.__flash ? "flash" : ""}`}
         >
           <h3>{pool.label}</h3>
-          <p><b>Base:</b> {pool.baseSymbol} — {pool.baseLiquidity}</p>
-          <p><b>Quote:</b> {pool.quoteSymbol} — {pool.quoteLiquidity}</p>
+          <p><b>Base:</b> {pool.baseSymbol} â€” {pool.baseLiquidity}</p>
+          <p><b>Quote:</b> {pool.quoteSymbol} â€” {pool.quoteLiquidity}</p>
           <p><b>LP Supply:</b> {pool.lpTokenSupply}</p>
         </div>
       ))}
@@ -176,7 +176,7 @@ function App() {
             <tr
               key={idx}
               className={log.__flash ? "flash" : ""}
-              onClick={() => setSelectedSwap(log)}
+              onClick={() => openSwapDetails(log)}
             >
               <td>{log.id}</td>
               <td>{log.pool}</td>
