@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 function PoolStatsTable({ pools }) {
   if (!pools || pools.length === 0) {

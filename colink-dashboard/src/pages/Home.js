@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PoolCard from "../components/PoolCard";
 import { fetchPools } from "../api/pools";
 import { fetchSimMeta } from "../api";
@@ -35,7 +35,7 @@ function Home() {
 
   return (
     <div style={{ padding: "24px" }}>
-      <h1>COLINK Dashboard — Overview</h1>
+      <h1>COLINK Dashboard - Overview</h1>
 
       {loading && pools.length === 0 && <p>Loading pools…</p>}
 

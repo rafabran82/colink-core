@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchPools } from "../api/pools";
 
 function PoolStats() {
@@ -45,8 +45,8 @@ function PoolStats() {
           >
             <h2>{p.label}</h2>
 
-            <p><strong>Base:</strong> {p.baseSymbol} — Liquidity: {p.baseLiquidity.toLocaleString()}</p>
-            <p><strong>Quote:</strong> {p.quoteSymbol} — Liquidity: {p.quoteLiquidity.toLocaleString()}</p>
+            <p><strong>Base:</strong> {p.baseSymbol} - Liquidity: {p.baseLiquidity.toLocaleString()}</p>
+            <p><strong>Quote:</strong> {p.quoteSymbol} - Liquidity: {p.quoteLiquidity.toLocaleString()}</p>
             <p><strong>LP Supply:</strong> {p.lpTokenSupply.toLocaleString()}</p>
             <p><strong>Fee:</strong> {p.feeBps} bps</p>
 

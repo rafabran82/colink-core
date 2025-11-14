@@ -1,4 +1,4 @@
-﻿// Deprecated API shim — dashboard now uses src/api/pools.ts
+// Deprecated API shim - dashboard now uses src/api/pools.ts
 // These remain only to prevent import crashes before full migration.
 
 export async function fetchPoolState() {
