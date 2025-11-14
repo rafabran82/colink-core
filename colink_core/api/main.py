@@ -1,8 +1,20 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import routers from existing backend
-from colink_core.routes import sim, status, orderbook, trustline, dex, offers, report, trade, paper_admin, paper_portfolio, debug
+# Import routers from top-level routes/ folder
+from routes import (
+    sim,
+    status,
+    orderbook,
+    trustline,
+    dex,
+    offers,
+    report,
+    trade,
+    paper_admin,
+    paper_portfolio,
+    debug,
+)
 
 app = FastAPI(title="COLINK API")
 
