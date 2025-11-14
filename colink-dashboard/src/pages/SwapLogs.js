@@ -1,12 +1,10 @@
 ﻿import React, { useEffect, useState } from "react";
-import "../App.css";
-import SimMetaBar from "../components/SimMetaBar";
 import SwapLogsTable from "../components/SwapLogsTable";
 import { fetchSwapLogs, fetchSimMeta } from "../api";
 
 function SwapLogsPage() {
-  const [meta, setMeta] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,32 +35,11 @@ function SwapLogsPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        padding: "24px",
-        minHeight: "100vh",
-        backgroundColor: "var(--bg)",
-        color: "var(--text)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "16px",
-        }}
-      >
-        <SimMetaBar meta={meta} />
-      </div>
+    <div style={{ padding: "24px" }}>
+      <h1>Recent Swaps</h1>
 
-      <h1>COLINK Swap Logs</h1>
-
-      <section style={{ marginTop: "16px" }}>
-        <h2>Recent Swaps</h2>
-        {loading && logs.length === 0 && <p>Loading swap logs…</p>}
-        {logs.length > 0 && <SwapLogsTable logs={logs} />}
-      </section>
+      {loading && logs.length === 0 && <p>Loading swaps…</p>}
+      {logs.length > 0 && <SwapLogsTable logs={logs} />}
     </div>
   );
 }
