@@ -1,7 +1,7 @@
 ﻿from datetime import datetime, timedelta
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI\nfrom colink_core.sim.xrpl_snapshot import load_bootstrap_snapshot\nfrom colink_core.sim.engine import extract_pool_from_snapshot
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -65,6 +65,42 @@ def _mock_meta() -> SimMeta:
 
 
 def _mock_pool() -> PoolState:
+def _load_real_pools():
+    """
+    Load real COPX/COL pool from XRPL snapshot and create a synthetic
+    deterministic COL/XRP pool derived from COL reserves.
+    """
+    snap = load_bootstrap_snapshot()
+    real = extract_pool_from_snapshot(snap)
+
+    # Real COPX/COL
+    pool_real = {
+        "label": "COPX/COL",
+        "baseSymbol": "COPX",
+        "quoteSymbol": "COL",
+        "baseLiquidity": real.copx_reserve,
+        "quoteLiquidity": real.col_reserve,
+        "lpTokenSupply": (real.copx_reserve * real.col_reserve) ** 0.5,
+        "feeBps": 30,
+        "lastUpdated": datetime.utcnow().isoformat()
+    }
+
+    # Synthetic COL/XRP (deterministic)
+    col_reserve = real.col_reserve
+    xrp_reserve = col_reserve / 3600.0
+
+    pool_synthetic = {
+        "label": "COL/XRP",
+        "baseSymbol": "COL",
+        "quoteSymbol": "XRP",
+        "baseLiquidity": col_reserve,
+        "quoteLiquidity": xrp_reserve,
+        "lpTokenSupply": (col_reserve ** 0.5),
+        "feeBps": 25,
+        "lastUpdated": datetime.utcnow().isoformat()
+    }
+
+    return [pool_real, pool_synthetic]
   now = datetime.utcnow()
   return PoolState(
     label="COPX/COL",
@@ -123,4 +159,6 @@ def get_pools_state() -> List[PoolState]:
 def get_recent_swaps() -> List[SwapLogEntry]:
   # TODO: later wire this to recent sim swaps
   return _mock_swaps()
+
+
 
