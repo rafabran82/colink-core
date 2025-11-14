@@ -1,12 +1,11 @@
 ﻿import React, { useEffect, useState } from "react";
 import PoolCard from "../components/PoolCard";
 import PoolStatsTable from "../components/PoolStatsTable";
-import { fetchPools, PoolState } from "../api/pools";
-import { fetchSimMeta } from "../api";
+import { fetchPools, fetchSimMeta } from "../api/pools";
 
 function PoolStatsPage() {
+  const [pools, setPools] = useState([]);
   const [meta, setMeta] = useState(null);
-  const [pools, setPools] = useState(/** @type {PoolState[] | null} */ (null));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,23 +30,26 @@ function PoolStatsPage() {
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
     <div style={{ padding: "24px" }}>
-      <h1>Pool Stats</h1>
+      <h1>Pool Statistics</h1>
 
-      {loading && !pools && <p>Loading pool data…</p>}
+      {loading && pools.length === 0 && <p>Loading pools…</p>}
 
-      {pools && pools.length > 0 && (
-        <>
-          <PoolCard pools={pools} />
-          <div style={{ marginTop: "24px" }}>
-            <PoolStatsTable pools={pools} />
-          </div>
-        </>
-      )}
+      {/* Overview table */}
+      {pools.length > 0 && <PoolStatsTable pools={pools} />}
+
+      {/* Each individual pool card */}
+      <div style={{ marginTop: "24px" }}>
+        {pools.map((p, i) => (
+          <PoolCard key={i} pool={p} />
+        ))}
+      </div>
     </div>
   );
 }
