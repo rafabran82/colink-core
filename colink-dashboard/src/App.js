@@ -5,7 +5,7 @@ import SwapLogsTable from "./components/SwapLogsTable";
 import SimMetaBar from "./components/SimMetaBar";
 
 import { fetchPools } from "./api/pools";
-import { fetchSwapLogs, fetchSimMeta } from "./api";
+import { fetchSwapLogs, fetchSimMeta } from "./api/pools";
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -106,3 +106,4 @@ function App() {
 }
 
 export default App;
+
