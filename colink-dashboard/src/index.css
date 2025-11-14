@@ -11,3 +11,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.flash-update {
+  animation: flashGlow 1.2s ease-out;
+}
+
+@keyframes flashGlow {
+  0% { background-color: rgba(255, 255, 0, 0.35); }
+  60% { background-color: rgba(255, 255, 0, 0.15); }
+  100% { background-color: transparent; }
+}
