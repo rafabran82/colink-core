@@ -17,15 +17,17 @@ export default function PoolCard({ pool }) {
   const updated = new Date(lastUpdated).toLocaleString();
 
   return (
-    <div
-      style={{
-        padding: "16px",
-        marginBottom: "16px",
-        borderRadius: "8px",
-        border: "1px solid #666",
-        background: "rgba(255, 255, 255, 0.03)"
-      }}
-    >
+  <div
+    style={{
+      padding: "16px",
+      marginBottom: "20px",
+      borderRadius: "8px",
+      border: "1px solid #666",
+      background: "rgba(255,255,255,0.04)",
+      lineHeight: "1.45",
+      fontSize: "0.92rem"
+    }}
+  >
       <h3>{label}</h3>
       <p><strong>Base:</strong> {baseSymbol} — Liquidity: {baseLiquidity.toLocaleString()}</p>
       <p><strong>Quote:</strong> {quoteSymbol} — Liquidity: {quoteLiquidity.toLocaleString()}</p>
@@ -37,3 +39,4 @@ export default function PoolCard({ pool }) {
     </div>
   );
 }
+
