@@ -4,6 +4,7 @@ import "./App.css";
 import { fetchSimMeta } from "./api/meta";
 import { fetchPools } from "./api/pools";
 import { fetchSwapLogs } from "./api/logs";
+import SwapDetailsModal from "./components/SwapDetailsModal";
 
 /* ---------------------------------------------
    computeLatestTimestamp
@@ -50,12 +51,16 @@ function markFlashes(oldArr, newArr, keyFn) {
 }
 
 /* ---------------------------------------------
-   App
+   App Component
 ---------------------------------------------- */
 function App() {
   const [simMeta, setSimMeta] = useState({});
   const [pools, setPools] = useState([]);
   const [logs, setLogs] = useState([]);
+
+  const [selectedSwap, setSelectedSwap] = useState(null);
+  const openSwapDetails = (swap) => setSelectedSwap(swap);
+  const closeSwapDetails = () => setSelectedSwap(null);
 
   useEffect(() => {
     loadAll();
@@ -89,7 +94,6 @@ function App() {
     >
       <h1 className="app-title">COLINK Dashboard</h1>
 
-      {/* Global Status Line */}
       <div className="global-status" style={{ marginBottom: "1rem" }}>
         Data as of: {computeLatestTimestamp(simMeta, pools, logs)}
       </div>
@@ -113,25 +117,11 @@ function App() {
             }}
           >
             <h3>{pool.label}</h3>
-            <p>
-              <b>Base:</b> {pool.baseSymbol} — Liquidity:{" "}
-              {pool.baseLiquidity.toLocaleString()}
-            </p>
-            <p>
-              <b>Quote:</b> {pool.quoteSymbol} — Liquidity:{" "}
-              {pool.quoteLiquidity.toLocaleString()}
-            </p>
-            <p>
-              <b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}
-            </p>
-            <p>
-              <b>Fee:</b> {pool.feeBps} bps
-            </p>
-            <p>
-              <small>
-                Updated: {new Date(pool.lastUpdated).toLocaleString()}
-              </small>
-            </p>
+            <p><b>Base:</b> {pool.baseSymbol} — Liquidity: {pool.baseLiquidity.toLocaleString()}</p>
+            <p><b>Quote:</b> {pool.quoteSymbol} — Liquidity: {pool.quoteLiquidity.toLocaleString()}</p>
+            <p><b>LP Supply:</b> {pool.lpTokenSupply.toLocaleString()}</p>
+            <p><b>Fee:</b> {pool.feeBps} bps</p>
+            <p><small>Updated: {new Date(pool.lastUpdated).toLocaleString()}</small></p>
           </div>
         ))
       )}
@@ -140,25 +130,12 @@ function App() {
       <h2>Swap Logs</h2>
 
       {logs.length === 0 ? (
-        <div
-          style={{
-            padding: "1rem",
-            background: "#111",
-            borderRadius: "8px",
-          }}
-        >
+        <div style={{ padding: "1rem", background: "#111", borderRadius: "8px" }}>
           <b>No swap logs yet</b>
           <p>Run a simulation or on-ledger test swap to see recent activity.</p>
         </div>
       ) : (
-        <table
-          style={{
-            width: "100%",
-            marginTop: "1rem",
-            background: "#111",
-            borderCollapse: "collapse",
-          }}
-        >
+        <table style={{ width: "100%", marginTop: "1rem", background: "#111", borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th>ID</th>
@@ -175,10 +152,9 @@ function App() {
             {logs.map((log, idx) => (
               <tr
                 key={idx}
+                onClick={() => openSwapDetails(log)}
                 className={log.__flash ? "flash" : ""}
-                style={{
-                  borderTop: "1px solid #333",
-                }}
+                style={{ borderTop: "1px solid #333", cursor: "pointer" }}
               >
                 <td>{log.id}</td>
                 <td>{log.pool}</td>
@@ -192,6 +168,11 @@ function App() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Modal */}
+      {selectedSwap && (
+        <SwapDetailsModal swap={selectedSwap} onClose={closeSwapDetails} />
       )}
     </div>
   );
