@@ -1,89 +1,55 @@
 ﻿import React from "react";
 
-function SwapLogsTable({ logs }) {
-  const border = "var(--card-border)";
-  const headerBg = "var(--card-bg)";
-  const muted = "var(--text-muted)";
-  const fg = "var(--text)";
+export default function SwapLogsTable({ logs }) {
+  if (!logs || logs.length === 0) {
+    return <p>No swap logs available.</p>;
+  }
 
   return (
     <table
       style={{
         width: "100%",
-        borderCollapse: "collapse",
         marginTop: "12px",
-        fontSize: "0.95rem",
-        color: fg,
+        borderCollapse: "collapse",
+        fontSize: "0.9rem",
       }}
     >
       <thead>
-        <tr
-          style={{
-            backgroundColor: headerBg,
-            borderBottom: `1px solid ${border}`,
-          }}
-        >
-          <th style={{ textAlign: "left", padding: "6px" }}>Time</th>
+        <tr style={{ borderBottom: "1px solid #555" }}>
+          <th style={{ padding: "6px" }}>Time</th>
           <th style={{ padding: "6px" }}>Pool</th>
           <th style={{ padding: "6px" }}>Swap</th>
-          <th style={{ padding: "6px", textAlign: "right" }}>In</th>
-          <th style={{ padding: "6px", textAlign: "right" }}>Out</th>
-          <th style={{ textAlign: "left", padding: "6px" }}>Status</th>
+          <th style={{ padding: "6px" }}>In</th>
+          <th style={{ padding: "6px" }}>Out</th>
+          <th style={{ padding: "6px" }}>Status</th>
         </tr>
       </thead>
 
       <tbody>
-        {logs.map((log) => (
-          <tr
-            key={log.id}
-            style={{
-              borderTop: `1px solid ${border}`,
-            }}
-          >
-            <td style={{ padding: "6px", color: muted }}>
-              {new Date(log.timestamp).toLocaleTimeString()}
-            </td>
+        {logs.map((log, i) => {
+          const ts = new Date(log.timestamp).toLocaleTimeString();
+          const poolLabel = `${log.pool.baseSymbol}/${log.pool.quoteSymbol}`;
+          const swapDir = `${log.inputSymbol} → ${log.outputSymbol}`;
 
-            <td style={{ padding: "6px" }}>{log.pool}</td>
-
-            <td style={{ padding: "6px" }}>
-              {log.fromAsset} → {log.toAsset}
-            </td>
-
-            <td
-              style={{
-                padding: "6px",
-                textAlign: "right",
-              }}
-            >
-              {log.amountIn.toLocaleString()}
-            </td>
-
-            <td
-              style={{
-                padding: "6px",
-                textAlign: "right",
-              }}
-            >
-              {log.amountOut.toLocaleString()}
-            </td>
-
-            <td
-              style={{
-                padding: "6px",
-                color:
-                  log.status === "confirmed"
-                    ? "var(--accent-green)"
-                    : "var(--accent-orange)",
-              }}
-            >
-              {log.status}
-            </td>
-          </tr>
-        ))}
+          return (
+            <tr key={i} style={{ borderBottom: "1px solid #333" }}>
+              <td style={{ padding: "6px" }}>{ts}</td>
+              <td style={{ padding: "6px" }}>{poolLabel}</td>
+              <td style={{ padding: "6px" }}>{swapDir}</td>
+              <td style={{ padding: "6px" }}>{log.inputAmount.toLocaleString()}</td>
+              <td style={{ padding: "6px" }}>{log.outputAmount.toLocaleString()}</td>
+              <td
+                style={{
+                  padding: "6px",
+                  color: log.confirmed ? "lightgreen" : "orange",
+                }}
+              >
+                {log.confirmed ? "confirmed" : "pending"}
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );
 }
-
-export default SwapLogsTable;
