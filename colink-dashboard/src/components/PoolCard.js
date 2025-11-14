@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import "./PoolCard.css";
+
 
 function PoolCard({ pools }) {
   if (!pools || pools.length === 0) {
@@ -49,3 +49,4 @@ function PoolCard({ pools }) {
 }
 
 export default PoolCard;
+
