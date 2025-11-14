@@ -1,4 +1,8 @@
-﻿@echo off
+@echo off
+@echo off
+@echo off
+@echo off
+@echo off
 @echo off
 @echo off
 @echo off

@@ -78,7 +78,7 @@ def _print(obj) -> None:
     sys.stdout.write(json.dumps(obj))
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser(, ensure_ascii=False, indent=2) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="colink-json",
         description="COLINK sim JSON CLI",

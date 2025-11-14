@@ -418,3 +418,9 @@ if ($abs) {
 } else {
   Write-Warning "Dashboard not found: $index"
 }
+
+Start-Process ".artifacts\\index.html"
+
+
+Start-Process ".artifacts\\index.html"
+

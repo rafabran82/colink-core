@@ -1,4 +1,4 @@
-﻿import csv, json, os, sys, pathlib, datetime
+import csv, json, os, sys, pathlib, datetime
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 ART   = REPO / ".artifacts"
@@ -83,7 +83,7 @@ def write_json(rows):
             pass
     for r in rows:
         by_id[r["run_id"]] = r
-    JSON_PATH.write_text(json.dumps(list(sorted(by_id.values(), key=lambda x: x.get("run_id",""))), indent=2), encoding="utf-8")
+    JSON_PATH.write_text(json.dumps(list(sorted(by_id.values(, ensure_ascii=False, indent=2), key=lambda x: x.get("run_id",""))), indent=2), encoding="utf-8")
 
 def write_ndjson(rows):
     seen = set()

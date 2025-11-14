@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import json, os, sys, time, random, argparse
 from datetime import datetime, timezone
 
@@ -35,7 +35,7 @@ def main():
                 "slippage_bps": round(random.uniform(0, 15), 3),
             }
             f.write(json.dumps(evt) + "\n")
-            time.sleep(0.0)  # keep instant for MVP
+            time.sleep(0.0, ensure_ascii=False, indent=2)  # keep instant for MVP
 
     # Summarize simple metrics
     met_path = os.path.join(args.out, "sim.metrics.json")

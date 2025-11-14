@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 from .xrpl_snapshot import load_bootstrap_snapshot
 import argparse
 import json
@@ -13,6 +13,7 @@ import sys
 import time
 from datetime import UTC, datetime
 
+
 def _select_backend(name: str | None) -> str:
     backend = (name or os.getenv("DISPLAY_BACKEND") or "Agg").strip()
     import matplotlib
@@ -22,6 +23,7 @@ def _select_backend(name: str | None) -> str:
     else:
         matplotlib.use(backend)
     return backend
+
 
 def _git_sha() -> str | None:
     sha = os.getenv("GITHUB_SHA")
@@ -34,6 +36,7 @@ def _git_sha() -> str | None:
         return out.strip()
     except Exception:
         return None
+
 
 def _demo_series(n: int = 240) -> list[tuple[int, float]]:
     """Generate a simple synthetic series (random-walk over a gentle sine)."""
@@ -49,6 +52,7 @@ def _demo_series(n: int = 240) -> list[tuple[int, float]]:
         series.append((ts_ms, y))
     return series
 
+
 def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
     backend = _select_backend(display)
     # Import pyplot only after backend selection
@@ -56,7 +60,7 @@ def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
 
     series = _demo_series()
 
-    # 1) Plot â†’ PNG
+    # 1) Plot → PNG
     xs = [t for (t, _y) in series]
     ys = [y for (_t, y) in series]
 
@@ -116,38 +120,20 @@ def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
         "backend": backend,
     }
 
-from .engine import run_sim
-from dataclasses import dataclass
-from typing import Optional
-
-@dataclass
-class SimContext:
-    out_prefix: pathlib.Path
-    display: str | None
-    xrpl_snapshot: Optional[object] = None
-    swap_direction: str | None = None
-    swap_amount: float | None = None
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="COLINK sim runner (PNG + NDJSON + JSON metrics)")
-
     p.add_argument("--demo", action="store_true", help="Run the demo series generator")
-
     p.add_argument(
         "--display",
         type=str,
         default=None,
         help="Matplotlib backend (default: env DISPLAY_BACKEND or Agg)",
     )
-
     p.add_argument(
-        "--out-prefix",
-        type=str,
-        required=True,
-        help="Output path prefix (no extension)",
+        "--out-prefix", type=str, required=True, help="Output path prefix (no extension)"
     )
-
-    p.add_argument(
+    parser.add_argument(
         "--xrpl-bootstrap-dir",
         type=str,
         default=None,
@@ -157,54 +143,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         ),
     )
 
-    p.add_argument(
-        "--sim",
-        action="store_true",
-        help="Run the COLINK XRPL simulation engine",
-    )
-
-    p.add_argument(
-        "--swap-direction",
-        type=str,
-        default=None,
-        help="Swap direction: CPX->COL or COL->CPX",
-    )
-
-    p.add_argument(
-        "--swap-amount",
-        type=float,
-        default=None,
-        help="Amount input for the swap",
-    )
-
     return p.parse_args(argv)
+
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    out_prefix = pathlib.Path(args.out_prefix)
+    if args.demo:
+        res = run_demo(out_prefix, args.display)
+        print(json.dumps({"ok": True, "backend": res["backend"], "prefix": str(out_prefix)}))
+        return 0
+    print(json.dumps({"ok": False, "error": "no mode selected (try --demo)"}))
+    return 2
 
-    # XRPL bootstrap (read-only wiring)
-    xrpl_snapshot = None
-    if args.xrpl_bootstrap_dir:
-        try:
-            xrpl_snapshot = load_bootstrap_snapshot(args.xrpl_bootstrap_dir)
-        except Exception as exc:
-            print(f"[XRPL] Warning: failed to load snapshot: {exc}")
-            xrpl_snapshot = None
-    if xrpl_snapshot is not None:
-        print(f"[XRPL] Loaded bootstrap snapshot from {xrpl_snapshot.base_dir}")
-
-    # Build unified context
-    ctx = SimContext(
-        out_prefix=pathlib.Path(args.out_prefix),
-        display=args.display,
-        xrpl_snapshot=xrpl_snapshot,
-        swap_direction=args.swap_direction,
-        swap_amount=args.swap_amount,
-    )
-
-print("DEBUG: calling run_sim")
 
 if __name__ == "__main__":
     sys.exit(main())
-
 
