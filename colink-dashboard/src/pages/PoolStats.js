@@ -1,13 +1,12 @@
 ﻿import React, { useEffect, useState } from "react";
-import "../App.css";
-import SimMetaBar from "../components/SimMetaBar";
-import PoolCard from '../components/PoolCard';
-import PoolStatsTable from '../components/PoolStatsTable';
-import { fetchPoolState, fetchSimMeta } from "../api";
+import PoolCard from "../components/PoolCard";
+import PoolStatsTable from "../components/PoolStatsTable";
+import { fetchPools, PoolState } from "../api/pools";
+import { fetchSimMeta } from "../api";
 
 function PoolStatsPage() {
   const [meta, setMeta] = useState(null);
-  const [pool, setPool] = useState(null);
+  const [pools, setPools] = useState(/** @type {PoolState[] | null} */ (null));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +16,12 @@ function PoolStatsPage() {
       try {
         const [m, p] = await Promise.all([
           fetchSimMeta(),
-          fetchPoolState(),
+          fetchPools(),
         ]);
 
         if (!cancelled) {
           setMeta(m);
-          setPool(p);
+          setPools(p);
           setLoading(false);
         }
       } catch (err) {
@@ -32,42 +31,25 @@ function PoolStatsPage() {
     }
 
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   return (
-    <div
-      style={{
-        padding: "24px",
-        minHeight: "100vh",
-        backgroundColor: "var(--bg)",
-        color: "var(--text)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "16px",
-        }}
-      >
-        <SimMetaBar meta={meta} />
-      </div>
+    <div style={{ padding: "24px" }}>
+      <h1>Pool Stats</h1>
 
-      <h1>COLINK Pool Stats</h1>
+      {loading && !pools && <p>Loading pool data…</p>}
 
-      <section style={{ marginTop: "16px" }}>
-        <h2>Pool State</h2>
-        {loading && !pool && <p>Loading pool state…</p>}
-        {pool && <PoolCard pool={pool} />`n        <PoolStatsTable pools={[pool]} />}
-      </section>
+      {pools && pools.length > 0 && (
+        <>
+          <PoolCard pools={pools} />
+          <div style={{ marginTop: "24px" }}>
+            <PoolStatsTable pools={pools} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 export default PoolStatsPage;
-
-
