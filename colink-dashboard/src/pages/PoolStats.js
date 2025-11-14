@@ -62,11 +62,12 @@ function PoolStatsPage() {
       <section style={{ marginTop: "16px" }}>
         <h2>Pool State</h2>
         {loading && !pool && <p>Loading pool state…</p>}
-        {pool && <PoolCard pool={pool} />}
+        {pool && <PoolCard pool={pool} />`n        <PoolStatsTable pools={[pool]} />}
       </section>
     </div>
   );
 }
 
 export default PoolStatsPage;
+
 
