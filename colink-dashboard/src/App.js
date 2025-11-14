@@ -15,7 +15,18 @@ function computeLatestTimestamp(simMeta, pools, swaps) {
   if (Array.isArray(pools)) {
     pools.forEach(p => {
       if (p.lastUpdated) ts.push(new Date(p.lastUpdated));
-    });
+    }
+function markFlashes(oldArr, newArr, keyFn) {
+  const oldMap = Object.fromEntries((oldArr || []).map(o => [keyFn(o), o]));
+  return (newArr || []).map(n => {
+    const key = keyFn(n);
+    const old = oldMap[key];
+    if (!old) return { ...n, __flash: true };              // New entry
+    if (JSON.stringify(old) !== JSON.stringify(n))          // Changed entry
+      return { ...n, __flash: true };
+    return { ...n, __flash: false };
+  });
+});
   }
 
   if (Array.isArray(swaps)) {
@@ -44,14 +55,21 @@ function App() {
   }, []);
 
   async function loadAll() {
-    try {
-      const [m, p, l] = await Promise.all([
-        fetchSimMeta(),
-        fetchPools(),
-        fetchSwapLogs(),
-      ]);
+  try {
+    const [m, p, l] = await Promise.all([
+      fetchSimMeta(),
+      fetchPools(),
+      fetchSwapLogs(),
+    ]);
 
-      setMeta(m || {});
+    // Apply flashing logic
+    setMeta(m || {});
+    setPools(prev => markFlashes(prev, p || [], x => x.label));
+    setLogs(prev => markFlashes(prev, l || [], x => x.id));
+  } catch (err) {
+    console.error("Dashboard loadAll failed", err);
+  }
+});
       setPools(p || []);
       setLogs(l || []);
     } catch (err) {
@@ -92,11 +110,11 @@ function App() {
           >
             <h3>{pool.label}</h3>
             <p>
-              <b>Base:</b> {pool.baseSymbol} Ã¢â‚¬â€ Liquidity:{" "}
+              <b>Base:</b> {pool.baseSymbol} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Liquidity:{" "}
               {pool.baseLiquidity.toLocaleString()}
             </p>
             <p>
-              <b>Quote:</b> {pool.quoteSymbol} Ã¢â‚¬â€ Liquidity:{" "}
+              <b>Quote:</b> {pool.quoteSymbol} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Liquidity:{" "}
               {pool.quoteLiquidity.toLocaleString()}
             </p>
             <p>
