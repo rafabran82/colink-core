@@ -33,10 +33,16 @@ function Home() {
     return () => { cancelled = true; };
   }, []);
 
+  // -------------------------
+  // AMM DEMO PANEL COMPONENT
+  // -------------------------
   const renderAmmDemo = () => {
     if (!meta || !meta.amm_demo) return null;
 
     const { png, json, ndjson } = meta.amm_demo;
+
+    // Prefix with backend API origin
+    const base = "http://localhost:8000";
 
     return (
       <div style={{
@@ -54,7 +60,7 @@ function Home() {
         </p>
 
         <img
-          src={`/${png}`}
+          src={`${base}/${png}`}
           alt="AMM Demo"
           style={{
             width: "100%",
@@ -66,9 +72,9 @@ function Home() {
         />
 
         <div style={{ display: "flex", gap: "12px" }}>
-          <a href={`/${png}`} target="_blank" rel="noopener noreferrer">PNG</a>
-          <a href={`/${json}`} target="_blank" rel="noopener noreferrer">JSON</a>
-          <a href={`/${ndjson}`} target="_blank" rel="noopener noreferrer">NDJSON</a>
+          <a href={`${base}/${png}`} target="_blank" rel="noopener noreferrer">PNG</a>
+          <a href={`${base}/${json}`} target="_blank" rel="noopener noreferrer">JSON</a>
+          <a href={`${base}/${ndjson}`} target="_blank" rel="noopener noreferrer">NDJSON</a>
         </div>
       </div>
     );
@@ -78,6 +84,7 @@ function Home() {
     <div style={{ padding: "24px" }}>
       <h1>COLINK Dashboard - Overview</h1>
 
+      {/* AMM DEMO PANEL */}
       {renderAmmDemo()}
 
       {loading && pools.length === 0 && <p>Loading pools…</p>}
