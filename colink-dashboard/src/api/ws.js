@@ -1,6 +1,6 @@
 /*
   WebSocket live feed for COLINK dashboard.
-  Backend must expose ws://localhost:8000/ws or wss://â€¦ in production.
+  Backend must expose ws://localhost:8000/ws or wss://Ã¢â‚¬Â¦ in production.
 */
 
 export function connectWS(onMessage) {

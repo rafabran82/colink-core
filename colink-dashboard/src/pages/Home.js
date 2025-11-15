@@ -1,11 +1,41 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PoolCard from "../components/PoolCard";
-import { fetchPools } from "../api/pools";
+import { fetchPools } from "../api/pools";`r`nimport { fetchSwaps } from "../api/swaps";
 import { fetchSimMeta } from "../api";
 
-function Home() {
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import React, { useEffect, useState } from "react";
+
+function AMMGraph() {
+  const [data, setData] = useState([]);
+
+  const fetchData = async () => {
+    const response = await fetch("http://localhost:8000/api/sim/meta");
+    const data = await response.json();
+    setData(data);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="price" stroke="#8884d8" />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+export default AMMGraph; {
   const [meta, setMeta] = useState(null);
-  const [pools, setPools] = useState([]);
+  const [pools, setPools]\r\n  const [swaps, setSwaps] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -87,7 +117,7 @@ function Home() {
       {/* AMM DEMO PANEL */}
       {renderAmmDemo()}
 
-      {loading && pools.length === 0 && <p>Loading pools…</p>}
+      {loading && pools.length === 0 && <p>Loading poolsâ€¦</p>}
 
       {pools.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -101,3 +131,23 @@ function Home() {
 }
 
 export default Home;
+
+      <h3>Recent swaps</h3>
+      {swaps.length === 0 && <p>No recent swaps.</p>}
+      {swaps.length > 0 && (
+        <table>
+          <thead><tr><th>Pair</th><th>Amount in</th><th>Amount out</th><th>Timestamp</th></tr></thead>
+          <tbody>
+            {swaps.map((s, i) => (
+              <tr key={i}>
+                <td>{s.pair}</td>
+                <td>{s.amount_in}</td>
+                <td>{s.amount_out}</td>
+                <td>{s.timestamp}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+

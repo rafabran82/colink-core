@@ -12,3 +12,4 @@ export async function fetchSwapLogs() {
 export async function fetchSimMeta() {
   return null;
 }
+

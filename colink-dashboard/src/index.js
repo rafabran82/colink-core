@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./index.css";          // <-- Ensure CSS is loaded
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
@@ -9,3 +10,5 @@ root.render(
     <App />
   </BrowserRouter>
 );
+
+

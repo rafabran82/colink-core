@@ -22,7 +22,7 @@ function SwapLogsPage() {
     <div style={{ padding: "20px" }}>
       <h1>Swap Logs</h1>
 
-      {loading && logs.length === 0 && <p>Loading swap logs…</p>}
+      {loading && logs.length === 0 && <p>Loading swap logsâ€¦</p>}
 
       {!loading && logs.length === 0 && (
         <p>No swap logs available.</p>
@@ -36,3 +36,4 @@ function SwapLogsPage() {
 }
 
 export default SwapLogsPage;
+

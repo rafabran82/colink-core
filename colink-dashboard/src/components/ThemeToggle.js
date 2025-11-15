@@ -10,9 +10,9 @@ export default function ThemeToggle() {
       className="theme-toggle-btn"
       title="Change theme"
     >
-      {theme === "dark" && "ðŸŒ™"}
-      {theme === "neon" && "ðŸ'¡"}
-      {theme === "future" && "ðŸš€"}
+      {theme === "dark" && "Ã°Å¸Å’â„¢"}
+      {theme === "neon" && "Ã°Å¸'Â¡"}
+      {theme === "future" && "Ã°Å¸Å¡â‚¬"}
     </button>
   );
 }

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 export default function MetaView({ meta }) {
   if (!meta) {
@@ -17,3 +17,4 @@ export default function MetaView({ meta }) {
     </div>
   );
 }
+

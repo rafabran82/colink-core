@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 export default function PoolsView({ pools }) {
   if (!pools || pools.length === 0) {
@@ -18,3 +18,4 @@ export default function PoolsView({ pools }) {
     </div>
   );
 }
+

@@ -1,22 +1,120 @@
+﻿/* Base light theme */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f4f4;
+  color: #222;
+  line-height: 1.5;
+  padding: 16px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-.flash-update {
-  animation: flashGlow 1.2s ease-out;
+/* Theme toggle button */
+.theme-toggle {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background-color: #ddd;
+  color: #222;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-@keyframes flashGlow {
-  0% { background-color: rgba(255, 255, 0, 0.35); }
-  60% { background-color: rgba(255, 255, 0, 0.15); }
-  100% { background-color: transparent; }
+.theme-toggle:hover {
+  background-color: #ccc;
+}
+
+/* Dark mode overrides */
+#root-container.dark-mode {
+  background-color: #0f1115;
+  color: #f5f5f5;
+}
+
+#root-container.dark-mode h1 {
+  margin: 0 0 16px 0;
+  font-size: 28px;
+}
+
+#root-container.dark-mode h2 {
+  margin: 16px 0 8px 0;
+  font-size: 18px;
+  color: #f5f5f5;
+}
+
+#root-container.dark-mode table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: 1px solid #2c2f36;
+  margin-bottom: 16px;
+}
+
+#root-container.dark-mode th,
+#root-container.dark-mode td {
+  border-bottom: 1px solid #2c2f36;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+#root-container.dark-mode th {
+  background-color: #1f2228;
+  font-weight: 600;
+}
+
+#root-container.dark-mode td {
+  background-color: transparent;
+}
+
+#root-container.dark-mode tbody tr:nth-child(even) {
+  background-color: #16181c;
+}
+
+#root-container.dark-mode .theme-toggle {
+  background-color: #2c2f36;
+  color: #f5f5f5;
+  border-color: #555;
+}
+
+#root-container.dark-mode .theme-toggle:hover {
+  background-color: #3a3e48;
+  border-color: #666;
+}
+
+/* Add spacing around sections */
+#root-container > section {
+  margin-bottom: 24px;
+}
+/* === COLINK Dashboard theme styles === */
+.app {
+  min-height: 100vh;
+  padding: 2rem;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Light theme */
+.app.light {
+  background-color: #ffffff;
+  color: #111111;
+}
+
+/* Dark theme */
+.app.dark {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
+/* Make sure main dashboard text follows theme */
+.app.dark .dashboard {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Keep a global body hook if we ever need it elsewhere */
+body.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
 }

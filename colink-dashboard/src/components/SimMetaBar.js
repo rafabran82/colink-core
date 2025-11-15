@@ -16,12 +16,13 @@ function SimMetaBar({ meta }) {
       }}
     >
       <strong>Phase {meta.phase}</strong>
-      {" · "}
+      {" Â· "}
       <span>{meta.network}</span>
-      {" · "}
+      {" Â· "}
       <span>Run: {meta.runId}</span>
     </div>
   );
 }
 
 export default SimMetaBar;
+

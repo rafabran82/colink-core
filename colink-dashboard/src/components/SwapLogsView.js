@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 export default function SwapLogsView({ logs }) {
   if (!logs || logs.length === 0) {
@@ -18,3 +18,4 @@ export default function SwapLogsView({ logs }) {
     </div>
   );
 }
+

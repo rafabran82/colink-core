@@ -18,7 +18,7 @@ function PoolStats() {
   }, []);
 
   if (loading) {
-    return <p style={{ padding: "20px" }}>Loading pool stats…</p>;
+    return <p style={{ padding: "20px" }}>Loading pool statsâ€¦</p>;
   }
 
   if (!loading && pools.length === 0) {
@@ -61,3 +61,4 @@ function PoolStats() {
 }
 
 export default PoolStats;
+

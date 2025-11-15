@@ -42,3 +42,4 @@ export default function PoolCard({ pool }) {
     </div>
   );
 }
+

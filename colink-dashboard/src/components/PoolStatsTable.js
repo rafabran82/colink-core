@@ -68,3 +68,4 @@ const row = {
 };
 
 export default PoolStatsTable;
+
