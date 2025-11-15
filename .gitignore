@@ -60,3 +60,9 @@ scripts/*.bak*
 *.zip
 *.7z
 *.rar
+# Local dependencies (keep untracked)
+node_modules/
+colink-dashboard/backend/node_modules/
+
+# Local backup files
+*.bak
