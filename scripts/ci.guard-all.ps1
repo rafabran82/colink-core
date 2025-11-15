@@ -109,7 +109,13 @@ if ($ewsExit -ne 0) {
 }
 
 Write-Host ""
-Write-Host "🟢 EWS-MASTER: all checks passed. Proceeding to Local CI..." -ForegroundColor Green
+Write-Host "🟢 Write-Host "▶ GIT NOISE CHECK (EWS)"
+& "$PSScriptRoot\ews.git-noise.ps1"
+if ($LASTEXITCODE -ne 0) {
+  Write-Error "EWS-MASTER: git-noise check failed."
+  exit 1
+}
+EWS-MASTER: ALL CHECKS PASSED. Proceeding to Local CI..." -ForegroundColor Green
 Write-Host ""
 
 # --- 4) Run Local CI, only after EWS success ---
@@ -129,3 +135,4 @@ if ($ciExit -eq 0) {
 }
 
 exit $ciExit
+
