@@ -1,4 +1,5 @@
-﻿from fastapi import FastAPI`r`nfrom fastapi.staticfiles import StaticFiles
+﻿from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from colink_core.api.ws import ws_router
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -19,6 +20,12 @@ from colink_core.api.routes import (
 )
 
 app = FastAPI(title="COLINK API")
+# Serve Local CI artifacts under /artifacts
+app.mount(
+    "/artifacts",
+    StaticFiles(directory=".artifacts", html=False),
+    name="artifacts"
+)
 
 # --- Serve artifacts to dashboard ---
 app.mount(
@@ -51,6 +58,10 @@ app.include_router(paper_admin.router, prefix="/api")
 app.include_router(paper_portfolio.router, prefix="/api")
 app.include_router(debug.router, prefix="/api")
 app.include_router(dashboard_api.router, prefix="/api")
+
+
+
+
 
 
 
