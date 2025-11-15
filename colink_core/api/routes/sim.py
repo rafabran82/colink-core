@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import re
 from pathlib import Path
@@ -81,3 +81,27 @@ def sim_sweep(outdir: str):
 
     charts = ["twap.png", "depth.png"]
     return {"ok": True, "outdir": str(p), "charts": charts}
+
+@router.get("/pools")
+async def get_pools():
+    return [
+        {"pair": "COPX/COL", "r1": 1000, "r2": 7800},
+        {"pair": "COL/XRP",  "r1": 15000, "r2": 270},
+    ]
+
+@router.get("/swaps")
+async def get_swaps():
+    return [
+        {
+            "pair": "COPX/COL",
+            "amount_in": 1000,
+            "amount_out": 7800,
+            "timestamp": "2025-01-01T00:00:00Z"
+        },
+        {
+            "pair": "COL/XRP",
+            "amount_in": 15000,
+            "amount_out": 270,
+            "timestamp": "2025-01-01T00:05:00Z"
+        }
+    ]

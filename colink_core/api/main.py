@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from colink_core.api.ws import ws_router
 from fastapi.middleware.cors import CORSMiddleware
+from colink_core.api.ws import ws_router
 
 # Import routers from top-level routes/ folder
 from colink_core.api.routes import (
@@ -17,9 +17,10 @@ from colink_core.api.routes import (
     paper_admin,
     paper_portfolio,
     debug,
+    meta,
 )
-
 app = FastAPI(title="COLINK API")
+app.include_router(meta.router, prefix="/api")
 # Serve Local CI artifacts under /artifacts
 app.mount(
     "/artifacts",
@@ -58,6 +59,9 @@ app.include_router(paper_admin.router, prefix="/api")
 app.include_router(paper_portfolio.router, prefix="/api")
 app.include_router(debug.router, prefix="/api")
 app.include_router(dashboard_api.router, prefix="/api")
+
+
+
 
 
 
