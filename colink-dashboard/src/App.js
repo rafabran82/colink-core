@@ -2,6 +2,7 @@
 import "./index.css";
 import { fetchPools } from "./api/pools";
 import { fetchAccountBalance } from "./api/account";
+import { fetchAccountInfo } from "./api/accountInfo";
 
 import { Bar } from "react-chartjs-2";
 import {
@@ -24,6 +25,7 @@ function getInitialTheme() {
 
 function App() {
   const [accountBalance, setAccountBalance] = useState(null);
+  const [accountInfo, setAccountInfo] = useState(null);
   const [theme, setTheme] = useState(getInitialTheme());
   const [pools, setPools] = useState([]);  // TEMP DEBUG: log pools when loaded
   useEffect(() => {
@@ -191,6 +193,17 @@ useEffect(() => {
     loadBalance();
   }, []);
 
+  useEffect(() => {
+    const loadAccountInfo = async () => {
+      try {
+        const info = await fetchAccountInfo();
+        setAccountInfo(info);
+      } catch (err) {
+        console.error("Failed to fetch account info", err);
+      }
+    };
+    loadAccountInfo();
+  }, []);
   return (
     <div className={`app ${theme}`}>
       <button
@@ -255,6 +268,41 @@ useEffect(() => {
           <p style={{ fontSize: '22px', fontWeight: 'bold' }}>
             {accountBalance !== null ? accountBalance + ' XRP' : 'Loading…'}
           </p>
+
+          <div
+            style={{
+              marginTop: '12px',
+              padding: '10px',
+              borderRadius: '8px',
+              border: '1px solid #1f2937',
+              backgroundColor: '#020617',
+              fontSize: '12px',
+              lineHeight: 1.4,
+            }}
+          >
+            <h3 style={{ marginBottom: '6px' }}>Account Info</h3>
+            {accountInfo ? (
+              <>
+                <p style={{ wordBreak: 'break-all', marginBottom: '4px' }}>
+                  <strong>Address:</strong> {accountInfo.Account}
+                </p>
+                <p style={{ marginBottom: '2px' }}>
+                  <strong>Ledger:</strong>{' '}
+                  {accountInfo.ledger_index ?? accountInfo.ledgerIndex ?? '—'}
+                </p>
+                <p style={{ marginBottom: '2px' }}>
+                  <strong>OwnerCount:</strong>{' '}
+                  {accountInfo.OwnerCount ?? '0'}
+                </p>
+                <p style={{ marginBottom: '2px' }}>
+                  <strong>Flags:</strong>{' '}
+                  {accountInfo.Flags ?? '0'}
+                </p>
+              </>
+            ) : (
+              <p>Loading XRPL account details…</p>
+            )}
+          </div>
         </div>
 </section>
       </div>
@@ -263,6 +311,7 @@ useEffect(() => {
 }
 
 export default App;
+
 
 
 
