@@ -214,8 +214,6 @@ COL_LP_BUY_AMOUNT   = "10000"     # ... wants 10k COL in return
 COL_LP_SELL_AMOUNT  = "10000"     # LP sells 10k COL for COPX
 COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
 
-
-
     override = os.environ.get("XRPL_ENDPOINT")
     if override:
         if verbose:
@@ -235,7 +233,6 @@ COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
         print(f"[client] Using default {network} endpoint: {url}")
 
     return JsonRpcClient(url)
-
 
 # -----------------------------------
 # Faucet funding
@@ -292,7 +289,6 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
     wait_for_activation(client, addr)
     time.sleep(2.0)
 
-
 # -----------------------------------
 # COL issuance helpers
 def issue_col_to_wallet(
@@ -337,7 +333,6 @@ def issue_col_to_wallet(
         print(f"[col-issue] submitted, hash={tx_hash or "N/A"}")
 
     return tx_hash or ""
-
 
 def issue_copx_to_wallet(
     client: JsonRpcClient,
@@ -431,8 +426,6 @@ def has_trustline(client: JsonRpcClient, acct: str, issuer: str, currency_hex: s
             return True
     return False
 
-
-
 def create_trustline(
     client: JsonRpcClient,
     wallet: Wallet,
@@ -475,7 +468,6 @@ tx = TrustSet(
         print(f"[trustline] submitted, hash={tx_hash or 'N/A'}")
     return tx_hash
 
-
 # COL trustline helper (thin wrapper around create_trustline)
 def create_col_trustline(
     client: JsonRpcClient,
@@ -500,7 +492,6 @@ def create_col_trustline(
         verbose=verbose,
     )
 
-
 # -----------------------------------
 # Argparse
 # -----------------------------------
@@ -524,7 +515,6 @@ def parse_args() -> argparse.Namespace:
         help="Verbose output",
     )
     return p.parse_args()
-
 
 # -----------------------------------
 # Main bootstrap flow
@@ -911,7 +901,6 @@ def main() -> int:
     append_tx_note(txlog_path, "bootstrap finished")
     return 0
 
-
 def inspect_copx_col_orderbook(
     client: JsonRpcClient,
     issuer_addr: str,
@@ -940,7 +929,6 @@ def inspect_copx_col_orderbook(
         if verbose:
         print(f"[orderbook] COPX->COL offers: {len(offers)}")
     return result if isinstance(result, dict) else {"offers": offers}
-
 
 def simulate_col_to_copx_payment(
     client: JsonRpcClient,
@@ -996,14 +984,6 @@ def simulate_col_to_copx_payment(
 
     return tx_hash or ""
 
-
 if __name__ == "__main__":
     sys.exit(main(")
-
-
-
-
-
-
-
 
