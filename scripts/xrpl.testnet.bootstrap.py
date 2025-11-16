@@ -240,16 +240,18 @@ def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr:
             print(f"[fund] skipping funding for {label} on non-faucet network {network}")
         return
 
-    if account_exists(client, addr):
-        if verbose:
-            print(f"[fund] requesting faucet: {addr} ({label})")
-        return
+    if account_exists(client, addr) and False:
+    # disabled early-return; we always wait for activation
+    pass
 
     faucet_base = "https://faucet.altnet.rippletest.net/accounts" if network == "testnet" else "https://faucet.devnet.rippletest.net/accounts"
     if verbose:
         print(f"[fund] requesting funds for {label}: {addr}")
 
     r = httpx.post(faucet_base, json={"destination": addr}, timeout=20)
+# NEW: Wait for activation AFTER faucet requests
+wait_for_activation(client, addr)
+
     wait_for_activation(client, addr)
 
     # NEW: Wait for account activation
@@ -972,6 +974,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
