@@ -64,8 +64,13 @@ $lpTx = Get-XRPLTx -address $lp -limit $Limit
 function Normalize-Tx {
     param($tx)
 
-    $t = $tx.tx
+    $t    = $tx.tx
     $meta = $tx.meta
+
+    # Safe getters for optional fields
+    $amount     = if ($t.PSObject.Properties["Amount"])     { $t.Amount }     else { $null }
+    $takerGets  = if ($t.PSObject.Properties["TakerGets"])  { $t.TakerGets }  else { $null }
+    $takerPays  = if ($t.PSObject.Properties["TakerPays"])  { $t.TakerPays }  else { $null }
 
     return [PSCustomObject]@{
         hash        = $t.hash
@@ -75,11 +80,12 @@ function Normalize-Tx {
         sequence    = $t.Sequence
         date        = $t.date
         validated   = $tx.validated
-        taker_gets  = $t.TakerGets
-        taker_pays  = $t.TakerPays
-        amount      = $t.Amount
+        amount      = $amount
+        taker_gets  = $takerGets
+        taker_pays  = $takerPays
         offer_data  = $meta.AffectedNodes
     }
+}
 }
 
 $norm = @{
@@ -103,3 +109,4 @@ $norm | ConvertTo-Json -Depth 20 | Set-Content $outFile -Encoding utf8
 
 Write-Host "💾 Saved ledger snapshot: $outFile"
 Write-Host "✅ XRPL Event Collector complete." -ForegroundColor Green
+
