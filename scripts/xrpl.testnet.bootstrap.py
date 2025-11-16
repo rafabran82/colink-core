@@ -1,4 +1,5 @@
-﻿# ============================================================
+﻿from __future__ import annotations
+# ============================================================
 # Wait until XRPL account exists on ledger
 # ============================================================
 def wait_for_activation(client, address, retries=20, sleep_s=1):
@@ -36,8 +37,6 @@ Usage (from repo root):
     --execute ^
     --verbose
 """
-
-from __future__ import annotations
 
 # ============================================================
 # Wait until XRPL account exists on ledger
@@ -930,6 +929,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
