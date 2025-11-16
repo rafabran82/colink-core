@@ -1,9 +1,11 @@
 ﻿. "$PSScriptRoot\scripts\Show-LP-Dashboard.ps1"
-
-
 param(
     [int]$TopN = 20,
-    [ValidateSet("lp_max_drawdown_pct","lp_volatility_abs_mean","total_shocks","lp_apy")]
+    [ValidateSet("lp_max_drawdown_pct","lp_volatility_abs_mean","total_shocks","lp_apy")
+
+
+
+]
     [string]$SortBy = "lp_max_drawdown_pct"
 )
 
@@ -73,8 +75,7 @@ Write-Host "`n✅ Simulation run complete. Dashboard and summary displayed."
 # ====================================================================
 
 function Distribute-LP-Rewards {
-    param(
-        [Parameter(Mandatory=$true)]
+    ]
         [array]$TopLPs,
 
         [double]$RewardPool = 1000,
@@ -137,6 +138,7 @@ Write-Host "`n💾 Rewards output saved → $rewardOut" -ForegroundColor Cyan
 # ====================================================================
 # END OF MODULE
 # ====================================================================
+
 
 
 
