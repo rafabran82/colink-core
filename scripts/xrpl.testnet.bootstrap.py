@@ -150,7 +150,8 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
         if network == "testnet"
         else "https://faucet.devnet.rippletest.net/accounts"
     )
-        if verbose:
+
+    if verbose:
         print(f"[fund] requesting faucet: {addr} ({label})")
 
     # Request funding
@@ -162,8 +163,9 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
 
     # Ensure activation before continuing
     wait_for_activation(client, addr)
-        if verbose:
-        print(f"[fund] activated: {addr} ({label})")
+
+    if verbose:
+        print(f"[fund] activated: {addr} ({label})"))
 import time
 
 def wait_for_activation(client, address, max_tries=30, sleep_s=2):
@@ -1007,6 +1009,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
