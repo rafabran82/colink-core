@@ -58,3 +58,30 @@ if ($issues.Count -eq 0) {
     Write-Host "?? Health Issues:" -ForegroundColor Yellow
     $issues | ForEach-Object { Write-Host " - $_" -ForegroundColor Yellow }
 }
+
+# ============================================================
+# LAYER 5 ? Logging & Summary File Output
+# ============================================================
+
+Write-Host "=== LAYER 5 ===" -ForegroundColor Yellow
+
+$summaryFolder = Join-Path $PSScriptRoot "scripts\.artifacts\data"
+if (-not (Test-Path $summaryFolder)) {
+    New-Item -ItemType Directory -Path $summaryFolder -Force | Out-Null
+}
+
+$timestamp = (Get-Date).ToString("yyyyMMdd-HHmmss")
+
+$summary = [ordered]@{
+    timestamp     = $timestamp
+    TopN          = $TopN
+    avgDrawdown   = $avgDrawdown
+    avgVolatility = $avgVol
+    totalShocks   = $totalShocks
+    avgAPY        = $avgAPY
+}
+
+$summaryPath = Join-Path $summaryFolder "lp_summary_$timestamp.json"
+$summary | ConvertTo-Json -Depth 5 | Set-Content -Path $summaryPath -Encoding UTF8
+
+Write-Host "?? Summary saved ? $summaryPath" -ForegroundColor Cyan
