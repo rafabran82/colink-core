@@ -124,7 +124,7 @@ def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr:
 
     if account_exists(client, addr):
         if verbose:
-            print(f"[fund] exists: {addr} ({label})")
+            print(f"[fund] requesting faucet: {addr} ({label})")
         return
 
     faucet_base = "https://faucet.altnet.rippletest.net/accounts" if network == "testnet" else "https://faucet.devnet.rippletest.net/accounts"
@@ -850,6 +850,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
