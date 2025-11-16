@@ -447,6 +447,7 @@ def has_trustline(client: JsonRpcClient, acct: str, issuer: str, currency_hex: s
     return False
 
 
+print('DEBUG: entering create_trustline')
 def create_trustline(
     client: JsonRpcClient,
     wallet: Wallet,
@@ -460,7 +461,8 @@ def create_trustline(
             print(f"[trustline] already exists for {wallet.classic_address}")
         return ""
 
-    tx = TrustSet(
+    print(f'DEBUG: creating trustline for wallet: {wallet.classic_address}')
+tx = TrustSet(
         account=wallet.classic_address,
         limit_amount={
             "currency": currency_hex,
@@ -1013,6 +1015,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
