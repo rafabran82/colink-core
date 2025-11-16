@@ -109,3 +109,12 @@ $rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
 Write-Host "?? Rewards saved ? $rewardOut" -ForegroundColor Green
 
 
+# === LAYER 7 ===
+Write-Host "=== LAYER 7 ===" -ForegroundColor Cyan
+
+$rewardLatest = Get-LP-LatestRewardFile -Dir "$PSScriptRoot\scripts\.artifacts\data"
+if ($rewardLatest) {
+    Show-LP-Rewards -RewardFile $rewardLatest
+} else {
+    Write-Host "No reward files found yet."
+}
