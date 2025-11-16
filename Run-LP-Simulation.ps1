@@ -62,3 +62,4 @@ Write-Host ("Shk  {0,3}   {1}" -f $totalShocks, $sSum.Bar) -ForegroundColor $shk
 Write-Host ("APY  {0,6:N2}% {1}" -f $avgAPY, $aSum.Bar) -ForegroundColor $apyColor
 
 Write-Host "`n✅ Simulation run complete. Dashboard and summary displayed."
+
