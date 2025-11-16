@@ -215,7 +215,7 @@ COL_LP_SELL_AMOUNT  = "10000"     # LP sells 10k COL for COPX
 COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
 
 
-(network: str, verbose: bool = False) -> JsonRpcClient:
+
     override = os.environ.get("XRPL_ENDPOINT")
     if override:
         if verbose:
@@ -252,7 +252,7 @@ def account_exists(client: JsonRpcClient, addr: str) -> bool:
 
 def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=False):
     pass
-(client: JsonRpcClient, addr: str) -> bool:
+
     req = AccountInfo(account=addr, ledger_index="validated", strict=True)
     resp = client.request(req)
     result = getattr(resp, "result", {})
@@ -999,6 +999,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main(")
+
 
 
 
