@@ -1,11 +1,10 @@
 ﻿. "$PSScriptRoot\scripts\Show-LP-Dashboard.ps1"
+. "$PSScriptRoot\scripts\Show-LP-Dashboard.ps1"
+
+
 param(
     [int]$TopN = 20,
-    [ValidateSet("lp_max_drawdown_pct","lp_volatility_abs_mean","total_shocks","lp_apy")
-
-
-
-]
+    [ValidateSet("lp_max_drawdown_pct","lp_volatility_abs_mean","total_shocks","lp_apy")]
     [string]$SortBy = "lp_max_drawdown_pct"
 )
 
@@ -75,7 +74,8 @@ Write-Host "`n✅ Simulation run complete. Dashboard and summary displayed."
 # ====================================================================
 
 function Distribute-LP-Rewards {
-    ]
+    param(
+        [Parameter(Mandatory=$true)]
         [array]$TopLPs,
 
         [double]$RewardPool = 1000,
@@ -141,4 +141,74 @@ Write-Host "`n💾 Rewards output saved → $rewardOut" -ForegroundColor Cyan
 
 
 
+
+
+# ====================================================================
+# === LP Reward Distribution Module
+# ====================================================================
+
+function Distribute-LP-Rewards {
+    param(
+        [Parameter(Mandatory=$true)]
+        [array]$TopLPs,
+
+        [double]$RewardPool = 1000,
+        [switch]$TestMode,
+        [string]$SlackWebhook = $env:COLINK_SLACK_WEBHOOK
+    )
+
+    Write-Host "`n▶ Starting reward distribution..." -ForegroundColor Cyan
+
+    $totalApy = ($TopLPs | Measure-Object -Property lp_apy -Sum).Sum
+    if ($totalApy -le 0) {
+        Write-Warning "⚠️ No APY values detected; skipping rewards."
+        return @()
+    }
+
+    $results = @()
+
+    foreach ($lp in $TopLPs) {
+        $weight = [double]$lp.lp_apy / $totalApy
+        $reward = [math]::Round($RewardPool * $weight, 6)
+
+        $record = [ordered]@{
+            wallet     = $lp.wallet
+            apy        = [double]$lp.lp_apy
+            weight     = $weight
+            reward_COL = $reward
+            timestamp  = (Get-Date).ToString("s")
+            status     = "pending"
+        }
+
+        if ($TestMode) {
+            $record.status = "simulated"
+        }
+        else {
+            try {
+                # python scripts/xrpl.send_reward.py --wallet $lp.wallet --amount $reward
+                $record.status = "sent"
+            }
+            catch {
+                $record.status = "failed"
+            }
+        }
+
+        $results += $record
+    }
+
+    Write-Host "✔ Reward distribution complete." -ForegroundColor Green
+    return $results
+}
+
+# === Execute reward distribution ===
+$RewardPool = 1000
+$rewards = Distribute-LP-Rewards -TopLPs $top -RewardPool $RewardPool -TestMode:$TestMode
+
+$rewardOut = Join-Path $summaryFolder ("lp_rewards_output_{0}.json" -f $timestamp)
+$rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
+Write-Host "`n💾 Rewards output saved → $rewardOut" -ForegroundColor Cyan
+
+# ====================================================================
+# END OF MODULE
+# ====================================================================
 
