@@ -215,65 +215,7 @@ COL_LP_SELL_AMOUNT  = "10000"     # LP sells 10k COL for COPX
 COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
 
 
-# -----------------------------------
-# -----------------------------------
-# Faucet funding
-# -----------------------------------
-def account_exists(client: JsonRpcClient, addr: str) -> bool:
-    """
-    Return True if XRPL account exists (has an AccountRoot), False otherwise.
-    """
-    req = AccountInfo(account=addr, ledger_index="validated", strict=True)
-    resp = client.request(req)
-    result = getattr(resp, "result", {})
-
-    if result.get("status") == "error":
-        if result.get("error") == "actNotFound":
-            return False
-        return True
-    return True
-
-
-def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr: str, verbose=False):
-    """
-    Ensure wallet is funded on Testnet/Devnet using the faucet.
-    Only runs faucet if account does not exist.
-    """
-    if network not in ["testnet", "devnet"]:
-        if verbose:
-            print(f"[fund] skipping {label}: faucet not available on {network}")
-        return
-
-    # Already active → skip
-    if account_exists(client, addr):
-        if verbose:
-            print(f"[fund] already activated: {addr} ({label})")
-        return
-
-    faucet_url = (
-        "https://faucet.altnet.rippletest.net/accounts"
-        if network == "testnet"
-        else "https://faucet.devnet.rippletest.net/accounts"
-    )
-
-    if verbose:
-        print(f"[fund] requesting faucet: {addr} ({label})")
-
-    r = httpx.post(faucet_url, json={"destination": addr}, timeout=20)
-    if r.status_code != 200:
-        raise RuntimeError(
-            f"Faucet funding failed for {addr}: {r.status_code} {r.text}"
-        )
-
-    # Wait for activation
-    if verbose:
-        print(f"[fund] waiting activation: {addr}")
-
-    wait_for_activation(client, addr)
-
-    if verbose:
-        print(f"[fund] activated: {addr} ({label})")
-\ndef get_client(network: str, verbose: bool = False) -> JsonRpcClient:
+(network: str, verbose: bool = False) -> JsonRpcClient:
     override = os.environ.get("XRPL_ENDPOINT")
     if override:
         if verbose:
@@ -1057,6 +999,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main(")
+
 
 
 
