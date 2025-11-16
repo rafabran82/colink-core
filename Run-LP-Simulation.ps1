@@ -47,10 +47,10 @@ function Render-Bar($value,$max,$width=10,$color="Green"){
     [PSCustomObject]@{ Bar=$bar; Color=if($bar -match "░"){ "DarkGray" } else { $color } }
 }
 
-$maxDrawdownValue = ($top | Measure-Object lp_max_drawdown_pct -Maximum).Maximum
-$maxVolValue      = ($top | Measure-Object lp_volatility_abs_mean -Maximum).Maximum
-$maxShocksValue   = ($top | Measure-Object total_shocks -Maximum).Maximum
-$maxAPYValue      = ($top | Measure-Object lp_apy -Maximum).Maximum
+$maxDrawdownValue = ($top | Sort-Object lp_max_drawdown_pct -Descending | Select-Object -First 1).lp_max_drawdown_pct
+$maxVolValue = ($top | Sort-Object lp_volatility_abs_mean -Descending | Select-Object -First 1).lp_volatility_abs_mean
+$maxShocksValue = ($top | Sort-Object total_shocks -Descending | Select-Object -First 1).total_shocks
+$maxAPYValue = ($top | Sort-Object lp_apy -Descending | Select-Object -First 1).lp_apy
 
 $avgDrawdown = ($top | Measure-Object lp_max_drawdown_pct -Average).Average
 $avgVol      = ($top | Measure-Object lp_volatility_abs_mean -Average).Average
