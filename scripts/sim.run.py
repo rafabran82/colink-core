@@ -16,24 +16,44 @@ def load_config():
     config["meta"]["timestamp"] = datetime.datetime.utcnow().isoformat()
     return config
 
+def init_pools(cfg):
+    pools = {}
+    pool_defs = cfg.get("pools", {})
+
+    for name, p in pool_defs.items():
+        pools[name] = {
+            "base": p["base"],
+            "quote": p["quote"],
+            "base_liq": float(p["initial_base_liquidity"]),
+            "quote_liq": float(p["initial_quote_liquidity"])
+        }
+
+    return pools
+
 def main():
     parser = argparse.ArgumentParser(
-        description="COLINK Phase 3 Simulation Runner (config loader stage)"
+        description="COLINK Phase 3 Simulation Runner (config loader + pool init)"
     )
     parser.add_argument("--out", default=".artifacts/data", help="Output folder")
     args = parser.parse_args()
 
     config = load_config()
 
-    os.makedirs(args.out, exist_ok=True)
+    # NEW: Initialize pool structures
+    pools = init_pools(config)
 
+    os.makedirs(args.out, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    out_file = os.path.join(args.out, f"sim_config_load_{timestamp}.json")
+    out_file = os.path.join(args.out, f"sim_pools_init_{timestamp}.json")
 
     with open(out_file, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=2)
+        json.dump({
+            "timestamp": timestamp,
+            "config_loaded": True,
+            "pools": pools
+        }, f, indent=2)
 
-    print(f"OK: Loaded config and wrote a debug copy to:")
+    print(f"OK: Pools initialized and written to:")
     print(f" -> {out_file}")
     return 0
 
