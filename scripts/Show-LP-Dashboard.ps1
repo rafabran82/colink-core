@@ -58,3 +58,28 @@ function Show-LP-Rewards {
     Write-Host "Raw Reward JSON:" -ForegroundColor DarkGray
     $json | ConvertTo-Json -Depth 10
 }
+
+# ===========================================
+# Utility: Get latest reward file
+# ===========================================
+function Get-LP-LatestRewardFile {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Dir
+    )
+
+    if (-not (Test-Path $Dir)) {
+        Write-Warning "⚠️ Reward directory missing: $Dir"
+        return $null
+    }
+
+    $files = Get-ChildItem -Path $Dir -Filter "lp_rewards_*.json" -File |
+             Sort-Object LastWriteTime -Descending
+
+    if ($files.Count -eq 0) {
+        Write-Warning "⚠️ No reward files found in: $Dir"
+        return $null
+    }
+
+    return $files[0].FullName
+}
