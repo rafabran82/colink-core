@@ -123,6 +123,30 @@ def wait_for_activation(client, address, retries=20, sleep_s=1):
 import time
 from decimal import Decimal
 from pathlib import Path
+def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
+    """
+    Return an XRPL client for testnet/devnet, respecting XRPL_ENDPOINT override.
+    """
+    override = os.environ.get("XRPL_ENDPOINT")
+    if override:
+        if verbose:
+            print(f"[client] Using XRPL_ENDPOINT={override}")
+        return JsonRpcClient(override)
+
+    if network == "testnet":
+        url = "https://s.altnet.rippletest.net:51234"
+    elif network == "devnet":
+        url = "https://s.devnet.rippletest.net:51234"
+    else:
+        raise SystemExit(
+            f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)"
+        )
+
+    if verbose:
+        print(f"[client] Using default {network} endpoint: {url}")
+
+    return JsonRpcClient(url)
+
 
 
 def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
@@ -213,52 +237,6 @@ def wait_for_activation(client, address, max_tries=30, sleep_s=2):
 from xrpl.clients import JsonRpcClient
 from xrpl.models.requests import AccountInfo, AccountLines, BookOffers
 from xrpl.models.transactions import TrustSet, Payment, OfferCreate
-from xrpl.models.amounts import IssuedCurrencyAmount
-from xrpl.transaction import autofill, sign, submit_and_wait
-from xrpl.wallet import Wallet
-
-# 160-bit HEX currency code for COPX (ASCII "COPX" + padding)
-COPX_HEX = "CPX"
-
-# --- COL token + COPX<->COL pool config ------------------------------
-
-# Human-readable COL token code (standard 3â€“4 char issuer token)
-COL_CODE = "COL"
-
-# Initial COL distribution (issued by issuer to LP + user)
-COL_LP_ISSUE_AMOUNT = "500000"   # 500k COL for liquidity provider
-COL_USER_ISSUE_AMOUNT = "10000"   # small COL balance for user testing
-
-# LP pool seeding for the COPX<->COL DEX offers
-# Idea: 1 COL ~ 10 COPX (arbitrary test rate for simulations)
-COPX_LP_SELL_AMOUNT = "100000"    # LP sells 100k COPX for COL
-COL_LP_BUY_AMOUNT   = "10000"     # ... wants 10k COL in return
-
-COL_LP_SELL_AMOUNT  = "10000"     # LP sells 10k COL for COPX
-COPX_LP_BUY_AMOUNT  = "100000"    # ... wants 100k COPX in return
-
-    override = os.environ.get("XRPL_ENDPOINT")
-    if override:
-        if verbose:
-            print(f"[client] Using XRPL_ENDPOINT={override}")
-        return JsonRpcClient(override)
-
-    if network == "testnet":
-        url = "https://s.altnet.rippletest.net:51234"
-    elif network == "devnet":
-        url = "https://s.devnet.rippletest.net:51234"
-    else:
-        raise SystemExit(
-            f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)"
-        )
-
-    if verbose:
-        print(f"[client] Using default {network} endpoint: {url}")
-
-    return JsonRpcClient(url)
-
-# -----------------------------------
-# Faucet funding
 # -----------------------------------
 def account_exists(client: JsonRpcClient, addr: str) -> bool:
     req = AccountInfo(account=addr, ledger_index="validated", strict=True)
