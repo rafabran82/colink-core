@@ -19,3 +19,31 @@ $healthStatus = if ($issues.Count -gt 0) { "⚠️ Issues detected: " + ($issues
 Write-Host "`n📊 HEALTH CHECK: $healthStatus`n"
 
 }
+# ============================
+# LAYER 7 — REWARD DISPLAY
+# ============================
+
+function Get-LP-LatestRewardFile {
+    param([string]$Dir)
+
+    $files = Get-ChildItem -Path $Dir -Filter "lp_rewards_*.json" -ErrorAction SilentlyContinue
+    if (-not $files) { return $null }
+
+    $latest = $files | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    return $latest.FullName
+}
+
+function Show-LP-Rewards {
+    param([Parameter(Mandatory=$true)][string]$RewardFile)
+
+    try {
+        $json = Get-Content $RewardFile -Raw | ConvertFrom-Json
+        Write-Host "=== LATEST LP REWARDS ===" -ForegroundColor Cyan
+        Write-Host ("Total Rewards: {0}" -f $json.TotalRewards)
+        Write-Host ("Top Beneficiary: {0}" -f $json.TopBeneficiary)
+        Write-Host ("RewardPool: {0}" -f $json.RewardPool)
+    }
+    catch {
+        Write-Warning "⚠️ Could not parse rewards file: $RewardFile"
+    }
+}
