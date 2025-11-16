@@ -85,3 +85,24 @@ $summaryPath = Join-Path $summaryFolder "lp_summary_$timestamp.json"
 $summary | ConvertTo-Json -Depth 5 | Set-Content -Path $summaryPath -Encoding UTF8
 
 Write-Host "?? Summary saved ? $summaryPath" -ForegroundColor Cyan
+
+# ============================================================
+# LAYER 6 ? Reward Distribution
+# ============================================================
+
+Write-Host "=== LAYER 6 ===" -ForegroundColor Yellow
+
+$RewardPool = 1000  # fixed for now
+
+if (-not (Get-Command "Distribute-LP-Rewards" -ErrorAction SilentlyContinue)) {
+    Write-Host "? Reward function not found: Distribute-LP-Rewards" -ForegroundColor Red
+    Write-Host "Skipping rewards..." -ForegroundColor Yellow
+    return
+}
+
+$rewards = Distribute-LP-Rewards -TopLPs $top -RewardPool $RewardPool -TestMode:$TestMode
+
+$rewardOut = Join-Path $summaryFolder "lp_rewards_$timestamp.json"
+$rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
+
+Write-Host "?? Rewards saved ? $rewardOut" -ForegroundColor Green
