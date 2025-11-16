@@ -125,6 +125,47 @@ from decimal import Decimal
 from pathlib import Path
 
 import httpx
+def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=False):
+    """
+    Ensure wallet is funded on Testnet/Devnet.
+    - Skips if account already exists.
+    - Requests faucet funding otherwise.
+    - Waits for activation using wait_for_activation().
+    """
+    # Faucet only works on testnet/devnet
+    if network not in ["testnet", "devnet"]:
+        if verbose:
+            print(f"[fund] skipping for {label} on non-faucet network {network}")
+        return
+
+    # If already active → skip
+    if account_exists(client, addr):
+        if verbose:
+            print(f"[fund] already activated: {addr} ({label})")
+        return
+
+    # Use correct faucet URL
+    faucet_url = (
+        "https://faucet.altnet.rippletest.net/accounts"
+        if network == "testnet"
+        else "https://faucet.devnet.rippletest.net/accounts"
+    )
+
+    if verbose:
+        print(f"[fund] requesting faucet: {addr} ({label})")
+
+    # Request funding
+    r = httpx.post(faucet_url, json={"destination": addr}, timeout=20)
+    if r.status_code != 200:
+        raise RuntimeError(
+            f"Faucet funding failed for {addr}: {r.status_code} {r.text}"
+        )
+
+    # Ensure activation before continuing
+    wait_for_activation(client, addr)
+
+    if verbose:
+        print(f"[fund] activated: {addr} ({label})")
 import time
 
 def wait_for_activation(client, address, max_tries=30, sleep_s=2):
@@ -972,6 +1013,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
