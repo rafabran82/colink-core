@@ -129,8 +129,7 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
     """
     override = os.environ.get("XRPL_ENDPOINT")
     if override:
-        if verbose:
-            print(f"[client] Using XRPL_ENDPOINT={override}")
+        if verbose:`r`n            print(f"[client] Using XRPL_ENDPOINT={override}")
         return JsonRpcClient(override)
 
     if network == "testnet":
@@ -142,7 +141,7 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
             f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)"
         )
 
-    if verbose:
+    if verbose:`r`n
         print(f"[client] Using default {network} endpoint: {url}")
 
     return JsonRpcClient(url)
@@ -155,8 +154,7 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
     """
     override = os.environ.get("XRPL_ENDPOINT")
     if override:
-        if verbose:
-            print(f"[client] Using XRPL_ENDPOINT={override}")
+        if verbose:`r`n            print(f"[client] Using XRPL_ENDPOINT={override}")
         return JsonRpcClient(override)
 
     if network == "testnet":
@@ -166,7 +164,7 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
     else:
         raise SystemExit(f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)")
 
-    if verbose:
+    if verbose:`r`n
         print(f"[client] Using default {network} endpoint: {url}")
 
     return JsonRpcClient(url)
@@ -181,14 +179,12 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
     """
     # Faucet only works on testnet/devnet
     if network not in ["testnet", "devnet"]:
-        if verbose:
-            print(f"[fund] skipping for {label} on non-faucet network {network}")
+        if verbose:`r`n            print(f"[fund] skipping for {label} on non-faucet network {network}")
         return
 
     # If already active → skip
     if account_exists(client, addr):
-        if verbose:
-            print(f"[fund] already activated: {addr} ({label})")
+        if verbose:`r`n            print(f"[fund] already activated: {addr} ({label})")
         return
 
     # Use correct faucet URL
@@ -198,7 +194,7 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
         else "https://faucet.devnet.rippletest.net/accounts"
     )
 
-    if verbose:
+    if verbose:`r`n
         print(f"[fund] requesting faucet: {addr} ({label})")
 
     # Request funding
@@ -209,9 +205,7 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
         )
 
     # Ensure activation before continuing
-    wait_for_activation(client, addr)
-
-    if verbose:
+    wait_for_activation(client, addr)`r`n    if verbose:`r`n
         print(f"[fund] activated: {addr} ({label})")
 import time
 
@@ -262,16 +256,13 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
     return True
     # --- Faucet funding ---
     if network not in ["testnet", "devnet"]:
-        if verbose:
-            print(f"[fund] skipping funding for {label} on non-faucet network {network}")
+        if verbose:`r`n            print(f"[fund] skipping funding for {label} on non-faucet network {network}")
         return
 
     if account_exists(client, addr):
-        if verbose:
-            print(f"[fund] already activated: {addr} ({label})")
+        if verbose:`r`n            print(f"[fund] already activated: {addr} ({label})")
         return
-        if verbose:
-        print(f"[fund] requesting faucet for {label}: {addr}")
+        if verbose:`r`n            print(f"[fund] requesting faucet for {label}: {addr}")
 
     faucet_base = (
         "https://faucet.altnet.rippletest.net/accounts"
@@ -314,24 +305,21 @@ def issue_col_to_wallet(
             value=amount,
         ),
     )
-        if verbose:
-        print(f"[col-issue] {amount} {COL_CODE} -> {dest_wallet.classic_address}")
+        if verbose:`r`n            print(f"[col-issue] {amount} {COL_CODE} -> {dest_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, issuer_wallet)
     try:
         result = submit_and_wait(signed, client)
     except Exception as e:
-        if verbose:
-            print(f"[col-issue] ERROR during COL issue: {e}")
+        if verbose:`r`n            print(f"[col-issue] ERROR during COL issue: {e}")
         return ""
 
     tx_result = (getattr(result, "result", None) or result)
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-        if verbose:
-        print(f"[col-issue] submitted, hash={tx_hash or "N/A"}")
+        if verbose:`r`n            print(f"[col-issue] submitted, hash={tx_hash or "N/A"}")
 
     return tx_hash or ""
 
@@ -356,24 +344,21 @@ def issue_copx_to_wallet(
             value=amount,
         ),
     )
-        if verbose:
-        print(f"[copx-issue] {amount} COPX -> {dest_wallet.classic_address}")
+        if verbose:`r`n            print(f"[copx-issue] {amount} COPX -> {dest_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, issuer_wallet)
     try:
         result = submit_and_wait(signed, client)
     except Exception as e:
-        if verbose:
-            print(f"[copx-issue] ERROR during COPX issue: {e}")
+        if verbose:`r`n            print(f"[copx-issue] ERROR during COPX issue: {e}")
         return ""
 
     tx_result = (getattr(result, "result", None) or result)
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-        if verbose:
-        print(f"[copx-issue] submitted, hash={tx_hash}")
+        if verbose:`r`n            print(f"[copx-issue] submitted, hash={tx_hash}")
 
     return tx_hash or ""
 
@@ -395,24 +380,21 @@ def create_copx_col_offer(
         taker_gets=taker_gets,
         taker_pays=taker_pays,
     )
-        if verbose:
-        print(f"[dex-offer] submitting offer from {lp_wallet.classic_address}")
+        if verbose:`r`n            print(f"[dex-offer] submitting offer from {lp_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, lp_wallet)
     try:
         result = submit_and_wait(signed, client)
     except Exception as e:
-        if verbose:
-            print(f"[col-issue] ERROR during COL issue: {e}")
+        if verbose:`r`n            print(f"[col-issue] ERROR during COL issue: {e}")
         return ""
 
     tx_result = (getattr(result, "result", None) or result)
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-        if verbose:
-        print(f"[dex-offer] submitted, hash={tx_hash}")
+        if verbose:`r`n            print(f"[dex-offer] submitted, hash={tx_hash}")
 
     return tx_hash or ""
 
@@ -436,8 +418,7 @@ def create_trustline(
     verbose: bool = False,
 ) -> str:
     if has_trustline(client, wallet.classic_address, issuer, currency_hex=currency_hex):
-        if verbose:
-            print(f"[trustline] already exists for {wallet.classic_address}")
+        if verbose:`r`n            print(f"[trustline] already exists for {wallet.classic_address}")
         return ""
 
     print(f'DEBUG: creating trustline for wallet: {wallet.classic_address}')
@@ -450,23 +431,20 @@ tx = TrustSet(
             "value": limit_value,
         },
     )
-        if verbose:
-        print(f"[trustline] creating for {wallet.classic_address}")
+        if verbose:`r`n            print(f"[trustline] creating for {wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
     signed = sign(tx_prepared, wallet)
     try:
         result = submit_and_wait(signed, client)
     except Exception as e:
-        if verbose:
-            print(f"[col-issue] ERROR during COL issue: {e}")
+        if verbose:`r`n            print(f"[col-issue] ERROR during COL issue: {e}")
         return ""
     # Try to extract a hash; fall back if not present
     result_dict = getattr(result, "result", {})
     tx_json = result_dict.get("tx_json", {})
     tx_hash = tx_json.get("hash") or result_dict.get("hash") or ""
-        if verbose:
-        print(f"[trustline] submitted, hash={tx_hash or 'N/A'}")
+        if verbose:`r`n            print(f"[trustline] submitted, hash={tx_hash or 'N/A'}")
     return tx_hash
 
 # COL trustline helper (thin wrapper around create_trustline)
@@ -927,8 +905,7 @@ def inspect_copx_col_orderbook(
     offers = []
     if isinstance(result, dict):
         offers = result.get("offers", [])
-        if verbose:
-        print(f"[orderbook] COPX->COL offers: {len(offers)}")
+        if verbose:`r`n            print(f"[orderbook] COPX->COL offers: {len(offers)}")
     return result if isinstance(result, dict) else {"offers": offers}
 
 def simulate_col_to_copx_payment(
@@ -960,8 +937,7 @@ def simulate_col_to_copx_payment(
             value=max_col_spend,
         ),
     )
-        if verbose:
-        print(
+        if verbose:`r`n            print(
             "[bridge] user "
             f"{user_wallet.classic_address} pays up to {max_col_spend} {COL_CODE} "
             f"to deliver {amount_copx} {COPX_HEX} to {issuer_addr}"
@@ -972,20 +948,19 @@ def simulate_col_to_copx_payment(
     try:
         result = submit_and_wait(signed, client)
     except Exception as e:
-        if verbose:
-            print(f"[bridge] ERROR during COL->COPX payment: {e}")
+        if verbose:`r`n            print(f"[bridge] ERROR during COL->COPX payment: {e}")
         return ""
 
     tx_result = (getattr(result, "result", None) or result)
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-        if verbose:
-        print(f"[bridge] submitted COL->COPX payment, hash={tx_hash}")
+        if verbose:`r`n            print(f"[bridge] submitted COL->COPX payment, hash={tx_hash}")
 
     return tx_hash or ""
 
 if __name__ == "__main__":
     sys.exit(main(")
+
 
 
