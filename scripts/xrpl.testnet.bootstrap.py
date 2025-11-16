@@ -253,9 +253,13 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
     elif network == "devnet":
         url = "https://s.devnet.rippletest.net:51234"
     else:
-        raise SystemExit(f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)")
-        if verbose:
+        raise SystemExit(
+            f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)"
+        )
+
+    if verbose:
         print(f"[client] Using default {network} endpoint: {url}")
+
     return JsonRpcClient(url)
 
 
@@ -263,6 +267,18 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
 # Faucet funding
 # -----------------------------------
 def account_exists(client: JsonRpcClient, addr: str) -> bool:
+    req = AccountInfo(account=addr, ledger_index="validated", strict=True)
+    resp = client.request(req)
+    result = getattr(resp, "result", {})
+    if result.get("status") == "error":
+        if result.get("error") == "actNotFound":
+            return False
+        return True
+    return True
+
+def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=False):
+    pass
+(client: JsonRpcClient, addr: str) -> bool:
     req = AccountInfo(account=addr, ledger_index="validated", strict=True)
     resp = client.request(req)
     result = getattr(resp, "result", {})
@@ -1009,5 +1025,6 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main(")
+
 
 
