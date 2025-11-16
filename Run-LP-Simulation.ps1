@@ -9,7 +9,6 @@ Write-Host "=== LAYER 1 OK ===" -ForegroundColor Green
 Write-Host "TopN: $TopN" -ForegroundColor Cyan
 Write-Host "TestMode: $TestMode" -ForegroundColor Cyan
 
-return 0
 
 
 # ============================================================
@@ -22,14 +21,12 @@ $metricsPath = Join-Path $PSScriptRoot "scripts\.artifacts\data\lp_metrics.json"
 
 if (-not (Test-Path $metricsPath)) {
     Write-Host "? Metrics file missing: $metricsPath" -ForegroundColor Red
-    return
 }
 
 $data = Get-Content $metricsPath | ConvertFrom-Json
 
 if ($null -eq $data -or $data.Count -eq 0) {
     Write-Host "? No LP data found" -ForegroundColor Red
-    return
 }
 
 $top = $data | Sort-Object -Property lp_apy -Descending | Select-Object -First $TopN
@@ -40,3 +37,4 @@ $totalShocks  = ($top | Measure-Object total_shocks -Sum).Sum
 $avgAPY       = ($top | Measure-Object lp_apy -Average).Average
 
 Write-Host "Metrics loaded." -ForegroundColor Green
+
