@@ -124,6 +124,29 @@ import time
 from decimal import Decimal
 from pathlib import Path
 
+
+def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
+    """
+    Return an XRPL client for testnet/devnet, respecting XRPL_ENDPOINT override.
+    """
+    override = os.environ.get("XRPL_ENDPOINT")
+    if override:
+        if verbose:
+            print(f"[client] Using XRPL_ENDPOINT={override}")
+        return JsonRpcClient(override)
+
+    if network == "testnet":
+        url = "https://s.altnet.rippletest.net:51234"
+    elif network == "devnet":
+        url = "https://s.devnet.rippletest.net:51234"
+    else:
+        raise SystemExit(f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)")
+
+    if verbose:
+        print(f"[client] Using default {network} endpoint: {url}")
+
+    return JsonRpcClient(url)
+
 import httpx
 def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=False):
     """
@@ -986,4 +1009,5 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main(")
+
 
