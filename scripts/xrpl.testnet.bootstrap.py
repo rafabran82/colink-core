@@ -159,9 +159,9 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
 
     # Create wallets
-    issuer = Wallet.create()
-    user = Wallet.create()
-    lp = Wallet.create()
+    issuer = Wallet.from_seed("sEdTLNGEMcU88eygdp2b5wUcjHgihPm")
+    user   = Wallet.from_seed("sEd79uZimDdjTin635hgAWhQWYCfSdm")
+    lp     = Wallet.from_seed("sEdTsHnFeYhAxihbaCcqmqxTojn1u2")
 
     if verbose:
         print("[wallets]")
@@ -204,3 +204,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
