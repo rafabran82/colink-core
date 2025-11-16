@@ -47,3 +47,37 @@ function Show-LP-Rewards {
         Write-Warning "⚠️ Could not parse rewards file: $RewardFile"
     }
 }
+# ============================
+# LAYER 7 — REWARD DISPLAY (FIXED)
+# Robust JSON parser
+# ============================
+
+function Show-LP-Rewards {
+    param([Parameter(Mandatory=$true)][string]$RewardFile)
+
+    try {
+        $raw = Get-Content $RewardFile -Raw
+        $json = $raw | ConvertFrom-Json -ErrorAction Stop
+
+        Write-Host "=== LATEST LP REWARDS ===" -ForegroundColor Cyan
+
+        if ($json -is [array]) {
+            $total = ($json | Measure-Object amount -Sum).Sum
+            $top   = $json | Sort-Object amount -Descending | Select-Object -First 1
+
+            Write-Host ("Reward entries: {0}" -f $json.Count)
+            Write-Host ("Total Rewards: {0}" -f $total)
+            Write-Host ("Top Beneficiary: {0} ({1})" -f $top.lp, $top.amount)
+        }
+        else {
+            # generic object-mode fallbacks
+            Write-Host ("RewardPool: {0}" -f $json.RewardPool)
+            Write-Host ("TotalRewards: {0}" -f $json.TotalRewards)
+            Write-Host ("TopBeneficiary: {0}" -f $json.TopBeneficiary)
+        }
+    }
+    catch {
+        Write-Warning "⚠️ Could not parse rewards file: $RewardFile"
+        Write-Warning $_.Exception.Message
+    }
+}
