@@ -62,6 +62,24 @@ import argparse
 import json
 import os
 import sys
+import time
+
+def wait_for_activation(client, address, timeout=20, sleep_s=1):
+    """Polls for account activation before proceeding."""
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            info = client.request({
+                "method": "account_info",
+                "params": [{"account": address}]
+            }).result
+            if "account_data" in info:
+                print(f"[fund] activation confirmed: {address}")
+                return
+        except Exception:
+            pass
+        time.sleep(sleep_s)
+    raise Exception(f"Account {address} did not activate in time.")
 # ============================================================
 # Wait until XRPL account exists on ledger
 # ============================================================
@@ -950,6 +968,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
