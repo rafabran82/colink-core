@@ -1,4 +1,4 @@
-"""
+﻿"""
 XRPL Testnet bootstrap for COLINK / COPX.
 
 This script:
@@ -40,7 +40,7 @@ COPX_HEX = "CPX"
 
 # --- COL token + COPX<->COL pool config ------------------------------
 
-# Human-readable COL token code (standard 3–4 char issuer token)
+# Human-readable COL token code (standard 3â€“4 char issuer token)
 COL_CODE = "COL"
 
 # Initial COL distribution (issued by issuer to LP + user)
@@ -79,7 +79,7 @@ def append_tx_note(txlog_path: Path, note: str, tx_hash: str | None = None) -> N
     if tx_hash:
         entry["hash"] = tx_hash
     with txlog_path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(entry) + "\n", ensure_ascii=False, indent=2)
+        fh.write(json.dumps(entry, ensure_ascii=False, indent=2) + "\n")
 
 
 def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
@@ -850,6 +850,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
