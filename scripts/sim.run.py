@@ -32,51 +32,75 @@ def init_pools(cfg):
         }
     return pools
 
-# AMM, fee, volatility, spread functions unchanged — preserved
+def apply_vol(config, mid):
+    sigma = Decimal(str(config["volatility"]["sigma"]))
+    drift = Decimal(str(config["volatility"]["drift"]))
+    noise = Decimal(str(random.gauss(0, float(sigma))))
+    return mid * (Decimal(1) + drift + noise)
 
 def main():
     parser = argparse.ArgumentParser(
-        description="COLINK Phase 3 Simulation Runner (Full Loop — Event Foundation)"
+        description="COLINK Phase 3 Simulation Runner (Tick Loop + Volatility)"
     )
     parser.add_argument("--out", default=".artifacts/data", help="Output folder")
     args = parser.parse_args()
 
     config = load_config()
     pools = init_pools(config)
-
     random.seed(config["simulation"]["random_seed"])
+
     max_ticks = config["simulation"]["max_ticks"]
     tick_ms = config["tick_interval_ms"]
 
-    # Create output folder + NDJSON log file
     os.makedirs(args.out, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
     ndjson_path = os.path.join(args.out, f"sim_events_{timestamp}.ndjson")
     summary_path = os.path.join(args.out, f"sim_summary_{timestamp}.json")
 
-    # Begin writing NDJSON
     with open(ndjson_path, "w", encoding="utf-8") as log:
         for tick in range(1, max_ticks + 1):
-            event = {
+
+            # --- Emit tick event ---
+            tick_event = {
                 "type": "tick",
                 "tick": tick,
                 "timestamp": datetime.datetime.utcnow().isoformat()
             }
-            log.write(json.dumps(event) + "\n")
+            log.write(json.dumps(tick_event) + "\n")
 
-    # Write summary metadata
+            # --- Apply volatility to COL_XRP mid price ---
+            pool = pools["COL_XRP"]
+            base = pool["base_liq"]
+            quote = pool["quote_liq"]
+
+            mid_before = quote / base
+            mid_after = apply_vol(config, mid_before)
+
+            # Adjust quote liquidity to preserve ratio
+            pool["quote_liq"] = mid_after * base
+
+            vol_event = {
+                "type": "vol_update",
+                "tick": tick,
+                "pool": "COL_XRP",
+                "mid_price_before": float(mid_before),
+                "mid_price_after": float(mid_after)
+            }
+            log.write(json.dumps(vol_event) + "\n")
+
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": timestamp,
-            "events_written": max_ticks,
+            "events_written": max_ticks * 2,
             "ndjson_file": ndjson_path,
             "tick_interval_ms": tick_ms,
             "seed": config["simulation"]["random_seed"],
+            "volatility": config["volatility"],
             "pools_initialized": True
         }, f, indent=2)
 
-    print("OK: Event loop baseline executed.")
+    print("OK: Tick loop + volatility updates executed.")
     print(f" -> Events:  {ndjson_path}")
     print(f" -> Summary: {summary_path}")
     return 0
