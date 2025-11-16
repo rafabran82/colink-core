@@ -45,14 +45,10 @@ def compute_spread(mid, base_spread=Decimal("0.0025"), vol_impulse=Decimal("0.5"
     return dynamic, bid, ask
 
 def perform_swap(pool, config):
-    """Attempt a swap with probability ~5%."""
     if random.random() > 0.05:
-        return None  # no trade
+        return None
 
-    # Trade direction
     direction = "COL->XRP" if random.random() < 0.5 else "XRP->COL"
-
-    # Trade amount (COL or XRP side)
     amount = Decimal(str(random.uniform(100, 3000)))
 
     base = pool["base_liq"]
@@ -75,18 +71,14 @@ def perform_swap(pool, config):
         new_x = k / new_y
         dx = x - new_x
 
-    # fees ------------------------------------
     amm_fee_bps = pool["fee_bps"]
     xrpay_fee_bps = Decimal(str(config["fees"]["xrpay_fee_bps"]))
 
-    gross_out = dy if direction == "COL->XRP" else dx
+    gross = dy if direction == "COL->XRP" else dx
+    amm_fee = gross * (amm_fee_bps / Decimal(10000))
+    xrpay_fee = gross * (xrpay_fee_bps / Decimal(10000))
+    net_out = gross - amm_fee - xrpay_fee
 
-    amm_fee = gross_out * (amm_fee_bps / Decimal(10000))
-    xrpay_fee = gross_out * (xrpay_fee_bps / Decimal(10000))
-
-    net_out = gross_out - amm_fee - xrpay_fee
-
-    # update pools -----------------------------
     if direction == "COL->XRP":
         pool["base_liq"] += dx
         pool["quote_liq"] -= net_out
@@ -94,25 +86,24 @@ def perform_swap(pool, config):
         pool["quote_liq"] += dy
         pool["base_liq"] -= net_out
 
-    # slippage --------------------------------
     mid_before = quote / base
     mid_after = pool["quote_liq"] / pool["base_liq"]
     slippage = abs((mid_after - mid_before) / mid_before)
 
     return {
         "direction": direction,
-        "amount_in": float(amount),
+        "amount": float(amount),
         "amount_out": float(net_out),
-        "slippage": float(slippage),
         "lp_fee": float(amm_fee),
         "xrpay_fee": float(xrpay_fee),
+        "slippage": float(slippage),
         "pool_base_after": float(pool["base_liq"]),
         "pool_quote_after": float(pool["quote_liq"])
     }
 
 def main():
     parser = argparse.ArgumentParser(
-        description="COLINK Phase 3 Simulation Runner (Full Loop: Tick + Vol + Spread + Swaps)"
+        description="COLINK Simulation (Ticks + Vol + Spread + Swaps + Fee Accumulation)"
     )
     parser.add_argument("--out", default=".artifacts/data", help="Output folder")
     args = parser.parse_args()
@@ -130,10 +121,16 @@ def main():
     ndjson_path = os.path.join(args.out, f"sim_events_{timestamp}.ndjson")
     summary_path = os.path.join(args.out, f"sim_summary_{timestamp}.json")
 
+    # --- NEW ACCUMULATORS ---
+    lp_fee_accum = Decimal("0")
+    xrpay_fee_accum = Decimal("0")
+    total_swaps = 0
+    total_volume = Decimal("0")
+
     with open(ndjson_path, "w", encoding="utf-8") as log:
         for tick in range(1, max_ticks + 1):
 
-            # --- TICK EVENT ---
+            # --- TICK ---
             log.write(json.dumps({
                 "type": "tick",
                 "tick": tick,
@@ -168,25 +165,38 @@ def main():
                 "spread_fraction": float(dyn_spread)
             }) + "\n")
 
-            # --- SWAP (AMM INTERACTION) ---
+            # --- SWAP ---
             swap = perform_swap(pool, config)
             if swap:
+                total_swaps += 1
+                total_volume += Decimal(str(swap["amount"]))
+                lp_fee_accum += Decimal(str(swap["lp_fee"]))
+                xrpay_fee_accum += Decimal(str(swap["xrpay_fee"]))
+
                 swap["type"] = "swap"
                 swap["tick"] = tick
                 log.write(json.dumps(swap) + "\n")
 
-    # Summary
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": timestamp,
             "ndjson_file": ndjson_path,
             "max_ticks": max_ticks,
             "tick_interval_ms": tick_ms,
-            "seed": config["simulation"]["random_seed"],
-            "modules": ["ticks", "volatility", "dynamic_spread", "swaps_enabled"]
+            "swaps_executed": total_swaps,
+            "total_volume": float(total_volume),
+            "lp_fee_accum": float(lp_fee_accum),
+            "xrpay_fee_accum": float(xrpay_fee_accum),
+            "modules": [
+                "ticks",
+                "volatility",
+                "dynamic_spread",
+                "swaps_enabled",
+                "fee_accumulation"
+            ]
         }, f, indent=2)
 
-    print("OK: Full simulation loop with swap events executed.")
+    print("OK: Full simulation loop with fee accumulation executed.")
     print(f" -> Events:  {ndjson_path}")
     print(f" -> Summary: {summary_path}")
     return 0
