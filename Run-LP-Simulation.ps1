@@ -38,3 +38,23 @@ $avgAPY       = ($top | Measure-Object lp_apy -Average).Average
 
 Write-Host "Metrics loaded." -ForegroundColor Green
 
+
+# ============================================================
+# LAYER 4 ? Health Summary
+# ============================================================
+
+Write-Host "=== LAYER 4 ===" -ForegroundColor Yellow
+
+$issues = @()
+
+if ($avgDrawdown -gt 0.04) { $issues += "Drawdown high" }
+if ($avgVol -gt 0.03)      { $issues += "Volatility high" }
+if ($totalShocks -gt 0)    { $issues += "Shocks detected" }
+if ($avgAPY -lt 8)         { $issues += "APY low" }
+
+if ($issues.Count -eq 0) {
+    Write-Host "?? System Healthy" -ForegroundColor Green
+} else {
+    Write-Host "?? Health Issues:" -ForegroundColor Yellow
+    $issues | ForEach-Object { Write-Host " - $_" -ForegroundColor Yellow }
+}
