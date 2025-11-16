@@ -34,3 +34,43 @@ if (Test-Path $dashboardPath) {
 } else {
     Write-Host "❌ Dashboard script not found at $dashboardPath" -ForegroundColor Red
 }
+
+# -----------------------------
+# Summary row
+# -----------------------------
+function Render-Bar($value,$max,$width=10,$color="Green"){
+    $max = if ($max -gt 0) { $max } else { 1 }
+    $value = if ($value -eq $null) { 0 } else { $value }
+    $filled = [math]::Round([math]::Min([math]::Max($value/$max,0),1)*$width)
+    $empty = $width - $filled
+    $bar = ("█"* $filled)+("░"* $empty)
+    [PSCustomObject]@{ Bar=$bar; Color=if($bar -match "░"){ "DarkGray" } else { $color } }
+}
+
+$maxDrawdownValue = ($top | Measure-Object lp_max_drawdown_pct -Maximum).Maximum
+$maxVolValue      = ($top | Measure-Object lp_volatility_abs_mean -Maximum).Maximum
+$maxShocksValue   = ($top | Measure-Object total_shocks -Maximum).Maximum
+$maxAPYValue      = ($top | Measure-Object lp_apy -Maximum).Maximum
+
+$avgDrawdown = ($top | Measure-Object lp_max_drawdown_pct -Average).Average
+$avgVol      = ($top | Measure-Object lp_volatility_abs_mean -Average).Average
+$totalShocks = ($top | Measure-Object total_shocks -Sum).Sum
+$avgAPY      = ($top | Measure-Object lp_apy -Average).Average
+
+$dSum = Render-Bar $avgDrawdown $maxDrawdownValue 10 "Red"
+$vSum = Render-Bar $avgVol $maxVolValue 10 "Cyan"
+$sSum = Render-Bar $totalShocks $maxShocksValue 10 "Yellow"
+$aSum = Render-Bar $avgAPY $maxAPYValue 10 "Green"
+
+$drawColor = if ($avgDrawdown -eq 0) { "DarkGray" } elseif ($avgDrawdown -ge 5) { "Red" } else { "White" }
+$volColor  = if ($avgVol -eq 0) { "DarkGray" } else { "White" }
+$shkColor  = if ($totalShocks -eq 0) { "DarkGray" } else { "White" }
+$apyColor  = if ($avgAPY -eq 0) { "DarkGray" } elseif ($avgAPY -ge 10) { "Green" } else { "White" }
+
+Write-Host "`nSUMMARY" -ForegroundColor White
+Write-Host ("Draw {0,6:N2}% {1}" -f $avgDrawdown, $dSum.Bar) -ForegroundColor $drawColor
+Write-Host ("Vol  {0,6:N2}% {1}" -f $avgVol, $vSum.Bar) -ForegroundColor $volColor
+Write-Host ("Shk  {0,3}   {1}" -f $totalShocks, $sSum.Bar) -ForegroundColor $shkColor
+Write-Host ("APY  {0,6:N2}% {1}" -f $avgAPY, $aSum.Bar) -ForegroundColor $apyColor
+
+Write-Host "`n✅ Simulation run complete. Dashboard and summary displayed."
