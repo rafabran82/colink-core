@@ -1,4 +1,5 @@
-﻿param(
+﻿. "$PSScriptRoot\scripts\Show-LP-Dashboard.ps1"
+param(
     [int]$TopN = 20,
     [ValidateSet("lp_max_drawdown_pct","lp_volatility_abs_mean","total_shocks","lp_apy")]
     [string]$SortBy = "lp_max_drawdown_pct"
@@ -134,3 +135,4 @@ Write-Host "`n💾 Rewards output saved → $rewardOut" -ForegroundColor Cyan
 # ====================================================================
 # END OF MODULE
 # ====================================================================
+
