@@ -150,8 +150,7 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
         if network == "testnet"
         else "https://faucet.devnet.rippletest.net/accounts"
     )
-
-    if verbose:
+        if verbose:
         print(f"[fund] requesting faucet: {addr} ({label})")
 
     # Request funding
@@ -163,8 +162,7 @@ def fund_wallet_if_needed(client, network: str, label: str, addr: str, verbose=F
 
     # Ensure activation before continuing
     wait_for_activation(client, addr)
-
-    if verbose:
+        if verbose:
         print(f"[fund] activated: {addr} ({label})")
 import time
 
@@ -254,8 +252,7 @@ def get_client(network: str, verbose: bool = False) -> JsonRpcClient:
         url = "https://s.devnet.rippletest.net:51234"
     else:
         raise SystemExit(f"Unsupported network: {network!r} (use testnet or devnet, or set XRPL_ENDPOINT)")
-
-    if verbose:
+        if verbose:
         print(f"[client] Using default {network} endpoint: {url}")
     return JsonRpcClient(url)
 
@@ -283,8 +280,7 @@ def account_exists(client: JsonRpcClient, addr: str) -> bool:
         if verbose:
             print(f"[fund] already activated: {addr} ({label})")
         return
-
-    if verbose:
+        if verbose:
         print(f"[fund] requesting faucet for {label}: {addr}")
 
     faucet_base = (
@@ -329,7 +325,7 @@ def issue_col_to_wallet(
             value=amount,
         ),
     )
-    if verbose:
+        if verbose:
         print(f"[col-issue] {amount} {COL_CODE} -> {dest_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
@@ -345,8 +341,7 @@ def issue_col_to_wallet(
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-
-    if verbose:
+        if verbose:
         print(f"[col-issue] submitted, hash={tx_hash or "N/A"}")
 
     return tx_hash or ""
@@ -373,7 +368,7 @@ def issue_copx_to_wallet(
             value=amount,
         ),
     )
-    if verbose:
+        if verbose:
         print(f"[copx-issue] {amount} COPX -> {dest_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
@@ -389,8 +384,7 @@ def issue_copx_to_wallet(
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-
-    if verbose:
+        if verbose:
         print(f"[copx-issue] submitted, hash={tx_hash}")
 
     return tx_hash or ""
@@ -413,7 +407,7 @@ def create_copx_col_offer(
         taker_gets=taker_gets,
         taker_pays=taker_pays,
     )
-    if verbose:
+        if verbose:
         print(f"[dex-offer] submitting offer from {lp_wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
@@ -429,8 +423,7 @@ def create_copx_col_offer(
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-
-    if verbose:
+        if verbose:
         print(f"[dex-offer] submitted, hash={tx_hash}")
 
     return tx_hash or ""
@@ -447,7 +440,7 @@ def has_trustline(client: JsonRpcClient, acct: str, issuer: str, currency_hex: s
     return False
 
 
-print('DEBUG: entering create_trustline')
+
 def create_trustline(
     client: JsonRpcClient,
     wallet: Wallet,
@@ -462,6 +455,7 @@ def create_trustline(
         return ""
 
     print(f'DEBUG: creating trustline for wallet: {wallet.classic_address}')
+print(f'DEBUG: creating trustline for {wallet.classic_address}')
 tx = TrustSet(
         account=wallet.classic_address,
         limit_amount={
@@ -470,8 +464,7 @@ tx = TrustSet(
             "value": limit_value,
         },
     )
-
-    if verbose:
+        if verbose:
         print(f"[trustline] creating for {wallet.classic_address}")
 
     tx_prepared = autofill(tx, client)
@@ -486,7 +479,7 @@ tx = TrustSet(
     result_dict = getattr(result, "result", {})
     tx_json = result_dict.get("tx_json", {})
     tx_hash = tx_json.get("hash") or result_dict.get("hash") or ""
-    if verbose:
+        if verbose:
         print(f"[trustline] submitted, hash={tx_hash or 'N/A'}")
     return tx_hash
 
@@ -952,7 +945,7 @@ def inspect_copx_col_orderbook(
     offers = []
     if isinstance(result, dict):
         offers = result.get("offers", [])
-    if verbose:
+        if verbose:
         print(f"[orderbook] COPX->COL offers: {len(offers)}")
     return result if isinstance(result, dict) else {"offers": offers}
 
@@ -986,7 +979,7 @@ def simulate_col_to_copx_payment(
             value=max_col_spend,
         ),
     )
-    if verbose:
+        if verbose:
         print(
             "[bridge] user "
             f"{user_wallet.classic_address} pays up to {max_col_spend} {COL_CODE} "
@@ -1006,8 +999,7 @@ def simulate_col_to_copx_payment(
     tx_hash = None
     if isinstance(tx_result, dict):
         tx_hash = (tx_result.get("tx_json") or {}).get("hash") or tx_result.get("hash")
-
-    if verbose:
+        if verbose:
         print(f"[bridge] submitted COL->COPX payment, hash={tx_hash}")
 
     return tx_hash or ""
@@ -1015,6 +1007,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
