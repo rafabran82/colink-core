@@ -107,6 +107,27 @@ from decimal import Decimal
 from pathlib import Path
 
 import httpx
+import time
+
+def wait_for_activation(client, address, max_tries=30, sleep_s=2):
+    """
+    Wait until an XRPL account is activated (has an AccountRoot).
+    """
+    for i in range(max_tries):
+        try:
+            acct = client.request({
+                "command": "account_info",
+                "account": address,
+                "ledger_index": "validated"
+            })
+            if acct and not ("error" in acct.result):
+                print(f"[activation] OK: {address}")
+                return
+        except Exception:
+            pass
+        print(f"[activation] waiting for {address} (try {i+1}/{max_tries}) ...")
+        time.sleep(sleep_s)
+    raise Exception(f"Account {address} did not activate in time.")
 from xrpl.clients import JsonRpcClient
 from xrpl.models.requests import AccountInfo, AccountLines, BookOffers
 from xrpl.models.transactions import TrustSet, Payment, OfferCreate
@@ -929,6 +950,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
