@@ -4,6 +4,7 @@ param(
 )
 # --- Load dashboard module ---
 . "$PSScriptRoot\scripts\Show-LP-Dashboard.ps1"
+. "$PSScriptRoot\scripts\Distribute-LP-Rewards.ps1"
 
 Write-Host "=== LAYER 1 OK ===" -ForegroundColor Green
 Write-Host "TopN: $TopN" -ForegroundColor Cyan
@@ -107,4 +108,4 @@ $rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
 
 Write-Host "?? Rewards saved ? $rewardOut" -ForegroundColor Green
 
-. "$PSScriptRoot\scripts\Distribute-LP-Rewards.ps1"
+
