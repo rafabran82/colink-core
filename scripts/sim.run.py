@@ -4,6 +4,7 @@ import os
 import json
 import datetime
 import sys
+import random
 from decimal import Decimal, getcontext
 
 getcontext().prec = 28
@@ -69,15 +70,25 @@ def apply_fees(gross_out, amm_fee_bps, xrpay_fee_bps):
         "net_out": float(net)
     }
 
+def apply_volatility(config, value):
+    sigma = Decimal(str(config["volatility"]["sigma"]))
+    drift = Decimal(str(config["volatility"]["drift"]))
+    noise = Decimal(str(random.gauss(0, float(sigma))))
+
+    new_value = value * (Decimal(1) + drift + noise)
+    return float(new_value)
+
 def main():
     parser = argparse.ArgumentParser(
-        description="COLINK Phase 3 Simulation Runner (config + pools + AMM + fees)"
+        description="COLINK Phase 3 Simulation Runner (AMM + Fees + Volatility)"
     )
     parser.add_argument("--out", default=".artifacts/data", help="Output folder")
     args = parser.parse_args()
 
     config = load_config()
     pools = init_pools(config)
+
+    random.seed(config["simulation"]["random_seed"])
 
     max_slip = config["slippage_model"]["max_slippage_pct"]
     amm_preview = amm_swap_preview(
@@ -92,20 +103,23 @@ def main():
         config["fees"]["xrpay_fee_bps"]
     )
 
+    # NEW: Apply volatility to the net output for demo
+    net_out = Decimal(str(fee_preview["net_out"]))
+    vol_adj = apply_volatility(config, net_out)
+
     os.makedirs(args.out, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    out_file = os.path.join(args.out, f"sim_fee_preview_{timestamp}.json")
+    out_file = os.path.join(args.out, f"sim_vol_preview_{timestamp}.json")
 
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": timestamp,
-            "config_loaded": True,
-            "pools_initialized": True,
             "amm_preview": amm_preview,
-            "fee_preview": fee_preview
+            "fee_preview": fee_preview,
+            "volatility_adjusted": vol_adj
         }, f, indent=2)
 
-    print(f"OK: Fee model integrated + preview written to:")
+    print(f"OK: Volatility integrated + preview written to:")
     print(f" -> {out_file}")
     return 0
 
