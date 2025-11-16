@@ -249,6 +249,8 @@ def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr:
         print(f"[fund] requesting funds for {label}: {addr}")
 
     r = httpx.post(faucet_base, json={"destination": addr}, timeout=20)
+wait_for_activation(client, addr)
+
 # FORCE ACTIVATION WAIT
 wait_for_activation(client, addr)
 
@@ -977,6 +979,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
