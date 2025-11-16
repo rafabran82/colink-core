@@ -1,47 +1,65 @@
-﻿# ============================
+﻿# ---------------------------
 # Show-LP-Dashboard.ps1
-# ============================
+# ---------------------------
 
-# 1) Find latest CSV
-$csvPath = Get-ChildItem ".artifacts/data/sim_summary_table.csv" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-if (-not $csvPath) { Write-Host "No CSV found!" -ForegroundColor Red; return }
+# 1) Load all summary JSONs safely
+$summaryText = Get-Content ".artifacts/data/sim_summary_*.json" -Raw
+$objects = $summaryText -split '}\s*\r?\n'
+$summaryObjects = @()
 
-# 2) Import CSV
-$summary = Import-Csv $csvPath.FullName
-
-# 3) Convert key fields to [double] for calculations
-foreach ($row in $summary) {
-    $row.lp_volatility_abs_mean = if ($row.lp_volatility_abs_mean -ne '') {[double]$row.lp_volatility_abs_mean} else {0}
-    $row.total_shocks = if ($row.total_shocks -ne '') {[double]$row.total_shocks} else {0}
-    $row.lp_max_drawdown_pct = if ($row.lp_max_drawdown_pct -ne '') {[double]$row.lp_max_drawdown_pct} else {0}
-    $row.apy_realistic = if ($row.apy_realistic -ne '') {[double]$row.apy_realistic} else {0}
+foreach ($obj in $objects) {
+    $trimmed = $obj.Trim()
+    if ($trimmed -ne '') {
+        try {
+            $json = "$trimmed}"
+            $summaryObjects += $json | ConvertFrom-Json
+        } catch {
+            # skip invalid fragments
+        }
+    }
 }
 
-# 4) Sort top events by drawdown
-$top = $summary | Sort-Object lp_max_drawdown_pct -Descending | Select-Object -First 20
+# 2) Export to CSV
+$summaryObjects | Export-Csv ".artifacts/data/sim_summary_table.csv" -NoTypeInformation
 
-# 5) Compute global maxima for sparklines
-$maxVol = ($top | ForEach-Object {[double]$_.lp_volatility_abs_mean} | Measure-Object -Maximum).Maximum
-$maxShocks = ($top | ForEach-Object {[double]$_.total_shocks} | Measure-Object -Maximum).Maximum
+# 3) Load CSV
+$summary = Import-Csv ".artifacts/data/sim_summary_table.csv"
 
-# 6) Helper: render mini-bar (sparkline)
+# 4) Ensure numeric columns are doubles
+$summary | ForEach-Object {
+    $_.lp_volatility_abs_mean = if ($_.lp_volatility_abs_mean -ne '') {[double]$_.lp_volatility_abs_mean} else {0}
+    $_.total_shocks           = if ($_.total_shocks -ne '') {[double]$_.total_shocks} else {0}
+    $_.lp_max_drawdown_pct    = if ($_.lp_max_drawdown_pct -ne '') {[double]$_.lp_max_drawdown_pct} else {0}
+    $_.apy_realistic          = if ($_.apy_realistic -ne '') {[double]$_.apy_realistic} else {0}
+}
+
+# 5) Pick top 20 by max drawdown
+$top = @($summary | Sort-Object lp_max_drawdown_pct -Descending | Select-Object -First 20)
+
+# 6) Compute global maxima for sparklines
+$maxVol      = ($top | ForEach-Object {[double]$_.lp_volatility_abs_mean} | Measure-Object -Maximum).Maximum
+$maxShocks   = ($top | ForEach-Object {[double]$_.total_shocks}           | Measure-Object -Maximum).Maximum
+$maxDrawdown = ($top | ForEach-Object {[double]$_.lp_max_drawdown_pct}   | Measure-Object -Maximum).Maximum
+$maxAPY      = ($top | ForEach-Object {[double]$_.apy_realistic}         | Measure-Object -Maximum).Maximum
+
+# 7) Mini-bar helper
 function Render-Bar($value, $max, $length=10, $color='Green') {
     if ($max -eq 0) { $max = 1 }
     $filled = [math]::Round(($value / $max) * $length)
     $filled = [math]::Min($filled, $length)
-    $empty = $length - $filled
+    $empty  = $length - $filled
     $bar = ('█' * $filled) + ('░' * $empty)
     return @{Bar=$bar; Color=$color}
 }
 
-# 7) Header
+# 8) Header
 Write-Host ("{0,-20} {1,6} {2,8} {3,8} {4,6} {5,10} {6,10} {7,10} {8,10} {9,7}" -f `
     "Timestamp","Swaps","Vol","LPVal","DD%","VolBar","ShockBar","Shocks","APY","APYc") -ForegroundColor Cyan
 Write-Host ("-" * 120) -ForegroundColor DarkGray
 
-# 8) Display rows
+# 9) Display each row
 foreach ($row in $top) {
-    $volBarData = Render-Bar ([double]$row.lp_volatility_abs_mean) $maxVol 10 'Cyan'
+    $volBarData   = Render-Bar ([double]$row.lp_volatility_abs_mean) $maxVol 10 'Cyan'
     $shockBarData = Render-Bar ([double]$row.total_shocks) $maxShocks 10 (if([double]$row.total_shocks -gt 0) {'Yellow'} else {'Green'})
 
     $ddColor  = if ([double]$row.lp_max_drawdown_pct -ge 50) {'Red'} elseif ([double]$row.lp_max_drawdown_pct -ge 20) {'Yellow'} else {'Green'}

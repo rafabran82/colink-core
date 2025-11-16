@@ -1,53 +1,56 @@
 ﻿{
-  "version": "1.0",
-  "tick_interval_ms": 1000,
-  "pairs": [
-    "COL/XRP",
-    "COL/COPX",
-    "COPX/XRP"
-  ],
-  "pools": {
-    "COL_XRP": {
-      "base": "COL",
-      "quote": "XRP",
-      "initial_base_liquidity": 500000,
-      "initial_quote_liquidity": 25000,
-      "fee_bps": 30
-    },
-    "COL_COPX": {
-      "base": "COL",
-      "quote": "COPX",
-      "initial_base_liquidity": 500000,
-      "initial_quote_liquidity": 500000000,
-      "fee_bps": 25
-    }
-  },
-  "volatility": {
-    "enabled": true,
-    "sigma": 0.015,
-    "drift": 0.0005
-  },
-  "slippage_model": {
-    "enabled": true,
-    "max_slippage_pct": 0.03
-  },
-  "fees": {
-    "xrpay_fee_bps": 5,
-    "amm_fee_bps": 30
-  },
-  "simulation": {
-    "max_ticks": 300,
-    "random_seed": 42,
-    "generate_events": true,
-    "generate_metrics": true
-  },
-  "output": {
-    "ndjson_log": ".artifacts/data/sim_events.ndjson",
-    "metrics_json": ".artifacts/data/sim_metrics.json"
-  },
-  "meta": {
-    "created_by": "COLINK Local CI",
-    "purpose": "Phase 3 Liquidity Simulation MVP",
-    "timestamp": ""
-  }
+    "version":  "1.0",
+    "tick_interval_ms":  1000,
+    "pairs":  [
+                  "COL/XRP",
+                  "COL/COPX",
+                  "COPX/XRP"
+              ],
+    "pools":  {
+                  "COL_XRP":  {
+                                  "base":  "COL",
+                                  "quote":  "XRP",
+                                  "initial_base_liquidity":  500000,
+                                  "initial_quote_liquidity":  25000,
+                                  "fee_bps":  30
+                              },
+                  "COL_COPX":  {
+                                   "base":  "COL",
+                                   "quote":  "COPX",
+                                   "initial_base_liquidity":  500000,
+                                   "initial_quote_liquidity":  500000000,
+                                   "fee_bps":  25
+                               }
+              },
+    "volatility":  {
+                       "enabled":  true,
+                       "sigma":  0.015,
+                       "drift":  0.0005
+                   },
+    "slippage_model":  {
+                           "enabled":  true,
+                           "max_slippage_pct":  0.03
+                       },
+    "fees":  {
+                 "xrpay_fee_bps":  5,
+                 "amm_fee_bps":  30
+             },
+    "simulation":  {
+                       "max_ticks":  300,
+                       "random_seed":  42,
+                       "generate_events":  true,
+                       "generate_metrics":  true
+                   },
+    "output":  {
+                   "ndjson_log":  ".artifacts/data/sim_events.ndjson",
+                   "metrics_json":  ".artifacts/data/sim_metrics.json"
+               },
+    "meta":  {
+                 "created_by":  "COLINK Local CI",
+                 "purpose":  "Phase 3 Liquidity Simulation MVP",
+                 "timestamp":  ""
+             },
+    "accounting":  {
+                       "interval_ticks":  300
+                   }
 }
