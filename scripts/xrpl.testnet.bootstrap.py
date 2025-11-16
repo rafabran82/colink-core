@@ -232,42 +232,35 @@ def account_exists(client: JsonRpcClient, addr: str) -> bool:
         # Other errors: be conservative and treat as "exists" to avoid looping
         return True
     return True
-
-
-def fund_wallet_if_needed(client: JsonRpcClient, network: str, label: str, addr: str, verbose: bool = False) -> None:
-    if network not in {"testnet", "devnet"}:
+    # --- Faucet funding ---
+    if network not in ["testnet", "devnet"]:
         if verbose:
             print(f"[fund] skipping funding for {label} on non-faucet network {network}")
         return
 
-    if account_exists(client, addr) and False:
-    # disabled early-return; we always wait for activation
-    pass
+    if account_exists(client, addr):
+        if verbose:
+            print(f"[fund] already activated: {addr} ({label})")
+        return
 
-    faucet_base = "https://faucet.altnet.rippletest.net/accounts" if network == "testnet" else "https://faucet.devnet.rippletest.net/accounts"
     if verbose:
-        print(f"[fund] requesting funds for {label}: {addr}")
+        print(f"[fund] requesting faucet for {label}: {addr}")
+
+    faucet_base = (
+        "https://faucet.altnet.rippletest.net/accounts"
+        if network == "testnet"
+        else "https://faucet.devnet.rippletest.net/accounts"
+    )
 
     r = httpx.post(faucet_base, json={"destination": addr}, timeout=20)
-wait_for_activation(client, addr)
 
-# FORCE ACTIVATION WAIT
-wait_for_activation(client, addr)
-
-# NEW: Wait for activation AFTER faucet requests
-wait_for_activation(client, addr)
-
-    wait_for_activation(client, addr)
-
-    # NEW: Wait for account activation
-    wait_for_activation(client, addr)
     if r.status_code != 200:
-        raise RuntimeError(f"Faucet funding failed for {addr}: {r.status_code} {r.text}")
+        raise RuntimeError(
+            f"Faucet funding failed for {addr}: {r.status_code} {r.text}"
+        )
 
-    if verbose:
-        print(f"[fund] funded OK: {addr} ({label})")
-
-    # Small delay so funding is visible to account_info
+    # Wait for activation
+    wait_for_activation(client, addr)
     time.sleep(2.0)
 
 
@@ -979,6 +972,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
