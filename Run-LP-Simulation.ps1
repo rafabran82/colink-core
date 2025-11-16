@@ -106,3 +106,5 @@ $rewardOut = Join-Path $summaryFolder "lp_rewards_$timestamp.json"
 $rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
 
 Write-Host "?? Rewards saved ? $rewardOut" -ForegroundColor Green
+
+. "$PSScriptRoot\scripts\Distribute-LP-Rewards.ps1"
