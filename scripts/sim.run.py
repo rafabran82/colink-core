@@ -36,11 +36,17 @@ def apply_vol(config, mid):
     sigma = Decimal(str(config["volatility"]["sigma"]))
     drift = Decimal(str(config["volatility"]["drift"]))
     noise = Decimal(str(random.gauss(0, float(sigma))))
-    return mid * (Decimal(1) + drift + noise)
+    return mid * (Decimal(1) + drift + noise), noise
+
+def compute_spread(mid, base_spread=Decimal("0.0025"), vol_impulse=Decimal("0.5"), noise=Decimal("0")):
+    dynamic = base_spread + abs(noise) * vol_impulse
+    bid = mid * (Decimal(1) - dynamic)
+    ask = mid * (Decimal(1) + dynamic)
+    return dynamic, bid, ask
 
 def main():
     parser = argparse.ArgumentParser(
-        description="COLINK Phase 3 Simulation Runner (Tick Loop + Volatility)"
+        description="COLINK Phase 3 Simulation Runner (Tick + Vol + Dynamic Spread)"
     )
     parser.add_argument("--out", default=".artifacts/data", help="Output folder")
     args = parser.parse_args()
@@ -61,46 +67,55 @@ def main():
     with open(ndjson_path, "w", encoding="utf-8") as log:
         for tick in range(1, max_ticks + 1):
 
-            # --- Emit tick event ---
-            tick_event = {
+            # Tick event
+            log.write(json.dumps({
                 "type": "tick",
                 "tick": tick,
                 "timestamp": datetime.datetime.utcnow().isoformat()
-            }
-            log.write(json.dumps(tick_event) + "\n")
+            }) + "\n")
 
-            # --- Apply volatility to COL_XRP mid price ---
+            # --- VOLATILITY UPDATE ---
             pool = pools["COL_XRP"]
             base = pool["base_liq"]
             quote = pool["quote_liq"]
 
             mid_before = quote / base
-            mid_after = apply_vol(config, mid_before)
+            mid_after, noise = apply_vol(config, mid_before)
 
-            # Adjust quote liquidity to preserve ratio
-            pool["quote_liq"] = mid_after * base
+            pool["quote_liq"] = mid_after * base  # preserve ratio
 
-            vol_event = {
+            log.write(json.dumps({
                 "type": "vol_update",
                 "tick": tick,
-                "pool": "COL_XRP",
-                "mid_price_before": float(mid_before),
-                "mid_price_after": float(mid_after)
-            }
-            log.write(json.dumps(vol_event) + "\n")
+                "mid_before": float(mid_before),
+                "mid_after": float(mid_after),
+                "noise": float(noise)
+            }) + "\n")
 
+            # --- SPREAD UPDATE ---
+            dyn_spread, bid, ask = compute_spread(mid_after, noise=Decimal(str(noise)))
+
+            log.write(json.dumps({
+                "type": "spread_update",
+                "tick": tick,
+                "mid_price": float(mid_after),
+                "bid_price": float(bid),
+                "ask_price": float(ask),
+                "spread_fraction": float(dyn_spread)
+            }) + "\n")
+
+    # Summary
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": timestamp,
-            "events_written": max_ticks * 2,
+            "events_written": max_ticks * 3,
             "ndjson_file": ndjson_path,
             "tick_interval_ms": tick_ms,
             "seed": config["simulation"]["random_seed"],
-            "volatility": config["volatility"],
-            "pools_initialized": True
+            "modules": ["ticks", "volatility", "dynamic_spread"]
         }, f, indent=2)
 
-    print("OK: Tick loop + volatility updates executed.")
+    print("OK: Tick loop + volatility + spread evolution executed.")
     print(f" -> Events:  {ndjson_path}")
     print(f" -> Summary: {summary_path}")
     return 0
