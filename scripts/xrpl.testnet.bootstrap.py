@@ -39,6 +39,26 @@ Usage (from repo root):
 
 from __future__ import annotations
 
+# ============================================================
+# Wait until XRPL account exists on ledger
+# ============================================================
+def wait_for_activation(client, address, retries=20, sleep_s=1):
+    import time
+    from xrpl.asyncio.account import get_account_root
+    import asyncio
+
+    for i in range(retries):
+        try:
+            root = asyncio.run(get_account_root(address, client))
+            if "Sequence" in root:
+                print(f"[wait] {address} is ACTIVE")
+                return True
+        except Exception:
+            pass
+        print(f"[wait] {address} not active yet... ({i+1}/{retries})")
+        time.sleep(sleep_s)
+    raise Exception(f"Account {address} did not activate in time.")
+
 import argparse
 import json
 import os
@@ -910,6 +930,7 @@ def simulate_col_to_copx_payment(
 
 if __name__ == "__main__":
     sys.exit(main())
+
 
 
 
