@@ -1,4 +1,4 @@
-param(
+﻿param(
     [int]$TopN = 20,
     [switch]$TestMode
 )
@@ -110,11 +110,21 @@ Write-Host "?? Rewards saved ? $rewardOut" -ForegroundColor Green
 
 
 # === LAYER 7 ===
-Write-Host "=== LAYER 7 ===" -ForegroundColor Cyan
+# --- Load latest reward file ---
+$rewardDir = "$PSScriptRoot\scripts\.artifacts\data"
+$latest = Get-LP-LatestRewardFile -Dir $rewardDir
 
-$rewardLatest = Get-LP-LatestRewardFile -Dir "$PSScriptRoot\scripts\.artifacts\data"
-if ($rewardLatest) {
-    Show-LP-Rewards -RewardFile $rewardLatest
+if (-not $latest) {
+    Write-Warning "⚠️ No reward files found."
 } else {
-    Write-Host "No reward files found yet."
+    Write-Host "Latest reward file: $latest"
+
+    try {
+        $json = Get-Content $latest -Raw | ConvertFrom-Json
+        Write-Host "=== LATEST LP REWARDS ===" -ForegroundColor Green
+        $json
+    }
+    catch {
+        Write-Warning "⚠️ Failed to parse reward JSON: $latest"
+    }
 }
