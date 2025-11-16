@@ -80,3 +80,5 @@ $rewards | ConvertTo-Json -Depth 5 | Set-Content -Path $rewardOut -Encoding UTF8
 
 Write-Host "💾 Rewards saved → $rewardOut" -ForegroundColor Green
 Write-Host "✔ Run complete" -ForegroundColor Green
+
+Show-LP-Dashboard
