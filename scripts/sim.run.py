@@ -138,12 +138,13 @@ def main():
 
     # --- REPLAY LOADING ---
     replay_data = []
-    if args.replay {
+    if args.replay:
         with open(args.replay, "r", encoding="utf-8") as f:
             replay_data = json.load(f)
 
     # --- rest of main() continues exactly as before, normalized ---if __name__ == "__main__":
     main()
+
 
 
 
