@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from main import app
+from colink_core.api.main import app
 
 client = TestClient(app)
 

@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from main import app
+from colink_core.api.main import app
 
 c = TestClient(app)
 

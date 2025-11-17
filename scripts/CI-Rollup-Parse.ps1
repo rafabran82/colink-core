@@ -1,8 +1,9 @@
 ﻿param(
-    [string]$Date = (Get-Date).ToString("yyyyMMdd")
+    [string]$Date
 )
 
 $rollPath = ".artifacts/data/ledger/$Date/ledger_rollup.json"
+
 if (-not (Test-Path $rollPath)) {
     Write-Error "Rollup file not found: $rollPath"
     exit 1
@@ -10,18 +11,21 @@ if (-not (Test-Path $rollPath)) {
 
 $roll = Get-Content $rollPath -Raw | ConvertFrom-Json
 
-# Build compact dashboard metrics
+# Build intelligence metrics block
 $metrics = [PSCustomObject]@{
-    date            = $Date
-    total_tx        = $roll.count
-    unique_accounts = ($roll.accounts | Get-Unique).Count
-    swap_tx         = $roll.types.swap
-    offer_create    = $roll.types.offercreate
-    payment_tx      = $roll.types.payment
-    min_ledger      = $roll.ledger.min
-    max_ledger      = $roll.ledger.max
-    first_tx_hash   = $roll.first.hash
-    last_tx_hash    = $roll.last.hash
+    date             = $roll.date
+    total_tx         = ($roll.totals.swaps + $roll.totals.offers + $roll.totals.cancel)
+    swaps            = $roll.totals.swaps
+    offers           = $roll.totals.offers
+    cancels          = $roll.totals.cancel
+    issued_COL       = $roll.totals.issued_COL
+    issued_CPX       = $roll.totals.issued_CPX
+    fees_total       = $roll.totals.total_fees
+    accounts_lp      = $roll.wallet_breakdown.lp
+    accounts_issuer  = $roll.wallet_breakdown.issuer
+    accounts_user    = $roll.wallet_breakdown.user
+    ledger_first     = $roll.ledger_span.first
+    ledger_last      = $roll.ledger_span.last
 }
 
 $metrics | ConvertTo-Json -Depth 10

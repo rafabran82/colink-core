@@ -86,7 +86,6 @@ function Normalize-Tx {
         offer_data  = $meta.AffectedNodes
     }
 }
-}
 
 $norm = @{
     issuer = $issuerTx | ForEach-Object { Normalize-Tx $_ }

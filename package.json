@@ -1,0 +1,31 @@
+{
+  "name": "colink-core",
+  "version": "1.0.0",
+  "description": "<!-- CI BADGE BEGIN --> [![PR CI](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/pr-ci.yml) <!-- CI BADGE END --> [![Windows Smoke (json_cli)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml/badge.svg)](https://github.com/rafabran82/colink-core/actions/workflows/win-smoke.yml)",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "object-assign": "^4.1.1",
+    "vary": "^1.1.2",
+    "xrpl": "^4.4.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafabran82/colink-core.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rafabran82/colink-core/issues"
+  },
+  "homepage": "https://github.com/rafabran82/colink-core#readme"
+}

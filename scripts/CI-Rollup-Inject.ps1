@@ -1,42 +1,45 @@
 ﻿param(
-    [string]$Date = (Get-Date).ToString("yyyyMMdd")
+    [string]$Date,
+    [string]$MetricsJson
 )
 
-$roll = & scripts/CI-Rollup-Parse.ps1 -Date $Date | ConvertFrom-Json
+$metrics = $MetricsJson | ConvertFrom-Json
 
 $index = ".artifacts/index.html"
 if (-not (Test-Path $index)) {
-    Write-Error "index.html not found: $index"
+    Write-Error "Dashboard not found: $index"
     exit 1
 }
 
+$html = Get-Content $index -Raw
+
 $block = @"
-<!-- XRPL-ROLLUP-BEGIN -->
-<h2>XRPL Intelligence Snapshot ($($Date.Substring(0,4))-$($Date.Substring(4,2))-$($Date.Substring(6,2)))</h2>
-<ul>
-  <li><b>Total TX:</b> $($roll.total_tx)</li>
-  <li><b>Unique Accounts:</b> $($roll.unique_accounts)</li>
-  <li><b>Swaps:</b> $($roll.swap_tx)</li>
-  <li><b>OfferCreate:</b> $($roll.offer_create)</li>
-  <li><b>Payments:</b> $($roll.payment_tx)</li>
-  <li><b>Ledger Range:</b> $($roll.min_ledger) → $($roll.max_ledger)</li>
-  <li><b>First TX:</b> $($roll.first_tx_hash)</li>
-  <li><b>Last TX:</b> $($roll.last_tx_hash)</li>
-</ul>
-<!-- XRPL-ROLLUP-END -->
+<!-- XRPL-INTEL-BEGIN -->
+<div class='intel-block'>
+  <h2>XRPL Intelligence — $($metrics.date)</h2>
+  <ul>
+    <li><b>Total TX:</b> $($metrics.total_tx)</li>
+    <li><b>Swaps:</b> $($metrics.swaps)</li>
+    <li><b>Offers:</b> $($metrics.offers)</li>
+    <li><b>Cancels:</b> $($metrics.cancels)</li>
+    <li><b>Issued COL:</b> $($metrics.issued_COL)</li>
+    <li><b>Issued CPX:</b> $($metrics.issued_CPX)</li>
+    <li><b>Total Fees:</b> $($metrics.fees_total)</li>
+    <li><b>Accounts LP:</b> $($metrics.accounts_lp)</li>
+    <li><b>Accounts Issuer:</b> $($metrics.accounts_issuer)</li>
+    <li><b>Accounts User:</b> $($metrics.accounts_user)</li>
+    <li><b>Ledger Range:</b> $($metrics.ledger_first) → $($metrics.ledger_last)</li>
+  </ul>
+</div>
+<!-- XRPL-INTEL-END -->
 "@
 
-# Inject or replace block
-$html = Get-Content $index -Raw
-$begin = "<!-- XRPL-ROLLUP-BEGIN -->"
-$end   = "<!-- XRPL-ROLLUP-END -->"
+# Remove old block
+$html = $html -replace '<!-- XRPL-INTEL-BEGIN -->.*?<!-- XRPL-INTEL-END -->',''
 
-if ($html -match [regex]::Escape($begin)) {
-    $pattern = "$begin.*?$end"
-    $html = [regex]::Replace($html, $pattern, $block, "Singleline")
-} else {
-    $html += "`n$block`n"
-}
+# Insert new block at bottom
+$html = $html + "`n$block`n"
 
-Set-Content $index -Encoding utf8 -Value $html
-Write-Host "✨ XRPL Rollup metrics injected into index.html"
+Set-Content -Path $index -Encoding utf8 -Value $html
+
+Write-Host "✨ Dashboard updated with XRPL intelligence block" -ForegroundColor Green
