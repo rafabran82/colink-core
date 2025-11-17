@@ -1,8 +1,5 @@
-﻿def test_import_main():
-    import importlib.util
+﻿# Updated COLINK test: ensure main app imports without errors
 
-    spec = importlib.util.spec_from_file_location("main", "main.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    assert hasattr(mod, "app"), "FastAPI app not found in main.py"
-
+def test_import_main():
+    import colink_core.api.main as main
+    assert hasattr(main, "app")
