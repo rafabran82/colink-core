@@ -66,3 +66,4 @@ colink-dashboard/backend/node_modules/
 
 # Local backup files
 *.bak
+*.log
