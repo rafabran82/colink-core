@@ -1,4 +1,4 @@
-from amm import PoolState
+﻿from amm import PoolState
 from wallet import Wallet
 
 
@@ -23,7 +23,7 @@ def main():
     print()
 
     # 2) Swap scenario: buy COPX with XRP
-    print("== Swap: XRP → COPX ==")
+    print("== Swap: XRP â†’ COPX ==")
     dx = 100.0
     trader.debit_x(dx)
     dy_out, px = pool.swap_x_for_y(dx)
@@ -34,7 +34,7 @@ def main():
     print()
 
     # 3) Swap other side: buy XRP with COPX
-    print("== Swap: COPX → XRP ==")
+    print("== Swap: COPX â†’ XRP ==")
     dy_in = 250_000.0
     trader.debit_y(dy_in)
     dx_out, px_xy = pool.swap_y_for_x(dy_in)
@@ -56,3 +56,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

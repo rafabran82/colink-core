@@ -1,4 +1,4 @@
-from collections import deque
+﻿from collections import deque
 from collections.abc import Iterable
 
 
@@ -30,3 +30,4 @@ class TWAPOracle:
     def warm(self, prices: Iterable[float]) -> None:
         for p in prices:
             self.push(p)
+

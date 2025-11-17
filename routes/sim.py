@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import re
 from pathlib import Path
@@ -81,3 +81,4 @@ def sim_sweep(outdir: str):
 
     charts = ["twap.png", "depth.png"]
     return {"ok": True, "outdir": str(p), "charts": charts}
+

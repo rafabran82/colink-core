@@ -1,10 +1,10 @@
-Write-Host "🔍 Running EWS-ROUTE-CHECK..." -ForegroundColor Yellow
+﻿Write-Host "ðŸ” Running EWS-ROUTE-CHECK..." -ForegroundColor Yellow
 
 # Find all Python files
 $pyFiles = @(Get-ChildItem -Recurse -Filter *.py -ErrorAction SilentlyContinue)
 
 if ($pyFiles.Count -eq 0) {
-    Write-Host "⚠️ No Python files found — skipping route check." -ForegroundColor DarkYellow
+    Write-Host "âš ï¸ No Python files found â€” skipping route check." -ForegroundColor DarkYellow
     return
 }
 
@@ -23,8 +23,8 @@ foreach ($file in $pyFiles) {
 
             # Route must start with "/"
             if ($route -notmatch '^(\/[a-z0-9_\-\/]*)$') {
-                Write-Host "🟥 Invalid route in $($file.FullName)" -ForegroundColor Red
-                Write-Host "     → $line"
+                Write-Host "ðŸŸ¥ Invalid route in $($file.FullName)" -ForegroundColor Red
+                Write-Host "     â†’ $line"
                 $issues++
             }
         }
@@ -32,7 +32,8 @@ foreach ($file in $pyFiles) {
 }
 
 if ($issues -eq 0) {
-    Write-Host "🟢 Route check completed — no issues found." -ForegroundColor Green
+    Write-Host "ðŸŸ¢ Route check completed â€” no issues found." -ForegroundColor Green
 } else {
-    Write-Host "🟧 Route check completed — $issues issue(s) found." -ForegroundColor DarkYellow
+    Write-Host "ðŸŸ§ Route check completed â€” $issues issue(s) found." -ForegroundColor DarkYellow
 }
+

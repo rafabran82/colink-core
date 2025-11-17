@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import sys
 
 import pytest
@@ -26,3 +26,4 @@ def test_sim_spread_headless(tmp_path, pair):
     res = subprocess.run(cmd, capture_output=True, text=True)
     assert res.returncode == 0, res.stderr
     assert png.exists() and png.stat().st_size > 0
+

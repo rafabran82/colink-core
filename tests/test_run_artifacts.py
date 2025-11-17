@@ -1,4 +1,4 @@
-import json
+﻿import json
 import pathlib
 import subprocess
 import sys
@@ -34,3 +34,4 @@ def test_run_demo_emits_artifacts(tmp_path: pathlib.Path):
     data = json.loads(jsn.read_text(encoding="utf-8"))
     for k in ["schema_version", "created_at", "backend", "sample_count", "artifacts"]:
         assert k in data
+

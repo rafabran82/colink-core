@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
   [ValidateSet("major","minor","patch")] [string]$Part = "patch"
 )
@@ -19,3 +19,4 @@ Write-Host "Bumping version $ver -> $new"
 $updated = [regex]::Replace($content, 'version\s*=\s*"(.*?)"', 'version = "' + $new + '"', 1)
 Set-Content -Path $path -Value $updated -Encoding utf8
 Write-Output $new
+

@@ -1,4 +1,4 @@
-# Windows/json_cli smoke: PowerShell-safe (no bash heredocs)
+﻿# Windows/json_cli smoke: PowerShell-safe (no bash heredocs)
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
@@ -53,3 +53,4 @@ Write-Host $s
 if (-not ($s -match '"charts"')) { throw "sweep output missing 'charts' key" }
 
 Write-Host "OK: json_cli smoke passed on Windows."
+

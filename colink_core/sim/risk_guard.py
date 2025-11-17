@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -61,3 +61,4 @@ def size_aware_twap_guard(
     modeled = modeled_bps_impact_for_size(pool_col_x, pool_x_copx, col_in)
     budget_bps = min(cap_bps, base_guard_bps + modeled + cushion_bps)
     return (dev_bps <= budget_bps, dev_bps, budget_bps)
+

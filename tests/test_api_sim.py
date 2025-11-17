@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,3 +26,4 @@ def test_api_sweep_ok(tmp_path: Path):
     # ensure files exist in the requested outdir
     for p in j["charts"]:
         assert (tmp_path / Path(p).name).exists()
+

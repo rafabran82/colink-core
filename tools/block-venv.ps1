@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 # Block any staged path under .venv/
 $staged = git diff --cached --name-only
 if ($staged) {
@@ -10,3 +10,4 @@ if ($staged) {
   }
 }
 exit 0
+

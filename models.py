@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+﻿from pydantic import BaseModel, Field
 
 
 class AirdropReq(BaseModel):
@@ -19,3 +19,4 @@ class OfferReq(BaseModel):
 class OrderbookResp(BaseModel):
     bids: list
     asks: list
+

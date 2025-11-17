@@ -1,4 +1,4 @@
-import importlib.util
+﻿import importlib.util
 
 
 def test_app_exists():
@@ -6,3 +6,4 @@ def test_app_exists():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert hasattr(mod, "app"), "main.app not found"
+

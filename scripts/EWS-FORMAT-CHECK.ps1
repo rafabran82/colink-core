@@ -1,4 +1,4 @@
-Write-Host "🧹 Running EWS-FORMAT-CHECK..."
+﻿Write-Host "ðŸ§¹ Running EWS-FORMAT-CHECK..."
 
 # Only scan REAL project source files
 $files = Get-ChildItem -Recurse -File -ErrorAction SilentlyContinue |
@@ -18,14 +18,15 @@ foreach ($f in $files) {
     $lines = Get-Content $f.FullName
     for ($i = 0; $i -lt $lines.Length; $i++) {
         if ($lines[$i] -match "\s+$") {
-            Write-Host "🟥 Trailing whitespace: $($f.Name):$($i+1)"
+            Write-Host "ðŸŸ¥ Trailing whitespace: $($f.Name):$($i+1)"
             $issues++
         }
     }
 }
 
 if ($issues -eq 0) {
-    Write-Host "🟢 Formatting clean — no issues found."
+    Write-Host "ðŸŸ¢ Formatting clean â€” no issues found."
 } else {
-    Write-Host "🟧 Formatting issues detected: $issues lines with trailing whitespace."
+    Write-Host "ðŸŸ§ Formatting issues detected: $issues lines with trailing whitespace."
 }
+

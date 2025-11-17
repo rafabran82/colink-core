@@ -1,4 +1,4 @@
-param(
+﻿param(
   [Parameter(Mandatory=$true)]
   [string]$RunId
 )
@@ -18,3 +18,4 @@ Get-ChildItem $root -Directory | ForEach-Object {
   Compress-Archive -Path $pattern -DestinationPath $zip -Force
   "Packed: $zip"
 }
+

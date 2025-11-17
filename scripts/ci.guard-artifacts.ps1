@@ -1,5 +1,5 @@
-Write-Host "======================================="
-Write-Host "📦 ci.guard-artifacts — Artifact Guard"
+﻿Write-Host "======================================="
+Write-Host "ðŸ“¦ ci.guard-artifacts â€” Artifact Guard"
 Write-Host "=======================================`n"
 
 # Required directories inside .artifacts
@@ -21,38 +21,39 @@ $requiredFiles = @(
 
 $missing = @()
 
-Write-Host "🔍 Checking required artifact directories..."
+Write-Host "ðŸ” Checking required artifact directories..."
 
 foreach ($dir in $requiredDirs) {
     if (Test-Path $dir) {
-        Write-Host "✅ OK: $dir"
+        Write-Host "âœ… OK: $dir"
     } else {
-        Write-Host "❌ Missing directory: $dir"
+        Write-Host "âŒ Missing directory: $dir"
         $missing += $dir
     }
 }
 
-Write-Host "`n🔍 Checking required artifact files..."
+Write-Host "`nðŸ” Checking required artifact files..."
 
 foreach ($file in $requiredFiles) {
     if (Test-Path $file) {
-        Write-Host "✅ OK: $file"
+        Write-Host "âœ… OK: $file"
     } else {
-        Write-Host "❌ Missing file: $file"
+        Write-Host "âŒ Missing file: $file"
         $missing += $file
     }
 }
 
 Write-Host "`n--------------------------------"
-Write-Host "📊 Artifact Guard Summary:"
+Write-Host "ðŸ“Š Artifact Guard Summary:"
 Write-Host "--------------------------------"
 
 if ($missing.Count -eq 0) {
-    Write-Host "🟢 All artifact folders and files exist!"
+    Write-Host "ðŸŸ¢ All artifact folders and files exist!"
 } else {
-    Write-Host "🟥 Missing artifacts detected:"
-    $missing | ForEach-Object { Write-Host "   → $_" }
+    Write-Host "ðŸŸ¥ Missing artifacts detected:"
+    $missing | ForEach-Object { Write-Host "   â†’ $_" }
     exit 1
 }
 
 Write-Host "ci.guard-artifacts completed."
+

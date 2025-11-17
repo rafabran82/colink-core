@@ -1,4 +1,4 @@
-Write-Host "🔧 Running EWS-FIX-INDENT..." -ForegroundColor Yellow
+﻿Write-Host "ðŸ”§ Running EWS-FIX-INDENT..." -ForegroundColor Yellow
 
 $files = Get-ChildItem -Recurse -Filter *.py
 foreach ($f in $files) {
@@ -6,4 +6,5 @@ foreach ($f in $files) {
     $fixed = $c -replace "^\t+", "    "
     Set-Content -Path $f.FullName -Value $fixed
 }
-Write-Host "🟢 Indentation normalized." -ForegroundColor Green
+Write-Host "ðŸŸ¢ Indentation normalized." -ForegroundColor Green
+

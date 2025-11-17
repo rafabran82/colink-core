@@ -1,4 +1,4 @@
-Write-Host "Running test bootstrap script..."
+﻿Write-Host "Running test bootstrap script..."
 
 # Reference to /scripts directory (parent of this script)
 $root = Split-Path $PSScriptRoot -Parent       # scripts\
@@ -14,18 +14,18 @@ $requiredFiles = @(
 Write-Host "`nChecking required files..."
 foreach ($file in $requiredFiles) {
     if (Test-Path $file) {
-        Write-Host "✔ File exists: $file"
+        Write-Host "âœ” File exists: $file"
     } else {
-        Write-Host "❌ File missing: $file"
+        Write-Host "âŒ File missing: $file"
     }
 }
 
 # Backend (Node.js) check
 $backend = Get-Process | Where-Object {$_.Name -like "*node*"}
 if ($backend) {
-    Write-Host "✔ Backend service (Node.js) is running."
+    Write-Host "âœ” Backend service (Node.js) is running."
 } else {
-    Write-Host "❌ Backend service NOT running."
+    Write-Host "âŒ Backend service NOT running."
 }
 
 # Check environment variables
@@ -35,12 +35,13 @@ $envVars = @("XRPL_TEST_ACCOUNT", "NODE_ENV")
 foreach ($envVar in $envVars) {
     $value = Get-Item "env:$envVar" -ErrorAction SilentlyContinue
     if ($value) {
-        Write-Host "✔ Environment variable $envVar is set."
+        Write-Host "âœ” Environment variable $envVar is set."
     } else {
-        Write-Host "❌ Environment variable $envVar is NOT set."
+        Write-Host "âŒ Environment variable $envVar is NOT set."
     }
 }
 
 # Simulate final test logic
 Start-Sleep -Seconds 1
 Write-Host "`nTest bootstrap script executed successfully!"
+

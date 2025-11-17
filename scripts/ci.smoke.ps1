@@ -1,5 +1,5 @@
-# =========================================
-# ci.smoke.ps1 — COLINK smoke health check
+﻿# =========================================
+# ci.smoke.ps1 â€” COLINK smoke health check
 # =========================================
 
 Write-Host "Checking if Node.js is installed..."
@@ -48,7 +48,7 @@ if ($backend) {
 # -----------------------------
 Write-Host ""
 Write-Host "==============================="
-Write-Host "🔥 Health Summary:"
+Write-Host "ðŸ”¥ Health Summary:"
 Write-Host "==============================="
 Write-Host "Node.js Status:          $nodeStatus"
 Write-Host "Test Script Status:      $scriptStatus"
@@ -60,10 +60,11 @@ if ($nodeStatus -eq "Installed" -and
     $pythonStatus -eq "Installed" -and
     $backendStatus -eq "Running") {
 
-    Write-Host "✅ All checks passed successfully! COLINK system is healthy and ready for the next steps!"
+    Write-Host "âœ… All checks passed successfully! COLINK system is healthy and ready for the next steps!"
 }
 else {
-    Write-Host "❌ Some checks failed. Please inspect above output."
+    Write-Host "âŒ Some checks failed. Please inspect above output."
 }
 
 Write-Host "COLINK Smoke Test completed."
+

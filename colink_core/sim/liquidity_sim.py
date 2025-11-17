@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 
 class LiquiditySim:
@@ -33,3 +33,4 @@ class LiquiditySim:
         self.reserve_b = new_reserve_b
         self.reserve_a = new_reserve_a
         return out_a
+

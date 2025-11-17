@@ -1,4 +1,4 @@
-param(
+﻿param(
   [Parameter(Mandatory=$true)][string]$Version
 )
 $ErrorActionPreference = "Stop"
@@ -16,3 +16,4 @@ git push
 git push --tags
 
 Write-Host "Done." -ForegroundColor Green
+

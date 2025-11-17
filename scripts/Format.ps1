@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param()
 $ErrorActionPreference = "Continue"
 $venv = ".\.venv\Scripts"
@@ -22,3 +22,4 @@ if (Test-Path $py) {
 }
 
 Write-Host "Format complete."
+

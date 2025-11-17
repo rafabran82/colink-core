@@ -26,3 +26,4 @@ if ($confirm -eq "YES") {
     Write-Host "🚫 Commit blocked to prevent accidental deletions." -ForegroundColor Red
     exit 1
 }
+
