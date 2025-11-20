@@ -1,0 +1,6 @@
+{
+  "network": "testnet",
+  "out_dir": ".artifacts\\data\\bootstrap",
+  "ts_start": "2025-11-16T20:43:45Z",
+  "xrpl_endpoint": ""
+}

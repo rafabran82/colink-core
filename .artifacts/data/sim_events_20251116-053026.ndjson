@@ -1,0 +1,918 @@
+{"type": "tick", "tick": 1, "timestamp": "2025-11-16T10:30:26.495853"}
+{"type": "vol_update", "tick": 1, "mid_before": 0.05, "mid_after": 0.04991693225281656, "noise": -0.0021613549436689254}
+{"type": "spread_update", "tick": 1, "mid_price": 0.04991693225281656, "bid_price": 0.049738195818035805, "ask_price": 0.0500956686875973, "spread_fraction": 0.0035806774718344626}
+{"type": "tick", "tick": 2, "timestamp": "2025-11-16T10:30:26.495993"}
+{"type": "vol_update", "tick": 2, "mid_before": 0.04991693225281656, "mid_after": 0.04981242845938271, "noise": -0.0025935540049727896}
+{"type": "spread_update", "tick": 2, "mid_price": 0.04981242845938271, "bid_price": 0.04962330177657013, "ask_price": 0.0500015551421953, "spread_fraction": 0.0037967770024863946}
+{"type": "tick", "tick": 3, "timestamp": "2025-11-16T10:30:26.496049"}
+{"type": "vol_update", "tick": 3, "mid_before": 0.04981242845938271, "mid_after": 0.04974200243973955, "noise": -0.0019138242567433063}
+{"type": "spread_update", "tick": 3, "mid_price": 0.04974200243973955, "bid_price": 0.04957004870821612, "ask_price": 0.04991395617126298, "spread_fraction": 0.003456912128371653}
+{"type": "tick", "tick": 4, "timestamp": "2025-11-16T10:30:26.496091"}
+{"type": "vol_update", "tick": 4, "mid_before": 0.04974200243973955, "mid_after": 0.048649653083119915, "noise": -0.022460301215114362}
+{"type": "spread_update", "tick": 4, "mid_price": 0.048649653083119915, "bid_price": 0.04798168601928327, "ask_price": 0.04931762014695656, "spread_fraction": 0.013730150607557182}
+{"type": "tick", "tick": 5, "timestamp": "2025-11-16T10:30:26.496127"}
+{"type": "vol_update", "tick": 5, "mid_before": 0.048649653083119915, "mid_after": 0.048515653438905966, "noise": -0.003254380262177925}
+{"type": "spread_update", "tick": 5, "mid_price": 0.048515653438905966, "bid_price": 0.048315420112829584, "ask_price": 0.04871588676498235, "spread_fraction": 0.004127190131088963}
+{"type": "tick", "tick": 6, "timestamp": "2025-11-16T10:30:26.496162"}
+{"type": "vol_update", "tick": 6, "mid_before": 0.048515653438905966, "mid_after": 0.04862424465788172, "noise": 0.001738271800512826}
+{"type": "spread_update", "tick": 6, "mid_price": 0.04862424465788172, "bid_price": 0.048460422969582, "ask_price": 0.04878806634618144, "spread_fraction": 0.003369135900256413}
+{"type": "tick", "tick": 7, "timestamp": "2025-11-16T10:30:26.496193"}
+{"type": "vol_update", "tick": 7, "mid_before": 0.04862424465788172, "mid_after": 0.04912748359257879, "noise": 0.009849547601980034}
+{"type": "spread_update", "tick": 7, "mid_price": 0.04912748359257879, "bid_price": 0.048762723139492044, "ask_price": 0.04949224404566554, "spread_fraction": 0.007424773800990017}
+{"type": "tick", "tick": 8, "timestamp": "2025-11-16T10:30:26.496225"}
+{"type": "vol_update", "tick": 8, "mid_before": 0.04912748359257879, "mid_after": 0.049233481427576095, "noise": 0.001657607661657479}
+{"type": "spread_update", "tick": 8, "mid_price": 0.049233481427576095, "bid_price": 0.04906959282599494, "ask_price": 0.04939737002915724, "spread_fraction": 0.0033288038308287395}
+{"type": "tick", "tick": 9, "timestamp": "2025-11-16T10:30:26.496257"}
+{"type": "vol_update", "tick": 9, "mid_before": 0.049233481427576095, "mid_after": 0.04944002242668127, "noise": 0.0036951329281680293}
+{"type": "spread_update", "tick": 9, "mid_price": 0.04944002242668127, "bid_price": 0.04922507864319547, "ask_price": 0.049654966210167066, "spread_fraction": 0.004347566464084015}
+{"type": "tick", "tick": 10, "timestamp": "2025-11-16T10:30:26.496289"}
+{"type": "vol_update", "tick": 10, "mid_before": 0.04944002242668127, "mid_after": 0.050437040420397004, "noise": 0.019666212408060723}
+{"type": "spread_update", "tick": 10, "mid_price": 0.050437040420397004, "bid_price": 0.04981499504427528, "ask_price": 0.05105908579651874, "spread_fraction": 0.012333106204030362}
+{"direction": "XRP->COL", "amount": 2124.604245465858, "amount_out": 38714.81721190312, "lp_fee": 116.55238498315039, "xrpay_fee": 19.42539749719173, "slippage": 0.17524669836035242, "pool_base_after": 461285.1827880969, "pool_quote_after": 27343.12445566436, "type": "swap", "tick": 10}
+{"type": "tick", "tick": 11, "timestamp": "2025-11-16T10:30:26.496362"}
+{"type": "vol_update", "tick": 11, "mid_before": 0.05927596522913922, "mid_after": 0.05902794512086015, "noise": -0.004684159757168397}
+{"type": "spread_update", "tick": 11, "mid_price": 0.05902794512086015, "bid_price": 0.05874212709551625, "ask_price": 0.059313763146204034, "spread_fraction": 0.0048420798785841985}
+{"type": "tick", "tick": 12, "timestamp": "2025-11-16T10:30:26.496398"}
+{"type": "vol_update", "tick": 12, "mid_before": 0.05902794512086015, "mid_after": 0.05949163548336942, "noise": 0.007355437988902871}
+{"type": "spread_update", "tick": 12, "mid_price": 0.05949163548336942, "bid_price": 0.05912411287683283, "ask_price": 0.059859158089906016, "spread_fraction": 0.006177718994451436}
+{"type": "tick", "tick": 13, "timestamp": "2025-11-16T10:30:26.496429"}
+{"type": "vol_update", "tick": 13, "mid_before": 0.05949163548336942, "mid_after": 0.05985744942385335, "noise": 0.005648997880318652}
+{"type": "spread_update", "tick": 13, "mid_price": 0.05985744942385335, "bid_price": 0.059538738497835406, "ask_price": 0.0601761603498713, "spread_fraction": 0.005324498940159326}
+{"type": "tick", "tick": 14, "timestamp": "2025-11-16T10:30:26.496459"}
+{"type": "vol_update", "tick": 14, "mid_before": 0.05985744942385335, "mid_after": 0.060110239508407715, "noise": 0.003723201739926217}
+{"type": "spread_update", "tick": 14, "mid_price": 0.060110239508407715, "bid_price": 0.05984806263547415, "ask_price": 0.060372416381341276, "spread_fraction": 0.004361600869963109}
+{"type": "tick", "tick": 15, "timestamp": "2025-11-16T10:30:26.496489"}
+{"type": "vol_update", "tick": 15, "mid_before": 0.060110239508407715, "mid_after": 0.060652659902135544, "noise": 0.008523760313780786}
+{"type": "spread_update", "tick": 15, "mid_price": 0.060652659902135544, "bid_price": 0.06024253388468067, "ask_price": 0.06106278591959041, "spread_fraction": 0.006761880156890393}
+{"type": "tick", "tick": 16, "timestamp": "2025-11-16T10:30:26.496519"}
+{"type": "vol_update", "tick": 16, "mid_before": 0.060652659902135544, "mid_after": 0.0593050908785743, "noise": -0.022717805875877094}
+{"type": "spread_update", "tick": 16, "mid_price": 0.0593050908785743, "bid_price": 0.05848318738036251, "ask_price": 0.060126994376786085, "spread_fraction": 0.013858902937938547}
+{"type": "tick", "tick": 17, "timestamp": "2025-11-16T10:30:26.496549"}
+{"type": "vol_update", "tick": 17, "mid_before": 0.0593050908785743, "mid_after": 0.05852006045362268, "noise": -0.013737150695189921}
+{"type": "spread_update", "tick": 17, "mid_price": 0.05852006045362268, "bid_price": 0.057971810857917104, "ask_price": 0.059068310049328256, "spread_fraction": 0.00936857534759496}
+{"type": "tick", "tick": 18, "timestamp": "2025-11-16T10:30:26.496580"}
+{"type": "vol_update", "tick": 18, "mid_before": 0.05852006045362268, "mid_after": 0.05931828482517611, "noise": 0.013140183645846095}
+{"type": "spread_update", "tick": 18, "mid_price": 0.05931828482517611, "bid_price": 0.058780262535033455, "ask_price": 0.05985630711531876, "spread_fraction": 0.009070091822923048}
+{"type": "tick", "tick": 19, "timestamp": "2025-11-16T10:30:26.496610"}
+{"type": "vol_update", "tick": 19, "mid_before": 0.05931828482517611, "mid_after": 0.060101904361489045, "noise": 0.012710421350220005}
+{"type": "spread_update", "tick": 19, "mid_price": 0.060101904361489045, "bid_price": 0.05956968933639275, "ask_price": 0.06063411938658534, "spread_fraction": 0.008855210675110003}
+{"type": "tick", "tick": 20, "timestamp": "2025-11-16T10:30:26.496640"}
+{"type": "vol_update", "tick": 20, "mid_before": 0.060101904361489045, "mid_after": 0.05922844083926837, "noise": -0.015033042363635245}
+{"type": "spread_update", "tick": 20, "mid_price": 0.05922844083926837, "bid_price": 0.058635177907035804, "ask_price": 0.059821703771500936, "spread_fraction": 0.010016521181817622}
+{"direction": "COL->XRP", "amount": 939.2250944461108, "amount_out": 55.321496629189994, "lp_fee": 0.16654740580789762, "xrpay_fee": 0.027757900967982935, "slippage": 0.004052709189882916, "pool_base_after": 462224.407882543, "pool_quote_after": 27265.880662166703, "type": "swap", "tick": 20}
+{"type": "tick", "tick": 21, "timestamp": "2025-11-16T10:30:26.496718"}
+{"type": "vol_update", "tick": 21, "mid_before": 0.05898840519277663, "mid_after": 0.05958278456595184, "noise": 0.009576206861886653}
+{"type": "spread_update", "tick": 21, "mid_price": 0.05958278456595184, "bid_price": 0.05914853906933157, "ask_price": 0.060017030062572106, "spread_fraction": 0.007288103430943327}
+{"type": "tick", "tick": 22, "timestamp": "2025-11-16T10:30:26.496752"}
+{"type": "vol_update", "tick": 22, "mid_before": 0.05958278456595184, "mid_after": 0.05992528288794745, "noise": 0.00524827652803813}
+{"type": "spread_update", "tick": 22, "mid_price": 0.05992528288794745, "bid_price": 0.059618217452919155, "ask_price": 0.06023234832297575, "spread_fraction": 0.005124138264019065}
+{"type": "tick", "tick": 23, "timestamp": "2025-11-16T10:30:26.496782"}
+{"type": "vol_update", "tick": 23, "mid_before": 0.05992528288794745, "mid_after": 0.059391661308842686, "noise": -0.009404781978293997}
+{"type": "spread_update", "tick": 23, "mid_price": 0.059391661308842686, "bid_price": 0.058963899342601406, "ask_price": 0.059819423275083966, "spread_fraction": 0.007202390989146998}
+{"type": "tick", "tick": 24, "timestamp": "2025-11-16T10:30:26.496812"}
+{"type": "vol_update", "tick": 24, "mid_before": 0.059391661308842686, "mid_after": 0.058782269223946484, "noise": -0.010760566407248661}
+{"type": "spread_update", "tick": 24, "mid_price": 0.058782269223946484, "bid_price": 0.058319048295110094, "ask_price": 0.059245490152782875, "spread_fraction": 0.007880283203624331}
+{"type": "tick", "tick": 25, "timestamp": "2025-11-16T10:30:26.496841"}
+{"type": "vol_update", "tick": 25, "mid_before": 0.058782269223946484, "mid_after": 0.05859112494608642, "noise": -0.003751733564960763}
+{"type": "spread_update", "tick": 25, "mid_price": 0.05859112494608642, "bid_price": 0.05833473798868668, "ask_price": 0.05884751190348616, "spread_fraction": 0.004375866782480382}
+{"type": "tick", "tick": 26, "timestamp": "2025-11-16T10:30:26.496872"}
+{"type": "vol_update", "tick": 26, "mid_before": 0.05859112494608642, "mid_after": 0.060673237520950066, "noise": 0.03503631333720822}
+{"type": "spread_update", "tick": 26, "mid_price": 0.060673237520950066, "bid_price": 0.059458671146664255, "ask_price": 0.06188780389523587, "spread_fraction": 0.02001815666860411}
+{"type": "tick", "tick": 27, "timestamp": "2025-11-16T10:30:26.496902"}
+{"type": "vol_update", "tick": 27, "mid_before": 0.060673237520950066, "mid_after": 0.06140296078170032, "noise": 0.011527102732045446}
+{"type": "spread_update", "tick": 27, "mid_price": 0.06140296078170032, "bid_price": 0.06089555426125486, "ask_price": 0.06191036730214578, "spread_fraction": 0.008263551366022723}
+{"type": "tick", "tick": 28, "timestamp": "2025-11-16T10:30:26.496933"}
+{"type": "vol_update", "tick": 28, "mid_before": 0.06140296078170032, "mid_after": 0.06274324924171959, "noise": 0.021327749720151983}
+{"type": "spread_update", "tick": 28, "mid_price": 0.06274324924171959, "bid_price": 0.06191730496038703, "ask_price": 0.06356919352305214, "spread_fraction": 0.013163874860075992}
+{"type": "tick", "tick": 29, "timestamp": "2025-11-16T10:30:26.496962"}
+{"type": "vol_update", "tick": 29, "mid_before": 0.06274324924171959, "mid_after": 0.06411702364270537, "noise": 0.021395174661632436}
+{"type": "spread_update", "tick": 29, "mid_price": 0.06411702364270537, "bid_price": 0.06327083362378876, "ask_price": 0.06496321366162199, "spread_fraction": 0.013197587330816218}
+{"type": "tick", "tick": 30, "timestamp": "2025-11-16T10:30:26.496991"}
+{"type": "vol_update", "tick": 30, "mid_before": 0.06411702364270537, "mid_after": 0.06405865072598471, "noise": -0.0014104121402445584}
+{"type": "spread_update", "tick": 30, "mid_price": 0.06405865072598471, "bid_price": 0.06385332954983394, "ask_price": 0.06426397190213548, "spread_fraction": 0.003205206070122279}
+{"type": "tick", "tick": 31, "timestamp": "2025-11-16T10:30:26.497022"}
+{"type": "vol_update", "tick": 31, "mid_before": 0.06405865072598471, "mid_after": 0.06500629829879093, "noise": 0.014293436359748647}
+{"type": "spread_update", "tick": 31, "mid_price": 0.06500629829879093, "bid_price": 0.06437920085918565, "ask_price": 0.0656333957383962, "spread_fraction": 0.009646718179874324}
+{"type": "tick", "tick": 32, "timestamp": "2025-11-16T10:30:26.497050"}
+{"type": "vol_update", "tick": 32, "mid_before": 0.06500629829879093, "mid_after": 0.0636310786112446, "noise": -0.021655176091174323}
+{"type": "spread_update", "tick": 32, "mid_price": 0.0636310786112446, "bid_price": 0.06278302980861757, "ask_price": 0.06447912741387164, "spread_fraction": 0.013327588045587162}
+{"direction": "COL->XRP", "amount": 876.4485403295379, "amount_out": 55.46899544429175, "lp_fee": 0.16699145643038157, "xrpay_fee": 0.0278319094050636, "slippage": 0.0037749370491058985, "pool_base_after": 463100.8564228725, "pool_quote_after": 29356.36863856579, "type": "swap", "tick": 32}
+{"type": "tick", "tick": 33, "timestamp": "2025-11-16T10:30:26.497118"}
+{"type": "vol_update", "tick": 33, "mid_before": 0.06339087529512044, "mid_after": 0.06397481277530365, "noise": 0.008711696122898495}
+{"type": "spread_update", "tick": 33, "mid_price": 0.06397481277530365, "bid_price": 0.0635362111791565, "ask_price": 0.06441341437145079, "spread_fraction": 0.006855848061449248}
+{"type": "tick", "tick": 34, "timestamp": "2025-11-16T10:30:26.497149"}
+{"type": "vol_update", "tick": 34, "mid_before": 0.06397481277530365, "mid_after": 0.0662344753103471, "noise": 0.03482112775351096}
+{"type": "spread_update", "tick": 34, "mid_price": 0.0662344753103471, "bid_price": 0.06491570955883705, "ask_price": 0.06755324106185714, "spread_fraction": 0.01991056387675548}
+{"type": "tick", "tick": 35, "timestamp": "2025-11-16T10:30:26.497179"}
+{"type": "vol_update", "tick": 35, "mid_before": 0.0662344753103471, "mid_after": 0.06570943701661935, "noise": -0.008426963885010458}
+{"type": "spread_update", "tick": 35, "mid_price": 0.06570943701661935, "bid_price": 0.0652682978977561, "ask_price": 0.06615057613548261, "spread_fraction": 0.006713481942505229}
+{"type": "tick", "tick": 36, "timestamp": "2025-11-16T10:30:26.497209"}
+{"type": "vol_update", "tick": 36, "mid_before": 0.06570943701661935, "mid_after": 0.06492265084518357, "noise": -0.012473716518630098}
+{"type": "spread_update", "tick": 36, "mid_price": 0.06492265084518357, "bid_price": 0.06435543084693021, "ask_price": 0.06548987084343694, "spread_fraction": 0.008736858259315049}
+{"type": "tick", "tick": 37, "timestamp": "2025-11-16T10:30:26.497238"}
+{"type": "vol_update", "tick": 37, "mid_before": 0.06492265084518357, "mid_after": 0.06488668943542002, "noise": -0.0010539116055089646}
+{"type": "spread_update", "tick": 37, "mid_price": 0.06488668943542002, "bid_price": 0.06469028029431195, "ask_price": 0.0650830985765281, "spread_fraction": 0.0030269558027544823}
+{"type": "tick", "tick": 38, "timestamp": "2025-11-16T10:30:26.497268"}
+{"type": "vol_update", "tick": 38, "mid_before": 0.06488668943542002, "mid_after": 0.06564842927540267, "noise": 0.011239539289345126}
+{"type": "spread_update", "tick": 38, "mid_price": 0.06564842927540267, "bid_price": 0.06511537915215182, "ask_price": 0.06618147939865351, "spread_fraction": 0.008119769644672563}
+{"type": "tick", "tick": 39, "timestamp": "2025-11-16T10:30:26.497299"}
+{"type": "vol_update", "tick": 39, "mid_before": 0.06564842927540267, "mid_after": 0.06386809022229134, "noise": -0.027619293984058737}
+{"type": "spread_update", "tick": 39, "mid_price": 0.06386809022229134, "bid_price": 0.06282642421671068, "ask_price": 0.06490975622787198, "spread_fraction": 0.01630964699202937}
+{"type": "tick", "tick": 40, "timestamp": "2025-11-16T10:30:26.497397"}
+{"type": "vol_update", "tick": 40, "mid_before": 0.06386809022229134, "mid_after": 0.06286298663583549, "noise": -0.0162371792855807}
+{"type": "spread_update", "tick": 40, "mid_price": 0.06286298663583549, "bid_price": 0.06219547037702934, "ask_price": 0.06353050289464164, "spread_fraction": 0.01061858964279035}
+{"type": "tick", "tick": 41, "timestamp": "2025-11-16T10:30:26.497427"}
+{"type": "vol_update", "tick": 41, "mid_before": 0.06286298663583549, "mid_after": 0.06401981640368685, "noise": 0.017902399086649458}
+{"type": "spread_update", "tick": 41, "mid_price": 0.06401981640368685, "bid_price": 0.06328671271132122, "ask_price": 0.06475292009605248, "spread_fraction": 0.01145119954332473}
+{"type": "tick", "tick": 42, "timestamp": "2025-11-16T10:30:26.497460"}
+{"type": "vol_update", "tick": 42, "mid_before": 0.06401981640368685, "mid_after": 0.06403409268206417, "noise": -0.00027700219745567447}
+{"type": "spread_update", "tick": 42, "mid_price": 0.06403409268206417, "bid_price": 0.0638651386581665, "ask_price": 0.06420304670596183, "spread_fraction": 0.0026385010987278372}
+{"direction": "COL->XRP", "amount": 1919.593520938961, "amount_out": 121.98357883409238, "lp_fee": 0.3672360627218034, "xrpay_fee": 0.061206010453633906, "slippage": 0.008224524667834044, "pool_base_after": 465020.4499438115, "pool_quote_after": 29532.259582491417, "type": "swap", "tick": 42}
+{"type": "tick", "tick": 43, "timestamp": "2025-11-16T10:30:26.497526"}
+{"type": "vol_update", "tick": 43, "mid_before": 0.06350744270721816, "mid_after": 0.06379991986678565, "noise": 0.004105399731113134}
+{"type": "spread_update", "tick": 43, "mid_price": 0.06379991986678565, "bid_price": 0.06350945798018563, "ask_price": 0.06409038175338569, "spread_fraction": 0.004552699865556567}
+{"type": "tick", "tick": 44, "timestamp": "2025-11-16T10:30:26.497556"}
+{"type": "vol_update", "tick": 44, "mid_before": 0.06379991986678565, "mid_after": 0.06286434734347514, "noise": -0.015164164551679677}
+{"type": "spread_update", "tick": 44, "mid_price": 0.06286434734347514, "bid_price": 0.06223054382134125, "ask_price": 0.06349815086560903, "spread_fraction": 0.010082082275839838}
+{"type": "tick", "tick": 45, "timestamp": "2025-11-16T10:30:26.497622"}
+{"type": "vol_update", "tick": 45, "mid_before": 0.06286434734347514, "mid_after": 0.06405274271341752, "noise": 0.018404123245713302}
+{"type": "spread_update", "tick": 45, "mid_price": 0.06405274271341752, "bid_price": 0.06330319357107213, "ask_price": 0.06480229185576292, "spread_fraction": 0.011702061622856651}
+{"type": "tick", "tick": 46, "timestamp": "2025-11-16T10:30:26.497663"}
+{"type": "vol_update", "tick": 46, "mid_before": 0.06405274271341752, "mid_after": 0.06405603509547755, "noise": -0.00044859889021820187}
+{"type": "spread_update", "tick": 46, "mid_price": 0.06405603509547755, "bid_price": 0.06388152727461106, "ask_price": 0.06423054291634406, "spread_fraction": 0.002724299445109101}
+{"type": "tick", "tick": 47, "timestamp": "2025-11-16T10:30:26.497683"}
+{"type": "vol_update", "tick": 47, "mid_before": 0.06405603509547755, "mid_after": 0.06561874012010405, "noise": 0.023895906213945647}
+{"type": "spread_update", "tick": 47, "mid_price": 0.06561874012010405, "bid_price": 0.06467068363991015, "ask_price": 0.06656679660029793, "spread_fraction": 0.014447953106972824}
+{"type": "tick", "tick": 48, "timestamp": "2025-11-16T10:30:26.497700"}
+{"type": "vol_update", "tick": 48, "mid_before": 0.06561874012010405, "mid_after": 0.06576485891936021, "noise": 0.0017267845891084925}
+{"type": "spread_update", "tick": 48, "mid_price": 0.06576485891936021, "bid_price": 0.06554366589961838, "ask_price": 0.06598605193910202, "spread_fraction": 0.003363392294554246}
+{"type": "tick", "tick": 49, "timestamp": "2025-11-16T10:30:26.497715"}
+{"type": "vol_update", "tick": 49, "mid_before": 0.06576485891936021, "mid_after": 0.06564875380510292, "noise": -0.0022654582730825485}
+{"type": "spread_update", "tick": 49, "mid_price": 0.06564875380510292, "bid_price": 0.06541026966437749, "ask_price": 0.06588723794582833, "spread_fraction": 0.0036327291365412743}
+{"type": "tick", "tick": 50, "timestamp": "2025-11-16T10:30:26.497731"}
+{"type": "vol_update", "tick": 50, "mid_before": 0.06564875380510292, "mid_after": 0.06708316695649261, "noise": 0.02134981539250776}
+{"type": "spread_update", "tick": 50, "mid_price": 0.06708316695649261, "bid_price": 0.06619935242386843, "ask_price": 0.06796698148911678, "spread_fraction": 0.01317490769625388}
+{"type": "tick", "tick": 51, "timestamp": "2025-11-16T10:30:26.497746"}
+{"type": "vol_update", "tick": 51, "mid_before": 0.06708316695649261, "mid_after": 0.06472599269265042, "noise": -0.03563808859636797}
+{"type": "spread_update", "tick": 51, "mid_price": 0.06472599269265042, "bid_price": 0.06341082237988452, "ask_price": 0.06604116300541632, "spread_fraction": 0.020319044298183986}
+{"type": "tick", "tick": 52, "timestamp": "2025-11-16T10:30:26.497761"}
+{"type": "vol_update", "tick": 52, "mid_before": 0.06472599269265042, "mid_after": 0.0654486236476428, "noise": 0.010664463068550581}
+{"type": "spread_update", "tick": 52, "mid_price": 0.0654486236476428, "bid_price": 0.0649360148736348, "ask_price": 0.06596123242165078, "spread_fraction": 0.007832231534275291}
+{"type": "tick", "tick": 53, "timestamp": "2025-11-16T10:30:26.497775"}
+{"type": "vol_update", "tick": 53, "mid_before": 0.0654486236476428, "mid_after": 0.06486542631049828, "noise": -0.009410765492705942}
+{"type": "spread_update", "tick": 53, "mid_price": 0.06486542631049828, "bid_price": 0.06439804608692579, "ask_price": 0.06533280653407077, "spread_fraction": 0.007205382746352971}
+{"type": "tick", "tick": 54, "timestamp": "2025-11-16T10:30:26.497790"}
+{"type": "vol_update", "tick": 54, "mid_before": 0.06486542631049828, "mid_after": 0.06489561099702566, "noise": -3.465677720371596e-05}
+{"type": "spread_update", "tick": 54, "mid_price": 0.06489561099702566, "bid_price": 0.06473224743316719, "ask_price": 0.06505897456088414, "spread_fraction": 0.002517328388601858}
+{"type": "tick", "tick": 55, "timestamp": "2025-11-16T10:30:26.497807"}
+{"type": "vol_update", "tick": 55, "mid_before": 0.06489561099702566, "mid_after": 0.06451161876577195, "noise": -0.006417075521044272}
+{"type": "spread_update", "tick": 55, "mid_price": 0.06451161876577195, "bid_price": 0.06414335175405513, "ask_price": 0.06487988577748877, "spread_fraction": 0.005708537760522136}
+{"type": "tick", "tick": 56, "timestamp": "2025-11-16T10:30:26.497820"}
+{"type": "vol_update", "tick": 56, "mid_before": 0.06451161876577195, "mid_after": 0.06586163865498972, "noise": 0.02042677125525876}
+{"type": "spread_update", "tick": 56, "mid_price": 0.06586163865498972, "bid_price": 0.06502431424470125, "ask_price": 0.06669896306527819, "spread_fraction": 0.01271338562762938}
+{"type": "tick", "tick": 57, "timestamp": "2025-11-16T10:30:26.497833"}
+{"type": "vol_update", "tick": 57, "mid_before": 0.06586163865498972, "mid_after": 0.06599116513112918, "noise": 0.0014666452093301504}
+{"type": "spread_update", "tick": 57, "mid_price": 0.06599116513112918, "bid_price": 0.06577779440520252, "ask_price": 0.06620453585705585, "spread_fraction": 0.0032333226046650752}
+{"type": "tick", "tick": 58, "timestamp": "2025-11-16T10:30:26.497846"}
+{"type": "vol_update", "tick": 58, "mid_before": 0.06599116513112918, "mid_after": 0.06479544873025851, "noise": -0.018619340649535434}
+{"type": "spread_update", "tick": 58, "mid_price": 0.06479544873025851, "bid_price": 0.06403023584220877, "ask_price": 0.06556066161830826, "spread_fraction": 0.011809670324767717}
+{"type": "tick", "tick": 59, "timestamp": "2025-11-16T10:30:26.497860"}
+{"type": "vol_update", "tick": 59, "mid_before": 0.06479544873025851, "mid_after": 0.06568819878064748, "noise": 0.013277974655372168}
+{"type": "spread_update", "tick": 59, "mid_price": 0.06568819878064748, "bid_price": 0.06508787516441261, "ask_price": 0.06628852239688234, "spread_fraction": 0.009138987327686084}
+{"direction": "XRP->COL", "amount": 2648.2934456872345, "amount_out": 36969.82351638273, "lp_fee": 111.29901710902978, "xrpay_fee": 18.549836184838295, "slippage": 0.18055328246773625, "pool_base_after": 428050.62642742874, "pool_quote_after": 33194.64919866245, "type": "swap", "tick": 59}
+{"type": "tick", "tick": 60, "timestamp": "2025-11-16T10:30:26.497895"}
+{"type": "vol_update", "tick": 60, "mid_before": 0.07754841868988653, "mid_after": 0.0775908929158567, "noise": 4.7712341369843315e-05}
+{"type": "spread_update", "tick": 60, "mid_price": 0.0775908929158567, "bid_price": 0.07739506466198207, "ask_price": 0.07778672116973133, "spread_fraction": 0.0025238561706849216}
+{"type": "tick", "tick": 61, "timestamp": "2025-11-16T10:30:26.497918"}
+{"type": "vol_update", "tick": 61, "mid_before": 0.0775908929158567, "mid_after": 0.07748753485145435, "noise": -0.0018320901528279818}
+{"type": "spread_update", "tick": 61, "mid_price": 0.07748753485145435, "bid_price": 0.07722283393954159, "ask_price": 0.07775223576336712, "spread_fraction": 0.003416045076413991}
+{"type": "tick", "tick": 62, "timestamp": "2025-11-16T10:30:26.497932"}
+{"type": "vol_update", "tick": 62, "mid_before": 0.07748753485145435, "mid_after": 0.0779018750207928, "noise": 0.0048471848102115455}
+{"type": "spread_update", "tick": 62, "mid_price": 0.0779018750207928, "bid_price": 0.07751831794059691, "ask_price": 0.07828543210098866, "spread_fraction": 0.004923592405105773}
+{"type": "tick", "tick": 63, "timestamp": "2025-11-16T10:30:26.497945"}
+{"type": "vol_update", "tick": 63, "mid_before": 0.0779018750207928, "mid_after": 0.07909839291564726, "noise": 0.014859295197132338}
+{"type": "spread_update", "tick": 63, "mid_price": 0.07909839291564726, "bid_price": 0.07831297374838196, "ask_price": 0.07988381208291255, "spread_fraction": 0.009929647598566169}
+{"type": "tick", "tick": 64, "timestamp": "2025-11-16T10:30:26.497958"}
+{"type": "vol_update", "tick": 64, "mid_before": 0.07909839291564726, "mid_after": 0.07983956939416093, "noise": 0.008870310207238746}
+{"type": "spread_update", "tick": 64, "mid_price": 0.07983956939416093, "bid_price": 0.07928586959700624, "ask_price": 0.08039326919131562, "spread_fraction": 0.006935155103619373}
+{"type": "tick", "tick": 65, "timestamp": "2025-11-16T10:30:26.497971"}
+{"type": "vol_update", "tick": 65, "mid_before": 0.07983956939416093, "mid_after": 0.07994184929380616, "noise": 0.0007810677765592243}
+{"type": "spread_update", "tick": 65, "mid_price": 0.07994184929380616, "bid_price": 0.07971077466933066, "ask_price": 0.08017292391828164, "spread_fraction": 0.002890533888279612}
+{"type": "tick", "tick": 66, "timestamp": "2025-11-16T10:30:26.497984"}
+{"type": "vol_update", "tick": 66, "mid_before": 0.07994184929380616, "mid_after": 0.07935629565238463, "noise": -0.00782474475627239}
+{"type": "spread_update", "tick": 66, "mid_price": 0.07935629565238463, "bid_price": 0.07884743353411207, "ask_price": 0.07986515777065718, "spread_fraction": 0.006412372378136195}
+{"type": "tick", "tick": 67, "timestamp": "2025-11-16T10:30:26.497997"}
+{"type": "vol_update", "tick": 67, "mid_before": 0.07935629565238463, "mid_after": 0.07916778861807083, "noise": -0.0028754515349296655}
+{"type": "spread_update", "tick": 67, "mid_price": 0.07916778861807083, "bid_price": 0.07885604757687625, "ask_price": 0.07947952965926543, "spread_fraction": 0.0039377257674648326}
+{"type": "tick", "tick": 68, "timestamp": "2025-11-16T10:30:26.498010"}
+{"type": "vol_update", "tick": 68, "mid_before": 0.07916778861807083, "mid_after": 0.08160647397597609, "noise": 0.030304010071194622}
+{"type": "spread_update", "tick": 68, "mid_price": 0.08160647397597609, "bid_price": 0.08016595608641483, "ask_price": 0.08304699186553736, "spread_fraction": 0.01765200503559731}
+{"type": "tick", "tick": 69, "timestamp": "2025-11-16T10:30:26.498023"}
+{"type": "vol_update", "tick": 69, "mid_before": 0.08160647397597609, "mid_after": 0.07972666711011853, "noise": -0.023535021295135943}
+{"type": "spread_update", "tick": 69, "mid_price": 0.07972666711011853, "bid_price": 0.07858916603822981, "ask_price": 0.08086416818200726, "spread_fraction": 0.014267510647567972}
+{"type": "tick", "tick": 70, "timestamp": "2025-11-16T10:30:26.498036"}
+{"type": "vol_update", "tick": 70, "mid_before": 0.07972666711011853, "mid_after": 0.07929359674362278, "noise": -0.005931938674892678}
+{"type": "spread_update", "tick": 70, "mid_price": 0.07929359674362278, "bid_price": 0.0788601803751663, "ask_price": 0.07972701311207926, "spread_fraction": 0.005465969337446339}
+{"type": "tick", "tick": 71, "timestamp": "2025-11-16T10:30:26.498049"}
+{"type": "vol_update", "tick": 71, "mid_before": 0.07929359674362278, "mid_after": 0.08105562140998121, "noise": 0.02172152530242151}
+{"type": "spread_update", "tick": 71, "mid_price": 0.08105562140998121, "bid_price": 0.07997265649077605, "ask_price": 0.08213858632918636, "spread_fraction": 0.013360762651210755}
+{"type": "tick", "tick": 72, "timestamp": "2025-11-16T10:30:26.498062"}
+{"type": "vol_update", "tick": 72, "mid_before": 0.08105562140998121, "mid_after": 0.0810424723526889, "noise": -0.0006622226449390396}
+{"type": "spread_update", "tick": 72, "mid_price": 0.0810424723526889, "bid_price": 0.08081303209161028, "ask_price": 0.08127191261376752, "spread_fraction": 0.0028311113224695197}
+{"type": "tick", "tick": 73, "timestamp": "2025-11-16T10:30:26.498075"}
+{"type": "vol_update", "tick": 73, "mid_before": 0.0810424723526889, "mid_after": 0.08171146227831369, "noise": 0.0077548064762069}
+{"type": "spread_update", "tick": 73, "mid_price": 0.08171146227831369, "bid_price": 0.0811903553341898, "ask_price": 0.08223256922243759, "spread_fraction": 0.00637740323810345}
+{"type": "tick", "tick": 74, "timestamp": "2025-11-16T10:30:26.498088"}
+{"type": "vol_update", "tick": 74, "mid_before": 0.08171146227831369, "mid_after": 0.08235492984147257, "noise": 0.007374875142574046}
+{"type": "spread_update", "tick": 74, "mid_price": 0.08235492984147257, "bid_price": 0.08184536385439073, "ask_price": 0.0828644958285544, "spread_fraction": 0.006187437571287023}
+{"type": "tick", "tick": 75, "timestamp": "2025-11-16T10:30:26.498101"}
+{"type": "vol_update", "tick": 75, "mid_before": 0.08235492984147257, "mid_after": 0.08250468723003171, "noise": 0.0013184386635677243}
+{"type": "spread_update", "tick": 75, "mid_price": 0.08250468723003171, "bid_price": 0.08224403682717181, "ask_price": 0.08276533763289161, "spread_fraction": 0.003159219331783862}
+{"type": "tick", "tick": 76, "timestamp": "2025-11-16T10:30:26.498114"}
+{"type": "vol_update", "tick": 76, "mid_before": 0.08250468723003171, "mid_after": 0.08341202174660502, "noise": 0.010497369325739785}
+{"type": "spread_update", "tick": 76, "mid_price": 0.08341202174660502, "bid_price": 0.08276568829299813, "ask_price": 0.0840583552002119, "spread_fraction": 0.007748684662869892}
+{"type": "tick", "tick": 77, "timestamp": "2025-11-16T10:30:26.498127"}
+{"type": "vol_update", "tick": 77, "mid_before": 0.08341202174660502, "mid_after": 0.08381221097482981, "noise": 0.004297740419726559}
+{"type": "spread_update", "tick": 77, "mid_price": 0.08381221097482981, "bid_price": 0.08342257888400614, "ask_price": 0.08420184306565347, "spread_fraction": 0.00464887020986328}
+{"type": "tick", "tick": 78, "timestamp": "2025-11-16T10:30:26.498139"}
+{"type": "vol_update", "tick": 78, "mid_before": 0.08381221097482981, "mid_after": 0.08656057500676502, "noise": 0.03229192852650786}
+{"type": "spread_update", "tick": 78, "mid_price": 0.08656057500676502, "bid_price": 0.08494656961858217, "ask_price": 0.08817458039494788, "spread_fraction": 0.01864596426325393}
+{"type": "tick", "tick": 79, "timestamp": "2025-11-16T10:30:26.498152"}
+{"type": "vol_update", "tick": 79, "mid_before": 0.08656057500676502, "mid_after": 0.08674923426159327, "noise": 0.0016795055637454487}
+{"type": "spread_update", "tick": 79, "mid_price": 0.08674923426159327, "bid_price": 0.08645951326514278, "ask_price": 0.08703895525804375, "spread_fraction": 0.003339752781872724}
+{"type": "tick", "tick": 80, "timestamp": "2025-11-16T10:30:26.498165"}
+{"type": "vol_update", "tick": 80, "mid_before": 0.08674923426159327, "mid_after": 0.08872204457733412, "noise": 0.022241530026557026}
+{"type": "spread_update", "tick": 80, "mid_price": 0.08872204457733412, "bid_price": 0.08751358245664864, "ask_price": 0.08993050669801962, "spread_fraction": 0.013620765013278514}
+{"type": "tick", "tick": 81, "timestamp": "2025-11-16T10:30:26.498178"}
+{"type": "vol_update", "tick": 81, "mid_before": 0.08872204457733412, "mid_after": 0.09035772167189784, "noise": 0.017935971604982448}
+{"type": "spread_update", "tick": 81, "mid_price": 0.09035772167189784, "bid_price": 0.08932150060261906, "ask_price": 0.09139394274117663, "spread_fraction": 0.011467985802491224}
+{"type": "tick", "tick": 82, "timestamp": "2025-11-16T10:30:26.498192"}
+{"type": "vol_update", "tick": 82, "mid_before": 0.09035772167189784, "mid_after": 0.08970778949933511, "noise": -0.007692879153402443}
+{"type": "spread_update", "tick": 82, "mid_price": 0.08970778949933511, "bid_price": 0.08913846443371815, "ask_price": 0.09027711456495208, "spread_fraction": 0.006346439576701221}
+{"type": "tick", "tick": 83, "timestamp": "2025-11-16T10:30:26.498204"}
+{"type": "vol_update", "tick": 83, "mid_before": 0.08970778949933511, "mid_after": 0.09006177840290222, "noise": 0.003446021917859535}
+{"type": "spread_update", "tick": 83, "mid_price": 0.09006177840290222, "bid_price": 0.08968144652572606, "ask_price": 0.09044211028007838, "spread_fraction": 0.004223010958929767}
+{"type": "tick", "tick": 84, "timestamp": "2025-11-16T10:30:26.498217"}
+{"type": "vol_update", "tick": 84, "mid_before": 0.09006177840290222, "mid_after": 0.08928543212257987, "noise": -0.009120152678412216}
+{"type": "spread_update", "tick": 84, "mid_price": 0.08928543212257987, "bid_price": 0.08865507015581546, "ask_price": 0.08991579408934429, "spread_fraction": 0.007060076339206108}
+{"type": "tick", "tick": 85, "timestamp": "2025-11-16T10:30:26.498230"}
+{"type": "vol_update", "tick": 85, "mid_before": 0.08928543212257987, "mid_after": 0.08799749991382322, "noise": -0.014924886323991247}
+{"type": "spread_update", "tick": 85, "mid_price": 0.08799749991382322, "bid_price": 0.08712082982253404, "ask_price": 0.0888741700051124, "spread_fraction": 0.009962443161995623}
+{"type": "tick", "tick": 86, "timestamp": "2025-11-16T10:30:26.498242"}
+{"type": "vol_update", "tick": 86, "mid_before": 0.08799749991382322, "mid_after": 0.0887255275760266, "noise": 0.0077732766603180415}
+{"type": "spread_update", "tick": 86, "mid_price": 0.0887255275760266, "bid_price": 0.08815886972074596, "ask_price": 0.08929218543130722, "spread_fraction": 0.006386638330159021}
+{"type": "tick", "tick": 87, "timestamp": "2025-11-16T10:30:26.498255"}
+{"type": "vol_update", "tick": 87, "mid_before": 0.0887255275760266, "mid_after": 0.08937271406573154, "noise": 0.006794253495989528}
+{"type": "spread_update", "tick": 87, "mid_price": 0.08937271406573154, "bid_price": 0.08884567184307363, "ask_price": 0.08989975628838946, "spread_fraction": 0.005897126747994764}
+{"type": "tick", "tick": 88, "timestamp": "2025-11-16T10:30:26.498267"}
+{"type": "vol_update", "tick": 88, "mid_before": 0.08937271406573154, "mid_after": 0.08935678611423732, "noise": -0.0006782194001908637}
+{"type": "spread_update", "tick": 88, "mid_price": 0.08935678611423732, "bid_price": 0.08910309239601104, "ask_price": 0.0896104798324636, "spread_fraction": 0.002839109700095432}
+{"type": "tick", "tick": 89, "timestamp": "2025-11-16T10:30:26.498280"}
+{"type": "vol_update", "tick": 89, "mid_before": 0.08935678611423732, "mid_after": 0.09005568119920082, "noise": 0.007321399082885686}
+{"type": "spread_update", "tick": 89, "mid_price": 0.09005568119920082, "bid_price": 0.08950087520533259, "ask_price": 0.09061048719306906, "spread_fraction": 0.006160699541442843}
+{"type": "tick", "tick": 90, "timestamp": "2025-11-16T10:30:26.498293"}
+{"type": "vol_update", "tick": 90, "mid_before": 0.09005568119920082, "mid_after": 0.08932055147203084, "noise": -0.008663057759164471}
+{"type": "spread_update", "tick": 90, "mid_price": 0.08932055147203084, "bid_price": 0.08871035554510946, "ask_price": 0.08993074739895224, "spread_fraction": 0.006831528879582235}
+{"type": "tick", "tick": 91, "timestamp": "2025-11-16T10:30:26.498305"}
+{"type": "vol_update", "tick": 91, "mid_before": 0.08932055147203084, "mid_after": 0.0884103750940394, "noise": -0.010689999535285528}
+{"type": "spread_update", "tick": 91, "mid_price": 0.0884103750940394, "bid_price": 0.08771679572196946, "ask_price": 0.08910395446610936, "spread_fraction": 0.007844999767642764}
+{"type": "tick", "tick": 92, "timestamp": "2025-11-16T10:30:26.498317"}
+{"type": "vol_update", "tick": 92, "mid_before": 0.0884103750940394, "mid_after": 0.08895969973446874, "noise": 0.005713350411023889}
+{"type": "spread_update", "tick": 92, "mid_price": 0.08895969973446874, "bid_price": 0.08848317151661132, "ask_price": 0.08943622795232616, "spread_fraction": 0.005356675205511944}
+{"type": "tick", "tick": 93, "timestamp": "2025-11-16T10:30:26.498329"}
+{"type": "vol_update", "tick": 93, "mid_before": 0.08895969973446874, "mid_after": 0.08651913088791041, "noise": -0.027934544561672804}
+{"type": "spread_update", "tick": 93, "mid_price": 0.08651913088791041, "bid_price": 0.08509439680207788, "ask_price": 0.08794386497374296, "spread_fraction": 0.0164672722808364}
+{"type": "tick", "tick": 94, "timestamp": "2025-11-16T10:30:26.498342"}
+{"type": "vol_update", "tick": 94, "mid_before": 0.08651913088791041, "mid_after": 0.08746472087533862, "noise": 0.01042925897109694}
+{"type": "spread_update", "tick": 94, "mid_price": 0.08746472087533862, "bid_price": 0.08678996296072847, "ask_price": 0.08813947878994878, "spread_fraction": 0.00771462948554847}
+{"type": "tick", "tick": 95, "timestamp": "2025-11-16T10:30:26.498354"}
+{"type": "vol_update", "tick": 95, "mid_before": 0.08746472087533862, "mid_after": 0.09000328247136105, "noise": 0.028523834645749042}
+{"type": "spread_update", "tick": 95, "mid_price": 0.09000328247136105, "bid_price": 0.08849465489178877, "ask_price": 0.09151191005093331, "spread_fraction": 0.01676191732287452}
+{"type": "tick", "tick": 96, "timestamp": "2025-11-16T10:30:26.498367"}
+{"type": "vol_update", "tick": 96, "mid_before": 0.09000328247136105, "mid_after": 0.0900367099362778, "noise": -0.0001285972689119115}
+{"type": "spread_update", "tick": 96, "mid_price": 0.0900367099362778, "bid_price": 0.08980582892393729, "ask_price": 0.0902675909486183, "spread_fraction": 0.0025642986344559557}
+{"type": "tick", "tick": 97, "timestamp": "2025-11-16T10:30:26.498379"}
+{"type": "vol_update", "tick": 97, "mid_before": 0.0900367099362778, "mid_after": 0.09055511255618642, "noise": 0.005257680620221643}
+{"type": "spread_update", "tick": 97, "mid_price": 0.09055511255618642, "bid_price": 0.09009066984462163, "ask_price": 0.09101955526775121, "spread_fraction": 0.0051288403101108215}
+{"type": "tick", "tick": 98, "timestamp": "2025-11-16T10:30:26.498392"}
+{"type": "vol_update", "tick": 98, "mid_before": 0.09055511255618642, "mid_after": 0.08993365885103313, "noise": -0.007362712525123373}
+{"type": "spread_update", "tick": 98, "mid_price": 0.08993365885103313, "bid_price": 0.0893777468656792, "ask_price": 0.09048957083638705, "spread_fraction": 0.006181356262561687}
+{"type": "tick", "tick": 99, "timestamp": "2025-11-16T10:30:26.498404"}
+{"type": "vol_update", "tick": 99, "mid_before": 0.08993365885103313, "mid_after": 0.08959743531303221, "noise": -0.004238572880236535}
+{"type": "spread_update", "tick": 99, "mid_price": 0.08959743531303221, "bid_price": 0.08918355909502135, "ask_price": 0.09001131153104308, "spread_fraction": 0.004619286440118268}
+{"type": "tick", "tick": 100, "timestamp": "2025-11-16T10:30:26.498416"}
+{"type": "vol_update", "tick": 100, "mid_before": 0.08959743531303221, "mid_after": 0.0899143749296536, "noise": 0.0030373737597964136}
+{"type": "spread_update", "tick": 100, "mid_price": 0.0899143749296536, "bid_price": 0.08955303721080954, "ask_price": 0.09027571264849764, "spread_fraction": 0.004018686879898207}
+{"type": "tick", "tick": 101, "timestamp": "2025-11-16T10:30:26.498429"}
+{"type": "vol_update", "tick": 101, "mid_before": 0.0899143749296536, "mid_after": 0.08973410077709462, "noise": -0.002504953631719182}
+{"type": "spread_update", "tick": 101, "mid_price": 0.08973410077709462, "bid_price": 0.08939737564433656, "ask_price": 0.09007082590985267, "spread_fraction": 0.003752476815859591}
+{"type": "tick", "tick": 102, "timestamp": "2025-11-16T10:30:26.498442"}
+{"type": "vol_update", "tick": 102, "mid_before": 0.08973410077709462, "mid_after": 0.09212493870260348, "noise": 0.026143582593509893}
+{"type": "spread_update", "tick": 102, "mid_price": 0.09212493870260348, "bid_price": 0.0906903883839002, "ask_price": 0.09355948902130676, "spread_fraction": 0.015571791296754947}
+{"type": "tick", "tick": 103, "timestamp": "2025-11-16T10:30:26.498456"}
+{"type": "vol_update", "tick": 103, "mid_before": 0.09212493870260348, "mid_after": 0.09654455262839248, "noise": 0.04747413152215328}
+{"type": "spread_update", "tick": 103, "mid_price": 0.09654455262839248, "bid_price": 0.09401150685220763, "ask_price": 0.09907759840457735, "spread_fraction": 0.02623706576107664}
+{"type": "tick", "tick": 104, "timestamp": "2025-11-16T10:30:26.498469"}
+{"type": "vol_update", "tick": 104, "mid_before": 0.09654455262839248, "mid_after": 0.09533331068134387, "noise": -0.013045937746594337}
+{"type": "spread_update", "tick": 104, "mid_price": 0.09533331068134387, "bid_price": 0.09447312118647774, "ask_price": 0.09619350017621, "spread_fraction": 0.009022968873297168}
+{"type": "tick", "tick": 105, "timestamp": "2025-11-16T10:30:26.498481"}
+{"type": "vol_update", "tick": 105, "mid_before": 0.09533331068134387, "mid_after": 0.09605663562721384, "noise": 0.007087326409839085}
+{"type": "spread_update", "tick": 105, "mid_price": 0.09605663562721384, "bid_price": 0.09547610167288527, "ask_price": 0.09663716958154239, "spread_fraction": 0.006043663204919543}
+{"type": "tick", "tick": 106, "timestamp": "2025-11-16T10:30:26.498494"}
+{"type": "vol_update", "tick": 106, "mid_before": 0.09605663562721384, "mid_after": 0.09710366261893633, "noise": 0.010400100600919443}
+{"type": "spread_update", "tick": 106, "mid_price": 0.09710366261893633, "bid_price": 0.09635595953241165, "ask_price": 0.097851365705461, "spread_fraction": 0.007700050300459721}
+{"type": "tick", "tick": 107, "timestamp": "2025-11-16T10:30:26.498506"}
+{"type": "vol_update", "tick": 107, "mid_before": 0.09710366261893633, "mid_after": 0.09481844819252401, "noise": -0.02403376139250453}
+{"type": "spread_update", "tick": 107, "mid_price": 0.09481844819252401, "bid_price": 0.09344198009230936, "ask_price": 0.09619491629273866, "spread_fraction": 0.014516880696252265}
+{"type": "tick", "tick": 108, "timestamp": "2025-11-16T10:30:26.498519"}
+{"type": "vol_update", "tick": 108, "mid_before": 0.09481844819252401, "mid_after": 0.09424712465195291, "noise": -0.006525447067126285}
+{"type": "spread_update", "tick": 108, "mid_price": 0.09424712465195291, "bid_price": 0.09370400452875044, "ask_price": 0.09479024477515538, "spread_fraction": 0.005762723533563142}
+{"type": "tick", "tick": 109, "timestamp": "2025-11-16T10:30:26.498531"}
+{"type": "vol_update", "tick": 109, "mid_before": 0.09424712465195291, "mid_after": 0.0915277104096567, "noise": -0.02935408178062505}
+{"type": "spread_update", "tick": 109, "mid_price": 0.0915277104096567, "bid_price": 0.08995553518535333, "ask_price": 0.09309988563396004, "spread_fraction": 0.017177040890312526}
+{"type": "tick", "tick": 110, "timestamp": "2025-11-16T10:30:26.498543"}
+{"type": "vol_update", "tick": 110, "mid_before": 0.0915277104096567, "mid_after": 0.09152535149569331, "noise": -0.0005257726753223446}
+{"type": "spread_update", "tick": 110, "mid_price": 0.09152535149569331, "bid_price": 0.09127247735249622, "ask_price": 0.09177822563889039, "spread_fraction": 0.0027628863376611724}
+{"type": "tick", "tick": 111, "timestamp": "2025-11-16T10:30:26.498556"}
+{"type": "vol_update", "tick": 111, "mid_before": 0.09152535149569331, "mid_after": 0.09234224267711932, "noise": 0.008425299581771663}
+{"type": "spread_update", "tick": 111, "mid_price": 0.09234224267711932, "bid_price": 0.09172238154112283, "ask_price": 0.09296210381311582, "spread_fraction": 0.006712649790885832}
+{"type": "tick", "tick": 112, "timestamp": "2025-11-16T10:30:26.498569"}
+{"type": "vol_update", "tick": 112, "mid_before": 0.09234224267711932, "mid_after": 0.09281683883689477, "noise": 0.004639534691992532}
+{"type": "spread_update", "tick": 112, "mid_price": 0.09281683883689477, "bid_price": 0.09236948326791011, "ask_price": 0.09326419440587944, "spread_fraction": 0.004819767345996266}
+{"type": "tick", "tick": 113, "timestamp": "2025-11-16T10:30:26.498581"}
+{"type": "vol_update", "tick": 113, "mid_before": 0.09281683883689477, "mid_after": 0.09292856598008889, "noise": 0.0007037378625924869}
+{"type": "spread_update", "tick": 113, "mid_price": 0.09292856598008889, "bid_price": 0.09266354588994036, "ask_price": 0.09319358607023742, "spread_fraction": 0.0028518689312962433}
+{"type": "tick", "tick": 114, "timestamp": "2025-11-16T10:30:26.498594"}
+{"type": "vol_update", "tick": 114, "mid_before": 0.09292856598008889, "mid_after": 0.09367645192995226, "noise": 0.007547966112202936}
+{"type": "spread_update", "tick": 114, "mid_price": 0.09367645192995226, "bid_price": 0.09308872745778804, "ask_price": 0.09426417640211648, "spread_fraction": 0.006273983056101468}
+{"type": "tick", "tick": 115, "timestamp": "2025-11-16T10:30:26.498606"}
+{"type": "vol_update", "tick": 115, "mid_before": 0.09367645192995226, "mid_after": 0.09210464224411227, "noise": -0.01727913342635273}
+{"type": "spread_update", "tick": 115, "mid_price": 0.09210464224411227, "bid_price": 0.09107863643724073, "ask_price": 0.0931306480509838, "spread_fraction": 0.011139566713176365}
+{"type": "tick", "tick": 116, "timestamp": "2025-11-16T10:30:26.498618"}
+{"type": "vol_update", "tick": 116, "mid_before": 0.09210464224411227, "mid_after": 0.09107613479195721, "noise": -0.011666727616498696}
+{"type": "spread_update", "tick": 116, "mid_price": 0.09107613479195721, "bid_price": 0.09031716422648667, "ask_price": 0.09183510535742774, "spread_fraction": 0.008333363808249348}
+{"type": "tick", "tick": 117, "timestamp": "2025-11-16T10:30:26.498631"}
+{"type": "vol_update", "tick": 117, "mid_before": 0.09107613479195721, "mid_after": 0.08796276847398653, "noise": -0.0346842165906849}
+{"type": "spread_update", "tick": 117, "mid_price": 0.08796276847398653, "bid_price": 0.08621740169596756, "ask_price": 0.08970813525200551, "spread_fraction": 0.01984210829534245}
+{"type": "tick", "tick": 118, "timestamp": "2025-11-16T10:30:26.498643"}
+{"type": "vol_update", "tick": 118, "mid_before": 0.08796276847398653, "mid_after": 0.0875670089911612, "noise": -0.0049991703841424035}
+{"type": "spread_update", "tick": 118, "mid_price": 0.0875670089911612, "bid_price": 0.08712921026969501, "ask_price": 0.08800480771262738, "spread_fraction": 0.004999585192071202}
+{"type": "tick", "tick": 119, "timestamp": "2025-11-16T10:30:26.498656"}
+{"type": "vol_update", "tick": 119, "mid_before": 0.0875670089911612, "mid_after": 0.08770444498495061, "noise": 0.0010694951257645775}
+{"type": "spread_update", "tick": 119, "mid_price": 0.08770444498495061, "bid_price": 0.08743828413427858, "ask_price": 0.08797060583562263, "spread_fraction": 0.003034747562882289}
+{"type": "tick", "tick": 120, "timestamp": "2025-11-16T10:30:26.498669"}
+{"type": "vol_update", "tick": 120, "mid_before": 0.08770444498495061, "mid_after": 0.08906555299025452, "noise": 0.01501925909271165}
+{"type": "spread_update", "tick": 120, "mid_price": 0.08906555299025452, "bid_price": 0.08817403979948076, "ask_price": 0.0899570661810283, "spread_fraction": 0.010009629546355824}
+{"type": "tick", "tick": 121, "timestamp": "2025-11-16T10:30:26.498681"}
+{"type": "vol_update", "tick": 121, "mid_before": 0.08906555299025452, "mid_after": 0.0882091079332315, "noise": -0.010115895576561989}
+{"type": "spread_update", "tick": 121, "mid_price": 0.0882091079332315, "bid_price": 0.0875424281010213, "ask_price": 0.0888757877654417, "spread_fraction": 0.007557947788280995}
+{"type": "tick", "tick": 122, "timestamp": "2025-11-16T10:30:26.498695"}
+{"type": "vol_update", "tick": 122, "mid_before": 0.0882091079332315, "mid_after": 0.09027408638973909, "noise": 0.022910036728527483}
+{"type": "spread_update", "tick": 122, "mid_price": 0.09027408638973909, "bid_price": 0.08901430985635315, "ask_price": 0.09153386292312503, "spread_fraction": 0.013955018364263742}
+{"type": "tick", "tick": 123, "timestamp": "2025-11-16T10:30:26.498707"}
+{"type": "vol_update", "tick": 123, "mid_before": 0.09027408638973909, "mid_after": 0.09482877811928746, "noise": 0.049954032953426576}
+{"type": "spread_update", "tick": 123, "mid_price": 0.09482877811928746, "bid_price": 0.0922231662204372, "ask_price": 0.09743439001813771, "spread_fraction": 0.027477016476713287}
+{"type": "tick", "tick": 124, "timestamp": "2025-11-16T10:30:26.498722"}
+{"type": "vol_update", "tick": 124, "mid_before": 0.09482877811928746, "mid_after": 0.09483018911575677, "noise": -0.0004851205878922412}
+{"type": "spread_update", "tick": 124, "mid_price": 0.09483018911575677, "bid_price": 0.0945701116044205, "ask_price": 0.09509026662709305, "spread_fraction": 0.0027425602939461207}
+{"type": "tick", "tick": 125, "timestamp": "2025-11-16T10:30:26.498736"}
+{"type": "vol_update", "tick": 125, "mid_before": 0.09483018911575677, "mid_after": 0.09456198228096634, "noise": -0.003328285351862399}
+{"type": "spread_update", "tick": 125, "mid_price": 0.09456198228096634, "bid_price": 0.09416821269502952, "ask_price": 0.09495575186690317, "spread_fraction": 0.0041641426759312}
+{"type": "tick", "tick": 126, "timestamp": "2025-11-16T10:30:26.498749"}
+{"type": "vol_update", "tick": 126, "mid_before": 0.09456198228096634, "mid_after": 0.0978945895813216, "noise": 0.03474257021657275}
+{"type": "spread_update", "tick": 126, "mid_price": 0.0978945895813216, "bid_price": 0.09594929828119247, "ask_price": 0.09983988088145072, "spread_fraction": 0.019871285108286375}
+{"type": "tick", "tick": 127, "timestamp": "2025-11-16T10:30:26.498762"}
+{"type": "vol_update", "tick": 127, "mid_before": 0.0978945895813216, "mid_after": 0.09735639500187658, "noise": -0.00599769483427823}
+{"type": "spread_update", "tick": 127, "mid_price": 0.09735639500187658, "bid_price": 0.09682104704067854, "ask_price": 0.09789174296307462, "spread_fraction": 0.005498847417139115}
+{"type": "tick", "tick": 128, "timestamp": "2025-11-16T10:30:26.498774"}
+{"type": "vol_update", "tick": 128, "mid_before": 0.09735639500187658, "mid_after": 0.09803059271772431, "noise": 0.006425048075524309}
+{"type": "spread_update", "tick": 128, "mid_price": 0.09803059271772431, "bid_price": 0.09747059060038823, "ask_price": 0.09859059483506039, "spread_fraction": 0.005712524037762155}
+{"type": "tick", "tick": 129, "timestamp": "2025-11-16T10:30:26.498786"}
+{"type": "vol_update", "tick": 129, "mid_before": 0.09803059271772431, "mid_after": 0.094762897424777, "noise": -0.03383342380532704}
+{"type": "spread_update", "tick": 129, "mid_price": 0.094762897424777, "bid_price": 0.09292291354641845, "ask_price": 0.09660288130313555, "spread_fraction": 0.01941671190266352}
+{"type": "tick", "tick": 130, "timestamp": "2025-11-16T10:30:26.498799"}
+{"type": "vol_update", "tick": 130, "mid_before": 0.094762897424777, "mid_after": 0.09210048601076805, "noise": -0.02859550453142673}
+{"type": "spread_update", "tick": 130, "mid_price": 0.09210048601076805, "bid_price": 0.09055340486320737, "ask_price": 0.09364756715832874, "spread_fraction": 0.016797752265713364}
+{"direction": "XRP->COL", "amount": 968.1983813799359, "amount_out": 10224.51795365149, "lp_fee": 30.781288370250348, "xrpay_fee": 5.130214728375058, "slippage": 0.0496305302909434, "pool_base_after": 417826.10847377725, "pool_quote_after": 40391.86911255984, "type": "swap", "tick": 130}
+{"type": "tick", "tick": 131, "timestamp": "2025-11-16T10:30:26.498827"}
+{"type": "vol_update", "tick": 131, "mid_before": 0.09667148197153609, "mid_after": 0.09494458465629343, "noise": -0.018363565138590936}
+{"type": "spread_update", "tick": 131, "mid_price": 0.09494458465629343, "bid_price": 0.09383546266220655, "ask_price": 0.09605370665038032, "spread_fraction": 0.011681782569295468}
+{"type": "tick", "tick": 132, "timestamp": "2025-11-16T10:30:26.498840"}
+{"type": "vol_update", "tick": 132, "mid_before": 0.09494458465629343, "mid_after": 0.092110899357629, "noise": -0.03034567586369024}
+{"type": "spread_update", "tick": 132, "mid_price": 0.092110899357629, "bid_price": 0.09048303836152513, "ask_price": 0.09373876035373288, "spread_fraction": 0.01767283793184512}
+{"type": "tick", "tick": 133, "timestamp": "2025-11-16T10:30:26.498853"}
+{"type": "vol_update", "tick": 133, "mid_before": 0.092110899357629, "mid_after": 0.09352893790780127, "noise": 0.014894905055335668}
+{"type": "spread_update", "tick": 133, "mid_price": 0.09352893790780127, "bid_price": 0.09259856323800023, "ask_price": 0.09445931257760232, "spread_fraction": 0.009947452527667834}
+{"type": "tick", "tick": 134, "timestamp": "2025-11-16T10:30:26.498865"}
+{"type": "vol_update", "tick": 134, "mid_before": 0.09352893790780127, "mid_after": 0.09468513658873667, "noise": 0.011861935319688488}
+{"type": "spread_update", "tick": 134, "mid_price": 0.09468513658873667, "bid_price": 0.0938868492642891, "ask_price": 0.09548342391318425, "spread_fraction": 0.008430967659844244}
+{"type": "tick", "tick": 135, "timestamp": "2025-11-16T10:30:26.498877"}
+{"type": "vol_update", "tick": 135, "mid_before": 0.09468513658873667, "mid_after": 0.09453880036236992, "noise": -0.002045503672898241}
+{"type": "spread_update", "tick": 135, "mid_price": 0.09453880036236992, "bid_price": 0.09420576362977767, "ask_price": 0.09487183709496215, "spread_fraction": 0.0035227518364491207}
+{"type": "tick", "tick": 136, "timestamp": "2025-11-16T10:30:26.498890"}
+{"type": "vol_update", "tick": 136, "mid_before": 0.09453880036236992, "mid_after": 0.09364894957457638, "noise": -0.009912545794771086}
+{"type": "spread_update", "tick": 136, "mid_price": 0.09364894957457638, "bid_price": 0.09295067744999484, "ask_price": 0.09434722169915792, "spread_fraction": 0.007456272897385543}
+{"type": "tick", "tick": 137, "timestamp": "2025-11-16T10:30:26.498902"}
+{"type": "vol_update", "tick": 137, "mid_before": 0.09364894957457638, "mid_after": 0.09065348951681923, "noise": -0.03248605079250512}
+{"type": "spread_update", "tick": 137, "mid_price": 0.09065348951681923, "bid_price": 0.08895436886054657, "ask_price": 0.09235261017309189, "spread_fraction": 0.01874302539625256}
+{"type": "tick", "tick": 138, "timestamp": "2025-11-16T10:30:26.498915"}
+{"type": "vol_update", "tick": 138, "mid_before": 0.09065348951681923, "mid_after": 0.0909113887946609, "noise": 0.0023448907947865006}
+{"type": "spread_update", "tick": 138, "mid_price": 0.0909113887946609, "bid_price": 0.09057752168331133, "ask_price": 0.09124525590601049, "spread_fraction": 0.00367244539739325}
+{"type": "tick", "tick": 139, "timestamp": "2025-11-16T10:30:26.498927"}
+{"type": "vol_update", "tick": 139, "mid_before": 0.0909113887946609, "mid_after": 0.08998339969768657, "noise": -0.01070762205129622}
+{"type": "spread_update", "tick": 139, "mid_price": 0.08998339969768657, "bid_price": 0.08927668708101558, "ask_price": 0.09069011231435756, "spread_fraction": 0.00785381102564811}
+{"direction": "XRP->COL", "amount": 1947.6287941740009, "amount_out": 20506.28631670304, "lp_fee": 61.734931209341816, "xrpay_fee": 10.28915520155697, "slippage": 0.10608732851276126, "pool_base_after": 397319.82215707423, "pool_quote_after": 39545.042517098846, "type": "swap", "tick": 139}
+{"type": "tick", "tick": 140, "timestamp": "2025-11-16T10:30:26.498954"}
+{"type": "vol_update", "tick": 140, "mid_before": 0.09952949818211014, "mid_after": 0.10013434465210524, "noise": 0.0055770573653291435}
+{"type": "spread_update", "tick": 140, "mid_price": 0.10013434465210524, "bid_price": 0.09960478129829277, "ask_price": 0.10066390800591772, "spread_fraction": 0.005288528682664571}
+{"type": "tick", "tick": 141, "timestamp": "2025-11-16T10:30:26.498968"}
+{"type": "vol_update", "tick": 141, "mid_before": 0.10013434465210524, "mid_after": 0.10007963659614734, "noise": -0.0010463465721774333}
+{"type": "spread_update", "tick": 141, "mid_price": 0.10007963659614734, "bid_price": 0.0997770785123084, "ask_price": 0.10038219467998627, "spread_fraction": 0.0030231732860887166}
+{"type": "tick", "tick": 142, "timestamp": "2025-11-16T10:30:26.498981"}
+{"type": "vol_update", "tick": 142, "mid_before": 0.10007963659614734, "mid_after": 0.09823101723350822, "noise": -0.018971483565621634}
+{"type": "spread_update", "tick": 142, "mid_price": 0.09823101723350822, "bid_price": 0.09705364562588455, "ask_price": 0.09940838884113189, "spread_fraction": 0.011985741782810817}
+{"direction": "COL->XRP", "amount": 2661.0085405704144, "amount_out": 258.745775142661, "lp_fee": 0.778963698372286, "xrpay_fee": 0.12982728306204766, "slippage": 0.013238290042321577, "pool_base_after": 399980.8306976447, "pool_quote_after": 38770.38452238332, "type": "swap", "tick": 142}
+{"type": "tick", "tick": 143, "timestamp": "2025-11-16T10:30:26.499009"}
+{"type": "vol_update", "tick": 143, "mid_before": 0.09693060653621874, "mid_after": 0.09848250805430274, "noise": 0.015510438534748195}
+{"type": "spread_update", "tick": 143, "mid_price": 0.09848250805430274, "bid_price": 0.09747254834020493, "ask_price": 0.09949246776840054, "spread_fraction": 0.010255219267374098}
+{"type": "tick", "tick": 144, "timestamp": "2025-11-16T10:30:26.499022"}
+{"type": "vol_update", "tick": 144, "mid_before": 0.09848250805430274, "mid_after": 0.09747855490171324, "noise": -0.0106942281164886}
+{"type": "spread_update", "tick": 144, "mid_price": 0.09747855490171324, "bid_price": 0.09671362956316668, "ask_price": 0.09824348024025982, "spread_fraction": 0.0078471140582443}
+{"type": "tick", "tick": 145, "timestamp": "2025-11-16T10:30:26.499035"}
+{"type": "vol_update", "tick": 145, "mid_before": 0.09747855490171324, "mid_after": 0.09798343634765747, "noise": 0.004679410450363048}
+{"type": "spread_update", "tick": 145, "mid_price": 0.09798343634765747, "bid_price": 0.09750922539878447, "ask_price": 0.09845764729653046, "spread_fraction": 0.004839705225181524}
+{"type": "tick", "tick": 146, "timestamp": "2025-11-16T10:30:26.499047"}
+{"type": "vol_update", "tick": 146, "mid_before": 0.09798343634765747, "mid_after": 0.09864786780137096, "noise": 0.00628105890628288}
+{"type": "spread_update", "tick": 146, "mid_price": 0.09864786780137096, "bid_price": 0.09809144159754772, "ask_price": 0.09920429400519419, "spread_fraction": 0.00564052945314144}
+{"type": "tick", "tick": 147, "timestamp": "2025-11-16T10:30:26.499059"}
+{"type": "vol_update", "tick": 147, "mid_before": 0.09864786780137096, "mid_after": 0.09953674476642674, "noise": 0.008510604941259945}
+{"type": "spread_update", "tick": 147, "mid_price": 0.09953674476642674, "bid_price": 0.09886434394858763, "ask_price": 0.10020914558426586, "spread_fraction": 0.006755302470629973}
+{"type": "tick", "tick": 148, "timestamp": "2025-11-16T10:30:26.499072"}
+{"type": "vol_update", "tick": 148, "mid_before": 0.09953674476642674, "mid_after": 0.09674564241713395, "noise": -0.02854092454341763}
+{"type": "spread_update", "tick": 148, "mid_price": 0.09674564241713395, "bid_price": 0.09512317327102518, "ask_price": 0.09836811156324272, "spread_fraction": 0.016770462271708815}
+{"type": "tick", "tick": 149, "timestamp": "2025-11-16T10:30:26.499084"}
+{"type": "vol_update", "tick": 149, "mid_before": 0.09674564241713395, "mid_after": 0.09679601238159131, "noise": 2.064323724452881e-05}
+{"type": "spread_update", "tick": 149, "mid_price": 0.09679601238159131, "bid_price": 0.09655302325911337, "ask_price": 0.09703900150406924, "spread_fraction": 0.0025103216186222643}
+{"type": "tick", "tick": 150, "timestamp": "2025-11-16T10:30:26.499098"}
+{"type": "vol_update", "tick": 150, "mid_before": 0.09679601238159131, "mid_after": 0.09752067300480569, "noise": 0.0069864718637127465}
+{"type": "spread_update", "tick": 150, "mid_price": 0.09752067300480569, "bid_price": 0.09693620860325447, "ask_price": 0.0981051374063569, "spread_fraction": 0.005993235931856373}
+{"type": "tick", "tick": 151, "timestamp": "2025-11-16T10:30:26.499110"}
+{"type": "vol_update", "tick": 151, "mid_before": 0.09752067300480569, "mid_after": 0.09587503152702882, "noise": -0.017374796154203766}
+{"type": "spread_update", "tick": 151, "mid_price": 0.09587503152702882, "bid_price": 0.09480243938368126, "ask_price": 0.09694762367037639, "spread_fraction": 0.011187398077101883}
+{"type": "tick", "tick": 152, "timestamp": "2025-11-16T10:30:26.499123"}
+{"type": "vol_update", "tick": 152, "mid_before": 0.09587503152702882, "mid_after": 0.0970340995262206, "noise": 0.011589362378618876}
+{"type": "spread_update", "tick": 152, "mid_price": 0.0970340995262206, "bid_price": 0.09622923260615887, "ask_price": 0.0978389664462823, "spread_fraction": 0.008294681189309438}
+{"type": "tick", "tick": 153, "timestamp": "2025-11-16T10:30:26.499136"}
+{"type": "vol_update", "tick": 153, "mid_before": 0.0970340995262206, "mid_after": 0.09970714867096347, "noise": 0.027047523579796576}
+{"type": "spread_update", "tick": 153, "mid_price": 0.09970714867096347, "bid_price": 0.09810946507190998, "ask_price": 0.10130483227001696, "spread_fraction": 0.016023761789898287}
+{"type": "tick", "tick": 154, "timestamp": "2025-11-16T10:30:26.499149"}
+{"type": "vol_update", "tick": 154, "mid_before": 0.09970714867096347, "mid_after": 0.09668272683775148, "noise": -0.03083304906945719}
+{"type": "spread_update", "tick": 154, "mid_price": 0.09668272683775148, "bid_price": 0.09495050839027844, "ask_price": 0.09841494528522451, "spread_fraction": 0.017916524534728594}
+{"type": "tick", "tick": 155, "timestamp": "2025-11-16T10:30:26.499161"}
+{"type": "vol_update", "tick": 155, "mid_before": 0.09668272683775148, "mid_after": 0.09907117797811268, "noise": 0.02420401092812993}
+{"type": "spread_update", "tick": 155, "mid_price": 0.09907117797811268, "bid_price": 0.09762454009594494, "ask_price": 0.10051781586028044, "spread_fraction": 0.014602005464064965}
+{"type": "tick", "tick": 156, "timestamp": "2025-11-16T10:30:26.499174"}
+{"type": "vol_update", "tick": 156, "mid_before": 0.09907117797811268, "mid_after": 0.09949720792376622, "noise": 0.0038002410423307272}
+{"type": "spread_update", "tick": 156, "mid_price": 0.09949720792376622, "bid_price": 0.0990594082173822, "ask_price": 0.09993500763015024, "spread_fraction": 0.004400120521165364}
+{"type": "tick", "tick": 157, "timestamp": "2025-11-16T10:30:26.499186"}
+{"type": "vol_update", "tick": 157, "mid_before": 0.09949720792376622, "mid_after": 0.1005080560814008, "noise": 0.009659563054363074}
+{"type": "spread_update", "tick": 157, "mid_price": 0.1005080560814008, "bid_price": 0.09977135398860242, "ask_price": 0.10124475817419917, "spread_fraction": 0.007329781527181537}
+{"type": "tick", "tick": 158, "timestamp": "2025-11-16T10:30:26.499198"}
+{"type": "vol_update", "tick": 158, "mid_before": 0.1005080560814008, "mid_after": 0.0977071746306063, "noise": -0.028367233334272088}
+{"type": "spread_update", "tick": 158, "mid_price": 0.0977071746306063, "bid_price": 0.09607706558344034, "ask_price": 0.09933728367777225, "spread_fraction": 0.016683616667136043}
+{"type": "tick", "tick": 159, "timestamp": "2025-11-16T10:30:26.499211"}
+{"type": "vol_update", "tick": 159, "mid_before": 0.0977071746306063, "mid_after": 0.09791914372137735, "noise": 0.001669432199553593}
+{"type": "spread_update", "tick": 159, "mid_price": 0.09791914372137735, "bid_price": 0.0975926111763333, "ask_price": 0.09824567626642138, "spread_fraction": 0.0033347160997767964}
+{"type": "tick", "tick": 160, "timestamp": "2025-11-16T10:30:26.499223"}
+{"type": "vol_update", "tick": 160, "mid_before": 0.09791914372137735, "mid_after": 0.09728483141842217, "noise": -0.00697791921833045}
+{"type": "spread_update", "tick": 160, "mid_price": 0.09728483141842217, "bid_price": 0.09670219649247279, "ask_price": 0.09786746634437155, "spread_fraction": 0.005988959609165225}
+{"type": "tick", "tick": 161, "timestamp": "2025-11-16T10:30:26.499235"}
+{"type": "vol_update", "tick": 161, "mid_before": 0.09728483141842217, "mid_after": 0.0977966544584161, "noise": 0.004761077523921246}
+{"type": "spread_update", "tick": 161, "mid_price": 0.0977966544584161, "bid_price": 0.09731935409554172, "ask_price": 0.09827395482129046, "spread_fraction": 0.004880538761960623}
+{"type": "tick", "tick": 162, "timestamp": "2025-11-16T10:30:26.499247"}
+{"type": "vol_update", "tick": 162, "mid_before": 0.0977966544584161, "mid_after": 0.10050687603966746, "noise": 0.027212825108999656}
+{"type": "spread_update", "tick": 162, "mid_price": 0.10050687603966746, "bid_price": 0.0988880708296086, "ask_price": 0.10212568124972632, "spread_fraction": 0.01610641255449983}
+{"type": "tick", "tick": 163, "timestamp": "2025-11-16T10:30:26.499260"}
+{"type": "vol_update", "tick": 163, "mid_before": 0.10050687603966746, "mid_after": 0.10086166778598897, "noise": 0.003030024614251156}
+{"type": "spread_update", "tick": 163, "mid_price": 0.10086166778598897, "bid_price": 0.10045670694851101, "ask_price": 0.10126662862346693, "spread_fraction": 0.004015012307125578}
+{"direction": "COL->XRP", "amount": 1051.959658473349, "amount_out": 105.45370128731568, "lp_fee": 0.3174722567606092, "xrpay_fee": 0.052912042793434866, "slippage": 0.005230214943811086, "pool_base_after": 401032.790356118, "pool_quote_after": 40237.27996530242, "type": "swap", "tick": 163}
+{"type": "tick", "tick": 164, "timestamp": "2025-11-16T10:30:26.499288"}
+{"type": "vol_update", "tick": 164, "mid_before": 0.10033413958387698, "mid_after": 0.09934629651831517, "noise": -0.01034553283317882}
+{"type": "spread_update", "tick": 164, "mid_price": 0.09934629651831517, "bid_price": 0.09858403559077691, "ask_price": 0.10010855744585344, "spread_fraction": 0.00767276641658941}
+{"type": "tick", "tick": 165, "timestamp": "2025-11-16T10:30:26.499301"}
+{"type": "vol_update", "tick": 165, "mid_before": 0.09934629651831517, "mid_after": 0.10057562993926766, "noise": 0.011874224948847037}
+{"type": "spread_update", "tick": 165, "mid_price": 0.10057562993926766, "bid_price": 0.09972706203728407, "ask_price": 0.10142419784125127, "spread_fraction": 0.008437112474423518}
+{"type": "tick", "tick": 166, "timestamp": "2025-11-16T10:30:26.499314"}
+{"type": "vol_update", "tick": 166, "mid_before": 0.10057562993926766, "mid_after": 0.10037381446029428, "noise": -0.0025066041753379737}
+{"type": "spread_update", "tick": 166, "mid_price": 0.10037381446029428, "bid_price": 0.09999708121293316, "ask_price": 0.1007505477076554, "spread_fraction": 0.0037533020876689867}
+{"type": "tick", "tick": 167, "timestamp": "2025-11-16T10:30:26.499327"}
+{"type": "vol_update", "tick": 167, "mid_before": 0.10037381446029428, "mid_after": 0.10227731497939493, "noise": 0.018464114588408288}
+{"type": "spread_update", "tick": 167, "mid_price": 0.10227731497939493, "bid_price": 0.10107739166015932, "ask_price": 0.10347723829863056, "spread_fraction": 0.011732057294204144}
+{"type": "tick", "tick": 168, "timestamp": "2025-11-16T10:30:26.499340"}
+{"type": "vol_update", "tick": 168, "mid_before": 0.10227731497939493, "mid_after": 0.10210373262890869, "noise": -0.002197173518108232}
+{"type": "spread_update", "tick": 168, "mid_price": 0.10210373262890869, "bid_price": 0.1017363034886203, "ask_price": 0.10247116176919709, "spread_fraction": 0.003598586759054116}
+{"type": "tick", "tick": 169, "timestamp": "2025-11-16T10:30:26.499359"}
+{"type": "vol_update", "tick": 169, "mid_before": 0.10210373262890869, "mid_after": 0.10309885011066554, "noise": 0.009246142047260368}
+{"type": "spread_update", "tick": 169, "mid_price": 0.10309885011066554, "bid_price": 0.10236446967887265, "ask_price": 0.10383323054245841, "spread_fraction": 0.007123071023630184}
+{"type": "tick", "tick": 170, "timestamp": "2025-11-16T10:30:26.499371"}
+{"type": "vol_update", "tick": 170, "mid_before": 0.10309885011066554, "mid_after": 0.10297103981142866, "noise": -0.0017396869518882508}
+{"type": "spread_update", "tick": 170, "mid_price": 0.10297103981142866, "bid_price": 0.10262404352470893, "ask_price": 0.10331803609814838, "spread_fraction": 0.0033698434759441252}
+{"type": "tick", "tick": 171, "timestamp": "2025-11-16T10:30:26.499384"}
+{"type": "vol_update", "tick": 171, "mid_before": 0.10297103981142866, "mid_after": 0.10430387733031407, "noise": 0.012443809456777827}
+{"type": "spread_update", "tick": 171, "mid_price": 0.10430387733031407, "bid_price": 0.10339414884943751, "ask_price": 0.10521360581119064, "spread_fraction": 0.008721904728388914}
+{"type": "tick", "tick": 172, "timestamp": "2025-11-16T10:30:26.499397"}
+{"type": "vol_update", "tick": 172, "mid_before": 0.10430387733031407, "mid_after": 0.10540801331388609, "noise": 0.010085761640244568}
+{"type": "spread_update", "tick": 172, "mid_price": 0.10540801331388609, "bid_price": 0.10461293323197358, "ask_price": 0.10620309339579859, "spread_fraction": 0.007542880820122284}
+{"type": "tick", "tick": 173, "timestamp": "2025-11-16T10:30:26.499410"}
+{"type": "vol_update", "tick": 173, "mid_before": 0.10540801331388609, "mid_after": 0.10397427461334466, "noise": -0.014101799858157084}
+{"type": "spread_update", "tick": 173, "mid_price": 0.10397427461334466, "bid_price": 0.10298122672131406, "ask_price": 0.10496732250537524, "spread_fraction": 0.009550899929078541}
+{"type": "tick", "tick": 174, "timestamp": "2025-11-16T10:30:26.499422"}
+{"type": "vol_update", "tick": 174, "mid_before": 0.10397427461334466, "mid_after": 0.10287099814734835, "noise": -0.011111052302111553}
+{"type": "spread_update", "tick": 174, "mid_price": 0.10287099814734835, "bid_price": 0.10204231813158716, "ask_price": 0.10369967816310952, "spread_fraction": 0.008055526151055776}
+{"type": "tick", "tick": 175, "timestamp": "2025-11-16T10:30:26.499435"}
+{"type": "vol_update", "tick": 175, "mid_before": 0.10287099814734835, "mid_after": 0.10285052325036322, "noise": -0.0006990346876560418}
+{"type": "spread_update", "tick": 175, "mid_price": 0.10285052325036322, "bid_price": 0.10255744890053953, "ask_price": 0.10314359760018692, "spread_fraction": 0.002849517343828021}
+{"direction": "XRP->COL", "amount": 1661.5107915690965, "amount_out": 15474.714926502378, "lp_fee": 46.587199979435155, "xrpay_fee": 7.764533329905859, "slippage": 0.0820351945652869, "pool_base_after": 385558.0754296156, "pool_quote_after": 42907.94312024905, "type": "swap", "tick": 175}
+{"type": "tick", "tick": 176, "timestamp": "2025-11-16T10:30:26.499460"}
+{"type": "vol_update", "tick": 176, "mid_before": 0.11128788593634834, "mid_after": 0.11396452815682612, "noise": 0.023551514663587955}
+{"type": "spread_update", "tick": 176, "mid_price": 0.11396452815682612, "bid_price": 0.11233759820842687, "ask_price": 0.11559145810522536, "spread_fraction": 0.014275757331793978}
+{"type": "tick", "tick": 177, "timestamp": "2025-11-16T10:30:26.499473"}
+{"type": "vol_update", "tick": 177, "mid_before": 0.11396452815682612, "mid_after": 0.11389270471918583, "noise": -0.0011302262537466522}
+{"type": "spread_update", "tick": 177, "mid_price": 0.11389270471918583, "bid_price": 0.11354361069489595, "ask_price": 0.11424179874347572, "spread_fraction": 0.003065113126873326}
+{"type": "tick", "tick": 178, "timestamp": "2025-11-16T10:30:26.499486"}
+{"type": "vol_update", "tick": 178, "mid_before": 0.11389270471918583, "mid_after": 0.11140681020392512, "noise": -0.022326635177292015}
+{"type": "spread_update", "tick": 178, "mid_price": 0.11140681020392512, "bid_price": 0.10988462357457088, "ask_price": 0.11292899683327937, "spread_fraction": 0.013663317588646008}
+{"type": "tick", "tick": 179, "timestamp": "2025-11-16T10:30:26.499499"}
+{"type": "vol_update", "tick": 179, "mid_before": 0.11140681020392512, "mid_after": 0.11069476274607144, "noise": -0.006891417692960638}
+{"type": "spread_update", "tick": 179, "mid_price": 0.11069476274607144, "bid_price": 0.11003660391595309, "ask_price": 0.1113529215761898, "spread_fraction": 0.005945708846480319}
+{"type": "tick", "tick": 180, "timestamp": "2025-11-16T10:30:26.499511"}
+{"type": "vol_update", "tick": 180, "mid_before": 0.11069476274607144, "mid_after": 0.10947419924907294, "noise": -0.011526388843692842}
+{"type": "spread_update", "tick": 180, "mid_price": 0.10947419924907294, "bid_price": 0.1085695926565019, "ask_price": 0.11037880584164399, "spread_fraction": 0.00826319442184642}
+{"type": "tick", "tick": 181, "timestamp": "2025-11-16T10:30:26.499523"}
+{"type": "vol_update", "tick": 181, "mid_before": 0.10947419924907294, "mid_after": 0.10926677944663983, "noise": -0.002394691204465352}
+{"type": "spread_update", "tick": 181, "mid_price": 0.10926677944663983, "bid_price": 0.10886278240018267, "ask_price": 0.10967077649309699, "spread_fraction": 0.003697345602232676}
+{"type": "tick", "tick": 182, "timestamp": "2025-11-16T10:30:26.499535"}
+{"type": "vol_update", "tick": 182, "mid_before": 0.10926677944663983, "mid_after": 0.10796115597440435, "noise": -0.012448951720253464}
+{"type": "spread_update", "tick": 182, "mid_price": 0.10796115597440435, "bid_price": 0.10701925147527429, "ask_price": 0.10890306047353442, "spread_fraction": 0.008724475860126733}
+{"type": "tick", "tick": 183, "timestamp": "2025-11-16T10:30:26.499548"}
+{"type": "vol_update", "tick": 183, "mid_before": 0.10796115597440435, "mid_after": 0.10690634086164123, "noise": -0.010270320660638363}
+{"type": "spread_update", "tick": 183, "mid_price": 0.10690634086164123, "bid_price": 0.10609009380883484, "ask_price": 0.10772258791444761, "spread_fraction": 0.007635160330319181}
+{"type": "tick", "tick": 184, "timestamp": "2025-11-16T10:30:26.499561"}
+{"type": "vol_update", "tick": 184, "mid_before": 0.10690634086164123, "mid_after": 0.10773248202249244, "noise": 0.007227709639977432}
+{"type": "spread_update", "tick": 184, "mid_price": 0.10773248202249244, "bid_price": 0.10707382126800988, "ask_price": 0.10839114277697501, "spread_fraction": 0.006113854819988716}
+{"type": "tick", "tick": 185, "timestamp": "2025-11-16T10:30:26.499574"}
+{"type": "vol_update", "tick": 185, "mid_before": 0.10773248202249244, "mid_after": 0.11004823697852877, "noise": 0.020995420067949754}
+{"type": "spread_update", "tick": 185, "mid_price": 0.11004823697852877, "bid_price": 0.1086178619045317, "ask_price": 0.11147861205252584, "spread_fraction": 0.012997710033974878}
+{"type": "tick", "tick": 186, "timestamp": "2025-11-16T10:30:26.499586"}
+{"type": "vol_update", "tick": 186, "mid_before": 0.11004823697852877, "mid_after": 0.10919456752680648, "noise": -0.008257229694546118}
+{"type": "spread_update", "tick": 186, "mid_price": 0.10919456752680648, "bid_price": 0.10847075879525672, "ask_price": 0.10991837625835622, "spread_fraction": 0.006628614847273059}
+{"type": "tick", "tick": 187, "timestamp": "2025-11-16T10:30:26.499599"}
+{"type": "vol_update", "tick": 187, "mid_before": 0.10919456752680648, "mid_after": 0.10859966480492893, "noise": -0.00594809815498838}
+{"type": "spread_update", "tick": 187, "mid_price": 0.10859966480492893, "bid_price": 0.10800518490998733, "ask_price": 0.10919414469987053, "spread_fraction": 0.00547404907749419}
+{"direction": "COL->XRP", "amount": 1346.6756349705204, "amount_out": 145.22939610188212, "lp_fee": 0.43721845289076405, "xrpay_fee": 0.07286974214846068, "slippage": 0.006937022644651298, "pool_base_after": 386904.75106458616, "pool_quote_after": 41726.24835838788, "type": "swap", "tick": 187}
+{"type": "tick", "tick": 188, "timestamp": "2025-11-16T10:30:26.499624"}
+{"type": "vol_update", "tick": 188, "mid_before": 0.1078463064709756, "mid_after": 0.10983513338168914, "noise": 0.017941307595905478}
+{"type": "spread_update", "tick": 188, "mid_price": 0.10983513338168914, "bid_price": 0.10857525259181583, "ask_price": 0.11109501417156246, "spread_fraction": 0.01147065379795274}
+{"type": "tick", "tick": 189, "timestamp": "2025-11-16T10:30:26.499637"}
+{"type": "vol_update", "tick": 189, "mid_before": 0.10983513338168914, "mid_after": 0.10885149490546125, "noise": -0.00945559049224846}
+{"type": "spread_update", "tick": 189, "mid_price": 0.10885149490546125, "bid_price": 0.10806473858805003, "ask_price": 0.10963825122287246, "spread_fraction": 0.00722779524612423}
+{"type": "tick", "tick": 190, "timestamp": "2025-11-16T10:30:26.499649"}
+{"type": "vol_update", "tick": 190, "mid_before": 0.10885149490546125, "mid_after": 0.10739742698284711, "noise": -0.013858272423148695}
+{"type": "spread_update", "tick": 190, "mid_price": 0.10739742698284711, "bid_price": 0.10638476201505324, "ask_price": 0.108410091950641, "spread_fraction": 0.009429136211574348}
+{"type": "tick", "tick": 191, "timestamp": "2025-11-16T10:30:26.499662"}
+{"type": "vol_update", "tick": 191, "mid_before": 0.10739742698284711, "mid_after": 0.10403422483626822, "noise": -0.03181548158147266}
+{"type": "spread_update", "tick": 191, "mid_price": 0.10403422483626822, "bid_price": 0.102119189792117, "ask_price": 0.10594925988041942, "spread_fraction": 0.01840774079073633}
+{"type": "tick", "tick": 192, "timestamp": "2025-11-16T10:30:26.499674"}
+{"type": "vol_update", "tick": 192, "mid_before": 0.10403422483626822, "mid_after": 0.10464921767359481, "noise": 0.005411447298179837}
+{"type": "spread_update", "tick": 192, "mid_price": 0.10464921767359481, "bid_price": 0.10410444276629262, "ask_price": 0.105193992580897, "spread_fraction": 0.005205723649089919}
+{"type": "tick", "tick": 193, "timestamp": "2025-11-16T10:30:26.499686"}
+{"type": "vol_update", "tick": 193, "mid_before": 0.10464921767359481, "mid_after": 0.10632924673309127, "noise": 0.015553909401755339}
+{"type": "spread_update", "tick": 193, "mid_price": 0.10632924673309127, "bid_price": 0.10523650588103685, "ask_price": 0.10742198758514569, "spread_fraction": 0.01027695470087767}
+{"type": "tick", "tick": 194, "timestamp": "2025-11-16T10:30:26.499699"}
+{"type": "vol_update", "tick": 194, "mid_before": 0.10632924673309127, "mid_after": 0.107357621351559, "noise": 0.009171606355391363}
+{"type": "spread_update", "tick": 194, "mid_price": 0.107357621351559, "bid_price": 0.10659690637703628, "ask_price": 0.10811833632608174, "spread_fraction": 0.007085803177695682}
+{"type": "tick", "tick": 195, "timestamp": "2025-11-16T10:30:26.499711"}
+{"type": "vol_update", "tick": 195, "mid_before": 0.107357621351559, "mid_after": 0.10853074729550408, "noise": 0.010427272131928926}
+{"type": "spread_update", "tick": 195, "mid_price": 0.10853074729550408, "bid_price": 0.1076935806088994, "ask_price": 0.10936791398210875, "spread_fraction": 0.007713636065964463}
+{"type": "tick", "tick": 196, "timestamp": "2025-11-16T10:30:26.499723"}
+{"type": "vol_update", "tick": 196, "mid_before": 0.10853074729550408, "mid_after": 0.10611690372377611, "noise": -0.022741103391241108}
+{"type": "spread_update", "tick": 196, "mid_price": 0.10611690372377611, "bid_price": 0.10464500372489628, "ask_price": 0.10758880372265593, "spread_fraction": 0.013870551695620554}
+{"type": "tick", "tick": 197, "timestamp": "2025-11-16T10:30:26.499736"}
+{"type": "vol_update", "tick": 197, "mid_before": 0.10611690372377611, "mid_after": 0.10628118991031026, "noise": 0.0010481622698094335}
+{"type": "spread_update", "tick": 197, "mid_price": 0.10628118991031026, "bid_price": 0.10595978696890726, "ask_price": 0.10660259285171325, "spread_fraction": 0.003024081134904717}
+{"type": "tick", "tick": 198, "timestamp": "2025-11-16T10:30:26.499748"}
+{"type": "vol_update", "tick": 198, "mid_before": 0.10628118991031026, "mid_after": 0.10667091217558516, "noise": 0.0031668978358614743}
+{"type": "spread_update", "tick": 198, "mid_price": 0.10667091217558516, "bid_price": 0.10623532695468708, "ask_price": 0.10710649739648324, "spread_fraction": 0.0040834489179307374}
+{"type": "tick", "tick": 199, "timestamp": "2025-11-16T10:30:26.499760"}
+{"type": "vol_update", "tick": 199, "mid_before": 0.10667091217558516, "mid_after": 0.10708916301073888, "noise": 0.003420945519480113}
+{"type": "spread_update", "tick": 199, "mid_price": 0.10708916301073888, "bid_price": 0.1066382670070188, "ask_price": 0.10754005901445896, "spread_fraction": 0.004210472759740056}
+{"type": "tick", "tick": 200, "timestamp": "2025-11-16T10:30:26.499772"}
+{"type": "vol_update", "tick": 200, "mid_before": 0.10708916301073888, "mid_after": 0.10663672374417844, "noise": -0.004724883768258271}
+{"type": "spread_update", "tick": 200, "mid_price": 0.10663672374417844, "bid_price": 0.10611820887225844, "ask_price": 0.10715523861609844, "spread_fraction": 0.004862441884129136}
+{"type": "tick", "tick": 201, "timestamp": "2025-11-16T10:30:26.499785"}
+{"type": "vol_update", "tick": 201, "mid_before": 0.10663672374417844, "mid_after": 0.10753483936564696, "noise": 0.007922198187775327}
+{"type": "spread_update", "tick": 201, "mid_price": 0.10753483936564696, "bid_price": 0.10684004611246022, "ask_price": 0.1082296326188337, "spread_fraction": 0.006461099093887664}
+{"type": "tick", "tick": 202, "timestamp": "2025-11-16T10:30:26.499798"}
+{"type": "vol_update", "tick": 202, "mid_before": 0.10753483936564696, "mid_after": 0.10992879535573907, "noise": 0.021762143173451296}
+{"type": "spread_update", "tick": 202, "mid_price": 0.10992879535573907, "bid_price": 0.10845783027564142, "ask_price": 0.11139976043583674, "spread_fraction": 0.013381071586725649}
+{"type": "tick", "tick": 203, "timestamp": "2025-11-16T10:30:26.499810"}
+{"type": "vol_update", "tick": 203, "mid_before": 0.10992879535573907, "mid_after": 0.10988697949027675, "noise": -0.0008803904639090733}
+{"type": "spread_update", "tick": 203, "mid_price": 0.10988697949027675, "bid_price": 0.10956389031712555, "ask_price": 0.11021006866342795, "spread_fraction": 0.002940195231954537}
+{"type": "tick", "tick": 204, "timestamp": "2025-11-16T10:30:26.499824"}
+{"type": "vol_update", "tick": 204, "mid_before": 0.10988697949027675, "mid_after": 0.10979751358961964, "noise": -0.001314162888743488}
+{"type": "spread_update", "tick": 204, "mid_price": 0.10979751358961964, "bid_price": 0.1094508738968277, "ask_price": 0.11014415328241159, "spread_fraction": 0.003157081444371744}
+{"type": "tick", "tick": 205, "timestamp": "2025-11-16T10:30:26.499836"}
+{"type": "vol_update", "tick": 205, "mid_before": 0.10979751358961964, "mid_after": 0.11121113275216576, "noise": 0.012374783010384778}
+{"type": "spread_update", "tick": 205, "mid_price": 0.11121113275216576, "bid_price": 0.11024499810221178, "ask_price": 0.11217726740211975, "spread_fraction": 0.008687391505192389}
+{"type": "tick", "tick": 206, "timestamp": "2025-11-16T10:30:26.499848"}
+{"type": "vol_update", "tick": 206, "mid_before": 0.11121113275216576, "mid_after": 0.11235639479160976, "noise": 0.009798088069979512}
+{"type": "spread_update", "tick": 206, "mid_price": 0.11235639479160976, "bid_price": 0.11152506487893395, "ask_price": 0.11318772470428556, "spread_fraction": 0.007399044034989756}
+{"type": "tick", "tick": 207, "timestamp": "2025-11-16T10:30:26.499860"}
+{"type": "vol_update", "tick": 207, "mid_before": 0.11235639479160976, "mid_after": 0.11187500292999988, "noise": -0.0047845079045365215}
+{"type": "spread_update", "tick": 207, "mid_price": 0.11187500292999988, "bid_price": 0.11132768200475557, "ask_price": 0.1124223238552442, "spread_fraction": 0.004892253952268261}
+{"type": "tick", "tick": 208, "timestamp": "2025-11-16T10:30:26.499872"}
+{"type": "vol_update", "tick": 208, "mid_before": 0.11187500292999988, "mid_after": 0.1118702876619276, "noise": -0.0005421476464696725}
+{"type": "spread_update", "tick": 208, "mid_price": 0.1118702876619276, "bid_price": 0.11156028683618988, "ask_price": 0.11218028848766531, "spread_fraction": 0.0027710738232348364}
+{"type": "tick", "tick": 209, "timestamp": "2025-11-16T10:30:26.499884"}
+{"type": "vol_update", "tick": 209, "mid_before": 0.1118702876619276, "mid_after": 0.10902114207993316, "noise": -0.02596829584102398}
+{"type": "spread_update", "tick": 209, "mid_price": 0.10902114207993316, "bid_price": 0.10733304258950432, "ask_price": 0.11070924157036201, "spread_fraction": 0.01548414792051199}
+{"type": "tick", "tick": 210, "timestamp": "2025-11-16T10:30:26.499896"}
+{"type": "vol_update", "tick": 210, "mid_before": 0.10902114207993316, "mid_after": 0.10987003733444105, "noise": 0.007286519553110974}
+{"type": "spread_update", "tick": 210, "mid_price": 0.10987003733444105, "bid_price": 0.10919507715343574, "ask_price": 0.11054499751544637, "spread_fraction": 0.006143259776555487}
+{"type": "tick", "tick": 211, "timestamp": "2025-11-16T10:30:26.499908"}
+{"type": "vol_update", "tick": 211, "mid_before": 0.10987003733444105, "mid_after": 0.10659453773939664, "noise": -0.03031249187231906}
+{"type": "spread_update", "tick": 211, "mid_price": 0.10659453773939664, "bid_price": 0.10471247836561862, "ask_price": 0.10847659711317466, "spread_fraction": 0.01765624593615953}
+{"type": "tick", "tick": 212, "timestamp": "2025-11-16T10:30:26.499920"}
+{"type": "vol_update", "tick": 212, "mid_before": 0.10659453773939664, "mid_after": 0.10443850030138782, "noise": -0.020726528335625587}
+{"type": "spread_update", "tick": 212, "mid_price": 0.10443850030138782, "bid_price": 0.10309508028272088, "ask_price": 0.10578192032005476, "spread_fraction": 0.012863264167812794}
+{"type": "tick", "tick": 213, "timestamp": "2025-11-16T10:30:26.499932"}
+{"type": "vol_update", "tick": 213, "mid_before": 0.10443850030138782, "mid_after": 0.10413438949927728, "noise": -0.0034118648892212796}
+{"type": "spread_update", "tick": 213, "mid_price": 0.10413438949927728, "bid_price": 0.10369640729188255, "ask_price": 0.10457237170667201, "spread_fraction": 0.00420593244461064}
+{"type": "tick", "tick": 214, "timestamp": "2025-11-16T10:30:26.499944"}
+{"type": "vol_update", "tick": 214, "mid_before": 0.10413438949927728, "mid_after": 0.10236903132968764, "noise": -0.01745269140269841}
+{"type": "spread_update", "tick": 214, "mid_price": 0.10236903132968764, "bid_price": 0.10121980119486831, "ask_price": 0.10351826146450696, "spread_fraction": 0.011226345701349205}
+{"type": "tick", "tick": 215, "timestamp": "2025-11-16T10:30:26.499956"}
+{"type": "vol_update", "tick": 215, "mid_before": 0.10236903132968764, "mid_after": 0.10444351749865904, "noise": 0.019764782640077472}
+{"type": "spread_update", "tick": 215, "mid_price": 0.10444351749865904, "bid_price": 0.10315025699414933, "ask_price": 0.10573677800316875, "spread_fraction": 0.012382391320038736}
+{"type": "tick", "tick": 216, "timestamp": "2025-11-16T10:30:26.499968"}
+{"type": "vol_update", "tick": 216, "mid_before": 0.10444351749865904, "mid_after": 0.1029398879167128, "noise": -0.014896581214009224}
+{"type": "spread_update", "tick": 216, "mid_price": 0.1029398879167128, "bid_price": 0.10191581199666486, "ask_price": 0.10396396383676074, "spread_fraction": 0.009948290607004612}
+{"type": "tick", "tick": 217, "timestamp": "2025-11-16T10:30:26.499980"}
+{"type": "vol_update", "tick": 217, "mid_before": 0.1029398879167128, "mid_after": 0.10302951441520573, "noise": 0.00037066831241794996}
+{"type": "spread_update", "tick": 217, "mid_price": 0.10302951441520573, "bid_price": 0.10275284574104897, "ask_price": 0.10330618308936251, "spread_fraction": 0.002685334156208975}
+{"type": "tick", "tick": 218, "timestamp": "2025-11-16T10:30:26.499993"}
+{"type": "vol_update", "tick": 218, "mid_before": 0.10302951441520573, "mid_after": 0.10528280609295883, "noise": 0.021370351331293273}
+{"type": "spread_update", "tick": 218, "mid_price": 0.10528280609295883, "bid_price": 0.10389463380005096, "ask_price": 0.10667097838586671, "spread_fraction": 0.013185175665646637}
+{"type": "tick", "tick": 219, "timestamp": "2025-11-16T10:30:26.500004"}
+{"type": "vol_update", "tick": 219, "mid_before": 0.10528280609295883, "mid_after": 0.1044505424458594, "noise": -0.008405029111444732}
+{"type": "spread_update", "tick": 219, "mid_price": 0.1044505424458594, "bid_price": 0.10375046116476293, "ask_price": 0.10515062372695587, "spread_fraction": 0.006702514555722366}
+{"type": "tick", "tick": 220, "timestamp": "2025-11-16T10:30:26.500016"}
+{"type": "vol_update", "tick": 220, "mid_before": 0.1044505424458594, "mid_after": 0.1036053538132466, "noise": -0.008591759150517506}
+{"type": "spread_update", "tick": 220, "mid_price": 0.1036053538132466, "bid_price": 0.1029012643053797, "ask_price": 0.1043094433211135, "spread_fraction": 0.006795879575258753}
+{"type": "tick", "tick": 221, "timestamp": "2025-11-16T10:30:26.500028"}
+{"type": "vol_update", "tick": 221, "mid_before": 0.1036053538132466, "mid_after": 0.10347161325243376, "noise": -0.0017908653451820559}
+{"type": "spread_update", "tick": 221, "mid_price": 0.10347161325243376, "bid_price": 0.10312028235611075, "ask_price": 0.10382294414875677, "spread_fraction": 0.003395432672591028}
+{"type": "tick", "tick": 222, "timestamp": "2025-11-16T10:30:26.500040"}
+{"type": "vol_update", "tick": 222, "mid_before": 0.10347161325243376, "mid_after": 0.10487304398830569, "noise": 0.013044108300050783}
+{"type": "spread_update", "tick": 222, "mid_price": 0.10487304398830569, "bid_price": 0.1039268737065652, "ask_price": 0.10581921427004617, "spread_fraction": 0.009022054150025391}
+{"type": "tick", "tick": 223, "timestamp": "2025-11-16T10:30:26.500052"}
+{"type": "vol_update", "tick": 223, "mid_before": 0.10487304398830569, "mid_after": 0.10520983391782467, "noise": 0.0027114060649993063}
+{"type": "spread_update", "tick": 223, "mid_price": 0.10520983391782467, "bid_price": 0.10480417604213893, "ask_price": 0.10561549179351042, "spread_fraction": 0.003855703032499653}
+{"type": "tick", "tick": 224, "timestamp": "2025-11-16T10:30:26.500064"}
+{"type": "vol_update", "tick": 224, "mid_before": 0.10520983391782467, "mid_after": 0.10767413431912375, "noise": 0.02292271924147168}
+{"type": "spread_update", "tick": 224, "mid_price": 0.10767413431912375, "bid_price": 0.10617085700804305, "ask_price": 0.10917741163020445, "spread_fraction": 0.01396135962073584}
+{"type": "tick", "tick": 225, "timestamp": "2025-11-16T10:30:26.500077"}
+{"type": "vol_update", "tick": 225, "mid_before": 0.10767413431912375, "mid_after": 0.10603882742116509, "noise": -0.01568755556568437}
+{"type": "spread_update", "tick": 225, "mid_price": 0.10603882742116509, "bid_price": 0.10494198535396741, "ask_price": 0.10713566948836277, "spread_fraction": 0.010343777782842185}
+{"type": "tick", "tick": 226, "timestamp": "2025-11-16T10:30:26.500089"}
+{"type": "vol_update", "tick": 226, "mid_before": 0.10603882742116509, "mid_after": 0.10718306937090478, "noise": 0.010290782749746905}
+{"type": "spread_update", "tick": 226, "mid_price": 0.10718306937090478, "bid_price": 0.10636361285680401, "ask_price": 0.10800252588500557, "spread_fraction": 0.007645391374873452}
+{"type": "tick", "tick": 227, "timestamp": "2025-11-16T10:30:26.500101"}
+{"type": "vol_update", "tick": 227, "mid_before": 0.10718306937090478, "mid_after": 0.10417935513361966, "noise": -0.02852414835584568}
+{"type": "spread_update", "tick": 227, "mid_price": 0.10417935513361966, "bid_price": 0.10243309305506175, "ask_price": 0.10592561721217755, "spread_fraction": 0.01676207417792284}
+{"type": "tick", "tick": 228, "timestamp": "2025-11-16T10:30:26.500113"}
+{"type": "vol_update", "tick": 228, "mid_before": 0.10417935513361966, "mid_after": 0.10586162298098371, "noise": 0.015647804382225173}
+{"type": "spread_update", "tick": 228, "mid_price": 0.10586162298098371, "bid_price": 0.1047687179395356, "ask_price": 0.10695452802243183, "spread_fraction": 0.010323902191112587}
+{"type": "tick", "tick": 229, "timestamp": "2025-11-16T10:30:26.500124"}
+{"type": "vol_update", "tick": 229, "mid_before": 0.10586162298098371, "mid_after": 0.10759550054736249, "noise": 0.01587871702278959}
+{"type": "spread_update", "tick": 229, "mid_price": 0.10759550054736249, "bid_price": 0.10647227254293559, "ask_price": 0.10871872855178938, "spread_fraction": 0.010439358511394796}
+{"type": "tick", "tick": 230, "timestamp": "2025-11-16T10:30:26.500136"}
+{"type": "vol_update", "tick": 230, "mid_before": 0.10759550054736249, "mid_after": 0.1054955525955916, "noise": -0.02001706103961579}
+{"type": "spread_update", "tick": 230, "mid_price": 0.1054955525955916, "bid_price": 0.10417595825624563, "ask_price": 0.10681514693493754, "spread_fraction": 0.012508530519807895}
+{"direction": "COL->XRP", "amount": 2285.077862672219, "amount_out": 238.81139098104623, "lp_fee": 0.7189504996920609, "xrpay_fee": 0.11982508328201015, "slippage": 0.01168783979640369, "pool_base_after": 389189.8289272584, "pool_quote_after": 40577.91912443727, "type": "swap", "tick": 230}
+{"type": "tick", "tick": 231, "timestamp": "2025-11-16T10:30:26.500161"}
+{"type": "vol_update", "tick": 231, "mid_before": 0.10426253747762124, "mid_after": 0.10665866518011123, "noise": 0.022481674534866262}
+{"type": "spread_update", "tick": 231, "mid_price": 0.10665866518011123, "bid_price": 0.10519308581870968, "ask_price": 0.10812424454151277, "spread_fraction": 0.013740837267433132}
+{"type": "tick", "tick": 232, "timestamp": "2025-11-16T10:30:26.500174"}
+{"type": "vol_update", "tick": 232, "mid_before": 0.10665866518011123, "mid_after": 0.10355764314501358, "noise": -0.029574262553924275}
+{"type": "spread_update", "tick": 232, "mid_price": 0.10355764314501358, "bid_price": 0.10176742857323293, "ask_price": 0.10534785771679422, "spread_fraction": 0.017287131276962138}
+{"type": "tick", "tick": 233, "timestamp": "2025-11-16T10:30:26.500186"}
+{"type": "vol_update", "tick": 233, "mid_before": 0.10355764314501358, "mid_after": 0.10158535034029045, "noise": -0.019545362030509716}
+{"type": "spread_update", "tick": 233, "mid_price": 0.10158535034029045, "bid_price": 0.10033862573974116, "ask_price": 0.10283207494083975, "spread_fraction": 0.012272681015254859}
+{"type": "tick", "tick": 234, "timestamp": "2025-11-16T10:30:26.500198"}
+{"type": "vol_update", "tick": 234, "mid_before": 0.10158535034029045, "mid_after": 0.10104394508969916, "noise": -0.005829560303505326}
+{"type": "spread_update", "tick": 234, "mid_price": 0.10104394508969916, "bid_price": 0.10049681434137267, "ask_price": 0.10159107583802565, "spread_fraction": 0.005414780151752663}
+{"type": "tick", "tick": 235, "timestamp": "2025-11-16T10:30:26.500210"}
+{"type": "vol_update", "tick": 235, "mid_before": 0.10104394508969916, "mid_after": 0.10075609221888157, "noise": -0.0033487889161696515}
+{"type": "spread_update", "tick": 235, "mid_price": 0.10075609221888157, "bid_price": 0.10033549654590479, "ask_price": 0.10117668789185835, "spread_fraction": 0.004174394458084826}
+{"type": "tick", "tick": 236, "timestamp": "2025-11-16T10:30:26.500222"}
+{"type": "vol_update", "tick": 236, "mid_before": 0.10075609221888157, "mid_after": 0.10095038158164213, "noise": 0.0014283137970305736}
+{"type": "spread_update", "tick": 236, "mid_price": 0.10095038158164213, "bid_price": 0.10062591121627373, "ask_price": 0.10127485194701051, "spread_fraction": 0.0032141568985152866}
+{"type": "tick", "tick": 237, "timestamp": "2025-11-16T10:30:26.500234"}
+{"type": "vol_update", "tick": 237, "mid_before": 0.10095038158164213, "mid_after": 0.1002508249295793, "noise": -0.0074297078535267526}
+{"type": "spread_update", "tick": 237, "mid_price": 0.1002508249295793, "bid_price": 0.09962778069660444, "ask_price": 0.10087386916255416, "spread_fraction": 0.006214853926763376}
+{"type": "tick", "tick": 238, "timestamp": "2025-11-16T10:30:26.500247"}
+{"type": "vol_update", "tick": 238, "mid_before": 0.1002508249295793, "mid_after": 0.10081182787557212, "noise": 0.005095993313640048}
+{"type": "spread_update", "tick": 238, "mid_price": 0.10081182787557212, "bid_price": 0.10030293010548832, "ask_price": 0.10132072564565593, "spread_fraction": 0.005047996656820024}
+{"type": "tick", "tick": 239, "timestamp": "2025-11-16T10:30:26.500258"}
+{"type": "vol_update", "tick": 239, "mid_before": 0.10081182787557212, "mid_after": 0.10060794134047304, "noise": -0.0025224465659994815}
+{"type": "spread_update", "tick": 239, "mid_price": 0.10060794134047304, "bid_price": 0.10022953240904858, "ask_price": 0.10098635027189751, "spread_fraction": 0.0037612232829997406}
+{"type": "tick", "tick": 240, "timestamp": "2025-11-16T10:30:26.500271"}
+{"type": "vol_update", "tick": 240, "mid_before": 0.10060794134047304, "mid_after": 0.10041306752350201, "noise": -0.002436962573476556}
+{"type": "spread_update", "tick": 240, "mid_price": 0.10041306752350201, "bid_price": 0.10003968341097189, "ask_price": 0.10078645163603214, "spread_fraction": 0.003718481286738278}
+{"type": "tick", "tick": 241, "timestamp": "2025-11-16T10:30:26.500283"}
+{"type": "vol_update", "tick": 241, "mid_before": 0.10041306752350201, "mid_after": 0.1025930991073593, "noise": 0.021210636251073917}
+{"type": "spread_update", "tick": 241, "mid_price": 0.1025930991073593, "bid_price": 0.10124858390607261, "ask_price": 0.10393761430864598, "spread_fraction": 0.013105318125536959}
+{"type": "tick", "tick": 242, "timestamp": "2025-11-16T10:30:26.500295"}
+{"type": "vol_update", "tick": 242, "mid_before": 0.1025930991073593, "mid_after": 0.10301857541031174, "noise": 0.003647221466691492}
+{"type": "spread_update", "tick": 242, "mid_price": 0.10301857541031174, "bid_price": 0.10257316319193373, "ask_price": 0.10346398762868976, "spread_fraction": 0.004323610733345746}
+{"type": "tick", "tick": 243, "timestamp": "2025-11-16T10:30:26.500306"}
+{"type": "vol_update", "tick": 243, "mid_before": 0.10301857541031174, "mid_after": 0.10450408129539718, "noise": 0.013919786714860188}
+{"type": "spread_update", "tick": 243, "mid_price": 0.10450408129539718, "bid_price": 0.10351548383092651, "ask_price": 0.10549267875986784, "spread_fraction": 0.009459893357430095}
+{"type": "tick", "tick": 244, "timestamp": "2025-11-16T10:30:26.500318"}
+{"type": "vol_update", "tick": 244, "mid_before": 0.10450408129539718, "mid_after": 0.105031863615128, "noise": 0.00455035127038675}
+{"type": "spread_update", "tick": 244, "mid_price": 0.105031863615128, "bid_price": 0.10453031801907407, "ask_price": 0.1055334092111819, "spread_fraction": 0.004775175635193375}
+{"type": "tick", "tick": 245, "timestamp": "2025-11-16T10:30:26.500330"}
+{"type": "vol_update", "tick": 245, "mid_before": 0.105031863615128, "mid_after": 0.1051928233584609, "noise": 0.001032484884041743}
+{"type": "spread_update", "tick": 245, "mid_price": 0.1051928233584609, "bid_price": 0.10487553630005111, "ask_price": 0.1055101104168707, "spread_fraction": 0.0030162424420208714}
+{"type": "tick", "tick": 246, "timestamp": "2025-11-16T10:30:26.500344"}
+{"type": "vol_update", "tick": 246, "mid_before": 0.1051928233584609, "mid_after": 0.10370868138672705, "noise": -0.0146087759064743}
+{"type": "spread_update", "tick": 246, "mid_price": 0.10370868138672705, "bid_price": 0.10269188124029291, "ask_price": 0.10472548153316118, "spread_fraction": 0.00980438795323715}
+{"type": "tick", "tick": 247, "timestamp": "2025-11-16T10:30:26.500355"}
+{"type": "vol_update", "tick": 247, "mid_before": 0.10370868138672705, "mid_after": 0.10375135713770305, "noise": -8.850358132642789e-05}
+{"type": "spread_update", "tick": 247, "mid_price": 0.10375135713770305, "bid_price": 0.1034873875615217, "ask_price": 0.10401532671388439, "spread_fraction": 0.002544251790663214}
+{"direction": "XRP->COL", "amount": 2999.7327026767066, "amount_out": 26819.134208107884, "lp_fee": 80.73999259841811, "xrpay_fee": 13.456665433069686, "slippage": 0.15379787358218683, "pool_base_after": 362370.6947191505, "pool_quote_after": 43378.70563807024, "type": "swap", "tick": 247}
+{"type": "tick", "tick": 248, "timestamp": "2025-11-16T10:30:26.500381"}
+{"type": "vol_update", "tick": 248, "mid_before": 0.11970809524674782, "mid_after": 0.12051020951945926, "noise": 0.006200585044462488}
+{"type": "spread_update", "tick": 248, "mid_price": 0.12051020951945926, "bid_price": 0.11983531709423491, "ask_price": 0.12118510194468361, "spread_fraction": 0.005600292522231244}
+{"type": "tick", "tick": 249, "timestamp": "2025-11-16T10:30:26.500394"}
+{"type": "vol_update", "tick": 249, "mid_before": 0.12051020951945926, "mid_after": 0.11872037439071431, "noise": -0.015352145190702148}
+{"type": "spread_update", "tick": 249, "mid_price": 0.11872037439071431, "bid_price": 0.11751226724236714, "ask_price": 0.11992848153906148, "spread_fraction": 0.010176072595351074}
+{"type": "tick", "tick": 250, "timestamp": "2025-11-16T10:30:26.500406"}
+{"type": "vol_update", "tick": 250, "mid_before": 0.11872037439071431, "mid_after": 0.11626634165048325, "noise": -0.02117069576578941}
+{"type": "spread_update", "tick": 250, "mid_price": 0.11626634165048325, "bid_price": 0.11474495612291519, "ask_price": 0.1177877271780513, "spread_fraction": 0.013085347882894704}
+{"type": "tick", "tick": 251, "timestamp": "2025-11-16T10:30:26.500418"}
+{"type": "vol_update", "tick": 251, "mid_before": 0.11626634165048325, "mid_after": 0.11742965815337467, "noise": 0.009505617157788875}
+{"type": "spread_update", "tick": 251, "mid_price": 0.11742965815337467, "bid_price": 0.11657796332130323, "ask_price": 0.1182813529854461, "spread_fraction": 0.007252808578894437}
+{"direction": "COL->XRP", "amount": 466.0408271351981, "amount_out": 54.46542310254517, "lp_fee": 0.16397016488473207, "xrpay_fee": 0.027328360814122012, "slippage": 0.0025627339115017233, "pool_base_after": 362836.7355462857, "pool_quote_after": 42498.60138256819, "type": "swap", "tick": 251}
+{"type": "tick", "tick": 252, "timestamp": "2025-11-16T10:30:26.500443"}
+{"type": "vol_update", "tick": 252, "mid_before": 0.11712871718620896, "mid_after": 0.11682251691772917, "noise": -0.0031142202854744657}
+{"type": "spread_update", "tick": 252, "mid_price": 0.11682251691772917, "bid_price": 0.11634855509944216, "ask_price": 0.11729647873601617, "spread_fraction": 0.004057110142737233}
+{"type": "tick", "tick": 253, "timestamp": "2025-11-16T10:30:26.500455"}
+{"type": "vol_update", "tick": 253, "mid_before": 0.11682251691772917, "mid_after": 0.11575007802122003, "noise": -0.009680070116657278}
+{"type": "spread_update", "tick": 253, "mid_price": 0.11575007802122003, "bid_price": 0.11490046839054, "ask_price": 0.11659968765190006, "spread_fraction": 0.007340035058328639}
+{"type": "tick", "tick": 254, "timestamp": "2025-11-16T10:30:26.500468"}
+{"type": "vol_update", "tick": 254, "mid_before": 0.11575007802122003, "mid_after": 0.11533167165200273, "noise": -0.0041147394141765065}
+{"type": "spread_update", "tick": 254, "mid_price": 0.11533167165200273, "bid_price": 0.11480606258534803, "ask_price": 0.1158572807186574, "spread_fraction": 0.004557369707088253}
+{"type": "tick", "tick": 255, "timestamp": "2025-11-16T10:30:26.500480"}
+{"type": "vol_update", "tick": 255, "mid_before": 0.11533167165200273, "mid_after": 0.11655744631943636, "noise": 0.010128257181013074}
+{"type": "spread_update", "tick": 255, "mid_price": 0.11655744631943636, "bid_price": 0.11567579080729508, "ask_price": 0.11743910183157764, "spread_fraction": 0.007564128590506537}
+{"type": "tick", "tick": 256, "timestamp": "2025-11-16T10:30:26.500492"}
+{"type": "vol_update", "tick": 256, "mid_before": 0.11655744631943636, "mid_after": 0.11869416831324162, "noise": 0.017831921822904103}
+{"type": "spread_update", "tick": 256, "mid_price": 0.11869416831324162, "bid_price": 0.11733916032736033, "ask_price": 0.12004917629912289, "spread_fraction": 0.011415960911452052}
+{"type": "tick", "tick": 257, "timestamp": "2025-11-16T10:30:26.500504"}
+{"type": "vol_update", "tick": 257, "mid_before": 0.11869416831324162, "mid_after": 0.12069577637408992, "noise": 0.016363575433343335}
+{"type": "spread_update", "tick": 257, "mid_price": 0.12069577637408992, "bid_price": 0.119406529712563, "ask_price": 0.12198502303561681, "spread_fraction": 0.010681787716671668}
+{"type": "tick", "tick": 258, "timestamp": "2025-11-16T10:30:26.500516"}
+{"type": "vol_update", "tick": 258, "mid_before": 0.12069577637408992, "mid_after": 0.11651071860166665, "noise": -0.03517443433523236}
+{"type": "spread_update", "tick": 258, "mid_price": 0.11651071860166665, "bid_price": 0.11417034249475995, "ask_price": 0.11885109470857334, "spread_fraction": 0.02008721716761618}
+{"direction": "COL->XRP", "amount": 2064.3071318661855, "amount_out": 238.31624287504815, "lp_fee": 0.7174598380583487, "xrpay_fee": 0.11957663967639144, "slippage": 0.011262647802456737, "pool_base_after": 364901.04267815186, "pool_quote_after": 42036.05255070558, "type": "swap", "tick": 258}
+{"type": "tick", "tick": 259, "timestamp": "2025-11-16T10:30:26.500540"}
+{"type": "vol_update", "tick": 259, "mid_before": 0.11519849941284492, "mid_after": 0.116933507616581, "noise": 0.014561031285817401}
+{"type": "spread_update", "tick": 259, "mid_price": 0.116933507616581, "bid_price": 0.11578983761615684, "ask_price": 0.11807717761700515, "spread_fraction": 0.0097805156429087}
+{"type": "tick", "tick": 260, "timestamp": "2025-11-16T10:30:26.500553"}
+{"type": "vol_update", "tick": 260, "mid_before": 0.116933507616581, "mid_after": 0.11653390387519708, "noise": -0.0039173587154693506}
+{"type": "spread_update", "tick": 260, "mid_price": 0.11653390387519708, "bid_price": 0.11601431656351249, "ask_price": 0.11705349118688166, "spread_fraction": 0.004458679357734675}
+{"type": "tick", "tick": 261, "timestamp": "2025-11-16T10:30:26.500565"}
+{"type": "vol_update", "tick": 261, "mid_before": 0.11653390387519708, "mid_after": 0.11569698084401925, "noise": -0.0076817986298145235}
+{"type": "spread_update", "tick": 261, "mid_price": 0.11569698084401925, "bid_price": 0.11496335793744857, "ask_price": 0.11643060375058993, "spread_fraction": 0.006340899314907261}
+{"type": "tick", "tick": 262, "timestamp": "2025-11-16T10:30:26.500577"}
+{"type": "vol_update", "tick": 262, "mid_before": 0.11569698084401925, "mid_after": 0.11348450760626352, "noise": -0.019622998902957975}
+{"type": "spread_update", "tick": 262, "mid_price": 0.11348450760626352, "bid_price": 0.11208734315311764, "ask_price": 0.1148816720594094, "spread_fraction": 0.012311499451478988}
+{"type": "tick", "tick": 263, "timestamp": "2025-11-16T10:30:26.500589"}
+{"type": "vol_update", "tick": 263, "mid_before": 0.11348450760626352, "mid_after": 0.11489994255622553, "noise": 0.011972494967091808}
+{"type": "spread_update", "tick": 263, "mid_price": 0.11489994255622553, "bid_price": 0.11392487320784819, "ask_price": 0.11587501190460286, "spread_fraction": 0.008486247483545904}
+{"type": "tick", "tick": 264, "timestamp": "2025-11-16T10:30:26.500602"}
+{"type": "vol_update", "tick": 264, "mid_before": 0.11489994255622553, "mid_after": 0.11307130551271136, "noise": -0.016415038796641152}
+{"type": "spread_update", "tick": 264, "mid_price": 0.11307130551271136, "bid_price": 0.11186059231554057, "ask_price": 0.11428201870988215, "spread_fraction": 0.010707519398320577}
+{"type": "tick", "tick": 265, "timestamp": "2025-11-16T10:30:26.500614"}
+{"type": "vol_update", "tick": 265, "mid_before": 0.11307130551271136, "mid_after": 0.11344679920961771, "noise": 0.0028208575350192867}
+{"type": "spread_update", "tick": 265, "mid_price": 0.11344679920961771, "bid_price": 0.11300317358240654, "ask_price": 0.1138904248368289, "spread_fraction": 0.003910428767509643}
+{"type": "tick", "tick": 266, "timestamp": "2025-11-16T10:30:26.500626"}
+{"type": "vol_update", "tick": 266, "mid_before": 0.11344679920961771, "mid_after": 0.11196480852775482, "noise": -0.013563309782099645}
+{"type": "spread_update", "tick": 266, "mid_price": 0.11196480852775482, "bid_price": 0.11092558981505773, "ask_price": 0.11300402724045192, "spread_fraction": 0.009281654891049823}
+{"type": "tick", "tick": 267, "timestamp": "2025-11-16T10:30:26.500638"}
+{"type": "vol_update", "tick": 267, "mid_before": 0.11196480852775482, "mid_after": 0.11048740913102903, "noise": -0.013695212104163584}
+{"type": "spread_update", "tick": 267, "mid_price": 0.11048740913102903, "bid_price": 0.10945461635675699, "ask_price": 0.11152020190530108, "spread_fraction": 0.009347606052081792}
+{"type": "tick", "tick": 268, "timestamp": "2025-11-16T10:30:26.500650"}
+{"type": "vol_update", "tick": 268, "mid_before": 0.11048740913102903, "mid_after": 0.11048595475611045, "noise": -0.0005131632638508303}
+{"type": "spread_update", "tick": 268, "mid_price": 0.11048595475611045, "bid_price": 0.11018139120264402, "ask_price": 0.11079051830957688, "spread_fraction": 0.0027565816319254153}
+{"type": "tick", "tick": 269, "timestamp": "2025-11-16T10:30:26.500662"}
+{"type": "vol_update", "tick": 269, "mid_before": 0.11048595475611045, "mid_after": 0.11386527048220782, "noise": 0.030085930433935846}
+{"type": "spread_update", "tick": 269, "mid_price": 0.11386527048220782, "bid_price": 0.11186773600271781, "ask_price": 0.11586280496169785, "spread_fraction": 0.017542965216967923}
+{"type": "tick", "tick": 270, "timestamp": "2025-11-16T10:30:26.500674"}
+{"type": "vol_update", "tick": 270, "mid_before": 0.11386527048220782, "mid_after": 0.11659810826880554, "noise": 0.023500626134943695}
+{"type": "spread_update", "tick": 270, "mid_price": 0.11659810826880554, "bid_price": 0.11493654872290009, "ask_price": 0.11825966781471099, "spread_fraction": 0.014250313067471848}
+{"type": "tick", "tick": 271, "timestamp": "2025-11-16T10:30:26.500686"}
+{"type": "vol_update", "tick": 271, "mid_before": 0.11659810826880554, "mid_after": 0.11616071054343385, "noise": -0.004251327803391979}
+{"type": "spread_update", "tick": 271, "mid_price": 0.11616071054343385, "bid_price": 0.11562339013787774, "ask_price": 0.11669803094898998, "spread_fraction": 0.00462566390169599}
+{"type": "tick", "tick": 272, "timestamp": "2025-11-16T10:30:26.500698"}
+{"type": "vol_update", "tick": 272, "mid_before": 0.11616071054343385, "mid_after": 0.11442211599642177, "noise": -0.015467148004505483}
+{"type": "spread_update", "tick": 272, "mid_price": 0.11442211599642177, "bid_price": 0.11325116880487804, "ask_price": 0.11559306318796549, "spread_fraction": 0.010233574002252742}
+{"type": "tick", "tick": 273, "timestamp": "2025-11-16T10:30:26.500710"}
+{"type": "vol_update", "tick": 273, "mid_before": 0.11442211599642177, "mid_after": 0.11408679845808586, "noise": -0.0034305308280296923}
+{"type": "spread_update", "tick": 273, "mid_price": 0.11408679845808586, "bid_price": 0.11360589232234981, "ask_price": 0.11456770459382191, "spread_fraction": 0.004215265414014846}
+{"type": "tick", "tick": 274, "timestamp": "2025-11-16T10:30:26.500723"}
+{"type": "vol_update", "tick": 274, "mid_before": 0.11408679845808586, "mid_after": 0.11722907370114292, "noise": 0.027042847073682263}
+{"type": "spread_update", "tick": 274, "mid_price": 0.11722907370114292, "bid_price": 0.11535089706054535, "ask_price": 0.11910725034174051, "spread_fraction": 0.01602142353684113}
+{"type": "tick", "tick": 275, "timestamp": "2025-11-16T10:30:26.500735"}
+{"type": "vol_update", "tick": 275, "mid_before": 0.11722907370114292, "mid_after": 0.11466830563594851, "noise": -0.02234413801411319}
+{"type": "spread_update", "tick": 275, "mid_price": 0.11466830563594851, "bid_price": 0.11310055264837157, "ask_price": 0.11623605862352546, "spread_fraction": 0.013672069007056595}
+{"type": "tick", "tick": 276, "timestamp": "2025-11-16T10:30:26.500747"}
+{"type": "vol_update", "tick": 276, "mid_before": 0.11466830563594851, "mid_after": 0.11582342402295816, "noise": 0.009573562878629559}
+{"type": "spread_update", "tick": 276, "mid_price": 0.11582342402295816, "bid_price": 0.11497944404654978, "ask_price": 0.11666740399936654, "spread_fraction": 0.00728678143931478}
+{"type": "tick", "tick": 277, "timestamp": "2025-11-16T10:30:26.500759"}
+{"type": "vol_update", "tick": 277, "mid_before": 0.11582342402295816, "mid_after": 0.11624068852340194, "noise": 0.003102591651591001}
+{"type": "spread_update", "tick": 277, "mid_price": 0.11624068852340194, "bid_price": 0.1157697631071995, "ask_price": 0.1167116139396044, "spread_fraction": 0.0040512958257955005}
+{"type": "tick", "tick": 278, "timestamp": "2025-11-16T10:30:26.500771"}
+{"type": "vol_update", "tick": 278, "mid_before": 0.11624068852340194, "mid_after": 0.11564987203122344, "noise": -0.005582699523580035}
+{"type": "spread_update", "tick": 278, "mid_price": 0.11564987203122344, "bid_price": 0.11503792810839998, "ask_price": 0.1162618159540469, "spread_fraction": 0.005291349761790017}
+{"type": "tick", "tick": 279, "timestamp": "2025-11-16T10:30:26.500782"}
+{"type": "vol_update", "tick": 279, "mid_before": 0.11564987203122344, "mid_after": 0.11338433467661153, "noise": -0.020089622667288778}
+{"type": "spread_update", "tick": 279, "mid_price": 0.11338433467661153, "bid_price": 0.11196194958990265, "ask_price": 0.11480671976332042, "spread_fraction": 0.01254481133364439}
+{"type": "tick", "tick": 280, "timestamp": "2025-11-16T10:30:26.500794"}
+{"type": "vol_update", "tick": 280, "mid_before": 0.11338433467661153, "mid_after": 0.11395456904871835, "noise": 0.004529216546829105}
+{"type": "spread_update", "tick": 280, "mid_price": 0.11395456904871835, "bid_price": 0.11341162016623545, "ask_price": 0.11449751793120128, "spread_fraction": 0.004764608273414552}
+{"direction": "XRP->COL", "amount": 627.3355857573063, "amount_out": 5404.336265835226, "lp_fee": 16.26995363522898, "xrpay_fee": 2.71165893920483, "slippage": 0.03034651972474223, "pool_base_after": 359496.70641231665, "pool_quote_after": 42209.476649574084, "type": "swap", "tick": 280}
+{"type": "tick", "tick": 281, "timestamp": "2025-11-16T10:30:26.500818"}
+{"type": "vol_update", "tick": 281, "mid_before": 0.1174126936260798, "mid_after": 0.11821387623484458, "noise": 0.006323645587386801}
+{"type": "spread_update", "tick": 281, "mid_price": 0.11821387623484458, "bid_price": 0.1175445702158473, "ask_price": 0.11888318225384188, "spread_fraction": 0.0056618227936934004}
+{"type": "tick", "tick": 282, "timestamp": "2025-11-16T10:30:26.500830"}
+{"type": "vol_update", "tick": 282, "mid_before": 0.11821387623484458, "mid_after": 0.12135428088743098, "noise": 0.026065448597148176}
+{"type": "spread_update", "tick": 282, "mid_price": 0.12135428088743098, "bid_price": 0.1194693182999548, "ask_price": 0.12323924347490718, "spread_fraction": 0.015532724298574089}
+{"type": "tick", "tick": 283, "timestamp": "2025-11-16T10:30:26.500843"}
+{"type": "vol_update", "tick": 283, "mid_before": 0.12135428088743098, "mid_after": 0.12097297981906008, "noise": -0.0036420487648442133}
+{"type": "spread_update", "tick": 283, "mid_price": 0.12097297981906008, "bid_price": 0.12045025262364767, "ask_price": 0.1214957070144725, "spread_fraction": 0.004321024382422107}
+{"direction": "XRP->COL", "amount": 348.2775896782616, "amount_out": 2846.101155412248, "lp_fee": 8.568292489951574, "xrpay_fee": 1.4280487483252624, "slippage": 0.01605232446946701, "pool_base_after": 356650.6052569044, "pool_quote_after": 43837.66539951401, "type": "swap", "tick": 283}
+{"type": "tick", "tick": 284, "timestamp": "2025-11-16T10:30:26.500869"}
+{"type": "vol_update", "tick": 284, "mid_before": 0.12291487734315391, "mid_after": 0.12156288747968699, "noise": -0.011499399687740249}
+{"type": "spread_update", "tick": 284, "mid_price": 0.12156288747968699, "bid_price": 0.12056003014582542, "ask_price": 0.12256574481354858, "spread_fraction": 0.008249699843870124}
+{"type": "tick", "tick": 285, "timestamp": "2025-11-16T10:30:26.500893"}
+{"type": "vol_update", "tick": 285, "mid_before": 0.12156288747968699, "mid_after": 0.11855919952919812, "noise": -0.025208922375595876}
+{"type": "spread_update", "tick": 285, "mid_price": 0.11855919952919812, "bid_price": 0.11676842670145295, "ask_price": 0.12034997235694328, "spread_fraction": 0.015104461187797938}
+{"type": "tick", "tick": 286, "timestamp": "2025-11-16T10:30:26.500909"}
+{"type": "vol_update", "tick": 286, "mid_before": 0.11855919952919812, "mid_after": 0.11883334325251795, "noise": 0.001812293979787779}
+{"type": "spread_update", "tick": 286, "mid_price": 0.11883334325251795, "bid_price": 0.11842857941809935, "ask_price": 0.11923810708693654, "spread_fraction": 0.0034061469898938896}
+{"type": "tick", "tick": 287, "timestamp": "2025-11-16T10:30:26.500922"}
+{"type": "vol_update", "tick": 287, "mid_before": 0.11883334325251795, "mid_after": 0.11573468415007022, "noise": -0.026575670494796606}
+{"type": "spread_update", "tick": 287, "mid_price": 0.11573468415007022, "bid_price": 0.11390748402429923, "ask_price": 0.1175618842758412, "spread_fraction": 0.015787835247398303}
+{"type": "tick", "tick": 288, "timestamp": "2025-11-16T10:30:26.500934"}
+{"type": "vol_update", "tick": 288, "mid_before": 0.11573468415007022, "mid_after": 0.11597012942788051, "noise": 0.0015343536558582783}
+{"type": "spread_update", "tick": 288, "mid_price": 0.11597012942788051, "bid_price": 0.1155912345082818, "ask_price": 0.11634902434747924, "spread_fraction": 0.003267176827929139}
+{"type": "tick", "tick": 289, "timestamp": "2025-11-16T10:30:26.500946"}
+{"type": "vol_update", "tick": 289, "mid_before": 0.11597012942788051, "mid_after": 0.11549610983572274, "noise": -0.00458742832741732}
+{"type": "spread_update", "tick": 289, "mid_price": 0.11549610983572274, "bid_price": 0.11494245449814999, "ask_price": 0.1160497651732955, "spread_fraction": 0.00479371416370866}
+{"type": "tick", "tick": 290, "timestamp": "2025-11-16T10:30:26.500958"}
+{"type": "vol_update", "tick": 290, "mid_before": 0.11549610983572274, "mid_after": 0.1141704738189029, "noise": -0.0119777546941225}
+{"type": "spread_update", "tick": 290, "mid_price": 0.1141704738189029, "bid_price": 0.11320129466999836, "ask_price": 0.11513965296780743, "spread_fraction": 0.00848887734706125}
+{"type": "tick", "tick": 291, "timestamp": "2025-11-16T10:30:26.500971"}
+{"type": "vol_update", "tick": 291, "mid_before": 0.1141704738189029, "mid_after": 0.1124583930254917, "noise": -0.015495828046810987}
+{"type": "spread_update", "tick": 291, "mid_price": 0.1124583930254917, "bid_price": 0.11130592908255611, "ask_price": 0.11361085696842728, "spread_fraction": 0.010247914023405493}
+{"type": "tick", "tick": 292, "timestamp": "2025-11-16T10:30:26.500982"}
+{"type": "vol_update", "tick": 292, "mid_before": 0.1124583930254917, "mid_after": 0.11217172311258443, "noise": -0.003049119769498029}
+{"type": "spread_update", "tick": 292, "mid_price": 0.11217172311258443, "bid_price": 0.11172028129554235, "ask_price": 0.11262316492962651, "spread_fraction": 0.004024559884749014}
+{"type": "tick", "tick": 293, "timestamp": "2025-11-16T10:30:26.500994"}
+{"type": "vol_update", "tick": 293, "mid_before": 0.11217172311258443, "mid_after": 0.1118373670227279, "noise": -0.003480752016450206}
+{"type": "spread_update", "tick": 293, "mid_price": 0.1118373670227279, "bid_price": 0.11136313453478165, "ask_price": 0.11231159951067414, "spread_fraction": 0.004240376008225103}
+{"type": "tick", "tick": 294, "timestamp": "2025-11-16T10:30:26.501006"}
+{"type": "vol_update", "tick": 294, "mid_before": 0.1118373670227279, "mid_after": 0.11061780283825183, "noise": -0.011404800577326013}
+{"type": "spread_update", "tick": 294, "mid_price": 0.11061780283825183, "bid_price": 0.1097104713403201, "ask_price": 0.11152513433618358, "spread_fraction": 0.008202400288663007}
+{"type": "tick", "tick": 295, "timestamp": "2025-11-16T10:30:26.501018"}
+{"type": "vol_update", "tick": 295, "mid_before": 0.11061780283825183, "mid_after": 0.11096866906981288, "noise": 0.0026718785092314052}
+{"type": "spread_update", "tick": 295, "mid_price": 0.11096866906981288, "bid_price": 0.11054299999609553, "ask_price": 0.11139433814353024, "spread_fraction": 0.0038359392546157027}
+{"type": "tick", "tick": 296, "timestamp": "2025-11-16T10:30:26.501031"}
+{"type": "vol_update", "tick": 296, "mid_before": 0.11096866906981288, "mid_after": 0.11181006271648405, "noise": 0.0070822631173653875}
+{"type": "spread_update", "tick": 296, "mid_price": 0.11181006271648405, "bid_price": 0.11113460341802921, "ask_price": 0.11248552201493889, "spread_fraction": 0.006041131558682694}
+{"type": "tick", "tick": 297, "timestamp": "2025-11-16T10:30:26.501043"}
+{"type": "vol_update", "tick": 297, "mid_before": 0.11181006271648405, "mid_after": 0.11233010145386815, "noise": 0.004151090650961864}
+{"type": "spread_update", "tick": 297, "mid_price": 0.11233010145386815, "bid_price": 0.1118161299832501, "ask_price": 0.1128440729244862, "spread_fraction": 0.004575545325480932}
+{"type": "tick", "tick": 298, "timestamp": "2025-11-16T10:30:26.501055"}
+{"type": "vol_update", "tick": 298, "mid_before": 0.11233010145386815, "mid_after": 0.11346659416660967, "noise": 0.009617436893869988}
+{"type": "spread_update", "tick": 298, "mid_price": 0.11346659416660967, "bid_price": 0.11263729877671329, "ask_price": 0.11429588955650606, "spread_fraction": 0.007308718446934994}
+{"type": "tick", "tick": 299, "timestamp": "2025-11-16T10:30:26.501067"}
+{"type": "vol_update", "tick": 299, "mid_before": 0.11346659416660967, "mid_after": 0.11557665409551032, "noise": 0.01809630972797447}
+{"type": "spread_update", "tick": 299, "mid_price": 0.11557665409551032, "bid_price": 0.11424195699535389, "ask_price": 0.11691135119566677, "spread_fraction": 0.011548154863987236}
+{"type": "tick", "tick": 300, "timestamp": "2025-11-16T10:30:26.501079"}
+{"type": "vol_update", "tick": 300, "mid_before": 0.11557665409551032, "mid_after": 0.11532479402344344, "noise": -0.0026791604371827265}
+{"type": "spread_update", "tick": 300, "mid_price": 0.11532479402344344, "bid_price": 0.1148819952255979, "ask_price": 0.11576759282128897, "spread_fraction": 0.0038395802185913633}
+{"type": "accounting", "tick": 300, "lp_fee_accum": 476.36787021042505, "xrpay_fee_accum": 79.39464503507084, "treasury_balance": 79.39464503507084, "est_lp_apy": 6.455108393995362, "est_xrpay_apy": 1.0758513989992269}

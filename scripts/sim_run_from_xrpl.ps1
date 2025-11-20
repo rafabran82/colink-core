@@ -39,5 +39,19 @@ Write-Host ""
 Write-Host "🟢 Simulation complete" -ForegroundColor Green
 Write-Host "📦 Output: $runDir"
 Write-Host ""
+# --- Save BEFORE snapshot ---
+Copy-Item ".artifacts/sim/sim_state.json" "$runDir/before.json" -Force
+
+# --- Save AFTER snapshot ---
+Copy-Item "$runDir/sim_output.json" "$runDir/after.json" -Force
 Write-Host "—— sim_run_from_xrpl Completed ——"
+# --- Compute delta automatically ---
+Write-Host ""
+Write-Host "▶ Computing delta..." -ForegroundColor Cyan
+.\scripts\sim_compute_delta.ps1 -RunDir $runDir
+
+
+
+
+
 

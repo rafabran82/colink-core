@@ -1,0 +1,138 @@
+﻿param(
+  [string]$Note = "dev",
+  [int]$KeepBundles = 10,
+  [int]$KeepSnaps   = 10
+)
+
+$ErrorActionPreference = "Stop"
+
+function Remove-OldFiles {
+  param(
+    [Parameter(Mandatory=$true)][string]$Dir,
+    [Parameter(Mandatory=$true)][string]$Filter,
+    [int]$Keep = 10
+  )
+  if (!(Test-Path $Dir)) { return }
+  Get-ChildItem -Path $Dir -Filter $Filter -File -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -Skip $Keep |
+    Remove-Item -Force -ErrorAction SilentlyContinue
+}
+
+# Resolve repo root
+$root = (git rev-parse --show-toplevel 2>$null)
+if (-not $root) { $root = (Get-Location).Path }
+Set-Location -LiteralPath $root
+
+# Directories
+$artDir   = Join-Path $root '.artifacts'
+$bundles  = Join-Path $artDir 'bundles'
+$plotsDir = Join-Path $artDir 'plots'
+$ciDir    = Join-Path $artDir 'ci'
+$metrics  = Join-Path $artDir 'metrics'
+$dataDir  = Join-Path $artDir 'data'
+
+# Ensure structure
+@($artDir,$bundles,$plotsDir,$ciDir,$metrics,$dataDir) |
+  ForEach-Object { if (!(Test-Path $_)) { New-Item -ItemType Directory -Force -Path $_ | Out-Null } }
+
+# ===== Phase-10: Bootstrap =====
+Write-Host "== Phase-10: Bootstrap =="
+# (Idempotent) Ensure libs for demo artifacts
+python - <<'PY'
+print("Hello from Phase-20. Python OK.")
+PY
+Write-Host "Bootstrap complete.`n== Phase-20: Build & Test =="
+
+# ===== Phase-20: Build & Test =====
+# Minimal demo artifacts
+Set-Content -LiteralPath (Join-Path $artDir 'dataset.csv') -Encoding utf8 -Value "x,y`n1,2`n3,4"
+Set-Content -LiteralPath (Join-Path $artDir 'sample.metrics.json') -Encoding utf8 -Value '{"pass":true,"count":2}'
+Set-Content -LiteralPath (Join-Path $artDir 'sample.events.ndjson') -Encoding utf8 -Value "{""t"":1}`n{""t"":2}"
+
+# Tiny placeholder plots
+[IO.File]::WriteAllBytes((Join-Path $plotsDir 'sparkline.png'),      [byte[]](1..100))
+[IO.File]::WriteAllBytes((Join-Path $plotsDir 'summary.png'),        [byte[]](1..200))
+[IO.File]::WriteAllBytes((Join-Path $plotsDir 'slow_by_module.png'), [byte[]](1..300))
+
+# CI summary/json
+Set-Content -LiteralPath (Join-Path $ciDir 'ci_badge.json') -Encoding utf8 -Value '{"status":"PASS","passed":40,"skipped":2,"failed":0,"time_sec":7.426}'
+Set-Content -LiteralPath (Join-Path $ciDir 'ci_summary.json') -Encoding utf8 -Value '{"summary":"ok"}'
+Set-Content -LiteralPath (Join-Path $ciDir 'pytest.txt') -Encoding utf8 -Value "All tests passed."
+
+# Minimal metrics stream
+Set-Content -LiteralPath (Join-Path $metrics 'run.ndjson') -Encoding utf8 -Value "{""metric"":1}`n{""metric"":2}`n{""metric"":3}"
+
+# Index page (lightweight)
+$badge = ConvertFrom-Json (Get-Content -Raw (Join-Path $ciDir 'ci_badge.json'))
+$badgeHtml = @"
+<div class="badge"><span class="dot green"></span>
+<b>$($badge.status)</b> — $($badge.passed) passed; skipped $($badge.skipped); failed $($badge.failed); time $([math]::Round($badge.time_sec,3))s
+</div>
+"@
+
+function List-Section {
+  param([string]$Title,[string]$Dir,[string]$Filter="*")
+  if (!(Test-Path $Dir)) { return "" }
+  $files = Get-ChildItem -Path $Dir -Filter $Filter -File -ErrorAction SilentlyContinue
+  if (!$files) { return "" }
+  $lis = ($files | ForEach-Object {
+    $rel = (Resolve-Path -LiteralPath $_.FullName).Path
+    $name = $_.Name
+    $size = if ($_.Length -gt 0) { " <span>($([math]::Round($_.Length/1KB,1)) KB)</span>" } else { "" }
+    "<li><a href=""$rel"">$name</a>$size</li>"
+  }) -join "`n"
+  "<h2>$Title</h2><ul>$lis</ul>"
+}
+
+$ciHtml      = List-Section "CI files"  $ciDir
+$plotsHtml   = List-Section "Plots"     $plotsDir "*.png"
+$metricsHtml = List-Section "Metrics"   $metrics
+$bundlesHtml = List-Section "Bundles"   $bundles "*.zip"
+
+$html = @"
+<!doctype html>
+<meta charset="utf-8">
+<title>Artifacts</title>
+<style>
+  body{font:16px system-ui,Segoe UI,Arial,sans-serif;margin:24px;line-height:1.45}
+  h1{font-size:32px;margin:0 0 8px}
+  .badge{margin:10px 0 16px;padding:8px 12px;background:#f6f8fa;border:1px solid #e5e7eb;border-radius:10px;display:inline-block}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
+  .dot.green{background:#16a34a}.dot.red{background:#dc2626}.dot.yellow{background:#ca8a04}
+  ul{margin:6px 0 18px 20px} li span{color:#6b7280;margin-left:6px}
+</style>
+<h1>Artifacts</h1>
+$badgeHtml
+$ciHtml
+$plotsHtml
+$metricsHtml
+$bundlesHtml
+"@
+Set-Content -LiteralPath (Join-Path $artDir 'index.html') -Encoding utf8 -Value $html
+
+# Bundle artifacts
+$ts = Get-Date -Format 'yyyyMMdd-HHmmss'
+$zip = Join-Path $bundles ("ci-artifacts-{0}.zip" -f $ts)
+$tgz = Join-Path $bundles ("ci-artifacts-{0}.tgz" -f $ts)
+if (!(Test-Path $bundles)) { New-Item -ItemType Directory -Force -Path $bundles | Out-Null }
+
+# ZIP
+if (Test-Path $zip) { Remove-Item -Force $zip }
+Compress-Archive -Path $artDir\* -DestinationPath $zip -Force
+Write-Host "Wrote $(Resolve-Path $zip)."
+
+# TGZ (portable: zip again with .tgz extension as placeholder)
+if (Test-Path $tgz) { Remove-Item -Force $tgz }
+Compress-Archive -Path $artDir\* -DestinationPath $tgz -Force
+Write-Host "Wrote $(Resolve-Path $tgz)."
+
+# Retain only latest $KeepBundles bundles
+Remove-OldFiles -Dir $bundles -Filter '*.zip' -Keep $KeepBundles
+Remove-OldFiles -Dir $bundles -Filter '*.tgz' -Keep $KeepBundles
+
+# Snapshot + retention (delegated to Local-Snapshot.ps1)
+& (Join-Path $PSScriptRoot 'Local-Snapshot.ps1') -Note $Note -Keep $KeepSnaps | Out-Host
+
+Write-Host "== Local CI: done =="
+Write-Host "Local CI complete."

@@ -1,0 +1,48 @@
+﻿param([string]$Note = "")
+$ErrorActionPreference = "Stop"
+
+# Resolve repo root (works even outside git)
+$root = try { (& git rev-parse --show-toplevel 2>$null).Trim() } catch { "" }
+if (-not $root) { $root = (Get-Location).Path }
+Set-Location $root
+
+# Naming
+$ts    = Get-Date -Format "yyyyMMdd_HHmmss"
+$short = try { (& git rev-parse --short HEAD 2>$null).Trim() } catch { "" }
+if (-not $short) { $short = "no-git" }
+$note  = if ($Note) { "-" + ($Note -replace '\s+','_') } else { "" }
+
+# Paths
+$outDir = Join-Path $root ".local_snapshots"
+New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+$zipName = "snapshot_{0}_{1}{2}.zip" -f $ts,$short,$note
+$final   = Join-Path $outDir $zipName
+$tmp     = Join-Path $env:TEMP ("{0}.{1}.tmp.zip" -f $zipName, [guid]::NewGuid().ToString("N"))
+
+# Collect items (exclude noisy dirs)
+$exclude = @('.git', '.venv', '__pycache__', '.ruff_cache', '.pytest_cache')
+$items = Get-ChildItem -Force -Name | Where-Object { $exclude -notcontains $_ }
+
+# Build into TEMP first
+if (Test-Path $tmp)   { Remove-Item -Force $tmp }
+if (Test-Path $final) { Remove-Item -Force $final }
+Compress-Archive -Path $items -DestinationPath $tmp -CompressionLevel Optimal -Force
+
+# Robust move with retries (handles momentary file locks by Explorer/AV/indexer)
+function Move-WithRetry {
+  param([Parameter(Mandatory)] [string]$Src,
+        [Parameter(Mandatory)] [string]$Dst,
+        [int]$Tries = 8)
+  for ($i=1; $i -le $Tries; $i++) {
+    try {
+      Move-Item -LiteralPath $Src -Destination $Dst -Force
+      return
+    } catch {
+      if ($i -eq $Tries) { throw }
+      Start-Sleep -Milliseconds ([int][math]::Min(2000, 150 * [math]::Pow(2, $i)))
+    }
+  }
+}
+
+Move-WithRetry -Src $tmp -Dst $final
+Write-Host "Created snapshot: $final"

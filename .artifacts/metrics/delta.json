@@ -1,0 +1,16 @@
+{
+  "current_timestamp": "2025-11-12T11:01:30Z",
+  "previous_timestamp": "2025-11-12T10:58:28Z",
+  "items": [
+    {
+      "key": "success_rate",
+      "label": "Success Rate",
+      "current": 0.96,
+      "previous": 0.98,
+      "delta": -0.02,
+      "unit": "%",
+      "higher_is_better": true,
+      "improved": false
+    }
+  ]
+}

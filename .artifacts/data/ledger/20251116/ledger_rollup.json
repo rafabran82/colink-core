@@ -1,0 +1,20 @@
+﻿{
+    "date":  "20251116",
+    "totals":  {
+                   "issued_CPX":  0,
+                   "total_fees":  296,
+                   "cancel":  0,
+                   "issued_COL":  0,
+                   "offers":  10,
+                   "swaps":  10
+               },
+    "ledger_span":  {
+                        "last":  12415923,
+                        "first":  0
+                    },
+    "wallet_breakdown":  {
+                             "lp":  7,
+                             "issuer":  14,
+                             "user":  8
+                         }
+}

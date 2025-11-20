@@ -1,0 +1,18 @@
+{
+  "timestamp": "20251116-050818",
+  "config_loaded": true,
+  "pools": {
+    "COL_XRP": {
+      "base": "COL",
+      "quote": "XRP",
+      "base_liq": 500000.0,
+      "quote_liq": 25000.0
+    },
+    "COL_COPX": {
+      "base": "COL",
+      "quote": "COPX",
+      "base_liq": 500000.0,
+      "quote_liq": 500000000.0
+    }
+  }
+}

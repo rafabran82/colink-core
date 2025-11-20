@@ -1,0 +1,11 @@
+{
+  "network": "testnet",
+  "execute": true,
+  "trustlines_only": false,
+  "steps": [
+    "ensure-wallets",
+    "fund-wallets",
+    "trustlines"
+  ],
+  "ts": "2025-11-16T20:43:45Z"
+}
