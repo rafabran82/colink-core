@@ -13,9 +13,10 @@
     [string]$LPSeed
 )
 
-Write-Host "🔵 Setting COL trustlines for USER + LP..." -ForegroundColor Cyan
-
+$RPC = "https://testnet.xrpl-labs.com"
 $currency = "COL00000000000000000000000000000000000000"
+
+Write-Host "🔵 Setting COL trustlines for USER + LP (XRPL-Labs Testnet)..." -ForegroundColor Cyan
 
 function Submit-TrustSet {
     param(
@@ -31,7 +32,7 @@ function Submit-TrustSet {
             issuer   = $IssuerAddress
             value    = "100000000000"
         }
-        Flags = 131072   # tfSetNoRipple + tfFullyCanonicalSig
+        Flags = 131072
     }
 
     $payload = @{
@@ -46,7 +47,7 @@ function Submit-TrustSet {
 
     try {
         $response = Invoke-RestMethod `
-            -Uri "https://s.altnet.rippletest.net:51234" `
+            -Uri $RPC `
             -Method Post `
             -Body ($payload | ConvertTo-Json -Depth 10) `
             -ContentType "application/json"
@@ -64,7 +65,6 @@ $userResult = Submit-TrustSet -Account $UserAddress -Seed $UserSeed
 Write-Host "➡️ Setting LP trustline..."
 $lpResult = Submit-TrustSet -Account $LPAddress -Seed $LPSeed
 
-# SUMMARY
 Write-Host ""
 Write-Host "============================"
 Write-Host "   TRUSTLINE SUMMARY"
@@ -73,13 +73,13 @@ Write-Host "============================"
 if ($userResult.error) {
     Write-Host "❌ USER trustline failed: $($userResult.error)" -ForegroundColor Red
 } else {
-    Write-Host "🟢 USER trustline OK"
+    Write-Host "🟢 USER trustline OK" -ForegroundColor Green
 }
 
 if ($lpResult.error) {
     Write-Host "❌ LP trustline failed: $($lpResult.error)" -ForegroundColor Red
 } else {
-    Write-Host "🟢 LP trustline OK"
+    Write-Host "🟢 LP trustline OK" -ForegroundColor Green
 }
 
 Write-Host "============================"
