@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
@@ -52,7 +52,7 @@ def quote_copx_to_col(pool_col_x: PoolState, pool_x_copx: PoolState, copx_in: fl
 
 
 def exec_col_to_copx(pool_col_x: PoolState, pool_x_copx: PoolState, col_in: float) -> RouteResult:
-    """Mutating execution of COL→XRP→COPX."""
+    """Mutating execution of COLâ†’XRPâ†’COPX."""
     xrp_out, _ = pool_col_x.swap_y_for_x(col_in)
     copx_out, _ = pool_x_copx.swap_x_for_y(xrp_out)
     eff_price = copx_out / col_in if col_in > 0 else 0.0
@@ -60,8 +60,9 @@ def exec_col_to_copx(pool_col_x: PoolState, pool_x_copx: PoolState, col_in: floa
 
 
 def exec_copx_to_col(pool_col_x: PoolState, pool_x_copx: PoolState, copx_in: float) -> RouteResult:
-    """Mutating execution of COPX→XRP→COL."""
+    """Mutating execution of COPXâ†’XRPâ†’COL."""
     xrp_out, _ = pool_x_copx.swap_y_for_x(copx_in)
     col_out, _ = pool_col_x.swap_x_for_y(xrp_out)
     eff_price = col_out / copx_in if copx_in > 0 else 0.0
     return RouteResult(copx_in, col_out, eff_price, xrp_out, col_out)
+

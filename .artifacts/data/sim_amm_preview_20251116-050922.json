@@ -1,0 +1,11 @@
+{
+  "timestamp": "20251116-050922",
+  "config_loaded": true,
+  "pools_initialized": true,
+  "amm_preview": {
+    "allowed": true,
+    "amount_in": 1000.0,
+    "amount_out": 49.9001996007984,
+    "impact": 0.001996007984031936
+  }
+}

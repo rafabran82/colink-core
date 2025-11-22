@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
   [string]$Python = "python",
   [switch]$Force
@@ -31,3 +31,4 @@ if ($reqs.Count -gt 0) {
   & $pip install pytest ruff black matplotlib numpy pandas
 }
 Write-Host "Bootstrap complete."
+

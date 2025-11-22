@@ -1,4 +1,4 @@
-import json
+﻿import json
 import pathlib
 import subprocess
 import sys
@@ -30,3 +30,4 @@ def test_bridge_smoke(tmp_path: pathlib.Path):
     assert m["schema_version"] == "colink.bridge.v1"
     assert m["metrics"]["slippage_bps"] >= 0
     assert m["metrics"]["amount_out"] > 0
+

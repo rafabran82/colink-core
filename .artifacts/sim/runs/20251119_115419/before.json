@@ -1,0 +1,22 @@
+﻿{
+    "timestamp":  "2025-11-19T10:50:48.2503910-05:00",
+    "ledger":  12494571,
+    "accounts":  {
+                     "lp":  {
+                                "COPX":  "0",
+                                "XRP":  "99999910",
+                                "COL":  "0",
+                                "address":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW"
+                            },
+                     "issuer":  {
+                                    "XRP":  "99999920",
+                                    "address":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM"
+                                },
+                     "user":  {
+                                  "COPX":  "0",
+                                  "XRP":  "99999900",
+                                  "COL":  "0",
+                                  "address":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ"
+                              }
+                 }
+}

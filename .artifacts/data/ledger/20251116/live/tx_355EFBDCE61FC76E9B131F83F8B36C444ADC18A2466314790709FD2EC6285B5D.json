@@ -1,0 +1,91 @@
+﻿{
+    "meta":  {
+                 "AffectedNodes":  [
+                                       {
+                                           "ModifiedNode":  {
+                                                                "FinalFields":  {
+                                                                                    "Flags":  0,
+                                                                                    "Owner":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                                                    "RootIndex":  "032F4B39D2FF5CF7A7D737A4F07DF2D7D582EB65FE85EF3DB71DCBDAF412823E"
+                                                                                },
+                                                                "LedgerEntryType":  "DirectoryNode",
+                                                                "LedgerIndex":  "032F4B39D2FF5CF7A7D737A4F07DF2D7D582EB65FE85EF3DB71DCBDAF412823E",
+                                                                "PreviousTxnID":  "9FC055384E8DA2F7770DC8F73ED7F9EB71ED57387C6B18DFC3BA0247D275071A",
+                                                                "PreviousTxnLgrSeq":  12416143
+                                                            }
+                                       },
+                                       {
+                                           "CreatedNode":  {
+                                                               "LedgerEntryType":  "Offer",
+                                                               "LedgerIndex":  "1B69BAA80D6D74F1E6F23C6F48C8A6EF9A53682C5C2E60E226772678FA7EE786",
+                                                               "NewFields":  {
+                                                                                 "Account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                                                 "BookDirectory":  "A8796F8D99422DB16A4200F95C983984050C90D9886985BF54038D7EA4C68000",
+                                                                                 "Sequence":  12415923,
+                                                                                 "TakerGets":  {
+                                                                                                   "currency":  "COL",
+                                                                                                   "issuer":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                                                                   "value":  "10"
+                                                                                               },
+                                                                                 "TakerPays":  "1"
+                                                                             }
+                                                           }
+                                       },
+                                       {
+                                           "CreatedNode":  {
+                                                               "LedgerEntryType":  "DirectoryNode",
+                                                               "LedgerIndex":  "A8796F8D99422DB16A4200F95C983984050C90D9886985BF54038D7EA4C68000",
+                                                               "NewFields":  {
+                                                                                 "ExchangeRate":  "54038d7ea4c68000",
+                                                                                 "RootIndex":  "A8796F8D99422DB16A4200F95C983984050C90D9886985BF54038D7EA4C68000",
+                                                                                 "TakerGetsCurrency":  "000000000000000000000000434F4C0000000000",
+                                                                                 "TakerGetsIssuer":  "40EC9F94CA978CC56ECA3D4D28E20544051666D7"
+                                                                             }
+                                                           }
+                                       },
+                                       {
+                                           "ModifiedNode":  {
+                                                                "FinalFields":  {
+                                                                                    "Account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                                                    "Balance":  "99999950",
+                                                                                    "Flags":  0,
+                                                                                    "OwnerCount":  5,
+                                                                                    "Sequence":  12415924
+                                                                                },
+                                                                "LedgerEntryType":  "AccountRoot",
+                                                                "LedgerIndex":  "E8F66324412FE9859A9DE83B45BB7D1CB83140C8A09B5B609064EC56C1B78CC8",
+                                                                "PreviousFields":  {
+                                                                                       "Balance":  "99999960",
+                                                                                       "OwnerCount":  4,
+                                                                                       "Sequence":  12415923
+                                                                                   },
+                                                                "PreviousTxnID":  "9FC055384E8DA2F7770DC8F73ED7F9EB71ED57387C6B18DFC3BA0247D275071A",
+                                                                "PreviousTxnLgrSeq":  12416143
+                                                            }
+                                       }
+                                   ],
+                 "TransactionIndex":  0,
+                 "TransactionResult":  "tesSUCCESS"
+             },
+    "tx":  {
+               "Account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+               "Fee":  "10",
+               "LastLedgerSequence":  12416273,
+               "Sequence":  12415923,
+               "SigningPubKey":  "ED27CC3D6ABC6132340E140A6F0D1B07DF5A29AC22271AFB444173B3D9B1DF9C8D",
+               "TakerGets":  {
+                                 "currency":  "COL",
+                                 "issuer":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                 "value":  "10"
+                             },
+               "TakerPays":  "1",
+               "TransactionType":  "OfferCreate",
+               "TxnSignature":  "9521579469804100ED8C0BC5A6971BB6D973797DAB4429594F2D92E8794A7953DE732F676B9C613BB0FCD417772120D204864AF1704BC0D00A87A76FABB86305",
+               "ctid":  "C0BD74FF00000001",
+               "date":  816643762,
+               "hash":  "355EFBDCE61FC76E9B131F83F8B36C444ADC18A2466314790709FD2EC6285B5D",
+               "inLedger":  12416255,
+               "ledger_index":  12416255
+           },
+    "validated":  true
+}

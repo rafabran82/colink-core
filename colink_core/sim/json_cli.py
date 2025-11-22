@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 # --- CI shim: optional plotting helpers ---
 # Try to import real helpers; if unavailable, use pure-stdlib fallbacks.
@@ -182,3 +182,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

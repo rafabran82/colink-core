@@ -1,0 +1,12 @@
+{
+  "timestamp": "20251116-051417",
+  "events_written": 900,
+  "ndjson_file": ".artifacts/data\\sim_events_20251116-051417.ndjson",
+  "tick_interval_ms": 1000,
+  "seed": 42,
+  "modules": [
+    "ticks",
+    "volatility",
+    "dynamic_spread"
+  ]
+}

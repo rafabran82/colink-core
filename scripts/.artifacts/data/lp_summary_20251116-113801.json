@@ -1,0 +1,33 @@
+﻿{
+    "Timestamp":  "20251116-113801",
+    "TopLPs":  [
+                   {
+                       "lp_name":  "LP-A",
+                       "lp_max_drawdown_pct":  5.2,
+                       "lp_volatility_abs_mean":  2.1,
+                       "total_shocks":  3,
+                       "lp_apy":  12.5,
+                       "xrpl_address":  "rTESTADDRESSLP-A"
+                   },
+                   {
+                       "lp_name":  "LP-C",
+                       "lp_max_drawdown_pct":  7.8,
+                       "lp_volatility_abs_mean":  3.4,
+                       "total_shocks":  5,
+                       "lp_apy":  8.9,
+                       "xrpl_address":  "rTESTADDRESSLP-C"
+                   },
+                   {
+                       "lp_name":  "LP-B",
+                       "lp_max_drawdown_pct":  0,
+                       "lp_volatility_abs_mean":  0,
+                       "total_shocks":  0,
+                       "lp_apy":  0,
+                       "xrpl_address":  "rTESTADDRESSLP-B"
+                   }
+               ],
+    "AvgDrawdown":  4.333333333333333,
+    "AvgVol":  1.8333333333333333,
+    "TotalShocks":  8,
+    "AvgAPY":  7.1333333333333329
+}

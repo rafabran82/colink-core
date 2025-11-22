@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import csv
 import datetime as dt
@@ -60,3 +60,4 @@ def read_fills_csv(path: Path | str) -> list[Fill]:
             notes = pick("notes") or ""
             fills.append(Fill(ts, side, col_in, copx_out, price, slip_bps, notes))
     return fills
+

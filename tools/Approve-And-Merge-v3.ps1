@@ -1,4 +1,4 @@
-# === Approve-And-Merge v3 ===
+﻿# === Approve-And-Merge v3 ===
 # Smart multi-PR merge helper with -All and -DryRun modes
 
 function Approve-And-Merge {
@@ -19,22 +19,22 @@ function Approve-And-Merge {
     }
 
     function _mergeOne($n) {
-        _log "🔎 Checking PR #$n..." Cyan
+        _log "ðŸ”Ž Checking PR #$n..." Cyan
         if ($DryRun) { _log "  (dry-run: would check CI + merge)" Yellow; return }
 
         gh pr checks $n --watch 2>$null | Out-Null
         try {
             gh pr merge $n --squash 2>$null
-            _log "✅ Merged PR #$n" Green
+            _log "âœ… Merged PR #$n" Green
         }
         catch {
-            _log "⚠️  Normal merge blocked — trying admin override..." Yellow
+            _log "âš ï¸  Normal merge blocked â€” trying admin override..." Yellow
             try {
                 gh pr merge $n --admin --squash 2>$null
-                _log "✅ Merged (admin) PR #$n" Green
+                _log "âœ… Merged (admin) PR #$n" Green
             }
             catch {
-                _log "❌ Failed to merge PR #$n" Red
+                _log "âŒ Failed to merge PR #$n" Red
             }
         }
 
@@ -42,7 +42,7 @@ function Approve-And-Merge {
         if ($head) {
             git branch -D $head 2>$null
             git push origin --delete $head 2>$null
-            _log "🧹 Cleaned branch $head" DarkGray
+            _log "ðŸ§¹ Cleaned branch $head" DarkGray
         }
     }
 
@@ -63,6 +63,7 @@ function Approve-And-Merge {
         _log "Usage: Approve-And-Merge <PR#> | -All | -All -DryRun" Yellow
     }
 
-    _log "✅ Done." Green
+    _log "âœ… Done." Green
 }
 # === end Approve-And-Merge v3 ===
+

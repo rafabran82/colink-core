@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import contextlib
 from decimal import Decimal
@@ -200,3 +200,4 @@ def orderbook_snapshot(
         }
 
     return {"bids": [shape(o) for o in bids], "asks": [shape(o) for o in asks]}
+

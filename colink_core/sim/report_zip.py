@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import io
 import time
@@ -25,10 +25,11 @@ def build_report(
                 z.write(p, arcname=f"charts/{p.name}")
         if summary_path.exists():
             z.write(summary_path, arcname="summary.json")
-        z.writestr("README.txt", f"COLINK Phase 3 — charts + summary`nGenerated: {ts}`n")
+        z.writestr("README.txt", f"COLINK Phase 3 â€” charts + summary`nGenerated: {ts}`n")
     zip_path.write_bytes(buf.getvalue())
     return str(zip_path)
 
 
 if __name__ == "__main__":
     print(build_report())
+

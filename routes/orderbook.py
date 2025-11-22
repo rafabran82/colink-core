@@ -1,4 +1,4 @@
-from typing import Any
+﻿from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
@@ -22,3 +22,4 @@ def get_orderbook(limit: int = 20) -> Any:
         raise HTTPException(
             status_code=400, detail={"error": str(e), "type": e.__class__.__name__}
         ) from e
+

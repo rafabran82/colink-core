@@ -1,4 +1,4 @@
-import csv
+﻿import csv
 import json
 import subprocess
 import sys
@@ -78,3 +78,4 @@ def test_csv_ingest_headless(tmp_path: Path):
     # sanity on first point presence
     p0 = pts[0]
     assert p0["t"] == 0 and p0["spread_bps"] == 10.0
+

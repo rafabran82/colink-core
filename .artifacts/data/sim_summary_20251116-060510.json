@@ -1,0 +1,55 @@
+{
+  "timestamp": "20251116-060510",
+  "ndjson_file": ".artifacts/data\\sim_events_20251116-060510.ndjson",
+  "max_ticks": 300,
+  "tick_interval_ms": 1000,
+  "swaps_executed": 17,
+  "total_volume": 26935.918347790895,
+  "lp_fee_accum": 476.36787021042505,
+  "xrpay_fee_accum": 79.39464503507084,
+  "treasury_balance": 79.39464503507084,
+  "accounting_events": 1,
+  "avg_slippage": 0.05063062776596737,
+  "min_slippage": 0.0025627339115017233,
+  "max_slippage": 0.18055328246773625,
+  "lp_drawdown": {
+    "peak_value": 500000.0,
+    "trough_value": 500000.0,
+    "max_drawdown_pct": 0.0,
+    "volatility_abs_mean": 0.0
+  },
+  "lp_shock_summary": {
+    "total_shocks": 0,
+    "price_shocks": 0,
+    "slippage_shocks": 0,
+    "volatility_shocks": 0,
+    "lp_value_shocks": 0,
+    "shock_events": []
+  },
+  "lp_summary": {
+    "lp_shares_total": 1000000.0,
+    "lp_shares_user": 1000000.0,
+    "lp_share_price_final": 0.08226131517917787,
+    "lp_total_value_user_final": 82261.31517917787
+  },
+  "lp_returns": {
+    "initial_value": 500000.0,
+    "final_value": 82261.31517917787,
+    "growth_multiple": 0.16452263035835574,
+    "roi_pct": -83.54773696416443,
+    "apr_pct": -8782538.109672965,
+    "apy_metrics": {
+      "apy_raw": -100.0,
+      "apy_realistic": -99.0,
+      "apy_clamped": -100.0
+    }
+  },
+  "modules": [
+    "ticks",
+    "volatility",
+    "dynamic_spread",
+    "swaps_enabled",
+    "fee_accumulation",
+    "treasury_accounting"
+  ]
+}

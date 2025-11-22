@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from amm import PoolState
 from risk_guard import quote_with_slippage
@@ -24,7 +24,7 @@ def main():
 
     gq = quote_with_slippage(poolA, poolB, col_in, slip_bps)
     print(
-        f"Quote: {fmt(col_in)} COL → {fmt(gq.copx_out_quote)} COPX | min_out @{slip_bps} bps = {fmt(gq.min_out)}"
+        f"Quote: {fmt(col_in)} COL â†’ {fmt(gq.copx_out_quote)} COPX | min_out @{slip_bps} bps = {fmt(gq.min_out)}"
     )
 
     # Step 2: new copies for execution... but someone moves the market against us
@@ -41,7 +41,7 @@ def main():
     r_exec = exec_col_to_copx(poolA2, poolB2, col_in)
     copx_out = r_exec.amount_out
     ok = copx_out >= gq.min_out
-    print(f"Exec:  {fmt(col_in)} COL → {fmt(copx_out)} COPX | {'OK' if ok else 'SLIPPED TOO FAR!'}")
+    print(f"Exec:  {fmt(col_in)} COL â†’ {fmt(copx_out)} COPX | {'OK' if ok else 'SLIPPED TOO FAR!'}")
 
     # Helpful context
     print("Note: guard should stop the trade if enforced on-chain.")
@@ -49,3 +49,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

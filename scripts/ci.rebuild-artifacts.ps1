@@ -1,0 +1,55 @@
+﻿Write-Host "====================================="
+Write-Host "ðŸ”§ ci.rebuild-artifacts â€” Rebuilder"
+Write-Host "=====================================`n"
+
+$dirs = @(
+    ".artifacts",
+    ".artifacts\ci",
+    ".artifacts\data",
+    ".artifacts\bundles",
+    ".artifacts\metrics",
+    ".artifacts\plots",
+    ".artifacts\runs"
+)
+
+$files = @(
+    ".artifacts\index.html",
+    ".artifacts\ci\ci_summary.json"
+)
+
+Write-Host "ðŸ“‚ Ensuring directory structure..."
+
+foreach ($d in $dirs) {
+    if (-not (Test-Path $d)) {
+        New-Item -ItemType Directory -Path $d | Out-Null
+        Write-Host "âœ… Created: $d"
+    } else {
+        Write-Host "ðŸŸ¦ Exists: $d"
+    }
+
+    # Drop a .gitkeep so Git tracks empty dirs
+    $gitkeep = Join-Path $d ".gitkeep"
+    if (-not (Test-Path $gitkeep)) {
+        Set-Content -Path $gitkeep -Value "" -Encoding utf8
+        Write-Host "   â†’ added .gitkeep"
+    }
+}
+
+Write-Host "`nðŸ“„ Ensuring required files..."
+
+foreach ($f in $files) {
+    if (-not (Test-Path $f)) {
+        if ($f -like "*.html") {
+            Set-Content -Path $f -Value "<!-- placeholder index -->" -Encoding utf8
+        } elseif ($f -like "*.json") {
+            Set-Content -Path $f -Value "{}" -Encoding utf8
+        }
+        Write-Host "âœ… Created: $f"
+    } else {
+        Write-Host "ðŸŸ¦ Exists: $f"
+    }
+}
+
+Write-Host "`nðŸŽ‰ Artifact rebuild complete!"
+Write-Host "ðŸŸ¢ All required artifact directories and files now exist."
+

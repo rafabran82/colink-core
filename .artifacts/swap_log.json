@@ -1,0 +1,115 @@
+﻿[
+    {
+        "PoolCOL":  972186.0720950292756950264646,
+        "AmountOut":  847.3018342478575584429200,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOPX":  822887.7402820903362033311489,
+        "AmountIn":  2000
+    },
+    {
+        "Direction":  "CPX-\u003eCOL",
+        "AmountOut":  2357.135461275233,
+        "PoolCOL":  969828.936633754,
+        "PoolCOPX":  824887.74028209038,
+        "AmountIn":  2000
+    },
+    {
+        "Direction":  "COL-\u003eCPX",
+        "AmountOut":  1273.8543697784189,
+        "PoolCOL":  971328.936633754,
+        "PoolCOPX":  823613.885912312,
+        "AmountIn":  1500
+    },
+    {
+        "Direction":  "CPX-\u003eCOL",
+        "AmountOut":  3525.2091206830228,
+        "PoolCOL":  967803.727513071,
+        "PoolCOPX":  826613.885912312,
+        "AmountIn":  3000
+    },
+    {
+        "Direction":  "COL-\u003eCPX",
+        "AmountOut":  853.23152919136919,
+        "PoolCOL":  968803.727513071,
+        "PoolCOPX":  825760.65438312059,
+        "AmountIn":  1000
+    },
+    {
+        "PoolCOPX":  827760.65438312059,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOL":  966462.9452534091,
+        "Timestamp":  "2025-11-13 14:47:21",
+        "AmountIn":  2000,
+        "AmountOut":  2340.7822596619371
+    },
+    {
+        "PoolCOPX":  826477.91831593611,
+        "Direction":  "COL-\u003eCPX",
+        "PoolCOL":  967962.9452534091,
+        "Timestamp":  "2025-11-13 14:47:21",
+        "AmountIn":  1500,
+        "AmountOut":  1282.73606718448
+    },
+    {
+        "PoolCOPX":  829477.91831593611,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOL":  964462.08191318193,
+        "Timestamp":  "2025-11-13 14:47:21",
+        "AmountIn":  3000,
+        "AmountOut":  3500.8633402271662
+    },
+    {
+        "PoolCOPX":  828618.767103418,
+        "Direction":  "COL-\u003eCPX",
+        "PoolCOL":  965462.08191318193,
+        "Timestamp":  "2025-11-13 14:47:21",
+        "AmountIn":  1000,
+        "AmountOut":  859.15121251810342
+    },
+    {
+        "PoolCOPX":  830618.76710342,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOL":  963137.40031399,
+        "Timestamp":  "2025-11-13T16:23:25",
+        "AmountIn":  2000,
+        "AmountOut":  2324.68159919
+    },
+    {
+        "PoolCOPX":  829327.16452793,
+        "Direction":  "COL-\u003eCPX",
+        "PoolCOL":  964637.40031399,
+        "Timestamp":  "2025-11-13T16:23:25",
+        "AmountIn":  1500,
+        "AmountOut":  1291.60257549
+    },
+    {
+        "PoolCOPX":  832327.16452793,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOL":  961160.50766375,
+        "Timestamp":  "2025-11-13T16:23:25",
+        "AmountIn":  3000,
+        "AmountOut":  3476.89265024
+    },
+    {
+        "PoolCOPX":  831462.10390873,
+        "Direction":  "COL-\u003eCPX",
+        "PoolCOL":  962160.50766375,
+        "Timestamp":  "2025-11-13T16:23:25",
+        "AmountIn":  1000,
+        "AmountOut":  865.06061920
+    },
+    {
+        "PoolCOL":  956563.4525952082689041731967,
+        "AmountOut":  4597.0550685450150679232126,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOPX":  836327.1645279325658726624366,
+        "AmountIn":  4000
+    },
+    {
+        "PoolCOL":  956563.4525952082689041731967,
+        "AmountOut":  4597.0550685450150679232126,
+        "Direction":  "CPX-\u003eCOL",
+        "PoolCOPX":  836327.1645279325658726624366,
+        "AmountIn":  4000
+    }
+]

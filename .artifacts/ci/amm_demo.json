@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "created_at": "2025-11-14T23:00:39.502196+00:00",
+  "backend": "Agg",
+  "python": "3.14.0",
+  "os": "Windows-11-10.0.26200-SP0",
+  "git_sha": "ae75baeda5fc638496acd01baf2794b41e14d859",
+  "sample_count": 240,
+  "value_min": 0.6318355831938552,
+  "value_max": 6.4081281666311725,
+  "value_mean": 1.3877728470283608,
+  "value_stdev": 1.1685129990548713,
+  "duration_ms": 11950,
+  "labels": {
+    "pair": "COPX/COL",
+    "env": "dev"
+  },
+  "artifacts": {
+    "png": ".artifacts\\ci\\amm_demo.png",
+    "ndjson": ".artifacts\\ci\\amm_demo.ndjson"
+  }
+}

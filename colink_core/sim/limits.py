@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -66,3 +66,4 @@ class TradeLimiter:
         # success clears strikes
         self.strikes = 0
         return True, "approved"
+
