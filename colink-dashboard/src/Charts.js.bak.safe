@@ -1,0 +1,78 @@
+﻿import React, { useEffect, useRef, useState } from "react";
+import Chart from "chart.js/auto";
+
+export default function Charts() {
+    const chartRef1 = useRef(null);
+    const chart1 = useRef(null);
+    const [xrpl, setXrpl] = useState(null);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const res = await fetch("http://localhost:5000/api/xrpl/account");
+                const data = await res.json();
+                setXrpl(data);
+            } catch (err) {
+                console.error("Charts XRPL fetch error:", err);
+            }
+        }
+        load();
+
+        const interval = setInterval(load, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (!xrpl) return;
+
+        const ctx1 = chartRef1.current.getContext("2d");
+
+        if (chart1.current) chart1.current.destroy();
+
+        const labels = ["Seq", "Owners", "Balance"];
+        const values = [
+            xrpl.sequence || 0,
+            xrpl.ownerCount || 0,
+            xrpl.xrpBalance || 0,
+        ];
+
+        chart1.current = new Chart(ctx1, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: "XRPL Live Metrics",
+                        data: values,
+                        borderColor: "#FFD400",
+                        borderWidth: 3,
+                        tension: 0.25,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: "#fff", font: { size: 14 } },
+                    },
+                },
+                scales: {
+                    x: { ticks: { color: "#aaa" } },
+                    y: { ticks: { color: "#aaa" } },
+                },
+            },
+        });
+
+    }, [xrpl]);
+
+    return (
+        <div className="chart-stable-wrapper">
+            <div className="chart-fixed-container" style={{ width: "100%", height: "360px", minHeight: "360px" }}>
+    <canvas ref={chartRef1}></canvas>
+</div>
+        </div>
+    );
+}
+

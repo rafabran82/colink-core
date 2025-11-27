@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param([switch]$NoCompile)
 $ErrorActionPreference = "Stop"
 $python = ".\.venv\Scripts\python.exe"
@@ -17,3 +17,4 @@ Write-Host "==> Running tests..."
 & ".\.venv\Scripts\pytest.exe" -q
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "Tests passed."
+

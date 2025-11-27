@@ -1,0 +1,14 @@
+﻿[
+    {
+        "LPName":  "LP-A",
+        "XRPLAddress":  "rTESTADDRESSLP-A",
+        "Reward":  584.11,
+        "Timestamp":  "2025-11-16 12:16:18"
+    },
+    {
+        "LPName":  "LP-C",
+        "XRPLAddress":  "rTESTADDRESSLP-C",
+        "Reward":  415.89,
+        "Timestamp":  "2025-11-16 12:16:18"
+    }
+]

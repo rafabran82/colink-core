@@ -1,0 +1,16 @@
+{
+  "timestamp": "20251116-050958",
+  "config_loaded": true,
+  "pools_initialized": true,
+  "amm_preview": {
+    "allowed": true,
+    "gross_out": 49.9001996007984,
+    "impact": 0.001996007984031936
+  },
+  "fee_preview": {
+    "gross_out": 49.9001996007984,
+    "amm_fee": 0.1497005988023952,
+    "xrpay_fee": 0.0249500998003992,
+    "net_out": 49.725548902195605
+  }
+}

@@ -1,4 +1,4 @@
-import json
+﻿import json
 from argparse import Namespace
 
 from colink_core.sim.json_cli import cmd_quote
@@ -28,3 +28,4 @@ def test_quote_keys_shape():
         "raw",
     }
     assert required.issubset(data.keys())
+

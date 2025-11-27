@@ -1,0 +1,17 @@
+{
+  "timestamp": "20251116-051146",
+  "ready": true,
+  "max_ticks": 300,
+  "tick_interval_ms": 1000,
+  "pools_initialized": true,
+  "volatility": {
+    "enabled": true,
+    "sigma": 0.015,
+    "drift": 0.0005
+  },
+  "fees": {
+    "xrpay_fee_bps": 5,
+    "amm_fee_bps": 30
+  },
+  "seed": 42
+}

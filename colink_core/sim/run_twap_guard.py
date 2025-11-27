@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import time
 from copy import deepcopy
@@ -47,11 +47,11 @@ def try_fill_with_twap_guard(
         f"Quote: {fmt(col_in)} COL -> {fmt(q.amount_out)} COPX | px={fmt(quote_px)}  TWAP={fmt(ref_px)}  dev={dev:.1f} bps"
     )
     print(
-        f"Guard budget: ≤ {allowed:.1f} bps (base {base_band_bps:.0f} + modeled-impact + cushion {cushion_bps:.0f})"
+        f"Guard budget: â‰¤ {allowed:.1f} bps (base {base_band_bps:.0f} + modeled-impact + cushion {cushion_bps:.0f})"
     )
 
     if dev > allowed:
-        print(f"‼️  Refused by TWAP guard: deviation {dev:.1f} bps > {allowed:.1f} bps\n")
+        print(f"â€¼ï¸  Refused by TWAP guard: deviation {dev:.1f} bps > {allowed:.1f} bps\n")
         return False
 
     # Mutating execution against fresh copies to simulate immediate fill
@@ -78,7 +78,7 @@ def main():
     warm_twap(tw, poolA, poolB, steps=3, dt=2.0)
     try_fill_with_twap_guard(poolA, poolB, col_in=5_000.0, twap=tw)
 
-    # Case 2: Adverse move — should FAIL
+    # Case 2: Adverse move â€” should FAIL
     poolB.swap_y_for_x(5_000_000.0)  # big COPX->XRP (drops COPX/XRP)
     poolA.swap_y_for_x(50_000.0)  # big COL->XRP (drains X on COL/X)
     print(
@@ -91,3 +91,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

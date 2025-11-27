@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
   [ValidateSet("major","minor","patch")] [string]$Part = "patch"
 )
@@ -15,3 +15,4 @@ git tag "v$new"
 git push
 git push --tags
 Write-Host "Release v$new pushed."
+

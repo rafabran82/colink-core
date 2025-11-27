@@ -1,0 +1,23 @@
+﻿[
+    {
+        "lp_drawdown_abs_mean":  0.02,
+        "lp_apy":  12.5,
+        "lp_volatility_abs_mean":  0.01,
+        "total_shocks":  0,
+        "lp_address":  "rEXAMPLE1"
+    },
+    {
+        "lp_drawdown_abs_mean":  0.03,
+        "lp_apy":  9.8,
+        "lp_volatility_abs_mean":  0.02,
+        "total_shocks":  1,
+        "lp_address":  "rEXAMPLE2"
+    },
+    {
+        "lp_drawdown_abs_mean":  0.05,
+        "lp_apy":  7.5,
+        "lp_volatility_abs_mean":  0.04,
+        "total_shocks":  2,
+        "lp_address":  "rEXAMPLE3"
+    }
+]

@@ -1,0 +1,20 @@
+﻿[
+    {
+        "lp_address":  "rEXAMPLE1",
+        "lp_apy":  12.5,
+        "reward":  419.4631,
+        "testMode":  true
+    },
+    {
+        "lp_address":  "rEXAMPLE2",
+        "lp_apy":  9.8,
+        "reward":  328.8591,
+        "testMode":  true
+    },
+    {
+        "lp_address":  "rEXAMPLE3",
+        "lp_apy":  7.5,
+        "reward":  251.6779,
+        "testMode":  true
+    }
+]

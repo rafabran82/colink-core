@@ -1,4 +1,4 @@
-def test_sweep_returns_pngs(tmp_path):
+﻿def test_sweep_returns_pngs(tmp_path):
     import json
     import os
     import subprocess
@@ -13,3 +13,4 @@ def test_sweep_returns_pngs(tmp_path):
     for p in data["charts"]:
         assert p.endswith(".png")
         assert (tmp_path / os.path.basename(p)).exists()
+

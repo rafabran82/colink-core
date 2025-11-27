@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from amm import PoolState
 
@@ -38,10 +38,10 @@ def main():
     for side, amt in swaps:
         if side == "x_for_y":
             out, px = pool.swap_x_for_y(amt)
-            print(f"Swap X→Y: in {fmt(amt)} XRP, out {fmt(out)} COPX, eff {fmt(px)} COPX/XRP")
+            print(f"Swap Xâ†’Y: in {fmt(amt)} XRP, out {fmt(out)} COPX, eff {fmt(px)} COPX/XRP")
         else:
             out, px = pool.swap_y_for_x(amt)
-            print(f"Swap Y→X: in {fmt(amt)} COPX, out {fmt(out)} XRP, eff {fmt(px)} XRP/COPX")
+            print(f"Swap Yâ†’X: in {fmt(amt)} COPX, out {fmt(out)} XRP, eff {fmt(px)} XRP/COPX")
 
     print("\n== Post-swaps ==")
     print("Reserves: X=", fmt(pool.x_reserve), " Y=", fmt(pool.y_reserve))
@@ -65,3 +65,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

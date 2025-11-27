@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
   [string] $Ref = "main",      # branch or commit-ish to match
   [int]    $Limit = 40,        # how many runs to scan
@@ -39,7 +39,7 @@ $jobs = gh api "repos/$repo/actions/runs/$RunId/jobs" --paginate | ConvertFrom-J
 $jobList = $jobs.jobs
 if (-not $jobList) { Write-Warning "No jobs returned for run $RunId. (Plan-level failure?)" }
 
-# 2) Artifacts → list → download each to its own subfolder
+# 2) Artifacts â†’ list â†’ download each to its own subfolder
 $artDir = "artifacts-$RunId"
 New-Item -ItemType Directory -Force -Path $artDir | Out-Null
 
@@ -68,7 +68,7 @@ if (-not $items -or $items.Count -eq 0) {
   }
 }
 
-# 3) Aggregate all smoke_summary.json → CSV & JSON
+# 3) Aggregate all smoke_summary.json â†’ CSV & JSON
 $outs = Join-Path $artDir "_combined"
 New-Item -ItemType Directory -Force -Path $outs | Out-Null
 
@@ -121,3 +121,4 @@ if (Test-Path $bundle) { Remove-Item $bundle -Force }
 $patternAll = Join-Path $artDir '*'
 Compress-Archive -Path $patternAll -DestinationPath $bundle -Force
 Write-Host "Packed bundle: $bundle"
+

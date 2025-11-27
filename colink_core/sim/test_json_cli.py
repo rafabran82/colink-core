@@ -1,4 +1,4 @@
-import json
+﻿import json
 import subprocess
 import sys
 
@@ -34,3 +34,4 @@ def test_sweep_json_smoke(tmp_path):
     # Should produce at least one chart; CSV optional
     assert isinstance(data["charts"], list)
     assert len(data["charts"]) >= 1
+

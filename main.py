@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 
 from routes.debug import router as debug_router
 
@@ -35,3 +35,4 @@ if orderbook_router is not None:
 @app.get("/healthz")
 def healthz():
     return {"status": "ok"}
+

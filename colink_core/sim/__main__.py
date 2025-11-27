@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import csv
@@ -178,11 +178,11 @@ def cmd_sweep(args: argparse.Namespace) -> int:
 
 def main():
     p = argparse.ArgumentParser(
-        prog="colink-sim", description="COLINK routed AMM simulator (COL ⇄ XRP ⇄ COPX)"
+        prog="colink-sim", description="COLINK routed AMM simulator (COL â‡„ XRP â‡„ COPX)"
     )
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    p_q = sub.add_parser("quote", help="Quote COL→COPX")
+    p_q = sub.add_parser("quote", help="Quote COLâ†’COPX")
     p_q.add_argument("--col-in", type=float, required=True)
     p_q.add_argument("--min-out-bps", type=float, help="Optional min-out slippage bps")
     p_q.add_argument("--twap-guard", action="store_true", help="Enable size-aware TWAP guard")
@@ -192,7 +192,7 @@ def main():
     p_q.add_argument("--cap-bps", type=float, default=2000.0)
     p_q.set_defaults(func=cmd_quote)
 
-    p_e = sub.add_parser("exec", help="Execute COL→COPX (mutates pools)")
+    p_e = sub.add_parser("exec", help="Execute COLâ†’COPX (mutates pools)")
     p_e.add_argument("--col-in", type=float, required=True)
     p_e.set_defaults(func=cmd_exec)
 
@@ -211,3 +211,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

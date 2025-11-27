@@ -1,0 +1,214 @@
+﻿{
+    "timestamp":  "2025-11-19T10:50:48.2503910-05:00",
+    "ledger":  12494571,
+    "accounts":  {
+                     "lp":  {
+                                "account_info":  {
+                                                     "Account":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                                     "Balance":  "99999910",
+                                                     "Flags":  0,
+                                                     "LedgerEntryType":  "AccountRoot",
+                                                     "OwnerCount":  6,
+                                                     "PreviousTxnID":  "0941D22F78210881E59AB3736FE5B2BE33DF0B25CEF242E17D6E017DF2FCB047",
+                                                     "PreviousTxnLgrSeq":  12494429,
+                                                     "Sequence":  12415929,
+                                                     "index":  "27E5E1AFCF67666CC6370AF54ADDB1706F1AA2439F2C8E47401BCA67CCA170A4"
+                                                 },
+                                "address":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                "trustlines":  [
+                                                   {
+                                                       "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                       "balance":  "2000000",
+                                                       "currency":  "4350580000000000000000000000000000000000",
+                                                       "limit":  "1000000000",
+                                                       "limit_peer":  "0",
+                                                       "no_ripple_peer":  true,
+                                                       "quality_in":  0,
+                                                       "quality_out":  0
+                                                   },
+                                                   {
+                                                       "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                       "balance":  "0",
+                                                       "currency":  "43504F5800000000000000000000000000000000",
+                                                       "limit":  "1000000000",
+                                                       "limit_peer":  "0",
+                                                       "no_ripple_peer":  true,
+                                                       "quality_in":  0,
+                                                       "quality_out":  0
+                                                   },
+                                                   {
+                                                       "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                       "balance":  "2000000",
+                                                       "currency":  "COL",
+                                                       "limit":  "1000000000",
+                                                       "limit_peer":  "0",
+                                                       "no_ripple_peer":  true,
+                                                       "quality_in":  0,
+                                                       "quality_out":  0
+                                                   },
+                                                   {
+                                                       "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                       "balance":  "0",
+                                                       "currency":  "434F4C0000000000000000000000000000000000",
+                                                       "limit":  "1000000000",
+                                                       "limit_peer":  "0",
+                                                       "no_ripple_peer":  true,
+                                                       "quality_in":  0,
+                                                       "quality_out":  0
+                                                   }
+                                               ]
+                            },
+                     "issuer":  {
+                                    "account_info":  {
+                                                         "Account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                         "Balance":  "99999920",
+                                                         "Flags":  0,
+                                                         "LedgerEntryType":  "AccountRoot",
+                                                         "OwnerCount":  0,
+                                                         "PreviousTxnID":  "2880B45DCAD7B900AE3734FDCA33442F1AFD1CA6C98FE15BE67C548122248DC3",
+                                                         "PreviousTxnLgrSeq":  12494409,
+                                                         "Sequence":  12415926,
+                                                         "index":  "6E7FBFD190E3C95C3DDF2A38E96D316D370D60D0137A5CE49FA55FC99E9DFAE4"
+                                                     },
+                                    "address":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                    "trustlines":  [
+                                                       {
+                                                           "account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                           "balance":  "0",
+                                                           "currency":  "43504F5800000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                                           "balance":  "-2000000",
+                                                           "currency":  "4350580000000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                                           "balance":  "0",
+                                                           "currency":  "43504F5800000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                                           "balance":  "-2000000",
+                                                           "currency":  "COL",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                           "balance":  "-2000000",
+                                                           "currency":  "COL",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                           "balance":  "0",
+                                                           "currency":  "434F4C0000000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "rUy4LLJCGhNtftC326niLwBUDVrPVNboWW",
+                                                           "balance":  "0",
+                                                           "currency":  "434F4C0000000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       },
+                                                       {
+                                                           "account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                           "balance":  "-2000000",
+                                                           "currency":  "4350580000000000000000000000000000000000",
+                                                           "limit":  "0",
+                                                           "limit_peer":  "1000000000",
+                                                           "no_ripple":  true,
+                                                           "quality_in":  0,
+                                                           "quality_out":  0
+                                                       }
+                                                   ]
+                                },
+                     "user":  {
+                                  "account_info":  {
+                                                       "Account":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                                       "Balance":  "99999900",
+                                                       "Flags":  0,
+                                                       "LedgerEntryType":  "AccountRoot",
+                                                       "OwnerCount":  7,
+                                                       "PreviousTxnID":  "874C07F95DEE1F627480671B43C5DFB4BC9304CEF31DD7ECDF8FBDBDA871E12D",
+                                                       "PreviousTxnLgrSeq":  12494427,
+                                                       "Sequence":  12415929,
+                                                       "index":  "E8F66324412FE9859A9DE83B45BB7D1CB83140C8A09B5B609064EC56C1B78CC8"
+                                                   },
+                                  "address":  "raK6mZNxYz4EBQvUEJ59M3AAN9NDHbjDFQ",
+                                  "trustlines":  [
+                                                     {
+                                                         "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                         "balance":  "0",
+                                                         "currency":  "43504F5800000000000000000000000000000000",
+                                                         "limit":  "1000000000",
+                                                         "limit_peer":  "0",
+                                                         "no_ripple_peer":  true,
+                                                         "quality_in":  0,
+                                                         "quality_out":  0
+                                                     },
+                                                     {
+                                                         "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                         "balance":  "2000000",
+                                                         "currency":  "COL",
+                                                         "limit":  "1000000000",
+                                                         "limit_peer":  "0",
+                                                         "no_ripple_peer":  true,
+                                                         "quality_in":  0,
+                                                         "quality_out":  0
+                                                     },
+                                                     {
+                                                         "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                         "balance":  "0",
+                                                         "currency":  "434F4C0000000000000000000000000000000000",
+                                                         "limit":  "1000000000",
+                                                         "limit_peer":  "0",
+                                                         "no_ripple_peer":  true,
+                                                         "quality_in":  0,
+                                                         "quality_out":  0
+                                                     },
+                                                     {
+                                                         "account":  "ravH5waBisEj3NJNd3bQjQUreJJ56FFQRM",
+                                                         "balance":  "2000000",
+                                                         "currency":  "4350580000000000000000000000000000000000",
+                                                         "limit":  "1000000000",
+                                                         "limit_peer":  "0",
+                                                         "no_ripple_peer":  true,
+                                                         "quality_in":  0,
+                                                         "quality_out":  0
+                                                     }
+                                                 ]
+                              }
+                 }
+}

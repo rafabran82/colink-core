@@ -1,4 +1,4 @@
-# === PR-Checks.ps1 (PowerShell-safe) ===
+﻿# === PR-Checks.ps1 (PowerShell-safe) ===
 $ErrorActionPreference = "Stop"
 
 Write-Host "== Byte-compile =="
@@ -63,3 +63,4 @@ if (Test-Path .\.venv\Scripts\python.exe) { $pyexe = ".\.venv\Scripts\python.exe
   --max-slip-bps 200
 
 Write-Host "`nPR checks complete."
+

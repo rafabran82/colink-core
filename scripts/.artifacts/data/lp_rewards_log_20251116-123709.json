@@ -1,0 +1,18 @@
+﻿[
+    {
+        "LPName":  "LP-A",
+        "APY":  12.5,
+        "Reward":  584.11,
+        "Timestamp":  "20251116-123709",
+        "XRPLAddr":  "rTESTADDRESSLP-A",
+        "TestMode":  false
+    },
+    {
+        "LPName":  "LP-C",
+        "APY":  8.9,
+        "Reward":  415.89,
+        "Timestamp":  "20251116-123709",
+        "XRPLAddr":  "rTESTADDRESSLP-C",
+        "TestMode":  false
+    }
+]

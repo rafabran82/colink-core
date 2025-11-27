@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 import json
 import pathlib
 import sys
@@ -70,3 +70,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

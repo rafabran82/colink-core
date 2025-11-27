@@ -1,0 +1,41 @@
+{
+  "timestamp": "20251116-055830",
+  "ndjson_file": ".artifacts/data\\sim_events_20251116-055830.ndjson",
+  "max_ticks": 300,
+  "tick_interval_ms": 1000,
+  "swaps_executed": 17,
+  "total_volume": 26935.918347790895,
+  "lp_fee_accum": 476.36787021042505,
+  "xrpay_fee_accum": 79.39464503507084,
+  "treasury_balance": 79.39464503507084,
+  "accounting_events": 1,
+  "avg_slippage": 0.05063062776596737,
+  "min_slippage": 0.0025627339115017233,
+  "max_slippage": 0.18055328246773625,
+  "lp_summary": {
+    "lp_shares_total": 1000000.0,
+    "lp_shares_user": 1000000.0,
+    "lp_share_price_final": 0.08226131517917787,
+    "lp_total_value_user_final": 82261.31517917787
+  },
+  "lp_returns": {
+    "initial_value": 50000.0,
+    "final_value": 82261.31517917787,
+    "growth_multiple": 1.6452263035835573,
+    "roi_pct": 64.52263035835573,
+    "apr_pct": 6782618.903270354,
+    "apy_metrics": {
+      "apy_raw": 8.362962993120151e+80,
+      "apy_realistic": 2500.0,
+      "apy_clamped": 100000.0
+    }
+  },
+  "modules": [
+    "ticks",
+    "volatility",
+    "dynamic_spread",
+    "swaps_enabled",
+    "fee_accumulation",
+    "treasury_accounting"
+  ]
+}

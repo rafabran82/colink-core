@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+﻿from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from config import settings
@@ -64,3 +64,4 @@ def get_orderbook(limit: int = Query(default=20, ge=1, le=400)):
         return orderbook_snapshot(c, settings.ISSUER_ADDRESS, settings.COL_CODE, limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+

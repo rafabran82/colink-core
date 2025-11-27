@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import time
@@ -39,3 +39,4 @@ def write_minimal(charts_dir: str, name: str = "dev", twap_guard_bps: float = 15
     )
     write_summary(out, s)
     return str(out)
+

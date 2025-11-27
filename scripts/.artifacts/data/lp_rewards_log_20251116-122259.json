@@ -1,0 +1,30 @@
+﻿[
+    {
+        "LPName":  "LP-A",
+        "XRPLAddress":  "rTESTADDRESSLP-A",
+        "Reward":  584.11,
+        "Timestamp":  "2025-11-16 12:17:06"
+    },
+    {
+        "LPName":  "LP-C",
+        "XRPLAddress":  "rTESTADDRESSLP-C",
+        "Reward":  415.89,
+        "Timestamp":  "2025-11-16 12:17:06"
+    },
+    {
+        "LPName":  "LP-A",
+        "APY":  12.5,
+        "Reward":  584.11,
+        "Timestamp":  "20251116-122259",
+        "XRPLAddr":  "rTESTADDRESSLP-A",
+        "TestMode":  false
+    },
+    {
+        "LPName":  "LP-C",
+        "APY":  8.9,
+        "Reward":  415.89,
+        "Timestamp":  "20251116-122259",
+        "XRPLAddr":  "rTESTADDRESSLP-C",
+        "TestMode":  false
+    }
+]

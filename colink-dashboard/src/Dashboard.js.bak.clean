@@ -1,0 +1,61 @@
+﻿import React, { useEffect, useState } from "react";
+import "./index.css";
+import Charts from "./Charts";
+import FlashGraph from "./components/FlashGraph";
+
+export default function Dashboard() {
+    const [info, setInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const res = await fetch("http://localhost:5000/api/xrpl/account");
+                const data = await res.json();
+                console.log("XRPL DATA:", data);
+                setInfo(data);
+            } catch (err) {
+                console.error("Dashboard fetch error:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        load();
+    }, []);
+
+    if (loading) {
+        return <div className="loading">Loading XRPL data...</div>;
+    }
+
+    if (!info) {
+        return <div className="error">Failed to load XRPL data.</div>;
+    }
+
+    return (
+        <div className="dashboard">
+            <h1>COLINK Dashboard</h1>
+
+            <div className="card">
+                <h2>XRPL Account Info</h2>
+                <p><strong>Address:</strong> {info.address}</p>
+                <p><strong>XRP Balance:</strong> {info.xrpBalance} XRP</p>
+                <p><strong>Sequence:</strong> {info.sequence}</p>
+                <p><strong>Owner Count:</strong> {info.ownerCount}</p>
+            </div>
+
+            <div style={{ marginTop: "40px" }}>
+                <h2>📊 Liquidity & TVL Trends</h2>
+                <Charts />
+            </div>
+
+            <div style={{ marginTop: "40px" }}>
+                <h2>🦜 Parrot Visualization</h2>
+                <FlashGraph />
+            </div>
+        </div>
+    );
+}
+
+
+

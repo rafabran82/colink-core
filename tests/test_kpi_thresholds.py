@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import pathlib
 
@@ -31,3 +31,4 @@ def test_kpi_thresholds(path: pathlib.Path):
 
     if p95 is not None:
         assert float(p95) <= MAX_P95, f"p95_latency_ms too high: {p95} > {MAX_P95}"
+

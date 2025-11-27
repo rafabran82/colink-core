@@ -1,0 +1,228 @@
+﻿[
+  {
+    "File": "Bootstrap.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Bump-Version.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "ci-smoke.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "ci.guard-artifacts.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "ci.guard-syntax.ps1",
+    "Status": "âŒ ERROR",
+    "Note": "Unbalanced single quotes"
+  },
+  {
+    "File": "ci.local.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "ci.run.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "clean-charts.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "dev-smoke.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "EnableRepoHooks.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Format.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Invoke-Sweep.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Invoke-Tests.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup_20251111_085610.ps1",
+    "Status": "âŒ ERROR",
+    "Note": "Suspicious pattern: } followed by double quote."
+  },
+  {
+    "File": "Local-CI.backup_20251111_111002.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup_20251111_111338.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup_axislabel_20251111_111804.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup_axislabels_20251111_111958.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup_trendfix_20251111_111626.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-CI.backup.ps1",
+    "Status": "âŒ ERROR",
+    "Note": "Unbalanced double quotes"
+  },
+  {
+    "File": "Local-CI.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-Snapshot-Rotate.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Local-Snapshot.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "open_pr.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "PR-Checks.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Release-Tag.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "release.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "run_api.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "run_ci.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "run_sim.ps1",
+    "Status": "âŒ ERROR",
+    "Note": "Unbalanced single quotes"
+  },
+  {
+    "File": "smoke_paper.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "smoke.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Clean-Artifacts.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "emit_demo.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Make-IndexHtml.ps1",
+    "Status": "âŒ ERROR",
+    "Note": "Unbalanced double quotes"
+  },
+  {
+    "File": "Open-Artifacts.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Phase-10-Bootstrap.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Phase-20-BuildAndTest.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Phase-25-EmitSamples.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Phase-30-Package.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Publish-Local.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Run-All.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Upload-B2.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Upload-S3.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  },
+  {
+    "File": "Verify-Bundles.ps1",
+    "Status": "âœ… OK",
+    "Note": ""
+  }
+]
+

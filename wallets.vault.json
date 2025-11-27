@@ -1,0 +1,21 @@
+﻿{
+    "version":  1,
+    "network":  "testnet",
+    "wallets":  {
+                    "issuer":  {
+                                   "seed":  "sEdTw5dpMFYbpfKMCoyz5URPCRFL6Hf",
+                                   "address":  "rMzJd3znWAEJpGo7Pq3rCYDWqLR7vun9ug",
+                                   "created":  "2025-11-19T16:38:45.5171073-05:00"
+                               },
+                    "user":  {
+                                 "seed":  "sEd7hm44ub72Gs3qHanP19mFaLUMSE7",
+                                 "address":  "rGcTaxo17ukDnynPJNygMp6eaeUHF6hPhE",
+                                 "created":  "2025-11-19T16:38:45.7676973-05:00"
+                             },
+                    "lp":  {
+                               "seed":  "sEdVPQETx2vvuhVqd5kSjoAo4kRTyWv",
+                               "address":  "rwXXPLYqvHqkNXmtG59g1qmLPUKV7Rm8hG",
+                               "created":  "2025-11-19T16:38:46.0070295-05:00"
+                           }
+                }
+}

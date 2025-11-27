@@ -1,4 +1,4 @@
-import json
+﻿import json
 import subprocess
 import sys
 from pathlib import Path
@@ -36,3 +36,4 @@ def test_sweep_placeholder(tmp_path: Path):
     # Only assert path prefix; files may be PNGs or small text files depending on env
     for p in charts:
         assert str(p).startswith(str(outdir))
+

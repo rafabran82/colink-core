@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
 
 from main import app
 
@@ -21,3 +21,4 @@ def test_sim_echo_ok():
 def test_sim_echo_bad_outdir():
     r = c.post("/sim/echo", json={"outdir": "..", "msg": "x"})
     assert r.status_code == 400
+

@@ -1,0 +1,23 @@
+{
+  "name": "colink-core",
+  "version": "1.0.0",
+  "description": "COLINK backend and scripts",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "xrpl": "^1.3.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafabran82/colink-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rafabran82/colink-core/issues"
+  },
+  "license": "ISC",
+  "homepage": "https://github.com/rafabran82/colink-core#readme"
+}

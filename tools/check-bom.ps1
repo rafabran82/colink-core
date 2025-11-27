@@ -1,4 +1,4 @@
-Param(
+﻿Param(
   [Parameter(Position=0)][string]$Path = ".",
   [switch]$Fail
 )
@@ -48,3 +48,4 @@ if ($Fail -and ($results | Where-Object { $_.BOM -or $_.CRLF })) {
   Write-Error "BOM/CRLF detected."
   exit 1
 }
+

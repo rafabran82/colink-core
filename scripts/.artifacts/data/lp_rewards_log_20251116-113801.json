@@ -1,0 +1,16 @@
+﻿[
+    {
+        "Timestamp":  "20251116-113801",
+        "LP_Name":  "LP-A",
+        "XRPL_Address":  "rTESTADDRESSLP-A",
+        "APY":  12.5,
+        "Reward":  584.11
+    },
+    {
+        "Timestamp":  "20251116-113801",
+        "LP_Name":  "LP-C",
+        "XRPL_Address":  "rTESTADDRESSLP-C",
+        "APY":  8.9,
+        "Reward":  415.89
+    }
+]

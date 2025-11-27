@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from fastapi import HTTPException
 
@@ -14,3 +14,4 @@ def http400(e: Exception, detail: str | dict | None = None) -> Exception:
     if detail is None:
         detail = str(e)
     return HTTPException(status_code=400, detail=detail)
+

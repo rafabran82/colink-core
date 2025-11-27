@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 import datetime as dt
 import json
 import os
@@ -19,3 +19,4 @@ doc = {
 }
 (ART / "run_meta.json").write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
 print("Wrote ./.artifacts/run_meta.json")
+

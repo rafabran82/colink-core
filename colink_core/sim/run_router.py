@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import csv
 from copy import deepcopy
@@ -12,10 +12,10 @@ def fmt(n):
 
 
 def seed_pools():
-    # Pool B: XRP⇄COPX (as before) — 1 XRP ~ 2,500 COPX
+    # Pool B: XRPâ‡„COPX (as before) â€” 1 XRP ~ 2,500 COPX
     pool_x_copx = PoolState(x_reserve=10_000.0, y_reserve=25_000_000.0, fee_bps=30)
 
-    # Pool A: COL⇄XRP. Interpret XRP as X, COL as Y.
+    # Pool A: COLâ‡„XRP. Interpret XRP as X, COL as Y.
     # Example: 1 XRP ~ 20 COL  (=> 0.05 XRP per COL)
     pool_col_x = PoolState(x_reserve=10_000.0, y_reserve=200_000.0, fee_bps=30)
 
@@ -40,9 +40,9 @@ def slippage_sweep(pool_col_x, pool_x_copx, col_sizes):
 def main():
     pool_col_x, pool_x_copx = seed_pools()
     print("== Seed ==")
-    print("Pool COL⇄XRP: price (COL per XRP):", fmt(pool_col_x.y_reserve / pool_col_x.x_reserve))
+    print("Pool COLâ‡„XRP: price (COL per XRP):", fmt(pool_col_x.y_reserve / pool_col_x.x_reserve))
     print(
-        "Pool XRP⇄COPX: price (COPX per XRP):", fmt(pool_x_copx.y_reserve / pool_x_copx.x_reserve)
+        "Pool XRPâ‡„COPX: price (COPX per XRP):", fmt(pool_x_copx.y_reserve / pool_x_copx.x_reserve)
     )
     print()
 
@@ -75,7 +75,7 @@ def main():
     poolA = deepcopy(pool_col_x)
     poolB = deepcopy(pool_x_copx)
     r_exec = exec_col_to_copx(poolA, poolB, 10_000.0)
-    print("EXECUTE: 10,000 COL → COPX")
+    print("EXECUTE: 10,000 COL â†’ COPX")
     print(
         "  XRP hop:",
         fmt(r_exec.hop1_out),
@@ -101,7 +101,7 @@ def main():
         w = csv.DictWriter(f, fieldnames=rows[0].keys())
         w.writeheader()
         w.writerows(rows)
-    print(f"Saved slippage table → {out}")
+    print(f"Saved slippage table â†’ {out}")
     for r in rows:
         print(
             f"  COL_in={fmt(r['col_in'])}  -> COPX_out={fmt(r['copx_out'])}  (eff {fmt(r['eff_price_copx_per_col'])} COPX/COL)"
@@ -110,3 +110,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

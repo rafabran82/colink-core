@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # Compatibility runner to satisfy legacy tests and headless usage.
 
 import argparse
@@ -163,3 +163,4 @@ def main(argv=None):
 
 if __name__ == "__main__":
     sys.exit(main())
+

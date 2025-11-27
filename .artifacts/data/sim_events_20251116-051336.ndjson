@@ -1,0 +1,600 @@
+{"type": "tick", "tick": 1, "timestamp": "2025-11-16T10:13:36.238094"}
+{"type": "vol_update", "tick": 1, "pool": "COL_XRP", "mid_price_before": 0.05, "mid_price_after": 0.04991693225281656}
+{"type": "tick", "tick": 2, "timestamp": "2025-11-16T10:13:36.238218"}
+{"type": "vol_update", "tick": 2, "pool": "COL_XRP", "mid_price_before": 0.04991693225281656, "mid_price_after": 0.04981242845938271}
+{"type": "tick", "tick": 3, "timestamp": "2025-11-16T10:13:36.238266"}
+{"type": "vol_update", "tick": 3, "pool": "COL_XRP", "mid_price_before": 0.04981242845938271, "mid_price_after": 0.0497541609727514}
+{"type": "tick", "tick": 4, "timestamp": "2025-11-16T10:13:36.238299"}
+{"type": "vol_update", "tick": 4, "pool": "COL_XRP", "mid_price_before": 0.0497541609727514, "mid_price_after": 0.050302937222120085}
+{"type": "tick", "tick": 5, "timestamp": "2025-11-16T10:13:36.238323"}
+{"type": "vol_update", "tick": 5, "pool": "COL_XRP", "mid_price_before": 0.050302937222120085, "mid_price_after": 0.050231817709290014}
+{"type": "tick", "tick": 6, "timestamp": "2025-11-16T10:13:36.238347"}
+{"type": "vol_update", "tick": 6, "pool": "COL_XRP", "mid_price_before": 0.050231817709290014, "mid_price_after": 0.04912871186181129}
+{"type": "tick", "tick": 7, "timestamp": "2025-11-16T10:13:36.238368"}
+{"type": "vol_update", "tick": 7, "pool": "COL_XRP", "mid_price_before": 0.04912871186181129, "mid_price_after": 0.04939817180032365}
+{"type": "tick", "tick": 8, "timestamp": "2025-11-16T10:13:36.238386"}
+{"type": "vol_update", "tick": 8, "pool": "COL_XRP", "mid_price_before": 0.04939817180032365, "mid_price_after": 0.049224781145851784}
+{"type": "tick", "tick": 9, "timestamp": "2025-11-16T10:13:36.238403"}
+{"type": "vol_update", "tick": 9, "pool": "COL_XRP", "mid_price_before": 0.049224781145851784, "mid_price_after": 0.04908919738025362}
+{"type": "tick", "tick": 10, "timestamp": "2025-11-16T10:13:36.238420"}
+{"type": "vol_update", "tick": 10, "pool": "COL_XRP", "mid_price_before": 0.04908919738025362, "mid_price_after": 0.049199072346459656}
+{"type": "tick", "tick": 11, "timestamp": "2025-11-16T10:13:36.238437"}
+{"type": "vol_update", "tick": 11, "pool": "COL_XRP", "mid_price_before": 0.049199072346459656, "mid_price_after": 0.04939510438009277}
+{"type": "tick", "tick": 12, "timestamp": "2025-11-16T10:13:36.238454"}
+{"type": "vol_update", "tick": 12, "pool": "COL_XRP", "mid_price_before": 0.04939510438009277, "mid_price_after": 0.05028191347393674}
+{"type": "tick", "tick": 13, "timestamp": "2025-11-16T10:13:36.238472"}
+{"type": "vol_update", "tick": 13, "pool": "COL_XRP", "mid_price_before": 0.05028191347393674, "mid_price_after": 0.05080230853095389}
+{"type": "tick", "tick": 14, "timestamp": "2025-11-16T10:13:36.238490"}
+{"type": "vol_update", "tick": 14, "pool": "COL_XRP", "mid_price_before": 0.05080230853095389, "mid_price_after": 0.05091191998107017}
+{"type": "tick", "tick": 15, "timestamp": "2025-11-16T10:13:36.238506"}
+{"type": "vol_update", "tick": 15, "pool": "COL_XRP", "mid_price_before": 0.05091191998107017, "mid_price_after": 0.05037353538597757}
+{"type": "tick", "tick": 16, "timestamp": "2025-11-16T10:13:36.238523"}
+{"type": "vol_update", "tick": 16, "pool": "COL_XRP", "mid_price_before": 0.05037353538597757, "mid_price_after": 0.04963204019356863}
+{"type": "tick", "tick": 17, "timestamp": "2025-11-16T10:13:36.238542"}
+{"type": "vol_update", "tick": 17, "pool": "COL_XRP", "mid_price_before": 0.04963204019356863, "mid_price_after": 0.04984025319967683}
+{"type": "tick", "tick": 18, "timestamp": "2025-11-16T10:13:36.238560"}
+{"type": "vol_update", "tick": 18, "pool": "COL_XRP", "mid_price_before": 0.04984025319967683, "mid_price_after": 0.05084534233217304}
+{"type": "tick", "tick": 19, "timestamp": "2025-11-16T10:13:36.238576"}
+{"type": "vol_update", "tick": 19, "pool": "COL_XRP", "mid_price_before": 0.05084534233217304, "mid_price_after": 0.05090253586592391}
+{"type": "tick", "tick": 20, "timestamp": "2025-11-16T10:13:36.238593"}
+{"type": "vol_update", "tick": 20, "pool": "COL_XRP", "mid_price_before": 0.05090253586592391, "mid_price_after": 0.050846805254738614}
+{"type": "tick", "tick": 21, "timestamp": "2025-11-16T10:13:36.238609"}
+{"type": "vol_update", "tick": 21, "pool": "COL_XRP", "mid_price_before": 0.050846805254738614, "mid_price_after": 0.051277815486133346}
+{"type": "tick", "tick": 22, "timestamp": "2025-11-16T10:13:36.238626"}
+{"type": "vol_update", "tick": 22, "pool": "COL_XRP", "mid_price_before": 0.051277815486133346, "mid_price_after": 0.05018543497999602}
+{"type": "tick", "tick": 23, "timestamp": "2025-11-16T10:13:36.238642"}
+{"type": "vol_update", "tick": 23, "pool": "COL_XRP", "mid_price_before": 0.05018543497999602, "mid_price_after": 0.04997545110255674}
+{"type": "tick", "tick": 24, "timestamp": "2025-11-16T10:13:36.238658"}
+{"type": "vol_update", "tick": 24, "pool": "COL_XRP", "mid_price_before": 0.04997545110255674, "mid_price_after": 0.050368030159660314}
+{"type": "tick", "tick": 25, "timestamp": "2025-11-16T10:13:36.238673"}
+{"type": "vol_update", "tick": 25, "pool": "COL_XRP", "mid_price_before": 0.050368030159660314, "mid_price_after": 0.05105308905110572}
+{"type": "tick", "tick": 26, "timestamp": "2025-11-16T10:13:36.238690"}
+{"type": "vol_update", "tick": 26, "pool": "COL_XRP", "mid_price_before": 0.05105308905110572, "mid_price_after": 0.050894342274035255}
+{"type": "tick", "tick": 27, "timestamp": "2025-11-16T10:13:36.238706"}
+{"type": "vol_update", "tick": 27, "pool": "COL_XRP", "mid_price_before": 0.050894342274035255, "mid_price_after": 0.05120729147679851}
+{"type": "tick", "tick": 28, "timestamp": "2025-11-16T10:13:36.238724"}
+{"type": "vol_update", "tick": 28, "pool": "COL_XRP", "mid_price_before": 0.05120729147679851, "mid_price_after": 0.05142355019926024}
+{"type": "tick", "tick": 29, "timestamp": "2025-11-16T10:13:36.238740"}
+{"type": "vol_update", "tick": 29, "pool": "COL_XRP", "mid_price_before": 0.05142355019926024, "mid_price_after": 0.05205271230315385}
+{"type": "tick", "tick": 30, "timestamp": "2025-11-16T10:13:36.238756"}
+{"type": "vol_update", "tick": 30, "pool": "COL_XRP", "mid_price_before": 0.05205271230315385, "mid_price_after": 0.05120954512458933}
+{"type": "tick", "tick": 31, "timestamp": "2025-11-16T10:13:36.238772"}
+{"type": "vol_update", "tick": 31, "pool": "COL_XRP", "mid_price_before": 0.05120954512458933, "mid_price_after": 0.05167164778557136}
+{"type": "tick", "tick": 32, "timestamp": "2025-11-16T10:13:36.238787"}
+{"type": "vol_update", "tick": 32, "pool": "COL_XRP", "mid_price_before": 0.05167164778557136, "mid_price_after": 0.05052361714578484}
+{"type": "tick", "tick": 33, "timestamp": "2025-11-16T10:13:36.238803"}
+{"type": "vol_update", "tick": 33, "pool": "COL_XRP", "mid_price_before": 0.05052361714578484, "mid_price_after": 0.04856334216253218}
+{"type": "tick", "tick": 34, "timestamp": "2025-11-16T10:13:36.238823"}
+{"type": "vol_update", "tick": 34, "pool": "COL_XRP", "mid_price_before": 0.04856334216253218, "mid_price_after": 0.04814553420228113}
+{"type": "tick", "tick": 35, "timestamp": "2025-11-16T10:13:36.238838"}
+{"type": "vol_update", "tick": 35, "pool": "COL_XRP", "mid_price_before": 0.04814553420228113, "mid_price_after": 0.04750822451074512}
+{"type": "tick", "tick": 36, "timestamp": "2025-11-16T10:13:36.238854"}
+{"type": "vol_update", "tick": 36, "pool": "COL_XRP", "mid_price_before": 0.04750822451074512, "mid_price_after": 0.04815624541775977}
+{"type": "tick", "tick": 37, "timestamp": "2025-11-16T10:13:36.238870"}
+{"type": "vol_update", "tick": 37, "pool": "COL_XRP", "mid_price_before": 0.04815624541775977, "mid_price_after": 0.04866015181573476}
+{"type": "tick", "tick": 38, "timestamp": "2025-11-16T10:13:36.238886"}
+{"type": "vol_update", "tick": 38, "pool": "COL_XRP", "mid_price_before": 0.04866015181573476, "mid_price_after": 0.04779467646184999}
+{"type": "tick", "tick": 39, "timestamp": "2025-11-16T10:13:36.238901"}
+{"type": "vol_update", "tick": 39, "pool": "COL_XRP", "mid_price_before": 0.04779467646184999, "mid_price_after": 0.04842606427620847}
+{"type": "tick", "tick": 40, "timestamp": "2025-11-16T10:13:36.238918"}
+{"type": "vol_update", "tick": 40, "pool": "COL_XRP", "mid_price_before": 0.04842606427620847, "mid_price_after": 0.04772228623257821}
+{"type": "tick", "tick": 41, "timestamp": "2025-11-16T10:13:36.238943"}
+{"type": "vol_update", "tick": 41, "pool": "COL_XRP", "mid_price_before": 0.04772228623257821, "mid_price_after": 0.04768441107288462}
+{"type": "tick", "tick": 42, "timestamp": "2025-11-16T10:13:36.238960"}
+{"type": "vol_update", "tick": 42, "pool": "COL_XRP", "mid_price_before": 0.04768441107288462, "mid_price_after": 0.047498036711026426}
+{"type": "tick", "tick": 43, "timestamp": "2025-11-16T10:13:36.238976"}
+{"type": "vol_update", "tick": 43, "pool": "COL_XRP", "mid_price_before": 0.047498036711026426, "mid_price_after": 0.04760330650823418}
+{"type": "tick", "tick": 44, "timestamp": "2025-11-16T10:13:36.238993"}
+{"type": "vol_update", "tick": 44, "pool": "COL_XRP", "mid_price_before": 0.04760330650823418, "mid_price_after": 0.04821165509034612}
+{"type": "tick", "tick": 45, "timestamp": "2025-11-16T10:13:36.239009"}
+{"type": "vol_update", "tick": 45, "pool": "COL_XRP", "mid_price_before": 0.04821165509034612, "mid_price_after": 0.04869744570019038}
+{"type": "tick", "tick": 46, "timestamp": "2025-11-16T10:13:36.239024"}
+{"type": "vol_update", "tick": 46, "pool": "COL_XRP", "mid_price_before": 0.04869744570019038, "mid_price_after": 0.048977372084284196}
+{"type": "tick", "tick": 47, "timestamp": "2025-11-16T10:13:36.239040"}
+{"type": "vol_update", "tick": 47, "pool": "COL_XRP", "mid_price_before": 0.048977372084284196, "mid_price_after": 0.049479352017652314}
+{"type": "tick", "tick": 48, "timestamp": "2025-11-16T10:13:36.239057"}
+{"type": "vol_update", "tick": 48, "pool": "COL_XRP", "mid_price_before": 0.049479352017652314, "mid_price_after": 0.04985922383318915}
+{"type": "tick", "tick": 49, "timestamp": "2025-11-16T10:13:36.239098"}
+{"type": "vol_update", "tick": 49, "pool": "COL_XRP", "mid_price_before": 0.04985922383318915, "mid_price_after": 0.04941523831534764}
+{"type": "tick", "tick": 50, "timestamp": "2025-11-16T10:13:36.239145"}
+{"type": "vol_update", "tick": 50, "pool": "COL_XRP", "mid_price_before": 0.04941523831534764, "mid_price_after": 0.048908209981082994}
+{"type": "tick", "tick": 51, "timestamp": "2025-11-16T10:13:36.239157"}
+{"type": "vol_update", "tick": 51, "pool": "COL_XRP", "mid_price_before": 0.048908209981082994, "mid_price_after": 0.048587884480535165}
+{"type": "tick", "tick": 52, "timestamp": "2025-11-16T10:13:36.239166"}
+{"type": "vol_update", "tick": 52, "pool": "COL_XRP", "mid_price_before": 0.048587884480535165, "mid_price_after": 0.048976096624742144}
+{"type": "tick", "tick": 53, "timestamp": "2025-11-16T10:13:36.239175"}
+{"type": "vol_update", "tick": 53, "pool": "COL_XRP", "mid_price_before": 0.048976096624742144, "mid_price_after": 0.04881683940746671}
+{"type": "tick", "tick": 54, "timestamp": "2025-11-16T10:13:36.239183"}
+{"type": "vol_update", "tick": 54, "pool": "COL_XRP", "mid_price_before": 0.04881683940746671, "mid_price_after": 0.05055160990878262}
+{"type": "tick", "tick": 55, "timestamp": "2025-11-16T10:13:36.239191"}
+{"type": "vol_update", "tick": 55, "pool": "COL_XRP", "mid_price_before": 0.05055160990878262, "mid_price_after": 0.04995563735883021}
+{"type": "tick", "tick": 56, "timestamp": "2025-11-16T10:13:36.239199"}
+{"type": "vol_update", "tick": 56, "pool": "COL_XRP", "mid_price_before": 0.04995563735883021, "mid_price_after": 0.049157190462276505}
+{"type": "tick", "tick": 57, "timestamp": "2025-11-16T10:13:36.239208"}
+{"type": "vol_update", "tick": 57, "pool": "COL_XRP", "mid_price_before": 0.049157190462276505, "mid_price_after": 0.04974840904198503}
+{"type": "tick", "tick": 58, "timestamp": "2025-11-16T10:13:36.239216"}
+{"type": "vol_update", "tick": 58, "pool": "COL_XRP", "mid_price_before": 0.04974840904198503, "mid_price_after": 0.050834304863529224}
+{"type": "tick", "tick": 59, "timestamp": "2025-11-16T10:13:36.239224"}
+{"type": "vol_update", "tick": 59, "pool": "COL_XRP", "mid_price_before": 0.050834304863529224, "mid_price_after": 0.0512453200621617}
+{"type": "tick", "tick": 60, "timestamp": "2025-11-16T10:13:36.239232"}
+{"type": "vol_update", "tick": 60, "pool": "COL_XRP", "mid_price_before": 0.0512453200621617, "mid_price_after": 0.05191341863330709}
+{"type": "tick", "tick": 61, "timestamp": "2025-11-16T10:13:36.239240"}
+{"type": "vol_update", "tick": 61, "pool": "COL_XRP", "mid_price_before": 0.05191341863330709, "mid_price_after": 0.05305007200156579}
+{"type": "tick", "tick": 62, "timestamp": "2025-11-16T10:13:36.239249"}
+{"type": "vol_update", "tick": 62, "pool": "COL_XRP", "mid_price_before": 0.05305007200156579, "mid_price_after": 0.05300177457197472}
+{"type": "tick", "tick": 63, "timestamp": "2025-11-16T10:13:36.239256"}
+{"type": "vol_update", "tick": 63, "pool": "COL_XRP", "mid_price_before": 0.05300177457197472, "mid_price_after": 0.05189698523026956}
+{"type": "tick", "tick": 64, "timestamp": "2025-11-16T10:13:36.239264"}
+{"type": "vol_update", "tick": 64, "pool": "COL_XRP", "mid_price_before": 0.05189698523026956, "mid_price_after": 0.051508736191342656}
+{"type": "tick", "tick": 65, "timestamp": "2025-11-16T10:13:36.239271"}
+{"type": "vol_update", "tick": 65, "pool": "COL_XRP", "mid_price_before": 0.051508736191342656, "mid_price_after": 0.052270727402160364}
+{"type": "tick", "tick": 66, "timestamp": "2025-11-16T10:13:36.239278"}
+{"type": "vol_update", "tick": 66, "pool": "COL_XRP", "mid_price_before": 0.052270727402160364, "mid_price_after": 0.05116493095955389}
+{"type": "tick", "tick": 67, "timestamp": "2025-11-16T10:13:36.239286"}
+{"type": "vol_update", "tick": 67, "pool": "COL_XRP", "mid_price_before": 0.05116493095955389, "mid_price_after": 0.05121624784072961}
+{"type": "tick", "tick": 68, "timestamp": "2025-11-16T10:13:36.239294"}
+{"type": "vol_update", "tick": 68, "pool": "COL_XRP", "mid_price_before": 0.05121624784072961, "mid_price_after": 0.0514364039750289}
+{"type": "tick", "tick": 69, "timestamp": "2025-11-16T10:13:36.239301"}
+{"type": "vol_update", "tick": 69, "pool": "COL_XRP", "mid_price_before": 0.0514364039750289, "mid_price_after": 0.05121862828580577}
+{"type": "tick", "tick": 70, "timestamp": "2025-11-16T10:13:36.239308"}
+{"type": "vol_update", "tick": 70, "pool": "COL_XRP", "mid_price_before": 0.05121862828580577, "mid_price_after": 0.051800189165831276}
+{"type": "tick", "tick": 71, "timestamp": "2025-11-16T10:13:36.239315"}
+{"type": "vol_update", "tick": 71, "pool": "COL_XRP", "mid_price_before": 0.051800189165831276, "mid_price_after": 0.05227735676753557}
+{"type": "tick", "tick": 72, "timestamp": "2025-11-16T10:13:36.239322"}
+{"type": "vol_update", "tick": 72, "pool": "COL_XRP", "mid_price_before": 0.05227735676753557, "mid_price_after": 0.05412385196453756}
+{"type": "tick", "tick": 73, "timestamp": "2025-11-16T10:13:36.239330"}
+{"type": "vol_update", "tick": 73, "pool": "COL_XRP", "mid_price_before": 0.05412385196453756, "mid_price_after": 0.0546542395458059}
+{"type": "tick", "tick": 74, "timestamp": "2025-11-16T10:13:36.239337"}
+{"type": "vol_update", "tick": 74, "pool": "COL_XRP", "mid_price_before": 0.0546542395458059, "mid_price_after": 0.054181969426448}
+{"type": "tick", "tick": 75, "timestamp": "2025-11-16T10:13:36.239344"}
+{"type": "vol_update", "tick": 75, "pool": "COL_XRP", "mid_price_before": 0.054181969426448, "mid_price_after": 0.053752470911585803}
+{"type": "tick", "tick": 76, "timestamp": "2025-11-16T10:13:36.239351"}
+{"type": "vol_update", "tick": 76, "pool": "COL_XRP", "mid_price_before": 0.053752470911585803, "mid_price_after": 0.05310885406271457}
+{"type": "tick", "tick": 77, "timestamp": "2025-11-16T10:13:36.239359"}
+{"type": "vol_update", "tick": 77, "pool": "COL_XRP", "mid_price_before": 0.05310885406271457, "mid_price_after": 0.05389402085248653}
+{"type": "tick", "tick": 78, "timestamp": "2025-11-16T10:13:36.239366"}
+{"type": "vol_update", "tick": 78, "pool": "COL_XRP", "mid_price_before": 0.05389402085248653, "mid_price_after": 0.053462734353622914}
+{"type": "tick", "tick": 79, "timestamp": "2025-11-16T10:13:36.239373"}
+{"type": "vol_update", "tick": 79, "pool": "COL_XRP", "mid_price_before": 0.053462734353622914, "mid_price_after": 0.0534331207246022}
+{"type": "tick", "tick": 80, "timestamp": "2025-11-16T10:13:36.239384"}
+{"type": "vol_update", "tick": 80, "pool": "COL_XRP", "mid_price_before": 0.0534331207246022, "mid_price_after": 0.054060400944700986}
+{"type": "tick", "tick": 81, "timestamp": "2025-11-16T10:13:36.239392"}
+{"type": "vol_update", "tick": 81, "pool": "COL_XRP", "mid_price_before": 0.054060400944700986, "mid_price_after": 0.05350077065502432}
+{"type": "tick", "tick": 82, "timestamp": "2025-11-16T10:13:36.239399"}
+{"type": "vol_update", "tick": 82, "pool": "COL_XRP", "mid_price_before": 0.05350077065502432, "mid_price_after": 0.05329185712991384}
+{"type": "tick", "tick": 83, "timestamp": "2025-11-16T10:13:36.239406"}
+{"type": "vol_update", "tick": 83, "pool": "COL_XRP", "mid_price_before": 0.05329185712991384, "mid_price_after": 0.05184661958945125}
+{"type": "tick", "tick": 84, "timestamp": "2025-11-16T10:13:36.239414"}
+{"type": "vol_update", "tick": 84, "pool": "COL_XRP", "mid_price_before": 0.05184661958945125, "mid_price_after": 0.051030700041620754}
+{"type": "tick", "tick": 85, "timestamp": "2025-11-16T10:13:36.239421"}
+{"type": "vol_update", "tick": 85, "pool": "COL_XRP", "mid_price_before": 0.051030700041620754, "mid_price_after": 0.05062163559334254}
+{"type": "tick", "tick": 86, "timestamp": "2025-11-16T10:13:36.239428"}
+{"type": "vol_update", "tick": 86, "pool": "COL_XRP", "mid_price_before": 0.05062163559334254, "mid_price_after": 0.050962643929958494}
+{"type": "tick", "tick": 87, "timestamp": "2025-11-16T10:13:36.239435"}
+{"type": "vol_update", "tick": 87, "pool": "COL_XRP", "mid_price_before": 0.050962643929958494, "mid_price_after": 0.05190047884206841}
+{"type": "tick", "tick": 88, "timestamp": "2025-11-16T10:13:36.239443"}
+{"type": "vol_update", "tick": 88, "pool": "COL_XRP", "mid_price_before": 0.05190047884206841, "mid_price_after": 0.05191205253480118}
+{"type": "tick", "tick": 89, "timestamp": "2025-11-16T10:13:36.239450"}
+{"type": "vol_update", "tick": 89, "pool": "COL_XRP", "mid_price_before": 0.05191205253480118, "mid_price_after": 0.052141527903956694}
+{"type": "tick", "tick": 90, "timestamp": "2025-11-16T10:13:36.239458"}
+{"type": "vol_update", "tick": 90, "pool": "COL_XRP", "mid_price_before": 0.052141527903956694, "mid_price_after": 0.05229897136066541}
+{"type": "tick", "tick": 91, "timestamp": "2025-11-16T10:13:36.239465"}
+{"type": "vol_update", "tick": 91, "pool": "COL_XRP", "mid_price_before": 0.05229897136066541, "mid_price_after": 0.05317608351273943}
+{"type": "tick", "tick": 92, "timestamp": "2025-11-16T10:13:36.239472"}
+{"type": "vol_update", "tick": 92, "pool": "COL_XRP", "mid_price_before": 0.05317608351273943, "mid_price_after": 0.05391524851431544}
+{"type": "tick", "tick": 93, "timestamp": "2025-11-16T10:13:36.239479"}
+{"type": "vol_update", "tick": 93, "pool": "COL_XRP", "mid_price_before": 0.05391524851431544, "mid_price_after": 0.05416354978532617}
+{"type": "tick", "tick": 94, "timestamp": "2025-11-16T10:13:36.239487"}
+{"type": "vol_update", "tick": 94, "pool": "COL_XRP", "mid_price_before": 0.05416354978532617, "mid_price_after": 0.053369286578571054}
+{"type": "tick", "tick": 95, "timestamp": "2025-11-16T10:13:36.239494"}
+{"type": "vol_update", "tick": 95, "pool": "COL_XRP", "mid_price_before": 0.053369286578571054, "mid_price_after": 0.05411916666784228}
+{"type": "tick", "tick": 96, "timestamp": "2025-11-16T10:13:36.239501"}
+{"type": "vol_update", "tick": 96, "pool": "COL_XRP", "mid_price_before": 0.05411916666784228, "mid_price_after": 0.0544555555465683}
+{"type": "tick", "tick": 97, "timestamp": "2025-11-16T10:13:36.239508"}
+{"type": "vol_update", "tick": 97, "pool": "COL_XRP", "mid_price_before": 0.0544555555465683, "mid_price_after": 0.055484990080034415}
+{"type": "tick", "tick": 98, "timestamp": "2025-11-16T10:13:36.239515"}
+{"type": "vol_update", "tick": 98, "pool": "COL_XRP", "mid_price_before": 0.055484990080034415, "mid_price_after": 0.05548784207010076}
+{"type": "tick", "tick": 99, "timestamp": "2025-11-16T10:13:36.239522"}
+{"type": "vol_update", "tick": 99, "pool": "COL_XRP", "mid_price_before": 0.05548784207010076, "mid_price_after": 0.05714118632580672}
+{"type": "tick", "tick": 100, "timestamp": "2025-11-16T10:13:36.239529"}
+{"type": "vol_update", "tick": 100, "pool": "COL_XRP", "mid_price_before": 0.05714118632580672, "mid_price_after": 0.05686215762151583}
+{"type": "tick", "tick": 101, "timestamp": "2025-11-16T10:13:36.239537"}
+{"type": "vol_update", "tick": 101, "pool": "COL_XRP", "mid_price_before": 0.05686215762151583, "mid_price_after": 0.05824936148597293}
+{"type": "tick", "tick": 102, "timestamp": "2025-11-16T10:13:36.239544"}
+{"type": "vol_update", "tick": 102, "pool": "COL_XRP", "mid_price_before": 0.05824936148597293, "mid_price_after": 0.0583790702664553}
+{"type": "tick", "tick": 103, "timestamp": "2025-11-16T10:13:36.239551"}
+{"type": "vol_update", "tick": 103, "pool": "COL_XRP", "mid_price_before": 0.0583790702664553, "mid_price_after": 0.05795617023008148}
+{"type": "tick", "tick": 104, "timestamp": "2025-11-16T10:13:36.239558"}
+{"type": "vol_update", "tick": 104, "pool": "COL_XRP", "mid_price_before": 0.05795617023008148, "mid_price_after": 0.05700414056002658}
+{"type": "tick", "tick": 105, "timestamp": "2025-11-16T10:13:36.239565"}
+{"type": "vol_update", "tick": 105, "pool": "COL_XRP", "mid_price_before": 0.05700414056002658, "mid_price_after": 0.05690350212847492}
+{"type": "tick", "tick": 106, "timestamp": "2025-11-16T10:13:36.239573"}
+{"type": "vol_update", "tick": 106, "pool": "COL_XRP", "mid_price_before": 0.05690350212847492, "mid_price_after": 0.05814683314516927}
+{"type": "tick", "tick": 107, "timestamp": "2025-11-16T10:13:36.239580"}
+{"type": "vol_update", "tick": 107, "pool": "COL_XRP", "mid_price_before": 0.05814683314516927, "mid_price_after": 0.05888795043632128}
+{"type": "tick", "tick": 108, "timestamp": "2025-11-16T10:13:36.239587"}
+{"type": "vol_update", "tick": 108, "pool": "COL_XRP", "mid_price_before": 0.05888795043632128, "mid_price_after": 0.059525898794368606}
+{"type": "tick", "tick": 109, "timestamp": "2025-11-16T10:13:36.239594"}
+{"type": "vol_update", "tick": 109, "pool": "COL_XRP", "mid_price_before": 0.059525898794368606, "mid_price_after": 0.05743427248875365}
+{"type": "tick", "tick": 110, "timestamp": "2025-11-16T10:13:36.239601"}
+{"type": "vol_update", "tick": 110, "pool": "COL_XRP", "mid_price_before": 0.05743427248875365, "mid_price_after": 0.05807549530282341}
+{"type": "tick", "tick": 111, "timestamp": "2025-11-16T10:13:36.239608"}
+{"type": "vol_update", "tick": 111, "pool": "COL_XRP", "mid_price_before": 0.05807549530282341, "mid_price_after": 0.0585887541116664}
+{"type": "tick", "tick": 112, "timestamp": "2025-11-16T10:13:36.239615"}
+{"type": "vol_update", "tick": 112, "pool": "COL_XRP", "mid_price_before": 0.0585887541116664, "mid_price_after": 0.05813475605087374}
+{"type": "tick", "tick": 113, "timestamp": "2025-11-16T10:13:36.239622"}
+{"type": "vol_update", "tick": 113, "pool": "COL_XRP", "mid_price_before": 0.05813475605087374, "mid_price_after": 0.057616730872728734}
+{"type": "tick", "tick": 114, "timestamp": "2025-11-16T10:13:36.239630"}
+{"type": "vol_update", "tick": 114, "pool": "COL_XRP", "mid_price_before": 0.057616730872728734, "mid_price_after": 0.057643542427960034}
+{"type": "tick", "tick": 115, "timestamp": "2025-11-16T10:13:36.239640"}
+{"type": "vol_update", "tick": 115, "pool": "COL_XRP", "mid_price_before": 0.057643542427960034, "mid_price_after": 0.05916378387004094}
+{"type": "tick", "tick": 116, "timestamp": "2025-11-16T10:13:36.239648"}
+{"type": "vol_update", "tick": 116, "pool": "COL_XRP", "mid_price_before": 0.05916378387004094, "mid_price_after": 0.05825700951584969}
+{"type": "tick", "tick": 117, "timestamp": "2025-11-16T10:13:36.239654"}
+{"type": "vol_update", "tick": 117, "pool": "COL_XRP", "mid_price_before": 0.05825700951584969, "mid_price_after": 0.05791229839091421}
+{"type": "tick", "tick": 118, "timestamp": "2025-11-16T10:13:36.239661"}
+{"type": "vol_update", "tick": 118, "pool": "COL_XRP", "mid_price_before": 0.05791229839091421, "mid_price_after": 0.05912421581220716}
+{"type": "tick", "tick": 119, "timestamp": "2025-11-16T10:13:36.239669"}
+{"type": "vol_update", "tick": 119, "pool": "COL_XRP", "mid_price_before": 0.05912421581220716, "mid_price_after": 0.05875810317786094}
+{"type": "tick", "tick": 120, "timestamp": "2025-11-16T10:13:36.239675"}
+{"type": "vol_update", "tick": 120, "pool": "COL_XRP", "mid_price_before": 0.05875810317786094, "mid_price_after": 0.058466441342429995}
+{"type": "tick", "tick": 121, "timestamp": "2025-11-16T10:13:36.239682"}
+{"type": "vol_update", "tick": 121, "pool": "COL_XRP", "mid_price_before": 0.058466441342429995, "mid_price_after": 0.058581424089202666}
+{"type": "tick", "tick": 122, "timestamp": "2025-11-16T10:13:36.239690"}
+{"type": "vol_update", "tick": 122, "pool": "COL_XRP", "mid_price_before": 0.058581424089202666, "mid_price_after": 0.057519967310395506}
+{"type": "tick", "tick": 123, "timestamp": "2025-11-16T10:13:36.239696"}
+{"type": "vol_update", "tick": 123, "pool": "COL_XRP", "mid_price_before": 0.057519967310395506, "mid_price_after": 0.057738496103335195}
+{"type": "tick", "tick": 124, "timestamp": "2025-11-16T10:13:36.239703"}
+{"type": "vol_update", "tick": 124, "pool": "COL_XRP", "mid_price_before": 0.057738496103335195, "mid_price_after": 0.05671974283774604}
+{"type": "tick", "tick": 125, "timestamp": "2025-11-16T10:13:36.239710"}
+{"type": "vol_update", "tick": 125, "pool": "COL_XRP", "mid_price_before": 0.05671974283774604, "mid_price_after": 0.05750122601702374}
+{"type": "tick", "tick": 126, "timestamp": "2025-11-16T10:13:36.239716"}
+{"type": "vol_update", "tick": 126, "pool": "COL_XRP", "mid_price_before": 0.05750122601702374, "mid_price_after": 0.057532720148157156}
+{"type": "tick", "tick": 127, "timestamp": "2025-11-16T10:13:36.239723"}
+{"type": "vol_update", "tick": 127, "pool": "COL_XRP", "mid_price_before": 0.057532720148157156, "mid_price_after": 0.05953206686162595}
+{"type": "tick", "tick": 128, "timestamp": "2025-11-16T10:13:36.239730"}
+{"type": "vol_update", "tick": 128, "pool": "COL_XRP", "mid_price_before": 0.05953206686162595, "mid_price_after": 0.05981261813849151}
+{"type": "tick", "tick": 129, "timestamp": "2025-11-16T10:13:36.239736"}
+{"type": "vol_update", "tick": 129, "pool": "COL_XRP", "mid_price_before": 0.05981261813849151, "mid_price_after": 0.06106780640736583}
+{"type": "tick", "tick": 130, "timestamp": "2025-11-16T10:13:36.239743"}
+{"type": "vol_update", "tick": 130, "pool": "COL_XRP", "mid_price_before": 0.06106780640736583, "mid_price_after": 0.05990452823173155}
+{"type": "tick", "tick": 131, "timestamp": "2025-11-16T10:13:36.239750"}
+{"type": "vol_update", "tick": 131, "pool": "COL_XRP", "mid_price_before": 0.05990452823173155, "mid_price_after": 0.05982472999956426}
+{"type": "tick", "tick": 132, "timestamp": "2025-11-16T10:13:36.239756"}
+{"type": "vol_update", "tick": 132, "pool": "COL_XRP", "mid_price_before": 0.05982472999956426, "mid_price_after": 0.060144623887092935}
+{"type": "tick", "tick": 133, "timestamp": "2025-11-16T10:13:36.239763"}
+{"type": "vol_update", "tick": 133, "pool": "COL_XRP", "mid_price_before": 0.060144623887092935, "mid_price_after": 0.06174963211974534}
+{"type": "tick", "tick": 134, "timestamp": "2025-11-16T10:13:36.239770"}
+{"type": "vol_update", "tick": 134, "pool": "COL_XRP", "mid_price_before": 0.06174963211974534, "mid_price_after": 0.06022356782385004}
+{"type": "tick", "tick": 135, "timestamp": "2025-11-16T10:13:36.239776"}
+{"type": "vol_update", "tick": 135, "pool": "COL_XRP", "mid_price_before": 0.06022356782385004, "mid_price_after": 0.061148559379881076}
+{"type": "tick", "tick": 136, "timestamp": "2025-11-16T10:13:36.239783"}
+{"type": "vol_update", "tick": 136, "pool": "COL_XRP", "mid_price_before": 0.061148559379881076, "mid_price_after": 0.06172154034999632}
+{"type": "tick", "tick": 137, "timestamp": "2025-11-16T10:13:36.239789"}
+{"type": "vol_update", "tick": 137, "pool": "COL_XRP", "mid_price_before": 0.06172154034999632, "mid_price_after": 0.06317219362115384}
+{"type": "tick", "tick": 138, "timestamp": "2025-11-16T10:13:36.239796"}
+{"type": "vol_update", "tick": 138, "pool": "COL_XRP", "mid_price_before": 0.06317219362115384, "mid_price_after": 0.06387882405617903}
+{"type": "tick", "tick": 139, "timestamp": "2025-11-16T10:13:36.239802"}
+{"type": "vol_update", "tick": 139, "pool": "COL_XRP", "mid_price_before": 0.06387882405617903, "mid_price_after": 0.0639606571592819}
+{"type": "tick", "tick": 140, "timestamp": "2025-11-16T10:13:36.239809"}
+{"type": "vol_update", "tick": 140, "pool": "COL_XRP", "mid_price_before": 0.0639606571592819, "mid_price_after": 0.06349216167114671}
+{"type": "tick", "tick": 141, "timestamp": "2025-11-16T10:13:36.239816"}
+{"type": "vol_update", "tick": 141, "pool": "COL_XRP", "mid_price_before": 0.06349216167114671, "mid_price_after": 0.062335163325383545}
+{"type": "tick", "tick": 142, "timestamp": "2025-11-16T10:13:36.239822"}
+{"type": "vol_update", "tick": 142, "pool": "COL_XRP", "mid_price_before": 0.062335163325383545, "mid_price_after": 0.06254905655656211}
+{"type": "tick", "tick": 143, "timestamp": "2025-11-16T10:13:36.239829"}
+{"type": "vol_update", "tick": 143, "pool": "COL_XRP", "mid_price_before": 0.06254905655656211, "mid_price_after": 0.06240047430415642}
+{"type": "tick", "tick": 144, "timestamp": "2025-11-16T10:13:36.239835"}
+{"type": "vol_update", "tick": 144, "pool": "COL_XRP", "mid_price_before": 0.06240047430415642, "mid_price_after": 0.06432265914306898}
+{"type": "tick", "tick": 145, "timestamp": "2025-11-16T10:13:36.239842"}
+{"type": "vol_update", "tick": 145, "pool": "COL_XRP", "mid_price_before": 0.06432265914306898, "mid_price_after": 0.06376527934656419}
+{"type": "tick", "tick": 146, "timestamp": "2025-11-16T10:13:36.239848"}
+{"type": "vol_update", "tick": 146, "pool": "COL_XRP", "mid_price_before": 0.06376527934656419, "mid_price_after": 0.06410361011888545}
+{"type": "tick", "tick": 147, "timestamp": "2025-11-16T10:13:36.239855"}
+{"type": "vol_update", "tick": 147, "pool": "COL_XRP", "mid_price_before": 0.06410361011888545, "mid_price_after": 0.06262698209470183}
+{"type": "tick", "tick": 148, "timestamp": "2025-11-16T10:13:36.239862"}
+{"type": "vol_update", "tick": 148, "pool": "COL_XRP", "mid_price_before": 0.06262698209470183, "mid_price_after": 0.0622867961685698}
+{"type": "tick", "tick": 149, "timestamp": "2025-11-16T10:13:36.239868"}
+{"type": "vol_update", "tick": 149, "pool": "COL_XRP", "mid_price_before": 0.0622867961685698, "mid_price_after": 0.06256193053831041}
+{"type": "tick", "tick": 150, "timestamp": "2025-11-16T10:13:36.239875"}
+{"type": "vol_update", "tick": 150, "pool": "COL_XRP", "mid_price_before": 0.06256193053831041, "mid_price_after": 0.06336643943962343}
+{"type": "tick", "tick": 151, "timestamp": "2025-11-16T10:13:36.239881"}
+{"type": "vol_update", "tick": 151, "pool": "COL_XRP", "mid_price_before": 0.06336643943962343, "mid_price_after": 0.06477453837695538}
+{"type": "tick", "tick": 152, "timestamp": "2025-11-16T10:13:36.239888"}
+{"type": "vol_update", "tick": 152, "pool": "COL_XRP", "mid_price_before": 0.06477453837695538, "mid_price_after": 0.06476403048001517}
+{"type": "tick", "tick": 153, "timestamp": "2025-11-16T10:13:36.239894"}
+{"type": "vol_update", "tick": 153, "pool": "COL_XRP", "mid_price_before": 0.06476403048001517, "mid_price_after": 0.06371105327423807}
+{"type": "tick", "tick": 154, "timestamp": "2025-11-16T10:13:36.239901"}
+{"type": "vol_update", "tick": 154, "pool": "COL_XRP", "mid_price_before": 0.06371105327423807, "mid_price_after": 0.06418046076877974}
+{"type": "tick", "tick": 155, "timestamp": "2025-11-16T10:13:36.239908"}
+{"type": "vol_update", "tick": 155, "pool": "COL_XRP", "mid_price_before": 0.06418046076877974, "mid_price_after": 0.0647102580519798}
+{"type": "tick", "tick": 156, "timestamp": "2025-11-16T10:13:36.239914"}
+{"type": "vol_update", "tick": 156, "pool": "COL_XRP", "mid_price_before": 0.0647102580519798, "mid_price_after": 0.0652198432545829}
+{"type": "tick", "tick": 157, "timestamp": "2025-11-16T10:13:36.239921"}
+{"type": "vol_update", "tick": 157, "pool": "COL_XRP", "mid_price_before": 0.0652198432545829, "mid_price_after": 0.06456736336661086}
+{"type": "tick", "tick": 158, "timestamp": "2025-11-16T10:13:36.239930"}
+{"type": "vol_update", "tick": 158, "pool": "COL_XRP", "mid_price_before": 0.06456736336661086, "mid_price_after": 0.06569734168178976}
+{"type": "tick", "tick": 159, "timestamp": "2025-11-16T10:13:36.239936"}
+{"type": "vol_update", "tick": 159, "pool": "COL_XRP", "mid_price_before": 0.06569734168178976, "mid_price_after": 0.06581680826799755}
+{"type": "tick", "tick": 160, "timestamp": "2025-11-16T10:13:36.239943"}
+{"type": "vol_update", "tick": 160, "pool": "COL_XRP", "mid_price_before": 0.06581680826799755, "mid_price_after": 0.06654062001636211}
+{"type": "tick", "tick": 161, "timestamp": "2025-11-16T10:13:36.239949"}
+{"type": "vol_update", "tick": 161, "pool": "COL_XRP", "mid_price_before": 0.06654062001636211, "mid_price_after": 0.0678455546765024}
+{"type": "tick", "tick": 162, "timestamp": "2025-11-16T10:13:36.239956"}
+{"type": "vol_update", "tick": 162, "pool": "COL_XRP", "mid_price_before": 0.0678455546765024, "mid_price_after": 0.0684995237319081}
+{"type": "tick", "tick": 163, "timestamp": "2025-11-16T10:13:36.239962"}
+{"type": "vol_update", "tick": 163, "pool": "COL_XRP", "mid_price_before": 0.0684995237319081, "mid_price_after": 0.0688281666656487}
+{"type": "tick", "tick": 164, "timestamp": "2025-11-16T10:13:36.239969"}
+{"type": "vol_update", "tick": 164, "pool": "COL_XRP", "mid_price_before": 0.0688281666656487, "mid_price_after": 0.07108517498755922}
+{"type": "tick", "tick": 165, "timestamp": "2025-11-16T10:13:36.239975"}
+{"type": "vol_update", "tick": 165, "pool": "COL_XRP", "mid_price_before": 0.07108517498755922, "mid_price_after": 0.07138057267474059}
+{"type": "tick", "tick": 166, "timestamp": "2025-11-16T10:13:36.239982"}
+{"type": "vol_update", "tick": 166, "pool": "COL_XRP", "mid_price_before": 0.07138057267474059, "mid_price_after": 0.07109937151468028}
+{"type": "tick", "tick": 167, "timestamp": "2025-11-16T10:13:36.239988"}
+{"type": "vol_update", "tick": 167, "pool": "COL_XRP", "mid_price_before": 0.07109937151468028, "mid_price_after": 0.07125433299047533}
+{"type": "tick", "tick": 168, "timestamp": "2025-11-16T10:13:36.239995"}
+{"type": "vol_update", "tick": 168, "pool": "COL_XRP", "mid_price_before": 0.07125433299047533, "mid_price_after": 0.07287476554370052}
+{"type": "tick", "tick": 169, "timestamp": "2025-11-16T10:13:36.240001"}
+{"type": "vol_update", "tick": 169, "pool": "COL_XRP", "mid_price_before": 0.07287476554370052, "mid_price_after": 0.07304097009620715}
+{"type": "tick", "tick": 170, "timestamp": "2025-11-16T10:13:36.240008"}
+{"type": "vol_update", "tick": 170, "pool": "COL_XRP", "mid_price_before": 0.07304097009620715, "mid_price_after": 0.07364652829792018}
+{"type": "tick", "tick": 171, "timestamp": "2025-11-16T10:13:36.240015"}
+{"type": "vol_update", "tick": 171, "pool": "COL_XRP", "mid_price_before": 0.07364652829792018, "mid_price_after": 0.07500427360242616}
+{"type": "tick", "tick": 172, "timestamp": "2025-11-16T10:13:36.240021"}
+{"type": "vol_update", "tick": 172, "pool": "COL_XRP", "mid_price_before": 0.07500427360242616, "mid_price_after": 0.07446477692641518}
+{"type": "tick", "tick": 173, "timestamp": "2025-11-16T10:13:36.240028"}
+{"type": "vol_update", "tick": 173, "pool": "COL_XRP", "mid_price_before": 0.07446477692641518, "mid_price_after": 0.07257347982414791}
+{"type": "tick", "tick": 174, "timestamp": "2025-11-16T10:13:36.240034"}
+{"type": "vol_update", "tick": 174, "pool": "COL_XRP", "mid_price_before": 0.07257347982414791, "mid_price_after": 0.07293571926550393}
+{"type": "tick", "tick": 175, "timestamp": "2025-11-16T10:13:36.240040"}
+{"type": "vol_update", "tick": 175, "pool": "COL_XRP", "mid_price_before": 0.07293571926550393, "mid_price_after": 0.07322352521232045}
+{"type": "tick", "tick": 176, "timestamp": "2025-11-16T10:13:36.240047"}
+{"type": "vol_update", "tick": 176, "pool": "COL_XRP", "mid_price_before": 0.07322352521232045, "mid_price_after": 0.07259232724533869}
+{"type": "tick", "tick": 177, "timestamp": "2025-11-16T10:13:36.240054"}
+{"type": "vol_update", "tick": 177, "pool": "COL_XRP", "mid_price_before": 0.07259232724533869, "mid_price_after": 0.07357713622343519}
+{"type": "tick", "tick": 178, "timestamp": "2025-11-16T10:13:36.240060"}
+{"type": "vol_update", "tick": 178, "pool": "COL_XRP", "mid_price_before": 0.07357713622343519, "mid_price_after": 0.07428447080646654}
+{"type": "tick", "tick": 179, "timestamp": "2025-11-16T10:13:36.240066"}
+{"type": "vol_update", "tick": 179, "pool": "COL_XRP", "mid_price_before": 0.07428447080646654, "mid_price_after": 0.07321292575944542}
+{"type": "tick", "tick": 180, "timestamp": "2025-11-16T10:13:36.240073"}
+{"type": "vol_update", "tick": 180, "pool": "COL_XRP", "mid_price_before": 0.07321292575944542, "mid_price_after": 0.07381863654936463}
+{"type": "tick", "tick": 181, "timestamp": "2025-11-16T10:13:36.240080"}
+{"type": "vol_update", "tick": 181, "pool": "COL_XRP", "mid_price_before": 0.07381863654936463, "mid_price_after": 0.07363840285733796}
+{"type": "tick", "tick": 182, "timestamp": "2025-11-16T10:13:36.240086"}
+{"type": "vol_update", "tick": 182, "pool": "COL_XRP", "mid_price_before": 0.07363840285733796, "mid_price_after": 0.07203710787433958}
+{"type": "tick", "tick": 183, "timestamp": "2025-11-16T10:13:36.240093"}
+{"type": "vol_update", "tick": 183, "pool": "COL_XRP", "mid_price_before": 0.07203710787433958, "mid_price_after": 0.07256256480029295}
+{"type": "tick", "tick": 184, "timestamp": "2025-11-16T10:13:36.240099"}
+{"type": "vol_update", "tick": 184, "pool": "COL_XRP", "mid_price_before": 0.07256256480029295, "mid_price_after": 0.07254963274351794}
+{"type": "tick", "tick": 185, "timestamp": "2025-11-16T10:13:36.240106"}
+{"type": "vol_update", "tick": 185, "pool": "COL_XRP", "mid_price_before": 0.07254963274351794, "mid_price_after": 0.07177485755049597}
+{"type": "tick", "tick": 186, "timestamp": "2025-11-16T10:13:36.240113"}
+{"type": "vol_update", "tick": 186, "pool": "COL_XRP", "mid_price_before": 0.07177485755049597, "mid_price_after": 0.07237376015436382}
+{"type": "tick", "tick": 187, "timestamp": "2025-11-16T10:13:36.240120"}
+{"type": "vol_update", "tick": 187, "pool": "COL_XRP", "mid_price_before": 0.07237376015436382, "mid_price_after": 0.07293982421566016}
+{"type": "tick", "tick": 188, "timestamp": "2025-11-16T10:13:36.240127"}
+{"type": "vol_update", "tick": 188, "pool": "COL_XRP", "mid_price_before": 0.07293982421566016, "mid_price_after": 0.07234441221764441}
+{"type": "tick", "tick": 189, "timestamp": "2025-11-16T10:13:36.240134"}
+{"type": "vol_update", "tick": 189, "pool": "COL_XRP", "mid_price_before": 0.07234441221764441, "mid_price_after": 0.0728150330823174}
+{"type": "tick", "tick": 190, "timestamp": "2025-11-16T10:13:36.240140"}
+{"type": "vol_update", "tick": 190, "pool": "COL_XRP", "mid_price_before": 0.0728150330823174, "mid_price_after": 0.07396012040250187}
+{"type": "tick", "tick": 191, "timestamp": "2025-11-16T10:13:36.240147"}
+{"type": "vol_update", "tick": 191, "pool": "COL_XRP", "mid_price_before": 0.07396012040250187, "mid_price_after": 0.07320646680997071}
+{"type": "tick", "tick": 192, "timestamp": "2025-11-16T10:13:36.240154"}
+{"type": "vol_update", "tick": 192, "pool": "COL_XRP", "mid_price_before": 0.07320646680997071, "mid_price_after": 0.07366132424061404}
+{"type": "tick", "tick": 193, "timestamp": "2025-11-16T10:13:36.240161"}
+{"type": "vol_update", "tick": 193, "pool": "COL_XRP", "mid_price_before": 0.07366132424061404, "mid_price_after": 0.0737011997861803}
+{"type": "tick", "tick": 194, "timestamp": "2025-11-16T10:13:36.240168"}
+{"type": "vol_update", "tick": 194, "pool": "COL_XRP", "mid_price_before": 0.0737011997861803, "mid_price_after": 0.07624316556541577}
+{"type": "tick", "tick": 195, "timestamp": "2025-11-16T10:13:36.240175"}
+{"type": "vol_update", "tick": 195, "pool": "COL_XRP", "mid_price_before": 0.07624316556541577, "mid_price_after": 0.07415146904218838}
+{"type": "tick", "tick": 196, "timestamp": "2025-11-16T10:13:36.240182"}
+{"type": "vol_update", "tick": 196, "pool": "COL_XRP", "mid_price_before": 0.07415146904218838, "mid_price_after": 0.07496188965043772}
+{"type": "tick", "tick": 197, "timestamp": "2025-11-16T10:13:36.240190"}
+{"type": "vol_update", "tick": 197, "pool": "COL_XRP", "mid_price_before": 0.07496188965043772, "mid_price_after": 0.07465502001458041}
+{"type": "tick", "tick": 198, "timestamp": "2025-11-16T10:13:36.240197"}
+{"type": "vol_update", "tick": 198, "pool": "COL_XRP", "mid_price_before": 0.07465502001458041, "mid_price_after": 0.07458014377438815}
+{"type": "tick", "tick": 199, "timestamp": "2025-11-16T10:13:36.240203"}
+{"type": "vol_update", "tick": 199, "pool": "COL_XRP", "mid_price_before": 0.07458014377438815, "mid_price_after": 0.07674474553515219}
+{"type": "tick", "tick": 200, "timestamp": "2025-11-16T10:13:36.240210"}
+{"type": "vol_update", "tick": 200, "pool": "COL_XRP", "mid_price_before": 0.07674474553515219, "mid_price_after": 0.07677324874324061}
+{"type": "tick", "tick": 201, "timestamp": "2025-11-16T10:13:36.240217"}
+{"type": "vol_update", "tick": 201, "pool": "COL_XRP", "mid_price_before": 0.07677324874324061, "mid_price_after": 0.07939230329345563}
+{"type": "tick", "tick": 202, "timestamp": "2025-11-16T10:13:36.240224"}
+{"type": "vol_update", "tick": 202, "pool": "COL_XRP", "mid_price_before": 0.07939230329345563, "mid_price_after": 0.07890545226454192}
+{"type": "tick", "tick": 203, "timestamp": "2025-11-16T10:13:36.240231"}
+{"type": "vol_update", "tick": 203, "pool": "COL_XRP", "mid_price_before": 0.07890545226454192, "mid_price_after": 0.07935976465787528}
+{"type": "tick", "tick": 204, "timestamp": "2025-11-16T10:13:36.240237"}
+{"type": "vol_update", "tick": 204, "pool": "COL_XRP", "mid_price_before": 0.07935976465787528, "mid_price_after": 0.07881514140696684}
+{"type": "tick", "tick": 205, "timestamp": "2025-11-16T10:13:36.240244"}
+{"type": "vol_update", "tick": 205, "pool": "COL_XRP", "mid_price_before": 0.07881514140696684, "mid_price_after": 0.07803799887693169}
+{"type": "tick", "tick": 206, "timestamp": "2025-11-16T10:13:36.240251"}
+{"type": "vol_update", "tick": 206, "pool": "COL_XRP", "mid_price_before": 0.07803799887693169, "mid_price_after": 0.07815015874864793}
+{"type": "tick", "tick": 207, "timestamp": "2025-11-16T10:13:36.240257"}
+{"type": "vol_update", "tick": 207, "pool": "COL_XRP", "mid_price_before": 0.07815015874864793, "mid_price_after": 0.07785798868456406}
+{"type": "tick", "tick": 208, "timestamp": "2025-11-16T10:13:36.240264"}
+{"type": "vol_update", "tick": 208, "pool": "COL_XRP", "mid_price_before": 0.07785798868456406, "mid_price_after": 0.07813340149072737}
+{"type": "tick", "tick": 209, "timestamp": "2025-11-16T10:13:36.240271"}
+{"type": "vol_update", "tick": 209, "pool": "COL_XRP", "mid_price_before": 0.07813340149072737, "mid_price_after": 0.0757053733784018}
+{"type": "tick", "tick": 210, "timestamp": "2025-11-16T10:13:36.240278"}
+{"type": "vol_update", "tick": 210, "pool": "COL_XRP", "mid_price_before": 0.0757053733784018, "mid_price_after": 0.07801718952575663}
+{"type": "tick", "tick": 211, "timestamp": "2025-11-16T10:13:36.240284"}
+{"type": "vol_update", "tick": 211, "pool": "COL_XRP", "mid_price_before": 0.07801718952575663, "mid_price_after": 0.07786076867828044}
+{"type": "tick", "tick": 212, "timestamp": "2025-11-16T10:13:36.240291"}
+{"type": "vol_update", "tick": 212, "pool": "COL_XRP", "mid_price_before": 0.07786076867828044, "mid_price_after": 0.07993525849935437}
+{"type": "tick", "tick": 213, "timestamp": "2025-11-16T10:13:36.240298"}
+{"type": "vol_update", "tick": 213, "pool": "COL_XRP", "mid_price_before": 0.07993525849935437, "mid_price_after": 0.07876766960653171}
+{"type": "tick", "tick": 214, "timestamp": "2025-11-16T10:13:36.240305"}
+{"type": "vol_update", "tick": 214, "pool": "COL_XRP", "mid_price_before": 0.07876766960653171, "mid_price_after": 0.0791526887774025}
+{"type": "tick", "tick": 215, "timestamp": "2025-11-16T10:13:36.240312"}
+{"type": "vol_update", "tick": 215, "pool": "COL_XRP", "mid_price_before": 0.0791526887774025, "mid_price_after": 0.08294997027914168}
+{"type": "tick", "tick": 216, "timestamp": "2025-11-16T10:13:36.240319"}
+{"type": "vol_update", "tick": 216, "pool": "COL_XRP", "mid_price_before": 0.08294997027914168, "mid_price_after": 0.08190928511593772}
+{"type": "tick", "tick": 217, "timestamp": "2025-11-16T10:13:36.240325"}
+{"type": "vol_update", "tick": 217, "pool": "COL_XRP", "mid_price_before": 0.08190928511593772, "mid_price_after": 0.08011305572675585}
+{"type": "tick", "tick": 218, "timestamp": "2025-11-16T10:13:36.240332"}
+{"type": "vol_update", "tick": 218, "pool": "COL_XRP", "mid_price_before": 0.08011305572675585, "mid_price_after": 0.07949637402172482}
+{"type": "tick", "tick": 219, "timestamp": "2025-11-16T10:13:36.240338"}
+{"type": "vol_update", "tick": 219, "pool": "COL_XRP", "mid_price_before": 0.07949637402172482, "mid_price_after": 0.0800995389598263}
+{"type": "tick", "tick": 220, "timestamp": "2025-11-16T10:13:36.240345"}
+{"type": "vol_update", "tick": 220, "pool": "COL_XRP", "mid_price_before": 0.0800995389598263, "mid_price_after": 0.08097263199257568}
+{"type": "tick", "tick": 221, "timestamp": "2025-11-16T10:13:36.240351"}
+{"type": "vol_update", "tick": 221, "pool": "COL_XRP", "mid_price_before": 0.08097263199257568, "mid_price_after": 0.08258038411304153}
+{"type": "tick", "tick": 222, "timestamp": "2025-11-16T10:13:36.240358"}
+{"type": "vol_update", "tick": 222, "pool": "COL_XRP", "mid_price_before": 0.08258038411304153, "mid_price_after": 0.08230331156638103}
+{"type": "tick", "tick": 223, "timestamp": "2025-11-16T10:13:36.240364"}
+{"type": "vol_update", "tick": 223, "pool": "COL_XRP", "mid_price_before": 0.08230331156638103, "mid_price_after": 0.08036640507016486}
+{"type": "tick", "tick": 224, "timestamp": "2025-11-16T10:13:36.240371"}
+{"type": "vol_update", "tick": 224, "pool": "COL_XRP", "mid_price_before": 0.08036640507016486, "mid_price_after": 0.07988216155043935}
+{"type": "tick", "tick": 225, "timestamp": "2025-11-16T10:13:36.240377"}
+{"type": "vol_update", "tick": 225, "pool": "COL_XRP", "mid_price_before": 0.07988216155043935, "mid_price_after": 0.0814081776761847}
+{"type": "tick", "tick": 226, "timestamp": "2025-11-16T10:13:36.240384"}
+{"type": "vol_update", "tick": 226, "pool": "COL_XRP", "mid_price_before": 0.0814081776761847, "mid_price_after": 0.08201751298512078}
+{"type": "tick", "tick": 227, "timestamp": "2025-11-16T10:13:36.240390"}
+{"type": "vol_update", "tick": 227, "pool": "COL_XRP", "mid_price_before": 0.08201751298512078, "mid_price_after": 0.07965097295800462}
+{"type": "tick", "tick": 228, "timestamp": "2025-11-16T10:13:36.240396"}
+{"type": "vol_update", "tick": 228, "pool": "COL_XRP", "mid_price_before": 0.07965097295800462, "mid_price_after": 0.07964892013933947}
+{"type": "tick", "tick": 229, "timestamp": "2025-11-16T10:13:36.240403"}
+{"type": "vol_update", "tick": 229, "pool": "COL_XRP", "mid_price_before": 0.07964892013933947, "mid_price_after": 0.08135918327911547}
+{"type": "tick", "tick": 230, "timestamp": "2025-11-16T10:13:36.240409"}
+{"type": "vol_update", "tick": 230, "pool": "COL_XRP", "mid_price_before": 0.08135918327911547, "mid_price_after": 0.08399507616514522}
+{"type": "tick", "tick": 231, "timestamp": "2025-11-16T10:13:36.240416"}
+{"type": "vol_update", "tick": 231, "pool": "COL_XRP", "mid_price_before": 0.08399507616514522, "mid_price_after": 0.08474475738331286}
+{"type": "tick", "tick": 232, "timestamp": "2025-11-16T10:13:36.240422"}
+{"type": "vol_update", "tick": 232, "pool": "COL_XRP", "mid_price_before": 0.08474475738331286, "mid_price_after": 0.08518030600384889}
+{"type": "tick", "tick": 233, "timestamp": "2025-11-16T10:13:36.240429"}
+{"type": "vol_update", "tick": 233, "pool": "COL_XRP", "mid_price_before": 0.08518030600384889, "mid_price_after": 0.08363827968224984}
+{"type": "tick", "tick": 234, "timestamp": "2025-11-16T10:13:36.240435"}
+{"type": "vol_update", "tick": 234, "pool": "COL_XRP", "mid_price_before": 0.08363827968224984, "mid_price_after": 0.08262218807209658}
+{"type": "tick", "tick": 235, "timestamp": "2025-11-16T10:13:36.240442"}
+{"type": "vol_update", "tick": 235, "pool": "COL_XRP", "mid_price_before": 0.08262218807209658, "mid_price_after": 0.0827216435281692}
+{"type": "tick", "tick": 236, "timestamp": "2025-11-16T10:13:36.240450"}
+{"type": "vol_update", "tick": 236, "pool": "COL_XRP", "mid_price_before": 0.0827216435281692, "mid_price_after": 0.08338738451202964}
+{"type": "tick", "tick": 237, "timestamp": "2025-11-16T10:13:36.240456"}
+{"type": "vol_update", "tick": 237, "pool": "COL_XRP", "mid_price_before": 0.08338738451202964, "mid_price_after": 0.08415477883777622}
+{"type": "tick", "tick": 238, "timestamp": "2025-11-16T10:13:36.240463"}
+{"type": "vol_update", "tick": 238, "pool": "COL_XRP", "mid_price_before": 0.08415477883777622, "mid_price_after": 0.08359320319926042}
+{"type": "tick", "tick": 239, "timestamp": "2025-11-16T10:13:36.240469"}
+{"type": "vol_update", "tick": 239, "pool": "COL_XRP", "mid_price_before": 0.08359320319926042, "mid_price_after": 0.08219058168924381}
+{"type": "tick", "tick": 240, "timestamp": "2025-11-16T10:13:36.240476"}
+{"type": "vol_update", "tick": 240, "pool": "COL_XRP", "mid_price_before": 0.08219058168924381, "mid_price_after": 0.08127278185087845}
+{"type": "tick", "tick": 241, "timestamp": "2025-11-16T10:13:36.240482"}
+{"type": "vol_update", "tick": 241, "pool": "COL_XRP", "mid_price_before": 0.08127278185087845, "mid_price_after": 0.079902960328528}
+{"type": "tick", "tick": 242, "timestamp": "2025-11-16T10:13:36.240489"}
+{"type": "vol_update", "tick": 242, "pool": "COL_XRP", "mid_price_before": 0.079902960328528, "mid_price_after": 0.08071406628477329}
+{"type": "tick", "tick": 243, "timestamp": "2025-11-16T10:13:36.240495"}
+{"type": "vol_update", "tick": 243, "pool": "COL_XRP", "mid_price_before": 0.08071406628477329, "mid_price_after": 0.0779549191609797}
+{"type": "tick", "tick": 244, "timestamp": "2025-11-16T10:13:36.240502"}
+{"type": "vol_update", "tick": 244, "pool": "COL_XRP", "mid_price_before": 0.0779549191609797, "mid_price_after": 0.07760418669739241}
+{"type": "tick", "tick": 245, "timestamp": "2025-11-16T10:13:36.240508"}
+{"type": "vol_update", "tick": 245, "pool": "COL_XRP", "mid_price_before": 0.07760418669739241, "mid_price_after": 0.07816667542187351}
+{"type": "tick", "tick": 246, "timestamp": "2025-11-16T10:13:36.240515"}
+{"type": "vol_update", "tick": 246, "pool": "COL_XRP", "mid_price_before": 0.07816667542187351, "mid_price_after": 0.07999031887913714}
+{"type": "tick", "tick": 247, "timestamp": "2025-11-16T10:13:36.240521"}
+{"type": "vol_update", "tick": 247, "pool": "COL_XRP", "mid_price_before": 0.07999031887913714, "mid_price_after": 0.0801158632947263}
+{"type": "tick", "tick": 248, "timestamp": "2025-11-16T10:13:36.240528"}
+{"type": "vol_update", "tick": 248, "pool": "COL_XRP", "mid_price_before": 0.0801158632947263, "mid_price_after": 0.08135920213463342}
+{"type": "tick", "tick": 249, "timestamp": "2025-11-16T10:13:36.240535"}
+{"type": "vol_update", "tick": 249, "pool": "COL_XRP", "mid_price_before": 0.08135920213463342, "mid_price_after": 0.08091294194177204}
+{"type": "tick", "tick": 250, "timestamp": "2025-11-16T10:13:36.240541"}
+{"type": "vol_update", "tick": 250, "pool": "COL_XRP", "mid_price_before": 0.08091294194177204, "mid_price_after": 0.0800499196645905}
+{"type": "tick", "tick": 251, "timestamp": "2025-11-16T10:13:36.240548"}
+{"type": "vol_update", "tick": 251, "pool": "COL_XRP", "mid_price_before": 0.0800499196645905, "mid_price_after": 0.07928016799618363}
+{"type": "tick", "tick": 252, "timestamp": "2025-11-16T10:13:36.240554"}
+{"type": "vol_update", "tick": 252, "pool": "COL_XRP", "mid_price_before": 0.07928016799618363, "mid_price_after": 0.08113611964081811}
+{"type": "tick", "tick": 253, "timestamp": "2025-11-16T10:13:36.240561"}
+{"type": "vol_update", "tick": 253, "pool": "COL_XRP", "mid_price_before": 0.08113611964081811, "mid_price_after": 0.0823866963858493}
+{"type": "tick", "tick": 254, "timestamp": "2025-11-16T10:13:36.240567"}
+{"type": "vol_update", "tick": 254, "pool": "COL_XRP", "mid_price_before": 0.0823866963858493, "mid_price_after": 0.08303021630884075}
+{"type": "tick", "tick": 255, "timestamp": "2025-11-16T10:13:36.240574"}
+{"type": "vol_update", "tick": 255, "pool": "COL_XRP", "mid_price_before": 0.08303021630884075, "mid_price_after": 0.08721942557861714}
+{"type": "tick", "tick": 256, "timestamp": "2025-11-16T10:13:36.240580"}
+{"type": "vol_update", "tick": 256, "pool": "COL_XRP", "mid_price_before": 0.08721942557861714, "mid_price_after": 0.08722072335239413}
+{"type": "tick", "tick": 257, "timestamp": "2025-11-16T10:13:36.240587"}
+{"type": "vol_update", "tick": 257, "pool": "COL_XRP", "mid_price_before": 0.08722072335239413, "mid_price_after": 0.08807594389348238}
+{"type": "tick", "tick": 258, "timestamp": "2025-11-16T10:13:36.240594"}
+{"type": "vol_update", "tick": 258, "pool": "COL_XRP", "mid_price_before": 0.08807594389348238, "mid_price_after": 0.08852635311030792}
+{"type": "tick", "tick": 259, "timestamp": "2025-11-16T10:13:36.240600"}
+{"type": "vol_update", "tick": 259, "pool": "COL_XRP", "mid_price_before": 0.08852635311030792, "mid_price_after": 0.08827597532255223}
+{"type": "tick", "tick": 260, "timestamp": "2025-11-16T10:13:36.240607"}
+{"type": "vol_update", "tick": 260, "pool": "COL_XRP", "mid_price_before": 0.08827597532255223, "mid_price_after": 0.09138704758129372}
+{"type": "tick", "tick": 261, "timestamp": "2025-11-16T10:13:36.240613"}
+{"type": "vol_update", "tick": 261, "pool": "COL_XRP", "mid_price_before": 0.09138704758129372, "mid_price_after": 0.09349800357740475}
+{"type": "tick", "tick": 262, "timestamp": "2025-11-16T10:13:36.240620"}
+{"type": "vol_update", "tick": 262, "pool": "COL_XRP", "mid_price_before": 0.09349800357740475, "mid_price_after": 0.09158202430092958}
+{"type": "tick", "tick": 263, "timestamp": "2025-11-16T10:13:36.240627"}
+{"type": "vol_update", "tick": 263, "pool": "COL_XRP", "mid_price_before": 0.09158202430092958, "mid_price_after": 0.09107853427901762}
+{"type": "tick", "tick": 264, "timestamp": "2025-11-16T10:13:36.240633"}
+{"type": "vol_update", "tick": 264, "pool": "COL_XRP", "mid_price_before": 0.09107853427901762, "mid_price_after": 0.0917092575075481}
+{"type": "tick", "tick": 265, "timestamp": "2025-11-16T10:13:36.240640"}
+{"type": "vol_update", "tick": 265, "pool": "COL_XRP", "mid_price_before": 0.0917092575075481, "mid_price_after": 0.09283248940346009}
+{"type": "tick", "tick": 266, "timestamp": "2025-11-16T10:13:36.240646"}
+{"type": "vol_update", "tick": 266, "pool": "COL_XRP", "mid_price_before": 0.09283248940346009, "mid_price_after": 0.09100121017336815}
+{"type": "tick", "tick": 267, "timestamp": "2025-11-16T10:13:36.240653"}
+{"type": "vol_update", "tick": 267, "pool": "COL_XRP", "mid_price_before": 0.09100121017336815, "mid_price_after": 0.08796782826786163}
+{"type": "tick", "tick": 268, "timestamp": "2025-11-16T10:13:36.240659"}
+{"type": "vol_update", "tick": 268, "pool": "COL_XRP", "mid_price_before": 0.08796782826786163, "mid_price_after": 0.08549632775014215}
+{"type": "tick", "tick": 269, "timestamp": "2025-11-16T10:13:36.240666"}
+{"type": "vol_update", "tick": 269, "pool": "COL_XRP", "mid_price_before": 0.08549632775014215, "mid_price_after": 0.08544787937936803}
+{"type": "tick", "tick": 270, "timestamp": "2025-11-16T10:13:36.240672"}
+{"type": "vol_update", "tick": 270, "pool": "COL_XRP", "mid_price_before": 0.08544787937936803, "mid_price_after": 0.08535832592714547}
+{"type": "tick", "tick": 271, "timestamp": "2025-11-16T10:13:36.240679"}
+{"type": "vol_update", "tick": 271, "pool": "COL_XRP", "mid_price_before": 0.08535832592714547, "mid_price_after": 0.08584301531045027}
+{"type": "tick", "tick": 272, "timestamp": "2025-11-16T10:13:36.240685"}
+{"type": "vol_update", "tick": 272, "pool": "COL_XRP", "mid_price_before": 0.08584301531045027, "mid_price_after": 0.0848948687619824}
+{"type": "tick", "tick": 273, "timestamp": "2025-11-16T10:13:36.240692"}
+{"type": "vol_update", "tick": 273, "pool": "COL_XRP", "mid_price_before": 0.0848948687619824, "mid_price_after": 0.0833783437439206}
+{"type": "tick", "tick": 274, "timestamp": "2025-11-16T10:13:36.240698"}
+{"type": "vol_update", "tick": 274, "pool": "COL_XRP", "mid_price_before": 0.0833783437439206, "mid_price_after": 0.0808898607224882}
+{"type": "tick", "tick": 275, "timestamp": "2025-11-16T10:13:36.240706"}
+{"type": "vol_update", "tick": 275, "pool": "COL_XRP", "mid_price_before": 0.0808898607224882, "mid_price_after": 0.08132972444685971}
+{"type": "tick", "tick": 276, "timestamp": "2025-11-16T10:13:36.240713"}
+{"type": "vol_update", "tick": 276, "pool": "COL_XRP", "mid_price_before": 0.08132972444685971, "mid_price_after": 0.08182183510619735}
+{"type": "tick", "tick": 277, "timestamp": "2025-11-16T10:13:36.240719"}
+{"type": "vol_update", "tick": 277, "pool": "COL_XRP", "mid_price_before": 0.08182183510619735, "mid_price_after": 0.08308147448911059}
+{"type": "tick", "tick": 278, "timestamp": "2025-11-16T10:13:36.240726"}
+{"type": "vol_update", "tick": 278, "pool": "COL_XRP", "mid_price_before": 0.08308147448911059, "mid_price_after": 0.08410852230300932}
+{"type": "tick", "tick": 279, "timestamp": "2025-11-16T10:13:36.240732"}
+{"type": "vol_update", "tick": 279, "pool": "COL_XRP", "mid_price_before": 0.08410852230300932, "mid_price_after": 0.08390996447876933}
+{"type": "tick", "tick": 280, "timestamp": "2025-11-16T10:13:36.240739"}
+{"type": "vol_update", "tick": 280, "pool": "COL_XRP", "mid_price_before": 0.08390996447876933, "mid_price_after": 0.08565016605286724}
+{"type": "tick", "tick": 281, "timestamp": "2025-11-16T10:13:36.240745"}
+{"type": "vol_update", "tick": 281, "pool": "COL_XRP", "mid_price_before": 0.08565016605286724, "mid_price_after": 0.0855177934066482}
+{"type": "tick", "tick": 282, "timestamp": "2025-11-16T10:13:36.240752"}
+{"type": "vol_update", "tick": 282, "pool": "COL_XRP", "mid_price_before": 0.0855177934066482, "mid_price_after": 0.08471285325994034}
+{"type": "tick", "tick": 283, "timestamp": "2025-11-16T10:13:36.240758"}
+{"type": "vol_update", "tick": 283, "pool": "COL_XRP", "mid_price_before": 0.08471285325994034, "mid_price_after": 0.08409371440740236}
+{"type": "tick", "tick": 284, "timestamp": "2025-11-16T10:13:36.240765"}
+{"type": "vol_update", "tick": 284, "pool": "COL_XRP", "mid_price_before": 0.08409371440740236, "mid_price_after": 0.08339807651312639}
+{"type": "tick", "tick": 285, "timestamp": "2025-11-16T10:13:36.240771"}
+{"type": "vol_update", "tick": 285, "pool": "COL_XRP", "mid_price_before": 0.08339807651312639, "mid_price_after": 0.0807305014017803}
+{"type": "tick", "tick": 286, "timestamp": "2025-11-16T10:13:36.240778"}
+{"type": "vol_update", "tick": 286, "pool": "COL_XRP", "mid_price_before": 0.0807305014017803, "mid_price_after": 0.08096017086207671}
+{"type": "tick", "tick": 287, "timestamp": "2025-11-16T10:13:36.240784"}
+{"type": "vol_update", "tick": 287, "pool": "COL_XRP", "mid_price_before": 0.08096017086207671, "mid_price_after": 0.0813041126505833}
+{"type": "tick", "tick": 288, "timestamp": "2025-11-16T10:13:36.240791"}
+{"type": "vol_update", "tick": 288, "pool": "COL_XRP", "mid_price_before": 0.0813041126505833, "mid_price_after": 0.08090295920244739}
+{"type": "tick", "tick": 289, "timestamp": "2025-11-16T10:13:36.240798"}
+{"type": "vol_update", "tick": 289, "pool": "COL_XRP", "mid_price_before": 0.08090295920244739, "mid_price_after": 0.08007713237207738}
+{"type": "tick", "tick": 290, "timestamp": "2025-11-16T10:13:36.240804"}
+{"type": "vol_update", "tick": 290, "pool": "COL_XRP", "mid_price_before": 0.08007713237207738, "mid_price_after": 0.08056376569915355}
+{"type": "tick", "tick": 291, "timestamp": "2025-11-16T10:13:36.240811"}
+{"type": "vol_update", "tick": 291, "pool": "COL_XRP", "mid_price_before": 0.08056376569915355, "mid_price_after": 0.08267881097826753}
+{"type": "tick", "tick": 292, "timestamp": "2025-11-16T10:13:36.240817"}
+{"type": "vol_update", "tick": 292, "pool": "COL_XRP", "mid_price_before": 0.08267881097826753, "mid_price_after": 0.08276759374160023}
+{"type": "tick", "tick": 293, "timestamp": "2025-11-16T10:13:36.240823"}
+{"type": "vol_update", "tick": 293, "pool": "COL_XRP", "mid_price_before": 0.08276759374160023, "mid_price_after": 0.08217874335590428}
+{"type": "tick", "tick": 294, "timestamp": "2025-11-16T10:13:36.240836"}
+{"type": "vol_update", "tick": 294, "pool": "COL_XRP", "mid_price_before": 0.08217874335590428, "mid_price_after": 0.08149076690973502}
+{"type": "tick", "tick": 295, "timestamp": "2025-11-16T10:13:36.240842"}
+{"type": "vol_update", "tick": 295, "pool": "COL_XRP", "mid_price_before": 0.08149076690973502, "mid_price_after": 0.08144624470856976}
+{"type": "tick", "tick": 296, "timestamp": "2025-11-16T10:13:36.240849"}
+{"type": "vol_update", "tick": 296, "pool": "COL_XRP", "mid_price_before": 0.08144624470856976, "mid_price_after": 0.07994181173795382}
+{"type": "tick", "tick": 297, "timestamp": "2025-11-16T10:13:36.240855"}
+{"type": "vol_update", "tick": 297, "pool": "COL_XRP", "mid_price_before": 0.07994181173795382, "mid_price_after": 0.07983157914851134}
+{"type": "tick", "tick": 298, "timestamp": "2025-11-16T10:13:36.240862"}
+{"type": "vol_update", "tick": 298, "pool": "COL_XRP", "mid_price_before": 0.07983157914851134, "mid_price_after": 0.07994475908975389}
+{"type": "tick", "tick": 299, "timestamp": "2025-11-16T10:13:36.240868"}
+{"type": "vol_update", "tick": 299, "pool": "COL_XRP", "mid_price_before": 0.07994475908975389, "mid_price_after": 0.08219681736867085}
+{"type": "tick", "tick": 300, "timestamp": "2025-11-16T10:13:36.240875"}
+{"type": "vol_update", "tick": 300, "pool": "COL_XRP", "mid_price_before": 0.08219681736867085, "mid_price_after": 0.08340117388756957}

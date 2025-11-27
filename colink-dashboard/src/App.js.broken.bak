@@ -1,0 +1,77 @@
+﻿import React, { useState, useEffect } from "react";
+const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+useEffect(() => {
+    document.body.classList.toggle("dark-mode", theme === "dark");
+    localStorage.setItem("theme", theme);
+}, [theme]);
+
+const toggleDarkMode = () => setTheme(prev => prev === "dark" ? "light" : "dark");
+import "./index.css";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+// DarkModeManager Hook
+function useDarkMode() {
+    const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+    useEffect(() => {
+        document.body.classList.toggle("dark-mode", theme === "dark");
+        localStorage.setItem("theme", theme);
+    }, [theme]);
+    const toggleDarkMode = () => setTheme(prev => prev === "dark" ? "light" : "dark");
+    return [theme, toggleDarkMode];
+}
+
+// ChartManager Component
+function Charts({ theme }) {
+    const poolLabels = ["COPX/COL", "COL/XRP"];
+    const poolData = {
+        labels: poolLabels,
+        datasets: [
+            { label: "Reserve 1", data: [0.8, 0.6], backgroundColor: "rgba(75,192,192,0.5)" },
+            { label: "Reserve 2", data: [0.2, 0.4], backgroundColor: "rgba(255,99,132,0.5)" }
+        ]
+    };
+    const poolOptions = { responsive: true, plugins: { legend: { position: "top" } } };
+    return <div style={{marginTop:"30px"}}><Bar data={poolData} options={poolOptions} /></div>;
+}
+
+// Main App Component
+function App() {
+    const [theme, toggleDarkMode] = useDarkMode();
+
+    return (
+        <div>
+            <button onClick={toggleDarkMode} style={{position: "absolute", top: 10, right: 10}}>
+                {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
+
+            <div id="dashboard">
+                <h2>Pools</h2>
+                <table>
+                    <thead><tr><th>Pair</th><th>Reserve 1</th><th>Reserve 2</th></tr></thead>
+                    <tbody>
+                        <tr><td>COPX/COL</td><td>0.8</td><td>0.2</td></tr>
+                        <tr><td>COL/XRP</td><td>0.6</td><td>0.4</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Recent swaps</h2>
+                <table>
+                    <thead><tr><th>Pair</th><th>Amount in</th><th>Amount out</th><th>Timestamp</th></tr></thead>
+                    <tbody>
+                        <tr><td>COPX/COL</td><td>1000</td><td>7800</td><td>2025-01-01T00:00:00Z</td></tr>
+                        <tr><td>COL/XRP</td><td>15000</td><td>270</td><td>2025-01-01T00:05:00Z</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <Charts theme={theme} />
+        </div>
+    );
+}
+
+export default App;

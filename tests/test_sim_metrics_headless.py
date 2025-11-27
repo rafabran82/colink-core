@@ -1,4 +1,4 @@
-import json
+﻿import json
 import subprocess
 import sys
 from pathlib import Path
@@ -66,3 +66,4 @@ def test_metrics_and_metrics_only(tmp_path: Path):
     assert r2.returncode == 0, r2.stderr
     assert out2.exists() and out2.stat().st_size > 0
     assert not png2.exists()
+

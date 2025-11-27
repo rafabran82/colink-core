@@ -1,4 +1,4 @@
-# scripts/smoke.ps1
+﻿# scripts/smoke.ps1
 $ErrorActionPreference = 'Stop'
 $base = "http://127.0.0.1:8010"
 Write-Host "Health:" -ForegroundColor Cyan
@@ -12,3 +12,4 @@ $tmp = Join-Path $env:TEMP "colink-smoke-$(Get-Random)"
 $r = Invoke-RestMethod -Uri ("$base/sim/sweep?outdir=" + [uri]::EscapeDataString($tmp)) -Method Post
 $r | Format-List
 Get-ChildItem $tmp
+

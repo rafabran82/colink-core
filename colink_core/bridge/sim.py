@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import dataclasses as dc
 import random
@@ -20,7 +20,7 @@ class Pool:
     def swap_out(self, amount_in: float, base_to_quote: bool) -> tuple[float, float]:
         """
         Return (amount_out, fee_paid). Updates reserves in-place.
-        base_to_quote=True → input BASE receive QUOTE.
+        base_to_quote=True â†’ input BASE receive QUOTE.
         """
         if amount_in <= 0:
             return 0.0, 0.0
@@ -98,3 +98,4 @@ class BridgeSim:
             "success": True,
             "p95_latency_ms": None,
         }
+

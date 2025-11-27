@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+﻿from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from config import settings
@@ -22,3 +22,4 @@ def airdrop(body: AirdropBody):
         return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
+

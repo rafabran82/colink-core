@@ -1,0 +1,6 @@
+﻿XRPL bootstrap (dry-run)
+Network: testnet
+Out dir: .artifacts\data\bootstrap
+Execute: false
+Trustlines: skipped (dry-run)
+

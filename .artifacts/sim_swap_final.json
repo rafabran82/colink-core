@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "created_at": "2025-11-13T19:26:48.110364+00:00",
+  "backend": "Agg",
+  "python": "3.12.10",
+  "os": "Windows-11-10.0.26200-SP0",
+  "git_sha": "7f2a0999d3d2fb2f54a3b98e9e16618b1f91166d",
+  "sample_count": 240,
+  "value_min": -3.9014107335939183,
+  "value_max": 1.4708796843655263,
+  "value_mean": -0.8119208621251454,
+  "value_stdev": 1.6080090293234077,
+  "duration_ms": 11950,
+  "labels": {
+    "pair": "DEMO/COL",
+    "env": "dev"
+  },
+  "artifacts": {
+    "png": ".artifacts\\sim_swap_final.png",
+    "ndjson": ".artifacts\\sim_swap_final.ndjson"
+  }
+}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 
 from routes.trade import PAPER_BOOK, _price_from_ask, _price_from_bid
 
@@ -18,3 +18,4 @@ def clear_paper_book():
     PAPER_BOOK["bids"].clear()
     PAPER_BOOK["asks"].clear()
     return {"ok": True, "message": "paper book cleared"}
+

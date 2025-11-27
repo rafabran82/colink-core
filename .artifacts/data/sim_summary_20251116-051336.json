@@ -1,0 +1,13 @@
+{
+  "timestamp": "20251116-051336",
+  "events_written": 600,
+  "ndjson_file": ".artifacts/data\\sim_events_20251116-051336.ndjson",
+  "tick_interval_ms": 1000,
+  "seed": 42,
+  "volatility": {
+    "enabled": true,
+    "sigma": 0.015,
+    "drift": 0.0005
+  },
+  "pools_initialized": true
+}

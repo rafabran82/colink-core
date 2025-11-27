@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$Title,
   [string]$Body = "",
   [string]$BranchName = "",
@@ -89,7 +89,7 @@ if ($LASTEXITCODE -ne 0) {
   exit 1
 }
 
-# Build gh pr create args (no --json; older gh versions don’t support it)
+# Build gh pr create args (no --json; older gh versions donâ€™t support it)
 $prArgs = @("pr","create","--base",$Base,"--head",$BranchName)
 if ($Title) { $prArgs += @("--title",$Title,"--body",$Body) } else { $prArgs += "--fill" }
 if ($Draft) { $prArgs += "--draft" }
@@ -109,3 +109,4 @@ if ($LASTEXITCODE -eq 0 -and $prUrl) {
 } else {
   Write-Host "PR created. (Opened in browser if -Open was used.)"
 }
+

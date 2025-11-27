@@ -1,4 +1,4 @@
-# Paper mode smoke: clear, seed, buy, sell, then show book/position
+﻿# Paper mode smoke: clear, seed, buy, sell, then show book/position
 Invoke-RestMethod -Method POST http://127.0.0.1:8011/_paper/clear | Out-Null
 Invoke-RestMethod -Method POST http://127.0.0.1:8011/_paper/position/reset | Out-Null
 
@@ -15,3 +15,4 @@ Invoke-RestMethod -Method POST http://127.0.0.1:8011/market-sell -ContentType "a
 Invoke-RestMethod http://127.0.0.1:8011/_paper/book | ConvertTo-Json -Depth 8
 "--- POSITION ---"
 Invoke-RestMethod http://127.0.0.1:8011/_paper/position | ConvertTo-Json -Depth 6
+

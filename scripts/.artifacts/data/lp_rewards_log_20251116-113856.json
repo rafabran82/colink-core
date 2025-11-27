@@ -1,0 +1,18 @@
+﻿[
+    {
+        "LP":  "LP-A",
+        "Address":  "rTESTADDRESSLP-A",
+        "APY":  12.5,
+        "Reward":  584.11,
+        "Mode":  "Test",
+        "Timestamp":  "2025-11-16 11:38:56"
+    },
+    {
+        "LP":  "LP-C",
+        "Address":  "rTESTADDRESSLP-C",
+        "APY":  8.9,
+        "Reward":  415.89,
+        "Mode":  "Test",
+        "Timestamp":  "2025-11-16 11:38:56"
+    }
+]

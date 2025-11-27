@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import sys
 
 import pytest
@@ -30,3 +30,4 @@ def test_sim_plot_headless(tmp_path, pair):
     assert res.returncode == 0, res.stderr
     assert png.exists() and png.stat().st_size > 0
     assert jsn.exists() and jsn.stat().st_size > 0
+

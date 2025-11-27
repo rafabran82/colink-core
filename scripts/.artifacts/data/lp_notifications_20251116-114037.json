@@ -1,0 +1,32 @@
+﻿[
+    {
+        "Timestamp":  "2025-11-16 11:40:37",
+        "LPName":  "LP-A",
+        "APY":  12.5,
+        "Drawdown":  5.2,
+        "Volatility":  2.1,
+        "TotalShocks":  3,
+        "RecommendedAction":  "Reward / acknowledge performance",
+        "XRPLAddress":  "rTESTADDRESSLP-A"
+    },
+    {
+        "Timestamp":  "2025-11-16 11:40:37",
+        "LPName":  "LP-C",
+        "APY":  8.9,
+        "Drawdown":  7.8,
+        "Volatility":  3.4,
+        "TotalShocks":  5,
+        "RecommendedAction":  "Reward / acknowledge performance",
+        "XRPLAddress":  "rTESTADDRESSLP-C"
+    },
+    {
+        "Timestamp":  "2025-11-16 11:40:37",
+        "LPName":  "LP-B",
+        "APY":  0,
+        "Drawdown":  0,
+        "Volatility":  0,
+        "TotalShocks":  0,
+        "RecommendedAction":  "Consider boosting liquidity or reward",
+        "XRPLAddress":  "rTESTADDRESSLP-B"
+    }
+]

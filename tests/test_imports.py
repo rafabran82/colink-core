@@ -1,4 +1,4 @@
-import importlib
+﻿import importlib
 import sys
 
 MODULES = [
@@ -18,3 +18,4 @@ def test_imports():
         for m, e in failed:
             print(f"[FAIL] {m}: {e}", file=sys.stderr)
         raise AssertionError(f"{len(failed)} import(s) failed")
+

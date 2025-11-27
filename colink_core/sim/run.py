@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -60,7 +60,7 @@ def run_demo(out_prefix: pathlib.Path, display: str | None) -> dict:
 
     series = _demo_series()
 
-    # 1) Plot → PNG
+    # 1) Plot â†’ PNG
     xs = [t for (t, _y) in series]
     ys = [y for (_t, y) in series]
 
@@ -149,3 +149,4 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+

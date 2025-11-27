@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 
 from config import settings
 from models import TrustlineReq
@@ -14,3 +14,4 @@ def trustline(body: TrustlineReq):
         c, settings.TRADER_SEED, settings.COL_ISSUER, settings.COL_CODE, body.limit
     )
     return res
+

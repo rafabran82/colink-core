@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -51,3 +51,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

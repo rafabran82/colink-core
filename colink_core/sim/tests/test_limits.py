@@ -1,4 +1,4 @@
-from colink_core.sim.limits import LimitConfig, TradeLimiter
+﻿from colink_core.sim.limits import LimitConfig, TradeLimiter
 
 
 def test_limiter_size_and_dev_caps_and_breaker():
@@ -26,3 +26,4 @@ def test_limiter_size_and_dev_caps_and_breaker():
     # first request after auto-reset tells caller to re-quote
     ok, reason = lim.check_and_record(10_000.0, 100.0)
     assert not ok and "auto_reset" in reason
+

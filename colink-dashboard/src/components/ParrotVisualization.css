@@ -1,0 +1,53 @@
+﻿.parrot-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+  min-height: 180px;
+}
+
+.parrot-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.parrot-body {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric .label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.metric .value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Parrot icon */
+.parrot-icon-area {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.parrot-icon {
+  width: 60px;
+  height: 60px;
+  opacity: 0.95;
+}
+
+/* Dark mode support */
+body.dark-mode .parrot-wrapper {
+  background: #0f0f0f !important;
+}
