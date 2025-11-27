@@ -1,0 +1,39 @@
+# ci-sanitized
+name: sim-unit-v2b2
+
+on:
+  push: { branches: [ main ] }
+  pull_request: { branches: [ main ] }
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Branch or tag to test"
+        required: false
+        default: "main"
+
+jobs:
+  unit:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout target ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.target_ref || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run pytest (noop if repo has none)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force .artifacts | Out-Null
+          if (Test-Path pyproject.toml) { python -m pip install -e ".[test]" } else { python -m pip install pytest }
+          $env:PYTEST_ADDOPTS = "-rA -q"
+          if (Test-Path tests) { python -m pytest 2>&1 | Tee-Object .artifacts\pytest.out } else { "no tests" | Out-File .artifacts\pytest.out -Encoding utf8 }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2b2-artifacts
+          path: .artifacts/*
+          if-no-files-found: warn
