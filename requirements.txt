@@ -15,5 +15,5 @@ black==25.11.0
 # Pin to stable wheels for CPython 3.11 on Windows self-hosted
 numpy==2.1.2
 Pillow==11.0.0
-matplotlib==3.9.2
+matplotlib==3.10.7
 
