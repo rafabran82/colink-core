@@ -13,7 +13,7 @@ black==25.12.0
 
 # --- Plotting deps for headless CI runs (tests use --display Agg) ---
 # Pin to stable wheels for CPython 3.11 on Windows self-hosted
-numpy==2.3.5
+numpy==2.4.0
 Pillow==12.0.0
 matplotlib==3.10.8
 
