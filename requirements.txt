@@ -1,4 +1,4 @@
-﻿uvicorn==0.40.0
+uvicorn==0.40.0
 fastapi==0.128.0
 pydantic==2.12.5
 pydantic-settings==2.12.0
@@ -8,7 +8,7 @@ xrpl-py==4.4.0
 websockets==15.0.1
 
 # Tooling
-ruff==0.14.10
+ruff==0.14.11
 black==25.12.0
 
 # --- Plotting deps for headless CI runs (tests use --display Agg) ---
