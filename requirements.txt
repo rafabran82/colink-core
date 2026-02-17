@@ -4,7 +4,7 @@ pydantic==2.12.5
 pydantic-settings==2.13.0
 httpx==0.28.1
 starlette==0.52.1
-xrpl-py==4.4.0
+xrpl-py==4.5.0
 websockets==16.0
 
 # Tooling
