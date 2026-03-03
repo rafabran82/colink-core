@@ -32,7 +32,7 @@ jobs:
           $env:PYTEST_ADDOPTS = "-rA -q"
           if (Test-Path tests) { python -m pytest 2>&1 | Tee-Object .artifacts\pytest.out } else { "no tests" | Out-File .artifacts\pytest.out -Encoding utf8 }
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: v2b2-artifacts
           path: .artifacts/*
