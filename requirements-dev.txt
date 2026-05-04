@@ -1,4 +1,4 @@
-pytest>=8.0
+pytest>=9.0.3
 tomli-w; python_version < "3.11"
 ruff>=0.15.12
 matplotlib>=3.7,<3.11
