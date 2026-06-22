@@ -2,7 +2,7 @@ pytest>=9.0.3
 tomli-w; python_version < "3.11"
 ruff>=0.15.18
 matplotlib>=3.7,<3.11
-fastapi>=0.137.1
+fastapi>=0.138.0
 uvicorn>=0.49.0
 httpx>=0.27
 pydantic>=2.13.4
