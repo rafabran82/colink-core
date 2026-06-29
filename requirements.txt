@@ -8,7 +8,7 @@ xrpl-py==5.0.0
 websockets==16.0
 
 # Tooling
-ruff==0.15.18
+ruff==0.15.20
 black==26.5.1
 
 # --- Plotting deps for headless CI runs (tests use --display Agg) ---
