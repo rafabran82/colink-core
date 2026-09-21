@@ -9,7 +9,7 @@ pydantic>=2.13.5
 pytest-asyncio>=1.4.0
 pydantic-settings>=2.15.0
 python-dotenv>=1.2.3
-xrpl-py>=5.1.0
+xrpl-py>=5.2.0
 # Added for sim tests
 numpy>=1.26,<3
 matplotlib>=3.8,<4
