@@ -8,7 +8,7 @@ httpx>=0.27
 pydantic>=2.13.5
 pytest-asyncio>=1.4.0
 pydantic-settings>=2.15.0
-python-dotenv>=1.2.3
+python-dotenv>=1.2.4
 xrpl-py>=5.2.0
 # Added for sim tests
 numpy>=1.26,<3
