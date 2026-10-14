@@ -5,7 +5,7 @@ pydantic-settings==2.15.0
 httpx==0.28.1
 starlette==1.7.0
 xrpl-py==5.2.0
-websockets==17.1
+websockets==17.2
 
 # Tooling
 ruff==0.16.10
