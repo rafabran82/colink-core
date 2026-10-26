@@ -3,7 +3,7 @@ fastapi==0.143.3
 pydantic==2.14.1
 pydantic-settings==2.16.0
 httpx==0.28.1
-starlette==1.8.0
+starlette==1.9.0
 xrpl-py==5.2.0
 websockets==17.2
 
