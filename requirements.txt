@@ -1,7 +1,7 @@
 uvicorn==0.54.0
 fastapi==0.162.7
 pydantic==2.14.3
-pydantic-settings==2.16.2
+pydantic-settings==2.16.3
 httpx==0.28.1
 starlette==1.10.0
 xrpl-py==5.2.0
